@@ -4,7 +4,7 @@
  *
  * 阶段:
  *  P0 面板体检:6 分类 / 35 个 palette 项(34 控件 + obj 面板)
- *  P1 素材:上传 png + lottie json → IndexedDB + runtime 注册 + 工程 assets
+ *  P1 素材:上传 png + lottie json + ttf → IndexedDB + runtime 注册 + 工程 assets，字体可选
  *  P2 34+1 控件逐个拖上画布:模型入树 / 零新增 console error / snapshot 变化
  *  P3 UI 专项:chart 加系列、tabview 加页签+拖 button 入 tab、table 单元格、
  *     buttonmatrix map、msgbox/list/win/menu/tileview 子项、line points、
@@ -160,7 +160,48 @@ try {
   page.on('console', (m) => {
     if (m.type() === 'error') pageErrors.push(`console.error: ${m.text()}`);
   });
-  page.on('dialog', (d) => d.accept());
+  page.on('dialog', (d) => d.type() === 'prompt' ? d.accept('e2e-project') : d.accept());
+  // 预览服务器没有登录会话；用确定性的同源 API 替身覆盖新建/保存与 CAS 上传。
+  let mockProjectSeq = 0;
+  let mockVersion = 0;
+  await page.route('**/api/auth/me', (route) => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify({ username: 'e2e', role: 'admin', permissions: [] }),
+  }));
+  await page.route('**/api/lvgl/**', async (route) => {
+    const request = route.request();
+    const path = new URL(request.url()).pathname;
+    if (path.includes('/api/lvgl/assets/')) {
+      await route.fulfill({ status: 204, body: '' });
+      return;
+    }
+    if (path === '/api/lvgl/projects' && request.method() === 'GET') {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ projects: [] }) });
+      return;
+    }
+    if (path === '/api/lvgl/projects' && request.method() === 'POST') {
+      const body = request.postDataJSON();
+      mockProjectSeq++;
+      mockVersion = 1;
+      await route.fulfill({
+        status: 201,
+        contentType: 'application/json',
+        body: JSON.stringify({ id: `e2e-${mockProjectSeq}`, name: body.name, version: mockVersion }),
+      });
+      return;
+    }
+    if (request.method() === 'PUT') {
+      mockVersion++;
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ version: mockVersion }),
+      });
+      return;
+    }
+    await route.fulfill({ status: 404, contentType: 'application/json', body: JSON.stringify({ detail: 'not mocked' }) });
+  });
 
   await page.goto(`http://localhost:${PORT}/`);
   await page.waitForSelector('.rt-badge.rt-wasm', { timeout: 30000 });
@@ -209,7 +250,11 @@ try {
       n.children.forEach((c) => walk(c, n.type));
     };
     scr.root.children.forEach((c) => walk(c, 'root'));
-    return { assets: st.project.assets.images.map((a) => ({ name: a.name, kind: a.kind ?? 'image' })), nodes: flat };
+    return {
+      assets: st.project.assets.images.map((a) => ({ name: a.name, kind: a.kind ?? 'image' })),
+      fonts: st.project.assets.fonts.map((a) => ({ name: a.name, loader: a.loader, sizePx: a.sizePx })),
+      nodes: flat,
+    };
   });
   const setProps = (nodeId, props, style) => page.evaluate(({ nodeId, props, style }) => {
     window.__lvd.projectStore.getState().mutateV2('e2e 补属性', (draft) => {
@@ -260,29 +305,59 @@ try {
   await shot('p0-palette.png', true);
 
   /* ================= P1 素材上传 ================= */
-  step('P1 素材面板上传 png/lottie');
+  step('P1 素材面板上传 png/lottie/ttf 与自定义字体预览');
   await newProject();
   await page.locator('.left-tab', { hasText: '素材' }).click();
   await page.setInputFiles('[data-testid="asset-upload"]', [
     { name: 'red.png', mimeType: 'image/png', buffer: solidPng(220, 30, 30) },
     { name: 'green.png', mimeType: 'image/png', buffer: solidPng(30, 200, 60) },
     { name: 'move.json', mimeType: 'application/json', buffer: Buffer.from(LOTTIE_JSON) },
+    {
+      name: 'Montserrat-Medium.ttf',
+      mimeType: 'font/ttf',
+      buffer: readFileSync(join(repoRoot, 'packages/asset-pipeline/spike/Montserrat-Medium.ttf')),
+    },
   ]);
   await page.waitForTimeout(800);
   let m = await model();
   assert(m.assets.length === 3, `P1 工程 assets = 3(实际 ${JSON.stringify(m.assets)})`);
   assert(m.assets.some((a) => a.name === 'red' && a.kind === 'image'), 'P1 red.png → image 素材 "red"');
   assert(m.assets.some((a) => a.name === 'move' && a.kind === 'lottie'), 'P1 move.json → lottie 素材 "move"');
+  assert(
+    m.fonts.some((a) => a.name === 'montserrat_medium' && a.loader === 'tiny_ttf'),
+    'P1 TTF → tiny_ttf 字体素材 "montserrat_medium"',
+  );
   const rowCount = await page.locator('.asset-row').count();
-  assert(rowCount === 3, `P1 素材面板 3 行(实际 ${rowCount})`);
+  assert(rowCount === 4, `P1 素材面板 4 行(实际 ${rowCount})`);
   const thumbCount = await page.locator('.asset-row img').count();
   assert(thumbCount === 2, `P1 图片缩略图 2 张(实际 ${thumbCount})`);
+  await page.locator('.asset-font-config input[placeholder*="OFL-1.1"]').fill('OFL-1.1');
   await shot('p1-assets.png', true);
   // EXTRA_PROPS 里引用的素材名对齐实际(sanitize 后 red/green/move)
   EXTRA_PROPS.imagebutton.props.src_released_mid = 'red';
   EXTRA_PROPS.animimage.props.srcs = ['red', 'green'];
   EXTRA_PROPS.lottie.props.src = 'move';
   await page.locator('.left-tab', { hasText: '组件' }).click();
+  const fontErrBefore = pageErrors.length;
+  await dropAt('label', 40, 40);
+  await page.locator('.inspector .tabs button', { hasText: '样式' }).click();
+  const fontSelect = page
+    .locator('.insp-body .prop-row', { has: page.locator('label[title="style_text_font"]') })
+    .locator('select');
+  assert(await fontSelect.locator('option[value="montserrat_medium"]').count() === 1, 'P1 自定义字体出现在样式选择器');
+  await fontSelect.selectOption('montserrat_medium');
+  await page.waitForTimeout(500);
+  assert(pageErrors.length === fontErrBefore, 'P1 自定义字体应用到标签后零 console error');
+  await page.locator('.inspector .tabs button', { hasText: '属性' }).click();
+  await page.evaluate(() => {
+    const st = window.__lvd.projectStore.getState();
+    const ed = window.__lvd.editorStore.getState();
+    st.mutateV2('e2e 清理字体标签', (draft) => {
+      const screen = draft.screens.find((item) => item.id === ed.activeScreenId) ?? draft.screens[0];
+      screen.root.children = screen.root.children.filter((node) => node.type !== 'label');
+    });
+    ed.select([]);
+  });
 
   /* ================= P2 35 控件逐拖 ================= */
   step('P2 35 控件逐个拖上画布(模型 / console / snapshot)');
@@ -297,6 +372,25 @@ try {
     if (extra) {
       await setProps(node.id, extra.props, extra.style);
       await page.waitForTimeout(350);
+    }
+    if (w === 'qrcode') {
+      const pixels = await page.evaluate((id) => {
+        const pipeline = window.__lvd.getPipeline();
+        const rect = pipeline.rectOf(id);
+        const image = pipeline.runtime.snapshot();
+        let dark = 0;
+        let light = 0;
+        for (let y = Math.max(0, Math.floor(rect.y)); y < Math.min(image.height, Math.ceil(rect.y + rect.h)); y++) {
+          for (let x = Math.max(0, Math.floor(rect.x)); x < Math.min(image.width, Math.ceil(rect.x + rect.w)); x++) {
+            const offset = (y * image.width + x) * 4;
+            const sum = image.data[offset] + image.data[offset + 1] + image.data[offset + 2];
+            if (sum < 180) dark++;
+            if (sum > 700) light++;
+          }
+        }
+        return { dark, light };
+      }, node.id);
+      assert(pixels.dark > 50 && pixels.light > 50, `P2 [qrcode] 区域含黑白码点(${JSON.stringify(pixels)})`);
     }
     await page.waitForTimeout(150);
     const after = await canvas.screenshot();
@@ -500,7 +594,7 @@ try {
   await page.selectOption('[aria-label="目标颜色格式"]', 'RGB565');
   await page.selectOption('[aria-label="目标控制器"]', 'screen-only');
   const [download] = await Promise.all([
-    page.waitForEvent('download', { timeout: 20000 }),
+    page.waitForEvent('download', { timeout: 60000 }),
     page.locator('.toolbar button', { hasText: '导出 C 代码' }).click(),
   ]);
   const zipPath = join(artDir, 'ui-all.zip');
@@ -514,6 +608,8 @@ try {
   }
   const dec = new TextDecoder();
   assert(names.includes('build-manifest.json'), 'P4 zip 含 build-manifest.json');
+  assert(names.includes('fonts/montserrat_medium.c'), 'P4 zip 含自定义字体 C 源码');
+  assert(names.includes('licenses/montserrat_medium.txt'), 'P4 zip 含字体许可证归档');
   const buildManifest = JSON.parse(dec.decode(unzipped['build-manifest.json']));
   assert(buildManifest.lvglVersion === '9.5.0', 'P4 正式导出精确钉死 LVGL 9.5.0');
   assert(buildManifest.profiles?.controllerProfileRef?.startsWith('controller:screen-only-'), 'P4 manifest 锁定 ControllerProfile revision');

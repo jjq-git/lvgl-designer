@@ -2,7 +2,7 @@ import {
   normalizeProject,
   type Diagnostic, type IRNode, type IRProject,
 } from '@lvd/compiler-core';
-import type { LvProject, PropValue } from '@lvd/schema';
+import { OBJ_BASE, type LvProject, type PropSpec, type PropValue } from '@lvd/schema';
 import type { ColorFormat } from '@lvd/schema/v2';
 import type {
   CompilePreviewOptions, CompilePreviewResult, PreviewNode, PreviewProgram,
@@ -67,8 +67,20 @@ function compileNode(
   }
 
   const props: Record<string, PropValue> = {};
-  for (const [key, value] of Object.entries(node.props)) {
-    if (!createKeys.has(key)) props[key] = value;
+  const append = (key: string): void => {
+    const value = node.props[key];
+    if (!createKeys.has(key) && value !== undefined) props[key] = value;
+  };
+  const appendSpec = (spec: PropSpec): void => {
+    append(spec.key);
+    for (const companion of spec.companions ?? []) append(companion.key);
+  };
+  // Preview bridge 的部分 setter 有顺序依赖（例如 qrcode: size 必须先于 data）。
+  // 按 registry 顺序固化协议，不能依赖用户 JSON 中对象键的插入顺序。
+  if (node.useObjBase) OBJ_BASE.props.forEach(appendSpec);
+  node.ownPropSpecs.forEach(appendSpec);
+  for (const key of Object.keys(node.props)) {
+    if (!Object.prototype.hasOwnProperty.call(props, key)) append(key);
   }
 
   return {

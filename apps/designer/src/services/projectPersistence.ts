@@ -6,7 +6,7 @@ import {
   type ProjectSnapshotV2,
   type StoredProjectDocument,
 } from '@lvd/schema/v2';
-import { useBuildTargetStore } from '../stores/buildTargetStore';
+import { createFreshProjectSnapshot, useBuildTargetStore } from '../stores/buildTargetStore';
 
 export type { StoredProjectDocument } from '@lvd/schema/v2';
 
@@ -32,7 +32,8 @@ export function createStoredProjectDocument(project: LvProject): ProjectSnapshot
  * with another project that happens to use the same display name.
  */
 export function createNewStoredProjectDocument(project: LvProject): ProjectSnapshotV2 {
-  const document = createStoredProjectDocument(project);
+  // 云端创建可能失败；这里必须保持纯函数，不能提前改写当前工程的目标侧车状态。
+  const document = createFreshProjectSnapshot(project);
   const suffix = newUuid().replaceAll('-', '').slice(0, 12);
   const base = document.uiProject.meta.id.slice('ui:'.length) || 'untitled-ui';
   const uiProjectId = `ui:${base}-${suffix}`;

@@ -32,6 +32,7 @@ describe('projectPersistence', () => {
   });
 
   it('assigns independent identities to new projects with the same name', () => {
+    const currentBefore = useBuildTargetStore.getState();
     const first = createNewStoredProjectDocument(createEmptyProject('同名工程'));
     const second = createNewStoredProjectDocument(createEmptyProject('同名工程'));
 
@@ -44,6 +45,7 @@ describe('projectPersistence', () => {
     );
     expect(first.buildTarget.themeRef).toContain(`${first.buildTarget.uiProjectRef}#theme:`);
     expect(second.buildTarget.themeRef).toContain(`${second.buildTarget.uiProjectRef}#theme:`);
+    expect(useBuildTargetStore.getState()).toBe(currentBefore);
   });
 
   it('preserves an unresolved 16bpp byte-order gate across reopen', () => {

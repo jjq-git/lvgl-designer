@@ -501,6 +501,14 @@ function sameSelector(a: Selector | undefined, b: Selector | undefined): boolean
 
 function StyleTab({ node }: { node: WidgetNodeV2 }): JSX.Element {
   const spec = REGISTRY.get(node.type);
+  const fonts = useProjectStore((s) => s.project.assets.fonts);
+  const fontTokens = useMemo(
+    () => [
+      ...M1_TEXT_FONTS,
+      ...fonts.map((font) => font.name).filter((name) => !M1_TEXT_FONTS.includes(name)),
+    ],
+    [fonts],
+  );
   const [state, setState] = useState<StateToken>('default');
   const [part, setPart] = useState<string>('main');
   const parts = spec?.parts ?? ['main'];
@@ -554,6 +562,7 @@ function StyleTab({ node }: { node: WidgetNodeV2 }): JSX.Element {
           <StyleRow
             key={key}
             spec={sp}
+            fontTokens={fontTokens}
             value={group?.props[key]}
             onChange={(v) => setStyleProp(key, v)}
           />
@@ -565,17 +574,18 @@ function StyleTab({ node }: { node: WidgetNodeV2 }): JSX.Element {
 
 function StyleRow(props: {
   spec: StylePropSpec;
+  fontTokens: readonly string[];
   value: PropValueV2 | undefined;
   onChange: (v: PropValueV2 | undefined) => void;
 }): JSX.Element {
-  const { spec, value, onChange } = props;
+  const { spec, fontTokens, value, onChange } = props;
   const isSet = value !== undefined && value !== null;
   return (
     <div className={`prop-row ${isSet ? '' : 'unset'}`}>
       <label title={`style_${spec.key}`}>{spec.key}</label>
       <ValueEditor
         type={spec.type === 'fontRef' ? 'fontRef' : spec.type}
-        tokens={spec.type === 'fontRef' ? M1_TEXT_FONTS : spec.enum?.tokens}
+        tokens={spec.type === 'fontRef' ? fontTokens : spec.enum?.tokens}
         value={value}
         onChange={onChange}
       />

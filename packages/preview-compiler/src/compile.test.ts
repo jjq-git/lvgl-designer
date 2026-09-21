@@ -69,4 +69,17 @@ describe('@lvd/preview-compiler', () => {
     project.display.colorDepth = 32;
     expect(compilePreview(project).program!.display.colorFormat).toBe('XRGB8888');
   });
+
+  it('按 registry 顺序固化属性，避免 qrcode 的 data 被后续 size 清空', () => {
+    const project = createEmptyProject('preview-qrcode-order');
+    const qrcode = createNode('qrcode');
+    // 故意按错误顺序写入，模拟 Object.assign/旧工程 JSON。
+    qrcode.props.data = 'https://lvgl.io';
+    qrcode.props.size = 80;
+    project.screens[0]!.root.children.push(qrcode);
+
+    const result = compilePreview(project, { colorFormat: 'RGB565' });
+    const props = result.program!.screens[0]!.root.children[0]!.props;
+    expect(Object.keys(props)).toEqual(['width', 'height', 'size', 'data']);
+  });
 });

@@ -257,7 +257,7 @@ export function Toolbar(): JSX.Element {
       <button
         className="btn primary"
         title="导出精确钉死 LVGL 9.5.0 的 C 代码与构建 manifest"
-        onClick={() => exportUiZip(useProjectStore.getState().project)}
+        onClick={() => { void exportUiZip(useProjectStore.getState().project); }}
       >
         导出 C 代码
       </button>

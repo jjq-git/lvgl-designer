@@ -61,7 +61,7 @@ try {
   page.on('console', (m) => {
     if (m.type() === 'error') pageErrors.push(`console.error: ${m.text()}`);
   });
-  page.on('dialog', (d) => d.accept());
+  page.on('dialog', (d) => d.type() === 'prompt' ? d.accept('e2e-project') : d.accept());
 
   await page.goto(`http://localhost:${PORT}/`);
   await page.waitForSelector('.rt-badge.rt-wasm', { timeout: 30000 });

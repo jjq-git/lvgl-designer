@@ -124,6 +124,22 @@ function makeDraft(project: LvProject): TargetDraft {
   };
 }
 
+/** 为尚未打开的新工程创建独立快照，不读写当前编辑会话。 */
+export function createFreshProjectSnapshot(project: LvProject): ProjectSnapshotV2 {
+  const draft = makeDraft(project);
+  return {
+    kind: 'lvgl-project-snapshot',
+    snapshotVersion: 1,
+    uiProject: draft.uiProject,
+    displayProfile: draft.displayProfile,
+    controllerProfile: draft.controllerProfile,
+    buildTarget: draft.buildTargetDraft,
+    actionRegistry: draft.actionRegistry,
+    migrationNotes: draft.migrationNotes,
+    colorFormatConfirmed: draft.colorFormatConfirmed,
+  };
+}
+
 function sameValue(a: unknown, b: unknown): boolean {
   return JSON.stringify(a) === JSON.stringify(b);
 }

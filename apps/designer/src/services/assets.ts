@@ -144,7 +144,18 @@ export async function syncProjectAssetsToRuntime(
   let registered = 0;
   const missing: string[] = [];
   for (const asset of project.assets.fonts) {
-    if (!await getAssetBytes(asset.file.sha256)) missing.push(asset.name);
+    const rec = await getAssetBytes(asset.file.sha256);
+    if (!rec) {
+      missing.push(asset.name);
+      continue;
+    }
+    try {
+      rt.registerFontTinyTtf(asset.name, new Uint8Array(rec.bytes), asset.sizePx ?? 16);
+      registered++;
+    } catch (e) {
+      console.warn('[assets] 注册字体失败', asset.name, e);
+      missing.push(asset.name);
+    }
   }
   for (const asset of project.assets.images) {
     const rec = await getAssetBytes(asset.file.sha256);
@@ -248,7 +259,7 @@ export async function importAssetFiles(files: Iterable<File>): Promise<string[]>
       ? {
           name,
           file: fileRef,
-          loader: 'bin',
+          loader: 'tiny_ttf',
           sizePx: 16,
           conv: { bpp: 4, ranges: '0x20-0x7e', autoCollect: true, license: 'UNSPECIFIED' },
         }
@@ -260,9 +271,13 @@ export async function importAssetFiles(files: Iterable<File>): Promise<string[]>
         };
 
     const p = getPipeline();
-    if (p && kind !== 'font') {
+    if (p) {
       try {
-        registerAssetToRuntime(p.runtime, asset as ImageAsset, bytes);
+        if (kind === 'font') {
+          p.runtime.registerFontTinyTtf(name, bytes, (asset as FontAsset).sizePx ?? 16);
+        } else {
+          registerAssetToRuntime(p.runtime, asset as ImageAsset, bytes);
+        }
       } catch (e) {
         ed.setBanner(`素材注册失败:${file.name} — ${(e as Error).message}`);
         continue;

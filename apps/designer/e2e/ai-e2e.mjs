@@ -58,7 +58,7 @@ try {
   const pushErr = (m) => (phase === 'badjson' ? errsBadJson : errsMain).push(m);
   page.on('pageerror', (e) => pushErr(`pageerror: ${e.message}`));
   page.on('console', (m) => { if (m.type() === 'error') pushErr(`console.error: ${m.text()}`); });
-  page.on('dialog', (d) => d.accept());
+  page.on('dialog', (d) => d.type() === 'prompt' ? d.accept('e2e-project') : d.accept());
 
   let mockHits = 0;
   await page.route('**/api/deepseek/chat', async (route) => {

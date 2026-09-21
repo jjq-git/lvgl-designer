@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { FontAsset, ImageAsset } from '@lvd/schema';
 import type { AssetEntry } from '@lvd/schema/v2';
 import { useProjectStore } from '../stores/projectStore';
-import { importAssetFiles, removeAsset, thumbUrlFor } from '../services/assets';
+import { importAssetFiles, removeAsset, resyncAssets, thumbUrlFor } from '../services/assets';
 
 export function useThumb(asset: ImageAsset | null): string | null {
   const [url, setUrl] = useState<string | null>(null);
@@ -40,6 +40,8 @@ function patchFont(name: string, patch: Partial<NonNullable<FontAsset['conv']>> 
     const { sizePx: _sizePx, ...convPatch } = patch;
     Object.assign(font.conv, convPatch, patch.sizePx === undefined ? {} : { sizePx: patch.sizePx });
   });
+  // tiny_ttf 的字号在创建字体实例时确定；改字号后立即重新注册并重载预览。
+  if (patch.sizePx !== undefined) void resyncAssets();
 }
 
 function FontOptions({ asset }: { asset: FontAsset }): JSX.Element {

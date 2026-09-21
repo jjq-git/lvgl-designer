@@ -31,6 +31,7 @@ import {
 import * as cloud from '../services/cloudStorage';
 import type { ProjectSummary } from '../services/cloudStorage';
 import {
+  createNewStoredProjectDocument,
   createStoredProjectDocument,
   loadProjectDocument,
   type StoredProjectDocument,
@@ -192,18 +193,26 @@ export const useProjectsStore = create<ProjectsStoreState>()((set, get) => ({
   },
 
   newProject: async (name) => {
+    // A pending save belongs to the currently open project. Finish it before
+    // switching identities so it can never run against the newly created one.
+    if (saveTimer !== null) {
+      clearTimeout(saveTimer);
+      saveTimer = null;
+    }
+    if (useProjectStore.getState().dirty) await get().saveCurrent();
+
     const doc = createEmptyProject(name);
     doc.meta.name = name;
+    const stored = createNewStoredProjectDocument(doc);
     if (!get().cloudEnabled) {
       // 纯本地模式:直接进编辑器(靠 storage.ts 的 last 自动保存兜底)
-      loadIntoEditor(doc);
+      loadIntoEditor(stored);
       set({ currentId: null, currentName: name, currentVersion: 0, syncState: 'offline' });
       return;
     }
-    const stored = createStoredProjectDocument(doc);
     const r = await cloud.createProject(name, stored);
     if (r.ok) {
-      loadIntoEditor(doc);
+      loadIntoEditor(stored);
       set({
         currentId: r.data.id,
         currentName: r.data.name,
@@ -225,7 +234,7 @@ export const useProjectsStore = create<ProjectsStoreState>()((set, get) => ({
     }
     if (r.kind === 'offline') {
       // 离线新建:进编辑器 + 本地占位,联网后由用户"上传到云"(无 id 无法 PUT)
-      loadIntoEditor(doc);
+      loadIntoEditor(stored);
       set({ currentId: null, currentName: name, currentVersion: 0, syncState: 'offline' });
       banner('离线新建:已在本地创建,联网后可从工程列表上传到云');
       return;

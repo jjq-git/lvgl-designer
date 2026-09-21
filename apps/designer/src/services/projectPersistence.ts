@@ -1,5 +1,5 @@
 /** Main persistence boundary: v2 snapshot on write, v1 compatibility on read. */
-import type { LvProject } from '@lvd/schema';
+import { newUuid, type LvProject } from '@lvd/schema';
 import {
   loadStoredProjectDocument,
   type LoadedProjectDocument,
@@ -25,6 +25,28 @@ export function createStoredProjectDocument(project: LvProject): ProjectSnapshot
     migrationNotes: state.migrationNotes,
     colorFormatConfirmed: state.colorFormatConfirmed,
   };
+}
+
+/**
+ * Create a snapshot for a brand new project with an identity that cannot collide
+ * with another project that happens to use the same display name.
+ */
+export function createNewStoredProjectDocument(project: LvProject): ProjectSnapshotV2 {
+  const document = createStoredProjectDocument(project);
+  const suffix = newUuid().replaceAll('-', '').slice(0, 12);
+  const base = document.uiProject.meta.id.slice('ui:'.length) || 'untitled-ui';
+  const uiProjectId = `ui:${base}-${suffix}`;
+  const uiProjectRef = `${uiProjectId}@${document.uiProject.meta.revision}` as typeof document.buildTarget.uiProjectRef;
+  const themeId = document.uiProject.themes[0]?.id ?? 'default';
+
+  document.uiProject.meta.id = uiProjectId;
+  document.buildTarget = {
+    ...document.buildTarget,
+    id: `target:${base}-${suffix}-draft`,
+    uiProjectRef,
+    themeRef: `${uiProjectRef}#theme:${themeId}`,
+  };
+  return document;
 }
 
 /** Load either a current v2 snapshot or a legacy v1 document. */

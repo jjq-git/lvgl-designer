@@ -2,7 +2,6 @@
  * 工具条:undo/redo、缩放、设计/运行、圆屏开关、屏幕尺寸预设、新建/打开/保存/导出。
  */
 import { useState } from 'react';
-import { createEmptyProject } from '@lvd/schema';
 import { useProjectStore } from './stores/projectStore';
 import { useEditorStore } from './stores/editorStore';
 import { exportUiZip, exportWebUiJson, openProjectFile, saveProjectFile } from './services/exportZip';
@@ -49,6 +48,7 @@ export function Toolbar(): JSX.Element {
   const catalogTargetRef = useBuildTargetStore((s) => s.catalogTargetRef);
 
   const [customOpen, setCustomOpen] = useState(false);
+  const [creatingProject, setCreatingProject] = useState(false);
   const [customW, setCustomW] = useState(String(display.width));
   const [customH, setCustomH] = useState(String(display.height));
 
@@ -101,17 +101,27 @@ export function Toolbar(): JSX.Element {
     setCustomOpen(false);
   };
 
-  const newProject = (): void => {
-    if (!window.confirm('新建工程?当前工程将被替换(已自动保存的内容会被覆盖)。')) return;
-    const p = createEmptyProject();
-    useProjectStore.getState().loadProject(p);
-    const home = p.screens[0];
-    if (home) useEditorStore.getState().setActiveScreen(home.id);
+  const newProject = async (): Promise<void> => {
+    const input = window.prompt('新建独立工程名称（不会覆盖当前工程）:', '未命名工程');
+    if (input == null) return;
+    const name = input.trim();
+    if (name === '') {
+      useEditorStore.getState().setBanner('工程名不能为空');
+      return;
+    }
+    setCreatingProject(true);
+    try {
+      await useProjectsStore.getState().newProject(name);
+    } finally {
+      setCreatingProject(false);
+    }
   };
 
   return (
     <div className="toolbar">
-      <button className="btn" onClick={newProject}>新建</button>
+      <button className="btn" disabled={creatingProject} onClick={() => void newProject()}>
+        {creatingProject ? '新建中…' : '新建'}
+      </button>
       <button className="btn" onClick={openProjectFile}>打开</button>
       <button className="btn" onClick={() => saveProjectFile(useProjectStore.getState().project)}>
         保存{dirty ? ' •' : ''}

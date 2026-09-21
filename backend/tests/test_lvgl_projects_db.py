@@ -45,6 +45,17 @@ def test_project_versions_match_designer_contract(isolated_db):
     assert storage.delete_version(7, project["id"], 2) == "not_found"
 
 
+def test_create_project_never_overwrites_an_existing_project(isolated_db):
+    storage = isolated_db
+    first = storage.create_project(7, "同名工程", {"project": "first"})
+    second = storage.create_project(7, "同名工程", {"project": "second"})
+
+    assert first["id"] != second["id"]
+    assert storage.get_project(7, first["id"])["doc"] == {"project": "first"}
+    assert storage.get_project(7, second["id"])["doc"] == {"project": "second"}
+    assert len(storage.list_projects(7)) == 2
+
+
 def test_existing_database_schema_is_upgraded(tmp_path, monkeypatch):
     data_dir = tmp_path / "legacy"
     data_dir.mkdir()

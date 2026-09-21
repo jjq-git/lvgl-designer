@@ -1,7 +1,11 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createEmptyProject, createNode } from '@lvd/schema';
 import { useBuildTargetStore } from '../stores/buildTargetStore';
-import { createStoredProjectDocument, loadProjectDocument } from './projectPersistence';
+import {
+  createNewStoredProjectDocument,
+  createStoredProjectDocument,
+  loadProjectDocument,
+} from './projectPersistence';
 
 describe('projectPersistence', () => {
   beforeEach(() => {
@@ -25,6 +29,21 @@ describe('projectPersistence', () => {
     expect(stored).not.toHaveProperty('legacyProject');
     expect(stored.actionRegistry['custom.save_settings']?.id).toBe('custom.save_settings');
     expect(stored.colorFormatConfirmed).toBe(false);
+  });
+
+  it('assigns independent identities to new projects with the same name', () => {
+    const first = createNewStoredProjectDocument(createEmptyProject('同名工程'));
+    const second = createNewStoredProjectDocument(createEmptyProject('同名工程'));
+
+    expect(first.uiProject.meta.id).not.toBe(second.uiProject.meta.id);
+    expect(first.buildTarget.uiProjectRef).toBe(
+      `${first.uiProject.meta.id}@${first.uiProject.meta.revision}`,
+    );
+    expect(second.buildTarget.uiProjectRef).toBe(
+      `${second.uiProject.meta.id}@${second.uiProject.meta.revision}`,
+    );
+    expect(first.buildTarget.themeRef).toContain(`${first.buildTarget.uiProjectRef}#theme:`);
+    expect(second.buildTarget.themeRef).toContain(`${second.buildTarget.uiProjectRef}#theme:`);
   });
 
   it('preserves an unresolved 16bpp byte-order gate across reopen', () => {

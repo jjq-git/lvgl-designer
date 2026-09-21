@@ -1,0 +1,5 @@
+<screen>
+    <view width="240" height="320">
+        <lv_arclabel name="arcl" width="150" height="150" align="center" text="Curved Text" angle_start="90" angle_size="270" offset="5" dir="counter_clockwise" recolor="true" radius="70" center_offset_x="2" center_offset_y="-2" text_vertical_align="center" text_horizontal_align="center"/>
+    </view>
+</screen>

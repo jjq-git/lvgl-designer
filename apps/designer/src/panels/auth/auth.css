@@ -1,0 +1,210 @@
+/* ============================================================
+   用户菜单 + 管理员用户管理 — Apple 亮色主题(与工具条/检查器一致)
+   胶囊按钮、hairline 细边框、圆角、半透明遮罩;危险操作用 --danger
+   ============================================================ */
+
+/* ---------- 工具条内的用户菜单 ---------- */
+.usermenu { position: relative; flex: 0 0 auto; }
+.usermenu-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-pill);
+  padding: 3px 10px 3px 11px;
+  cursor: pointer;
+  color: var(--fg);
+  line-height: 1.3;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  white-space: nowrap;
+}
+.usermenu-trigger:hover { background: rgba(255, 255, 255, 0.9); border-color: var(--hairline-strong); }
+.usermenu-name {
+  font-size: 12px;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.usermenu-caret { font-size: 9px; color: var(--fg-hint); }
+
+/* 角色徽章 */
+.role-badge {
+  font-size: 10px;
+  padding: 1px 7px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--hairline);
+  color: var(--fg-secondary);
+  background: var(--bg-inset);
+  white-space: nowrap;
+  line-height: 1.5;
+}
+.role-badge.admin {
+  color: var(--accent);
+  border-color: rgba(0, 113, 227, 0.3);
+  background: var(--accent-tint);
+}
+
+/* 下拉 */
+.usermenu-pop {
+  position: absolute;
+  z-index: 10000;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 168px;
+  background: rgba(255, 255, 255, 0.9);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  padding: 5px;
+  box-shadow: var(--shadow-menu);
+}
+.usermenu-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-radius: var(--radius-s);
+  color: var(--fg);
+  padding: 6px 12px;
+  cursor: pointer;
+  font: inherit;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.usermenu-item:hover { background: var(--accent); color: #fff; }
+.usermenu-item.danger { color: var(--danger); }
+.usermenu-item.danger:hover { background: var(--danger); color: #fff; }
+.usermenu-sep { height: 1px; background: var(--hairline); margin: 4px 6px; }
+
+/* ---------- 通用模态(遮罩 + 卡片) ---------- */
+.auth-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 9600;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.auth-modal {
+  width: 460px;
+  max-width: 100%;
+  max-height: calc(100vh - 48px);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-panel);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-l);
+  box-shadow: var(--shadow-2);
+  overflow: hidden;
+}
+.auth-modal.wide { width: 720px; }
+.auth-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--hairline);
+  font-weight: 600;
+  color: var(--fg);
+  flex: 0 0 auto;
+}
+.auth-modal-body { padding: 16px; overflow: auto; }
+
+/* ---------- 表单 ---------- */
+.auth-form-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+.auth-form-row > label {
+  flex: 0 0 88px;
+  color: var(--fg-secondary);
+  font-size: 12px;
+}
+.auth-form-row .ed-text,
+.auth-form-row .ed-select { flex: 1; }
+
+.auth-note { font-size: 11px; color: var(--fg-hint); line-height: 1.5; margin: 4px 0 0; }
+.auth-msg-ok { color: #1a7f37; font-size: 12px; }
+.auth-msg-fail { color: var(--danger); font-size: 12px; }
+
+.auth-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+.auth-inline-msg { flex: 1; align-self: center; font-size: 12px; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+
+/* ---------- 管理面板:新建用户区 ---------- */
+.auth-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg-secondary);
+  margin: 4px 0 8px;
+}
+.auth-create {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-m);
+  background: var(--bg-inset);
+  margin-bottom: 16px;
+}
+.auth-create .ed-text { flex: 1 1 130px; min-width: 0; }
+.auth-create .ed-select { flex: 0 0 auto; }
+
+/* ---------- 用户列表表格 ---------- */
+.auth-table-wrap { overflow-x: auto; }
+.auth-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.auth-table th {
+  text-align: left;
+  font-weight: 600;
+  color: var(--fg-secondary);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--hairline);
+  white-space: nowrap;
+}
+.auth-table td {
+  padding: 8px;
+  border-bottom: 1px solid var(--hairline);
+  vertical-align: middle;
+}
+.auth-table tr:last-child td { border-bottom: none; }
+.auth-table .col-actions { text-align: right; white-space: nowrap; }
+.auth-uname { font-weight: 500; }
+.auth-you-tag { color: var(--fg-hint); font-size: 10px; margin-left: 6px; }
+.auth-time { color: var(--fg-secondary); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.auth-row-actions { display: inline-flex; gap: 6px; justify-content: flex-end; }
+.btn-danger {
+  color: var(--danger);
+  background: rgba(215, 0, 21, 0.08);
+}
+.btn-danger:hover:not(:disabled) { background: rgba(215, 0, 21, 0.15); }
+
+/* ---------- 空 / 加载 / 错误态 ---------- */
+.auth-state {
+  padding: 24px 12px;
+  text-align: center;
+  color: var(--fg-secondary);
+  font-size: 12px;
+}
+.auth-state.error { color: var(--danger); }

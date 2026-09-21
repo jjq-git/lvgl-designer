@@ -1,0 +1,5 @@
+<screen>
+    <view width="240" height="320">
+        <lv_animimage name="anim" srcs="f1 f2" duration="500" repeat_count="3"/>
+    </view>
+</screen>

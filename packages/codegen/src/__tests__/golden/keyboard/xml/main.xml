@@ -1,0 +1,6 @@
+<screen>
+    <view width="240" height="320">
+        <lv_textarea name="ta_in" width="200" height="40" placeholder_text="Input…" one_line="true"/>
+        <lv_keyboard name="kb" align="bottom_mid" mode="number" popovers="true"/>
+    </view>
+</screen>

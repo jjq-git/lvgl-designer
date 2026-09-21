@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "kind": {
+      "type": "string",
+      "const": "trusted-extension"
+    },
+    "uiProjectId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "patches": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "nodeId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "ownerId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "post": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string"
+          },
+          "review": {
+            "type": "object",
+            "properties": {
+              "by": {
+                "type": "string"
+              },
+              "at": {
+                "type": "string"
+              },
+              "note": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "by",
+              "at"
+            ]
+          }
+        },
+        "required": [
+          "nodeId",
+          "ownerId",
+          "post"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "kind",
+    "uiProjectId",
+    "patches"
+  ],
+  "additionalProperties": false
+}

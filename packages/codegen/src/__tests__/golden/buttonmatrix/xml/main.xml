@@ -1,0 +1,5 @@
+<screen>
+    <view width="240" height="320">
+        <lv_buttonmatrix name="bm" width="220" height="140" align="center" map="'1' '2' '3' '\n' 'OK' 'Cancel'" ctrl_map="width_1 width_1 width_1 checkable|checked disabled" selected_button="1" one_checked="true"/>
+    </view>
+</screen>

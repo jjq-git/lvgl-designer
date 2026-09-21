@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "kind": {
+      "type": "string",
+      "const": "lvgl-theme"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "revision": {
+      "type": "integer",
+      "exclusiveMinimum": 0,
+      "maximum": 9007199254740991
+    },
+    "displayName": {
+      "type": "string"
+    },
+    "extends": {
+      "type": "string",
+      "pattern": "^theme:[a-z0-9][a-z0-9._-]*@[1-9]\\d*$"
+    },
+    "tokens": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "color",
+              "px",
+              "percent",
+              "int",
+              "opa",
+              "fontRef",
+              "imageRef"
+            ]
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "value"
+        ]
+      }
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "kind",
+    "id",
+    "revision",
+    "tokens"
+  ],
+  "additionalProperties": false
+}

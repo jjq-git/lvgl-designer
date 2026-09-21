@@ -1,0 +1,12 @@
+<screen>
+    <view width="240" height="320">
+        <lv_tileview name="tvw" width="100%" height="100%">
+            <lv_tileview-tile name="_x00002002" dir="hor">
+                <lv_label name="_x00002001" align="center" text="Tile 0,0"/>
+            </lv_tileview-tile>
+            <lv_tileview-tile name="_x00002004" col="1">
+                <lv_label name="_x00002003" align="center" text="Tile 1,0"/>
+            </lv_tileview-tile>
+        </lv_tileview>
+    </view>
+</screen>

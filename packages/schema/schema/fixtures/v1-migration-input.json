@@ -1,0 +1,173 @@
+{
+  "_comment": "迁移 fixture:刻意覆盖 v1→v2 的每一条有损/需人工确认分支 —— colorDepth 16(色彩格式歧义)、cPatch(信任隔离)、callback 事件(需登记 Action)、全部 4 种 subject 事件、screen_load/screen_create、style 绑定(styleRef 是 CName 需转 BizId)、颜色常量(建议提升为 token)、lottie 资源、exportXml。",
+  "schemaVersion": 1,
+  "meta": {
+    "name": "CTRL-430 Lighting",
+    "lvglVersion": "9.4",
+    "appVersion": "0.1.0",
+    "createdAt": "2026-01-02T03:04:05.000Z",
+    "modifiedAt": "2026-08-30T10:11:12.000Z"
+  },
+  "display": {
+    "width": 480,
+    "height": 480,
+    "shape": "rect",
+    "colorDepth": 16,
+    "dpi": 130
+  },
+  "screens": [
+    {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "name": "home",
+      "displayName": "主页",
+      "isHome": true,
+      "styles": [
+        {
+          "id": "s-screen-card",
+          "name": "card",
+          "props": { "radius": 12, "bg_color": "#111827" }
+        }
+      ],
+      "consts": [],
+      "root": {
+        "id": "n-home-root",
+        "type": "obj",
+        "name": "home_root",
+        "props": { "width": "100%", "height": "100%" },
+        "styles": [],
+        "inlineStyles": [
+          { "selector": { "part": "main", "states": ["default"] }, "props": { "bg_color": "#111827" } }
+        ],
+        "events": [],
+        "bindings": [],
+        "children": [
+          {
+            "id": "n-light-label",
+            "type": "label",
+            "name": "light_label",
+            "displayName": "灯光标题",
+            "props": { "text": "LIGHT" },
+            "styles": [{ "styleId": "s-screen-card" }],
+            "inlineStyles": [],
+            "events": [],
+            "bindings": [{ "kind": "prop", "prop": "text", "subject": "light_level", "fmt": "%d%%" }],
+            "children": []
+          },
+          {
+            "id": "n-light-slider",
+            "type": "slider",
+            "name": "light_slider",
+            "props": { "min_value": 0, "max_value": 100, "value": 50 },
+            "styles": [],
+            "inlineStyles": [],
+            "events": [
+              { "kind": "subject_set", "trigger": "value_changed", "subject": "light_level", "subjectType": "int", "value": "42" },
+              { "kind": "subject_increment", "trigger": "clicked", "subject": "light_level", "step": 5, "min": 0, "max": 100, "rollover": true }
+            ],
+            "bindings": [
+              { "kind": "state", "state": "disabled", "op": "eq", "subject": "light_on", "refValue": 0 },
+              { "kind": "style", "styleRef": "accent", "selector": { "part": "knob" }, "subject": "light_on", "refValue": 1 }
+            ],
+            "children": [],
+            "cPatch": { "post": "lv_slider_set_range($obj, 0, 100);" }
+          },
+          {
+            "id": "n-toggle-btn",
+            "type": "button",
+            "name": "toggle_btn",
+            "props": {},
+            "styles": [],
+            "inlineStyles": [],
+            "events": [
+              { "kind": "subject_toggle", "trigger": "clicked", "subject": "light_on" },
+              { "kind": "callback", "trigger": "long_pressed", "callback": "on_light_long_press", "userData": "ctx" }
+            ],
+            "bindings": [],
+            "children": []
+          },
+          {
+            "id": "n-nav-btn",
+            "type": "button",
+            "name": "nav_btn",
+            "props": {},
+            "styles": [],
+            "inlineStyles": [],
+            "events": [
+              { "kind": "screen_load", "trigger": "clicked", "screenId": "22222222-2222-4222-8222-222222222222", "animType": "fade_in", "duration": 300, "delay": 0 },
+              { "kind": "screen_create", "trigger": "released", "screenId": "22222222-2222-4222-8222-222222222222" }
+            ],
+            "bindings": [],
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "22222222-2222-4222-8222-222222222222",
+      "name": "settings",
+      "displayName": "设置",
+      "styles": [],
+      "consts": [],
+      "root": {
+        "id": "n-settings-root",
+        "type": "obj",
+        "name": "settings_root",
+        "props": { "width": "100%", "height": "100%" },
+        "styles": [],
+        "inlineStyles": [],
+        "events": [],
+        "bindings": [],
+        "children": []
+      }
+    }
+  ],
+  "components": [],
+  "styles": [
+    {
+      "id": "s-accent",
+      "name": "accent",
+      "props": { "bg_color": "#2563EB", "radius": 8 }
+    }
+  ],
+  "consts": [
+    { "name": "brand_primary", "type": "color", "value": "#2563EB" },
+    { "name": "brand_bg", "type": "color", "value": "#111827" },
+    { "name": "gap", "type": "px", "value": "8" }
+  ],
+  "subjects": [
+    { "name": "light_level", "type": "int", "initial": 50, "min": 0, "max": 100 },
+    { "name": "light_on", "type": "int", "initial": 1 },
+    { "name": "room_name", "type": "string", "initial": "Living" },
+    { "name": "accent_color", "type": "color", "initial": "#2563EB" }
+  ],
+  "assets": {
+    "fonts": [
+      {
+        "name": "text_16",
+        "file": { "fileName": "text_16.ttf", "sha256": "aaaa1111", "byteSize": 12345 },
+        "loader": "tiny_ttf",
+        "sizePx": 16,
+        "conv": { "bpp": 4, "ranges": "0x20-0x7F", "symbols": "灯风扇" }
+      }
+    ],
+    "images": [
+      {
+        "name": "logo",
+        "file": { "fileName": "logo.png", "sha256": "bbbb2222", "byteSize": 2048 },
+        "conv": { "colorFormat": "RGB565A8" }
+      },
+      {
+        "name": "spinner_anim",
+        "kind": "lottie",
+        "file": { "fileName": "spinner.json", "sha256": "cccc3333", "byteSize": 4096 },
+        "conv": { "colorFormat": "ARGB8888" }
+      }
+    ]
+  },
+  "translations": null,
+  "codegen": {
+    "outputDirName": "ui",
+    "exportXml": true,
+    "userIncludes": ["app_actions.h"]
+  }
+}

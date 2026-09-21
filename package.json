@@ -1,0 +1,27 @@
+{
+  "name": "@dengtec/lvgl-designer-standalone",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Standalone LVGL 9.5 visual designer, preview, code generation and release service.",
+  "type": "module",
+  "scripts": {
+    "dev": "corepack pnpm --filter @lvd/designer dev",
+    "build": "corepack pnpm -r build",
+    "build:designer": "corepack pnpm --filter @lvd/designer build",
+    "build:services": "corepack pnpm --filter @lvd/build-worker build && corepack pnpm --filter @lvd/preview-host build",
+    "start": "python -m uvicorn app:app --app-dir backend --host 127.0.0.1 --port 8001",
+    "test": "corepack pnpm -r test",
+    "test:backend": "python -m pytest backend/tests -q",
+    "typecheck": "corepack pnpm -r typecheck",
+    "audit:lvgl-diff": "node scripts/audit-lvgl-version-diff.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.61.1",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@9.15.9"
+}

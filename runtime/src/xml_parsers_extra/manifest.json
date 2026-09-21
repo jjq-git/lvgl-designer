@@ -1,0 +1,225 @@
+[
+  {
+    "type": "led",
+    "xmlTag": "lv_led",
+    "attrs": [
+      { "name": "color", "type": "color", "cSetter": "lv_led_set_color" },
+      { "name": "brightness", "type": "int", "cSetter": "lv_led_set_brightness" }
+    ],
+    "notes": "brightness 0..255 (LV_LED_BRIGHT_MIN/MAX); on/off is expressed via brightness."
+  },
+  {
+    "type": "line",
+    "xmlTag": "lv_line",
+    "attrs": [
+      { "name": "points", "type": "intList", "cSetter": "lv_line_set_points_mutable" },
+      { "name": "y_invert", "type": "bool", "cSetter": "lv_line_set_y_invert" }
+    ],
+    "notes": "points format: \"x1,y1 x2,y2 ...\" (pairs space-separated, coords comma-separated; floats accepted, LV_USE_FLOAT=1). Parser owns the point array: freed on re-apply and on widget delete."
+  },
+  {
+    "type": "spinner",
+    "xmlTag": "lv_spinner",
+    "attrs": [
+      { "name": "anim_duration", "type": "int", "cSetter": "lv_spinner_set_anim_params" },
+      { "name": "angle", "type": "int", "cSetter": "lv_spinner_set_anim_params" }
+    ],
+    "notes": "Single C setter takes both values at once; parser gathers then calls once. Defaults when only one attr is present: anim_duration=1000 ms, angle=270 deg (constructor defaults)."
+  },
+  {
+    "type": "imagebutton",
+    "xmlTag": "lv_imagebutton",
+    "attrs": [
+      { "name": "src_released_left", "type": "imageRef", "cSetter": "lv_imagebutton_set_src" },
+      { "name": "src_released_mid", "type": "imageRef", "cSetter": "lv_imagebutton_set_src" },
+      { "name": "src_released_right", "type": "imageRef", "cSetter": "lv_imagebutton_set_src" },
+      { "name": "src_pressed_left", "type": "imageRef", "cSetter": "lv_imagebutton_set_src" },
+      { "name": "src_pressed_mid", "type": "imageRef", "cSetter": "lv_imagebutton_set_src" },
+      { "name": "src_pressed_right", "type": "imageRef", "cSetter": "lv_imagebutton_set_src" },
+      {
+        "name": "state", "type": "enum",
+        "enum": {
+          "tokens": ["released", "pressed", "disabled", "checked_released", "checked_pressed", "checked_disabled"],
+          "cPrefix": "LV_IMAGEBUTTON_STATE_"
+        },
+        "cSetter": "lv_imagebutton_set_state"
+      }
+    ],
+    "notes": "Pragmatic subset: only RELEASED/PRESSED source states exposed (left/mid/right each). lv_imagebutton_set_src(obj,state,left,mid,right) is called once per state with the gathered parts; missing parts are NULL (mid-only is the common case)."
+  },
+  {
+    "type": "animimage",
+    "xmlTag": "lv_animimage",
+    "attrs": [
+      { "name": "srcs", "type": "stringList", "cSetter": "lv_animimg_set_src" },
+      { "name": "duration", "type": "int", "cSetter": "lv_animimg_set_duration" },
+      { "name": "repeat_count", "type": "int", "cSetter": "lv_animimg_set_repeat_count" }
+    ],
+    "notes": "C prefix is lv_animimg_. srcs = space-separated imageRef list (each token resolved via lv_xml_get_image); parser owns the dsc array (freed on re-apply/delete; max 127 frames, pic_count is int8_t). repeat_count also accepts token \"infinite\" -> LV_ANIM_REPEAT_INFINITE. Defaults: duration=1000 ms, repeat_count=infinite. lv_animimg_start() is called automatically after apply when a source list exists."
+  },
+  {
+    "type": "msgbox",
+    "xmlTag": "lv_msgbox",
+    "attrs": [
+      { "name": "title", "type": "string", "cSetter": "lv_msgbox_add_title" },
+      { "name": "text", "type": "string", "cSetter": "lv_msgbox_add_text" },
+      { "name": "close_button", "type": "bool", "cSetter": "lv_msgbox_add_close_button" }
+    ],
+    "children": [
+      {
+        "type": "msgbox-button",
+        "xmlTag": "lv_msgbox-button",
+        "kind": "add",
+        "createAttrs": [
+          { "name": "text", "type": "string", "cSetter": "lv_msgbox_add_footer_button" }
+        ],
+        "attrs": []
+      }
+    ],
+    "notes": "title/text are idempotent on re-apply (existing label text is updated instead of adding another). close_button=true adds once (no-op if a header button already exists); false does not remove."
+  },
+  {
+    "type": "list",
+    "xmlTag": "lv_list",
+    "attrs": [],
+    "children": [
+      {
+        "type": "list-text",
+        "xmlTag": "lv_list-text",
+        "kind": "add",
+        "createAttrs": [
+          { "name": "text", "type": "string", "cSetter": "lv_list_add_text" }
+        ],
+        "attrs": []
+      },
+      {
+        "type": "list-button",
+        "xmlTag": "lv_list-button",
+        "kind": "add",
+        "createAttrs": [
+          { "name": "icon", "type": "imageRef", "cSetter": "lv_list_add_button" },
+          { "name": "text", "type": "string", "cSetter": "lv_list_add_button" }
+        ],
+        "attrs": []
+      }
+    ],
+    "notes": "lv_list has no own setters (styled lv_obj). icon on list-button is optional (absent -> NULL -> text-only button)."
+  },
+  {
+    "type": "menu",
+    "xmlTag": "lv_menu",
+    "attrs": [
+      {
+        "name": "mode_header", "type": "enum",
+        "enum": { "tokens": ["top_fixed", "top_unfixed", "bottom_fixed"], "cPrefix": "LV_MENU_HEADER_" },
+        "cSetter": "lv_menu_set_mode_header"
+      },
+      {
+        "name": "mode_root_back_button", "type": "enum",
+        "enum": { "tokens": ["disabled", "enabled"], "cPrefix": "LV_MENU_ROOT_BACK_BUTTON_" },
+        "cSetter": "lv_menu_set_mode_root_back_button"
+      }
+    ],
+    "children": [
+      {
+        "type": "menu-page",
+        "xmlTag": "lv_menu-page",
+        "kind": "add",
+        "createAttrs": [
+          { "name": "title", "type": "string", "cSetter": "lv_menu_page_create" }
+        ],
+        "attrs": []
+      }
+    ],
+    "notes": "Simplified model: menu + pages only. menu-page is a container (nested XML children go inside it); title is optional (strdup'd by LVGL). The FIRST page created under a menu is auto-loaded as main page via lv_menu_set_page()."
+  },
+  {
+    "type": "win",
+    "xmlTag": "lv_win",
+    "attrs": [
+      { "name": "title", "type": "string", "cSetter": "lv_win_add_title" }
+    ],
+    "children": [
+      {
+        "type": "win-button",
+        "xmlTag": "lv_win-button",
+        "kind": "add",
+        "createAttrs": [
+          { "name": "icon", "type": "imageRef", "cSetter": "lv_win_add_button" },
+          { "name": "width", "type": "int", "cSetter": "lv_win_add_button" }
+        ],
+        "attrs": []
+      }
+    ],
+    "notes": "title idempotent on re-apply (first header label updated in place). win-button goes into the header; width default 40 when absent, icon optional. Generic XML children of lv_win land on the win object itself (below header+content), not in the content area."
+  },
+  {
+    "type": "tileview",
+    "xmlTag": "lv_tileview",
+    "attrs": [],
+    "children": [
+      {
+        "type": "tileview-tile",
+        "xmlTag": "lv_tileview-tile",
+        "kind": "add",
+        "createAttrs": [
+          { "name": "col", "type": "int", "cSetter": "lv_tileview_add_tile" },
+          { "name": "row", "type": "int", "cSetter": "lv_tileview_add_tile" },
+          {
+            "name": "dir", "type": "enum",
+            "enum": { "tokens": ["none", "left", "right", "top", "bottom", "hor", "ver", "all"], "cPrefix": "LV_DIR_" },
+            "cSetter": "lv_tileview_add_tile"
+          }
+        ],
+        "attrs": []
+      }
+    ],
+    "notes": "tileview-tile is a container (nested XML children go inside it). dir accepts '|'-combined tokens (e.g. \"left|bottom\"); defaults: col=0 row=0 dir=all."
+  },
+  {
+    "type": "arclabel",
+    "xmlTag": "lv_arclabel",
+    "attrs": [
+      { "name": "text", "type": "string", "cSetter": "lv_arclabel_set_text" },
+      { "name": "angle_start", "type": "int", "cSetter": "lv_arclabel_set_angle_start" },
+      { "name": "angle_size", "type": "int", "cSetter": "lv_arclabel_set_angle_size" },
+      { "name": "offset", "type": "int", "cSetter": "lv_arclabel_set_offset" },
+      {
+        "name": "dir", "type": "enum",
+        "enum": { "tokens": ["clockwise", "counter_clockwise"], "cPrefix": "LV_ARCLABEL_DIR_" },
+        "cSetter": "lv_arclabel_set_dir"
+      },
+      { "name": "recolor", "type": "bool", "cSetter": "lv_arclabel_set_recolor" },
+      { "name": "radius", "type": "int", "cSetter": "lv_arclabel_set_radius" },
+      { "name": "center_offset_x", "type": "int", "cSetter": "lv_arclabel_set_center_offset_x" },
+      { "name": "center_offset_y", "type": "int", "cSetter": "lv_arclabel_set_center_offset_y" },
+      {
+        "name": "text_vertical_align", "type": "enum",
+        "enum": { "tokens": ["default", "leading", "center", "trailing"], "cPrefix": "LV_ARCLABEL_TEXT_ALIGN_" },
+        "cSetter": "lv_arclabel_set_text_vertical_align"
+      },
+      {
+        "name": "text_horizontal_align", "type": "enum",
+        "enum": { "tokens": ["default", "leading", "center", "trailing"], "cPrefix": "LV_ARCLABEL_TEXT_ALIGN_" },
+        "cSetter": "lv_arclabel_set_text_horizontal_align"
+      }
+    ],
+    "notes": "angle_start/angle_size are lv_value_precise_t (float in this build): the parser reads them with lv_xml_atof, so fractional degrees are accepted; declared int here for designer simplicity. text is copied by LVGL."
+  },
+  {
+    "type": "canvas",
+    "xmlTag": "lv_canvas",
+    "attrs": [
+      { "name": "fill_color", "type": "color", "cSetter": "lv_canvas_fill_bg" }
+    ],
+    "notes": "OVERRIDES the official buffer-less lv_canvas parser. width/height (common obj attrs, PLAIN PX ONLY here, no % / content) additionally size an auto-allocated ARGB8888 draw buffer (default 100x100) which is filled with fill_color (default white, LV_OPA_COVER) so the canvas is visible in the preview. Buffer is parser-owned: recreated on size change, destroyed with the widget. C code emission should use lv_canvas_set_buffer/lv_draw_buf + lv_canvas_fill_bg."
+  },
+  {
+    "type": "lottie",
+    "xmlTag": "lv_lottie",
+    "attrs": [
+      { "name": "src", "type": "imageRef", "cSetter": "lv_lottie_set_src_file" }
+    ],
+    "notes": "Requires LV_USE_LOTTIE + LV_USE_THORVG_INTERNAL (+ LV_USE_VECTOR_GRAPHIC/LV_USE_MATRIX enabled in this build). src is an imageRef whose registered value must be a MEMFS path to a lottie .json (e.g. \"A:assets/anim.json\"); unknown refs fall back to using the raw value as a path. A leading \"X:\" drive prefix is stripped before the thorvg fopen(). width/height (common obj attrs, PLAIN PX ONLY, default 100x100) size the auto-allocated ARGB8888 render buffer (parser-owned, recreated on size change, destroyed with the widget). Animation starts automatically (lv_lottie internal lv_anim, ~60fps, infinite)."
+  }
+]

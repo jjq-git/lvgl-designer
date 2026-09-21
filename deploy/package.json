@@ -1,0 +1,16 @@
+{
+  "name": "lvgl-designer-deploy",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "部署侧运行时:静态托管 + DeepSeek 代理 + 账号系统 + PostgreSQL 数据层。deploy 目录自成一体,不属于根 pnpm workspace。",
+  "scripts": {
+    "start": "node server-ai.mjs",
+    "migrate": "node migrate.mjs",
+    "test": "node --experimental-test-module-mocks --test snapshot-policy.test.mjs handlers-logic.test.mjs",
+    "test:db": "node test-db-integration.mjs"
+  },
+  "dependencies": {
+    "pg": "^8.13.1"
+  }
+}

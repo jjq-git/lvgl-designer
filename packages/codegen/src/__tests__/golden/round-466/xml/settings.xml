@@ -1,0 +1,8 @@
+<screen>
+    <view width="466" height="466">
+        <lv_label name="lbl_msg" bind_text="msg"/>
+        <lv_button name="btn_back" align="bottom_mid">
+            <lv_obj-screen_create_event trigger="clicked" screen="main" anim_type="fade_in" duration="200"/>
+        </lv_button>
+    </view>
+</screen>

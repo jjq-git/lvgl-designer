@@ -1,0 +1,7 @@
+<screen>
+    <view width="240" height="320">
+        <lv_calendar name="cal" width="230" height="230" align="center" today_year="2026" today_month="7" today_day="2" shown_year="2026" shown_month="7">
+            <lv_calendar-header_arrow name="_x00000501"/>
+        </lv_calendar>
+    </view>
+</screen>

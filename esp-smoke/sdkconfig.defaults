@@ -1,0 +1,5 @@
+# esp-smoke defaults — esp32s3, LVGL via Kconfig (LV_CONF_SKIP)
+CONFIG_IDF_TARGET="esp32s3"
+
+# Exercise the generated set_name path (R8: guarded by LV_USE_OBJ_NAME)
+CONFIG_LV_USE_OBJ_NAME=y

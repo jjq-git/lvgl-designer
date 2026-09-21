@@ -1,0 +1,8 @@
+<screen>
+    <view width="240" height="320">
+        <lv_button name="btn"/>
+        <lv_button name="btn_2" x="50"/>
+        <lv_button name="btn_3" x="100"/>
+        <lv_label name="_xdeadbeef" text="anon"/>
+    </view>
+</screen>

@@ -1,0 +1,425 @@
+{
+  "_comment": "由 v1-migration-input.json 经 migrateV1ToV2 生成。改动请改迁移器或 v1 fixture,然后 `pnpm --filter @lvd/schema test -u` 重新生成,不要手改本文件。",
+  "uiProject": {
+    "schemaVersion": 2,
+    "kind": "lvgl-ui-project",
+    "meta": {
+      "id": "ui:ctrl-430-lighting",
+      "revision": 1,
+      "name": "CTRL-430 Lighting",
+      "appVersion": "0.1.0",
+      "createdAt": "2026-01-02T03:04:05.000Z",
+      "modifiedAt": "2026-08-30T10:11:12.000Z"
+    },
+    "designDisplayRef": "display:480x480-rgb565@1",
+    "themes": [
+      {
+        "id": "default",
+        "displayName": "默认",
+        "tokens": []
+      }
+    ],
+    "subjects": [
+      {
+        "id": "subject:light_level",
+        "codeName": "light_level",
+        "type": "int",
+        "initial": 50,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "id": "subject:light_on",
+        "codeName": "light_on",
+        "type": "int",
+        "initial": 1
+      },
+      {
+        "id": "subject:room_name",
+        "codeName": "room_name",
+        "type": "string",
+        "initial": "Living"
+      },
+      {
+        "id": "subject:accent_color",
+        "codeName": "accent_color",
+        "type": "color",
+        "initial": "#2563EB"
+      }
+    ],
+    "screens": [
+      {
+        "id": "11111111-1111-4111-8111-111111111111",
+        "codeName": "home",
+        "displayName": "主页",
+        "isHome": true,
+        "styles": [
+          {
+            "id": "s-screen-card",
+            "codeName": "card",
+            "props": {
+              "radius": 12,
+              "bg_color": "#111827"
+            }
+          }
+        ],
+        "consts": [],
+        "root": {
+          "id": "n-home-root",
+          "type": "obj",
+          "codeName": "home_root",
+          "props": {
+            "width": "100%",
+            "height": "100%"
+          },
+          "styleRefs": [],
+          "styles": [
+            {
+              "selector": {
+                "part": "main",
+                "states": [
+                  "default"
+                ]
+              },
+              "props": {
+                "bg_color": "#111827"
+              }
+            }
+          ],
+          "events": [],
+          "bindings": [],
+          "children": [
+            {
+              "id": "n-light-label",
+              "type": "label",
+              "codeName": "light_label",
+              "displayName": "灯光标题",
+              "props": {
+                "text": "LIGHT"
+              },
+              "styleRefs": [
+                {
+                  "styleId": "s-screen-card"
+                }
+              ],
+              "styles": [],
+              "events": [],
+              "bindings": [
+                {
+                  "kind": "prop",
+                  "prop": "text",
+                  "subject": "subject:light_level",
+                  "fmt": "%d%%"
+                }
+              ],
+              "children": []
+            },
+            {
+              "id": "n-light-slider",
+              "type": "slider",
+              "codeName": "light_slider",
+              "props": {
+                "min_value": 0,
+                "max_value": 100,
+                "value": 50
+              },
+              "styleRefs": [],
+              "styles": [],
+              "events": [
+                {
+                  "on": "value_changed",
+                  "action": "subject.set",
+                  "args": {
+                    "subject": "subject:light_level",
+                    "value": "42"
+                  }
+                },
+                {
+                  "on": "clicked",
+                  "action": "subject.increment",
+                  "args": {
+                    "subject": "subject:light_level",
+                    "step": 5,
+                    "min": 0,
+                    "max": 100,
+                    "rollover": true
+                  }
+                }
+              ],
+              "bindings": [
+                {
+                  "kind": "state",
+                  "state": "disabled",
+                  "op": "eq",
+                  "subject": "subject:light_on",
+                  "refValue": 0
+                },
+                {
+                  "kind": "style",
+                  "styleId": "s-accent",
+                  "selector": {
+                    "part": "knob"
+                  },
+                  "subject": "subject:light_on",
+                  "refValue": 1
+                }
+              ],
+              "children": []
+            },
+            {
+              "id": "n-toggle-btn",
+              "type": "button",
+              "codeName": "toggle_btn",
+              "props": {},
+              "styleRefs": [],
+              "styles": [],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "subject.toggle",
+                  "args": {
+                    "subject": "subject:light_on"
+                  }
+                },
+                {
+                  "on": "long_pressed",
+                  "action": "custom.on_light_long_press",
+                  "args": {
+                    "userData": "ctx"
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "n-nav-btn",
+              "type": "button",
+              "codeName": "nav_btn",
+              "props": {},
+              "styleRefs": [],
+              "styles": [],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "22222222-2222-4222-8222-222222222222",
+                    "anim": "fade_in",
+                    "duration": 300,
+                    "delay": 0
+                  }
+                },
+                {
+                  "on": "released",
+                  "action": "screen.create",
+                  "args": {
+                    "screen": "22222222-2222-4222-8222-222222222222"
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": []
+            }
+          ]
+        }
+      },
+      {
+        "id": "22222222-2222-4222-8222-222222222222",
+        "codeName": "settings",
+        "displayName": "设置",
+        "styles": [],
+        "consts": [],
+        "root": {
+          "id": "n-settings-root",
+          "type": "obj",
+          "codeName": "settings_root",
+          "props": {
+            "width": "100%",
+            "height": "100%"
+          },
+          "styleRefs": [],
+          "styles": [],
+          "events": [],
+          "bindings": [],
+          "children": []
+        }
+      }
+    ],
+    "components": [],
+    "styles": [
+      {
+        "id": "s-accent",
+        "codeName": "accent",
+        "props": {
+          "bg_color": "#2563EB",
+          "radius": 8
+        }
+      }
+    ],
+    "consts": [
+      {
+        "name": "brand_primary",
+        "type": "color",
+        "value": "#2563EB"
+      },
+      {
+        "name": "brand_bg",
+        "type": "color",
+        "value": "#111827"
+      },
+      {
+        "name": "gap",
+        "type": "px",
+        "value": "8"
+      }
+    ],
+    "assets": {
+      "fonts": [
+        {
+          "id": "font:text_16",
+          "codeName": "text_16",
+          "file": {
+            "fileName": "text_16.ttf",
+            "sha256": "aaaa1111",
+            "byteSize": 12345
+          },
+          "conv": {
+            "loader": "tiny_ttf",
+            "sizePx": 16,
+            "bpp": 4,
+            "ranges": "0x20-0x7F",
+            "symbols": "灯风扇"
+          }
+        }
+      ],
+      "images": [
+        {
+          "id": "image:logo",
+          "codeName": "logo",
+          "file": {
+            "fileName": "logo.png",
+            "sha256": "bbbb2222",
+            "byteSize": 2048
+          },
+          "conv": {
+            "colorFormat": "RGB565A8"
+          }
+        },
+        {
+          "id": "image:spinner_anim",
+          "codeName": "spinner_anim",
+          "file": {
+            "fileName": "spinner.json",
+            "sha256": "cccc3333",
+            "byteSize": 4096
+          },
+          "conv": {
+            "kind": "lottie",
+            "colorFormat": "ARGB8888"
+          }
+        }
+      ],
+      "icons": []
+    },
+    "translations": null
+  },
+  "displayProfile": {
+    "schemaVersion": 1,
+    "kind": "display-profile",
+    "id": "display:480x480-rgb565",
+    "revision": 1,
+    "displayName": "480×480 方 RGB565",
+    "logicalSize": {
+      "width": 480,
+      "height": 480
+    },
+    "shape": "rect",
+    "colorFormat": "RGB565",
+    "dpi": 130
+  },
+  "buildTargetDraft": {
+    "schemaVersion": 1,
+    "kind": "lvgl-build-target",
+    "id": "target:ctrl-430-lighting-draft",
+    "revision": 1,
+    "uiProjectRef": "ui:ctrl-430-lighting@1",
+    "themeRef": "ui:ctrl-430-lighting@1#theme:default",
+    "lvglVersion": "9.5.0"
+  },
+  "trustedExtension": {
+    "schemaVersion": 1,
+    "kind": "trusted-extension",
+    "uiProjectId": "ui:ctrl-430-lighting",
+    "patches": [
+      {
+        "nodeId": "n-light-slider",
+        "ownerId": "11111111-1111-4111-8111-111111111111",
+        "post": "lv_slider_set_range($obj, 0, 100);",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb924"
+      }
+    ]
+  },
+  "notes": [
+    {
+      "severity": "must-confirm",
+      "code": "color-format-ambiguous",
+      "path": "display.colorDepth",
+      "message": "v1 只存 colorDepth=16,无法区分 RGB565 与 RGB565_SWAPPED(二者都是 16bpp 但驱动含义不同)。已按 LVGL LV_COLOR_FORMAT_NATIVE 取 \"RGB565\",请对照面板驱动确认。"
+    },
+    {
+      "severity": "info",
+      "code": "visible-rect-absent",
+      "path": "display",
+      "message": "v1 无 visibleRect 概念,迁移后留空(视为全屏)。若目标是插黑条屏(如 TXW620002B0 逻辑 480×960、可视仅中间 360 列),必须人工补 visibleRect,否则产品预览会画错开孔。"
+    },
+    {
+      "severity": "info",
+      "code": "lottie-asset",
+      "path": "assets.images",
+      "message": "lottie 资源已并入 images 并在 conv.kind 标记。v2 的 icons 分类为空 —— v1 无图标概念,如需接入 platforms/icons 共享图标链,请人工填充。"
+    },
+    {
+      "severity": "info",
+      "code": "consts-to-tokens",
+      "path": "consts",
+      "message": "发现 2 个颜色常量(brand_primary, brand_bg)。迁移器**不自动**把它们转成 Theme Token —— const 是值级 IR、token 是设计语义,自动转换会编造语义 ID。建议人工提升为 `color.*` token 以启用 Theme 切换。"
+    },
+    {
+      "severity": "must-confirm",
+      "code": "lvgl-version-moved",
+      "path": "meta.lvglVersion",
+      "message": "v1 的 meta.lvglVersion=\"9.4\" 已移出 UiProject,改由 BuildTarget.lvglVersion 决定,当前草稿取 \"9.5.0\"。注意 9.5 移除了 XML 引擎,预览通道必须走 IR 直驱(见 docs/lvgl-version-baseline.md §2.2)。"
+    },
+    {
+      "severity": "must-confirm",
+      "code": "export-xml-obsolete",
+      "path": "codegen.exportXml",
+      "message": "v1 开启了 exportXml,但目标 9.5.0 已无 XML 引擎,导出的 XML 没有任何 LVGL 运行时能加载它。v2 不再保留该选项,请确认不依赖 XML 产物。"
+    },
+    {
+      "severity": "must-confirm",
+      "code": "cpatch-extracted",
+      "path": "screens[0].root.children[1].cPatch",
+      "message": "v2 普通工程禁止 cPatch,该片段已抽入 trusted extension manifest,需权限+内容哈希+人工审查。优先考虑改为 typed property:去 XML 后 calendar 高亮日期 / chart scatter X / arc change_rate·knob_offset 等原本必须 cPatch 的属性都能直接建模。"
+    },
+    {
+      "severity": "must-confirm",
+      "code": "callback-needs-action",
+      "path": "screens[0].root.children[2].events[1]",
+      "message": "v1 回调 \"on_light_long_press\" 已映射为 Action \"custom.on_light_long_press\",但它尚未登记进 Action Registry。请补契约,或改为已有的业务 Action。"
+    },
+    {
+      "severity": "must-confirm",
+      "code": "controller-profile-missing",
+      "path": "buildTarget.controllerProfileRef",
+      "message": "v1 无 ControllerProfile 概念,BuildTarget 草稿缺 controllerProfileRef,必须人工补一个外壳 Profile,且其 displayRef 必须等于 \"display:480x480-rgb565@1\"。"
+    },
+    {
+      "severity": "info",
+      "code": "theme-empty",
+      "path": "themes",
+      "message": "已建空 Theme \"default\"。v1 无 Theme 概念,token 表为空 —— 在补齐 token 之前,BuildTarget 可以构建,但 Theme 切换能力等同于没有。"
+    }
+  ]
+}

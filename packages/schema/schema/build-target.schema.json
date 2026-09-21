@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "kind": {
+      "type": "string",
+      "const": "lvgl-build-target"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "revision": {
+      "type": "integer",
+      "exclusiveMinimum": 0,
+      "maximum": 9007199254740991
+    },
+    "displayName": {
+      "type": "string"
+    },
+    "uiProjectRef": {
+      "type": "string",
+      "pattern": "^ui:[a-z0-9][a-z0-9._-]*@[1-9]\\d*$"
+    },
+    "controllerProfileRef": {
+      "type": "string",
+      "pattern": "^controller:[a-z0-9][a-z0-9._-]*@[1-9]\\d*$"
+    },
+    "themeRef": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^ui:[a-z0-9][a-z0-9._-]*@[1-9]\\d*#theme:.+$"
+        },
+        {
+          "type": "string",
+          "pattern": "^theme:[a-z0-9][a-z0-9._-]*@[1-9]\\d*$"
+        }
+      ]
+    },
+    "firmwareProfileRef": {
+      "type": "string",
+      "pattern": "^firmware:[a-z0-9][a-z0-9._-]*@[1-9]\\d*$"
+    },
+    "lvglVersion": {
+      "type": "string",
+      "enum": [
+        "9.4.0",
+        "9.5.0"
+      ]
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "kind",
+    "id",
+    "revision",
+    "uiProjectRef",
+    "controllerProfileRef",
+    "themeRef",
+    "lvglVersion"
+  ],
+  "additionalProperties": false
+}

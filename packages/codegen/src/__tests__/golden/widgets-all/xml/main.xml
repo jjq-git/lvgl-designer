@@ -1,0 +1,23 @@
+<screen>
+    <view width="240" height="320">
+        <lv_obj name="panel" width="240" height="320"/>
+        <lv_label name="title" y="4" width="content" height="content" align="top_mid" text="Hello &amp; &lt;World&gt;" long_mode="dots"/>
+        <lv_button name="btn_ok" width="100" height="40" align="center" hidden="false" checkable="true" checked="true">
+            <lv_label name="_x00000003" align="center" text="OK"/>
+        </lv_button>
+        <lv_slider name="sld" width="150" height="10" min_value="10" value="35" value-animated="true" start_value="20" mode="range" style_bg_color:pressed:knob="0xff0000" style_radius:pressed:knob="2"/>
+        <lv_switch name="sw" width="50" height="25" orientation="horizontal"/>
+        <lv_checkbox name="cb" text="Agree"/>
+        <lv_bar name="bar_dl" width="150" height="15" value="66" max_value="200"/>
+        <lv_arc name="arc_vol" width="150" height="150" rotation="90" value="40" mode="reverse"/>
+        <lv_image name="img_logo" src="logo" rotation="450" scale_x="512" pivot_x="50%" pivot_y="30"/>
+        <lv_dropdown name="dd" width="130" height="content" options="Red&#10;Green&#10;Blue" selected="1">
+            <lv_dropdown-list name="_x00000011" style_bg_color="0x202020"/>
+        </lv_dropdown>
+        <lv_roller name="rl" selected="2" value-animated="true" visible_row_count="4" options="One&#10;Two&#10;Three" options-mode="infinite"/>
+        <lv_textarea name="ta" width="150" height="70" placeholder_text="Type…" one_line="true"/>
+        <lv_spinbox name="spin" width="100" height="40" value="7" rollover="true" digit_count="3" step="10"/>
+        <lv_qrcode name="qr" size="100" dark_color="0x003a57" data="https://lvgl.io" quiet_zone="true"/>
+        <lv_scale name="sc" width="200" height="100" mode="round_inner" total_tick_count="21" label_show="false" angle_range="240" rotation="120"/>
+    </view>
+</screen>

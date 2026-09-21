@@ -1,0 +1,7 @@
+<screen>
+    <view width="240" height="320">
+        <lv_imagebutton name="ibtn" width="100" height="40" align="center" src_released_mid="btn_rel" src_pressed_mid="btn_prs" state="pressed">
+            <lv_label name="_x00001401" align="center" text="GO"/>
+        </lv_imagebutton>
+    </view>
+</screen>

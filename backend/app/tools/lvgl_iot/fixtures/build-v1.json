@@ -1,0 +1,18 @@
+{
+  "apiVersion": "iot.lvgl/v1",
+  "uiBuildId": "01JLVGLBUILD000000000000000",
+  "uiProjectRevision": 7,
+  "buildTargetRevision": 3,
+  "lvglVersion": "9.5.0",
+  "uiAbiVersion": "1.0.0",
+  "generatorVersion": "@lvd/codegen@0.1.0",
+  "firmwareCapabilitySha256": "1111111111111111111111111111111111111111111111111111111111111111",
+  "artifactSha256": "2222222222222222222222222222222222222222222222222222222222222222",
+  "manifestUrl": "https://index.example/api/integrations/iot/v1/builds/01JLVGLBUILD000000000000000/manifest",
+  "previewUrl": "https://index.example/api/integrations/iot/v1/builds/01JLVGLBUILD000000000000000/preview",
+  "artifactUrl": "https://index.example/api/integrations/iot/v1/builds/01JLVGLBUILD000000000000000/artifact",
+  "previewAvailable": true,
+  "status": "approved",
+  "createdAt": "2026-09-10T00:00:00+00:00",
+  "updatedAt": "2026-09-10T00:05:00+00:00"
+}

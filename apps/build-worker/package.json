@@ -1,0 +1,23 @@
+{
+  "name": "@lvd/build-worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit && vite build",
+    "test": "vitest run --passWithNoTests",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@lvd/asset-pipeline": "workspace:*",
+    "@lvd/codegen": "workspace:*",
+    "@lvd/lvgl-runtime": "workspace:*",
+    "@lvd/preview-compiler": "workspace:*",
+    "@lvd/schema": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^26.0.1",
+    "vite": "^6.3.6",
+    "vitest": "^3.2.4"
+  }
+}

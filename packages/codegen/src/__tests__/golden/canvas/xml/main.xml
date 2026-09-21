@@ -1,0 +1,5 @@
+<screen>
+    <view width="240" height="320">
+        <lv_canvas name="cv" width="80" height="60" align="center" fill_color="0x00c040"/>
+    </view>
+</screen>

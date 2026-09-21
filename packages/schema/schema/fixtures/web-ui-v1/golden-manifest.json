@@ -1,0 +1,9 @@
+{
+  "algorithm": "sha256",
+  "canonicalization": "UTF-8; object keys sorted by ECMAScript UTF-16 code units; array order preserved; no whitespace; no trailing newline",
+  "files": {
+    "minimal.json": "4b55db355a873525b4c02be775375e342947c7fe8e35e55cdf07b2f7a9291f52",
+    "p0-widgets.json": "9926839e7ee64146ea883672f81257f76adef13cabd656e9697328146650addf",
+    "resource-icon.json": "362acbb23b70eaf268d5e3c856bfc31ffe202b7d3f1491d74f9349be019fadb0"
+  }
+}

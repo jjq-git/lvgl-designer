@@ -1,0 +1,247 @@
+/* ai-panel.css — AI 面板专属样式(独立文件,由 AiPanel.tsx import,禁碰 styles.css)。
+   颜色全部走 CSS 变量,变量名与 styles.css.bak-dark 的 :root 对齐
+   (--bg/--bg2/--bg3/--border/--fg/--fg-dim/--accent/--danger),
+   带回退值,主题换肤时自动跟随。所有类名 ai- 前缀,零全局污染。 */
+
+/* ---------- 收起态:右下角圆形启动钮 ---------- */
+.ai-launcher {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 9000;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--border, #33383f);
+  background: var(--bg3, #262a31);
+  color: var(--accent, #4aa8ff);
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+}
+.ai-launcher:hover {
+  border-color: var(--accent, #4aa8ff);
+}
+
+/* ---------- 展开态:右下浮动面板 ---------- */
+.ai-panel {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 9000;
+  width: 360px;
+  max-width: calc(100vw - 36px);
+  height: 480px;
+  max-height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg2, #1e2127);
+  border: 1px solid var(--border, #33383f);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+/* ---------- 顶栏 ---------- */
+.ai-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  background: var(--bg3, #262a31);
+  border-bottom: 1px solid var(--border, #33383f);
+  flex: 0 0 auto;
+}
+.ai-title {
+  font-weight: 600;
+  color: var(--fg, #d7dbe0);
+  white-space: nowrap;
+}
+.ai-head-spacer { flex: 1; }
+.ai-model-select {
+  max-width: 168px;
+  font-size: 11px;
+  background: var(--bg, #17191d);
+  color: var(--fg, #d7dbe0);
+  border: 1px solid var(--border, #33383f);
+  border-radius: 3px;
+  padding: 2px 4px;
+}
+.ai-head .icon-btn:disabled { opacity: 0.4; cursor: default; }
+
+/* ---------- 消息区 ---------- */
+.ai-msgs {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 10px 10px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ai-msg { display: flex; flex-direction: column; max-width: 100%; }
+.ai-msg.user { align-items: flex-end; }
+.ai-msg.assistant { align-items: flex-start; }
+.ai-bubble {
+  max-width: 86%;
+  padding: 6px 10px;
+  border-radius: 10px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.5;
+  font-size: 12.5px;
+}
+.ai-msg.user .ai-bubble {
+  background: var(--accent, #1d4e89); /* 跟随主题强调色(苹果亮色 = #0071e3) */
+  color: #fff;
+  border-bottom-right-radius: 3px;
+}
+.ai-msg.assistant .ai-bubble {
+  background: var(--bg3, #262a31);
+  color: var(--fg, #d7dbe0);
+  border: 1px solid var(--border, #33383f);
+  border-bottom-left-radius: 3px;
+}
+.ai-bubble.pending { color: var(--fg-dim, #8a919a); font-style: italic; }
+.ai-meta {
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--fg-dim, #8a919a);
+  padding: 0 2px;
+}
+.ai-meta.error { color: var(--danger, #ff6b6b); }
+
+/* ---------- 空态 ---------- */
+.ai-empty {
+  margin: auto 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: stretch;
+  padding: 8px 14px;
+}
+.ai-empty-title {
+  text-align: center;
+  color: var(--fg-dim, #8a919a);
+  margin-bottom: 6px;
+}
+.ai-empty-nokey {
+  text-align: center;
+  font-size: 11px;
+  color: var(--danger, #ff6b6b);
+  margin-bottom: 2px;
+}
+.ai-example-btn {
+  background: var(--bg3, #262a31);
+  color: var(--fg, #d7dbe0);
+  border: 1px dashed var(--border, #33383f);
+  border-radius: 6px;
+  padding: 7px 10px;
+  cursor: pointer;
+  text-align: left;
+}
+.ai-example-btn:hover { border-color: var(--accent, #4aa8ff); color: var(--accent, #4aa8ff); }
+
+/* ---------- 选中上下文提示 ---------- */
+.ai-ctx {
+  flex: 0 0 auto;
+  padding: 3px 10px;
+  font-size: 11px;
+  color: var(--fg-dim, #8a919a);
+  border-top: 1px solid var(--border, #33383f);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ai-ctx b { color: var(--accent, #4aa8ff); font-weight: 600; }
+
+/* ---------- 输入区 ---------- */
+.ai-inputbar {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 6px;
+  align-items: flex-end;
+  padding: 8px;
+  border-top: 1px solid var(--border, #33383f);
+  background: var(--bg2, #1e2127);
+}
+.ai-input {
+  flex: 1;
+  resize: none;
+  min-height: 38px;
+  max-height: 110px;
+  background: var(--bg, #17191d);
+  color: var(--fg, #d7dbe0);
+  border: 1px solid var(--border, #33383f);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font: inherit;
+  line-height: 1.4;
+}
+.ai-input:focus { outline: none; border-color: var(--accent, #4aa8ff); }
+.ai-input:disabled { opacity: 0.6; }
+.ai-send, .ai-stop { flex: 0 0 auto; height: 30px; }
+.ai-stop {
+  border-color: var(--danger, #ff6b6b) !important;
+  color: var(--danger, #ff6b6b);
+}
+
+/* ---------- 设置弹层 ---------- */
+.ai-modal-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 9500;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ai-modal {
+  width: 420px;
+  max-width: calc(100vw - 32px);
+  background: var(--bg2, #1e2127);
+  border: 1px solid var(--border, #33383f);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+.ai-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--bg3, #262a31);
+  border-bottom: 1px solid var(--border, #33383f);
+  font-weight: 600;
+  color: var(--fg, #d7dbe0);
+}
+.ai-form { padding: 12px; }
+.ai-form-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 4px;
+}
+.ai-form-row label {
+  flex: 0 0 58px;
+  color: var(--fg-dim, #8a919a);
+}
+.ai-form-row input[type='range'] { flex: 1; accent-color: var(--accent, #4aa8ff); }
+.ai-temp-val { min-width: 28px; text-align: right; color: var(--fg, #d7dbe0); }
+.ai-note {
+  font-size: 11px;
+  color: var(--fg-dim, #8a919a);
+  margin: 0 0 6px 66px;
+  line-height: 1.5;
+}
+.ai-danger-btn { color: var(--danger, #ff6b6b); }
+.ai-test-ok { color: #1e8e3e; font-size: 12px; } /* 深绿:白底对比度达标(原 #7ddc8f 亮色下看不清) */
+.ai-test-fail {
+  color: var(--danger, #ff6b6b);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 220px;
+}

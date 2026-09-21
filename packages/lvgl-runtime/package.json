@@ -1,0 +1,22 @@
+{
+  "name": "@lvd/lvgl-runtime",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@lvd/preview-compiler": "workspace:*"
+  },
+  "devDependencies": {
+    "@lvd/schema": "workspace:*"
+  }
+}

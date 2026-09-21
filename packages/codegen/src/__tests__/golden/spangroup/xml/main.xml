@@ -1,0 +1,12 @@
+<screen>
+    <styles>
+        <style name="s_red" text_color="0xff3030"/>
+    </styles>
+    <view width="240" height="320">
+        <lv_spangroup name="sg" width="200" height="content" overflow="ellipsis" max_lines="3" indent="12">
+            <lv_spangroup-span text="Hello, "/>
+            <lv_spangroup-span text="red" style="s_red"/>
+            <lv_spangroup-span bind_text="msg" bind_text-fmt="[%s]"/>
+        </lv_spangroup>
+    </view>
+</screen>

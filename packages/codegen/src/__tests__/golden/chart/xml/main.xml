@@ -1,0 +1,10 @@
+<screen>
+    <view width="240" height="320">
+        <lv_chart name="ch" width="200" height="150" align="center" point_count="8" update_mode="circular" hor_div_line_count="4">
+            <lv_chart-series values="10 20 30 25 40 35 50 45"/>
+            <lv_chart-series color="0x00c040" axis="secondary_y" values="5 15 10 20 15 25 20 30"/>
+            <lv_chart-cursor dir="ver" pos_x="3" pos_y="20"/>
+            <lv_chart-axis axis="secondary_y" min_value="0" max_value="60"/>
+        </lv_chart>
+    </view>
+</screen>

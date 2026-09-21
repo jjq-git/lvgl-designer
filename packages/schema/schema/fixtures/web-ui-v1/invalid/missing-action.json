@@ -1,0 +1,325 @@
+{
+  "kind": "wf2-web-ui",
+  "schemaVersion": 1,
+  "source": {
+    "kind": "lvgl-ui-project",
+    "schemaVersion": 2,
+    "projectId": "ui:web-p0",
+    "revision": 7
+  },
+  "uiProject": {
+    "schemaVersion": 2,
+    "kind": "lvgl-ui-project",
+    "meta": {
+      "id": "ui:web-p0",
+      "revision": 7,
+      "name": "web-p0",
+      "appVersion": "0.1.0",
+      "createdAt": "2026-09-11T00:00:00.000Z",
+      "modifiedAt": "2026-09-11T00:00:00.000Z"
+    },
+    "designDisplayRef": "display:240x240-rgb565@1",
+    "themes": [
+      {
+        "id": "default",
+        "displayName": "默认",
+        "tokens": [
+          {
+            "id": "color.accent",
+            "type": "color",
+            "value": "#2563EB"
+          }
+        ]
+      }
+    ],
+    "subjects": [
+      {
+        "id": "subject:level",
+        "codeName": "level",
+        "type": "int",
+        "initial": 35,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "id": "subject:title",
+        "codeName": "title",
+        "type": "string",
+        "initial": "客厅"
+      },
+      {
+        "id": "subject:accent",
+        "codeName": "accent",
+        "type": "color",
+        "initial": "#2563EB"
+      }
+    ],
+    "styles": [
+      {
+        "id": "style:card",
+        "codeName": "card",
+        "props": {
+          "radius": 12,
+          "bg_color": "#111827"
+        }
+      }
+    ],
+    "consts": [],
+    "assets": {
+      "fonts": [],
+      "images": [],
+      "icons": []
+    },
+    "translations": null,
+    "screens": [
+      {
+        "id": "screen:web-p0:main",
+        "codeName": "main",
+        "isHome": true,
+        "styles": [],
+        "consts": [],
+        "root": {
+          "id": "node:web-p0:root",
+          "type": "obj",
+          "props": {
+            "width": "100%",
+            "height": "100%",
+            "flex_flow": "column"
+          },
+          "styleRefs": [],
+          "styles": [],
+          "events": [],
+          "bindings": [],
+          "children": [
+            {
+              "id": "node:label",
+              "type": "label",
+              "props": {
+                "text": "客厅"
+              },
+              "styleRefs": [],
+              "styles": [],
+              "events": [],
+              "bindings": [
+                {
+                  "kind": "prop",
+                  "prop": "text",
+                  "subject": "subject:title"
+                }
+              ],
+              "children": []
+            },
+            {
+              "id": "node:button",
+              "type": "button",
+              "props": {
+                "width": 120,
+                "height": 48
+              },
+              "styleRefs": [
+                {
+                  "styleId": "style:card"
+                }
+              ],
+              "styles": [],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "screen:web-p0:main"
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "node:switch",
+              "type": "switch",
+              "props": {
+                "orientation": "horizontal"
+              },
+              "styleRefs": [],
+              "styles": [],
+              "events": [
+                {
+                  "on": "value_changed",
+                  "action": "subject.toggle",
+                  "args": {
+                    "subject": "subject:level"
+                  }
+                }
+              ],
+              "bindings": [
+                {
+                  "kind": "state",
+                  "state": "checked",
+                  "op": "gt",
+                  "subject": "subject:level",
+                  "refValue": 0
+                }
+              ],
+              "children": []
+            },
+            {
+              "id": "node:slider",
+              "type": "slider",
+              "props": {
+                "min_value": 0,
+                "max_value": 100,
+                "value": 35
+              },
+              "styleRefs": [],
+              "styles": [],
+              "events": [
+                {
+                  "on": "value_changed",
+                  "action": "subject.set",
+                  "args": {
+                    "subject": "subject:level",
+                    "value": "50"
+                  }
+                }
+              ],
+              "bindings": [
+                {
+                  "kind": "prop",
+                  "prop": "value",
+                  "subject": "subject:level"
+                }
+              ],
+              "children": []
+            },
+            {
+              "id": "node:arc",
+              "type": "arc",
+              "props": {
+                "min_value": 0,
+                "max_value": 100,
+                "value": 35
+              },
+              "styleRefs": [],
+              "styles": [],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "subject.increment",
+                  "args": {
+                    "subject": "subject:level",
+                    "step": 5,
+                    "min": 0,
+                    "max": 100,
+                    "rollover": false
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "node:bar",
+              "type": "bar",
+              "props": {
+                "min_value": 0,
+                "max_value": 100,
+                "value": 35
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent"
+                    }
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [
+                {
+                  "kind": "prop",
+                  "prop": "value",
+                  "subject": "subject:level"
+                }
+              ],
+              "children": []
+            }
+          ]
+        }
+      }
+    ],
+    "components": []
+  },
+  "displayProfile": {
+    "schemaVersion": 1,
+    "kind": "display-profile",
+    "id": "display:240x240-rgb565",
+    "revision": 1,
+    "displayName": "240×240 圆 RGB565",
+    "logicalSize": {
+      "width": 240,
+      "height": 240
+    },
+    "shape": "round",
+    "colorFormat": "RGB565",
+    "dpi": 130
+  },
+  "actionRegistry": {
+    "subject.increment": {
+      "id": "subject.increment",
+      "displayName": "递增 Subject",
+      "params": [
+        {
+          "name": "subject",
+          "type": "subjectRef",
+          "required": true
+        },
+        {
+          "name": "step",
+          "type": "int"
+        },
+        {
+          "name": "min",
+          "type": "int"
+        },
+        {
+          "name": "max",
+          "type": "int"
+        },
+        {
+          "name": "rollover",
+          "type": "bool"
+        }
+      ]
+    },
+    "subject.set": {
+      "id": "subject.set",
+      "displayName": "设置 Subject",
+      "params": [
+        {
+          "name": "subject",
+          "type": "subjectRef",
+          "required": true
+        },
+        {
+          "name": "value",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    "subject.toggle": {
+      "id": "subject.toggle",
+      "displayName": "翻转 Subject",
+      "params": [
+        {
+          "name": "subject",
+          "type": "subjectRef",
+          "required": true
+        }
+      ]
+    }
+  },
+  "assetManifest": []
+}

@@ -1,0 +1,1 @@
+"""Standalone LVGL backend tests."""

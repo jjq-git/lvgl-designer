@@ -1,0 +1,28 @@
+# 默认让 git 自行判断文本/二进制，并在仓库内统一以 LF 存储。
+* text=auto
+
+# ── 按字节比对的产物 fixture：工作区必须是 LF ──────────────────────────────
+# codegen 的 golden 测试把 emitter 输出（'\n' 拼接）与磁盘文件逐字节比对。
+# Windows 上 core.autocrlf=true 会在检出时把它们转成 CRLF，导致 27 个 golden
+# 测试全红——内容其实一模一样，只差行尾。这里钉死 LF，避免检出转换。
+packages/codegen/src/__tests__/golden/** text eol=lf
+
+# schema 的 JSON Schema 与 fixture 同理：由 toMatchFileSnapshot 逐字节比对。
+packages/schema/schema/** text eol=lf
+
+# ControllerProfile 的 assetRef 按内容 SHA-256 寻址，行尾也必须可复现。
+apps/designer/public/controllers/*.svg text eol=lf
+
+# vitest 快照总是以 LF 写盘。不钉死的话，检出转成 CRLF → 跑一次测试又被改回 LF，
+# 于是这个文件永远显示为「已修改」。
+*.snap text eol=lf
+
+# ── shell 脚本：CRLF 会让 shebang 失效（bash: bad interpreter: ^M）────────
+*.sh text eol=lf
+
+# ── 二进制 ────────────────────────────────────────────────────────────────
+*.wasm binary
+*.png  binary
+*.jpg  binary
+*.ttf  binary
+*.woff binary

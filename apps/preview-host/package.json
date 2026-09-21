@@ -1,0 +1,21 @@
+{
+  "name": "@lvd/preview-host",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit && vite build",
+    "test:e2e": "node e2e/smoke.mjs",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@lvd/lvgl-runtime": "workspace:*",
+    "@lvd/preview-compiler": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^26.0.1",
+    "vite": "^6.3.6",
+    "vitest": "^3.2.4"
+  }
+}

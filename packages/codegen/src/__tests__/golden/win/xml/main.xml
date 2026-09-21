@@ -1,0 +1,9 @@
+<screen>
+    <view width="240" height="320">
+        <lv_win name="wnd" width="240" height="200" title="Window">
+            <lv_win-button name="_x00001901" icon="ico_close" width="60" width="60"/>
+            <lv_win-button name="_x00001902" icon="ico_close"/>
+            <lv_label name="_x00001903" align="center" text="Body"/>
+        </lv_win>
+    </view>
+</screen>

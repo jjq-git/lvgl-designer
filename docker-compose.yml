@@ -1,0 +1,31 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8001:8001"
+    environment:
+      AUTH_BOOTSTRAP_ADMIN: ${AUTH_BOOTSTRAP_ADMIN:-admin}
+      AUTH_BOOTSTRAP_PASSWORD: ${AUTH_BOOTSTRAP_PASSWORD:?请在 .env 中设置 AUTH_BOOTSTRAP_PASSWORD}
+      AUTH_SESSION_COOKIE: ${AUTH_SESSION_COOKIE:-lvd_session}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      DEEPSEEK_BASE_URL: ${DEEPSEEK_BASE_URL:-https://api.deepseek.com}
+      LVGL_BUILD_COMPILE_GATE: ${LVGL_BUILD_COMPILE_GATE:-host}
+    volumes:
+      - ./auth_data:/workspace/auth_data
+      - ./lvgl_data:/workspace/lvgl_data
+    restart: unless-stopped
+
+  worker:
+    build: .
+    working_dir: /workspace/backend
+    command: ["python", "-m", "app.tools.lvgl_builds.worker"]
+    environment:
+      AUTH_DATA_DIR: /workspace/auth_data
+      LVGL_DATA_DIR: /workspace/lvgl_data
+      LVGL_BUILD_COMPILE_GATE: ${LVGL_BUILD_COMPILE_GATE:-host}
+      LVGL_HOST_SOURCE_DIR: /workspace/lvgl-source
+      LVGL_BUILD_WORKER_PATH: /workspace/apps/build-worker/dist/lvgl-build-worker.mjs
+    volumes:
+      - ./auth_data:/workspace/auth_data
+      - ./lvgl_data:/workspace/lvgl_data
+    restart: unless-stopped

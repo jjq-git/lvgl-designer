@@ -1,0 +1,272 @@
+/* ============================================================
+   云端工程 / 同步 / 版本历史 —— 苹果亮色主题(与 styles.css 一致)
+   胶囊按钮 · hairline · 模态遮罩 · 危险操作 --danger
+   ============================================================ */
+
+/* ---------- 同步徽章(工具条) ---------- */
+.sync-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  padding: 3px 10px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.6);
+  color: var(--fg-secondary);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+.sync-badge:hover:not(:disabled) { background: var(--bg-hover); }
+.sync-badge:disabled { cursor: default; opacity: 0.7; }
+.sync-badge .sync-dot { font-size: 9px; line-height: 1; }
+
+.sync-badge.synced { color: #1a7f37; border-color: rgba(26, 127, 55, 0.28); background: rgba(52, 199, 89, 0.08); }
+.sync-badge.saving { color: var(--accent); border-color: rgba(0, 113, 227, 0.3); background: var(--accent-tint); }
+.sync-badge.offline { color: #b25000; border-color: rgba(178, 80, 0, 0.28); background: rgba(255, 149, 0, 0.1); }
+.sync-badge.conflict { color: var(--danger); border-color: rgba(215, 0, 21, 0.3); background: rgba(215, 0, 21, 0.08); }
+.sync-badge.local { color: var(--fg-secondary); }
+
+/* ---------- 模态遮罩 / 容器(与 auth 一致) ---------- */
+.cloud-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.28);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.cloud-modal {
+  width: min(680px, 100%);
+  max-height: min(80vh, 720px);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-panel);
+  border-radius: var(--radius-l);
+  box-shadow: var(--shadow-menu);
+  overflow: hidden;
+}
+.cloud-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--hairline);
+  font-weight: 600;
+  font-size: 15px;
+}
+.cloud-modal-body {
+  padding: 14px 18px 18px;
+  overflow: auto;
+  flex: 1 1 auto;
+}
+
+/* ---------- 顶部提示条 ---------- */
+.cloud-msg-ok, .cloud-msg-fail, .cloud-msg-info {
+  padding: 7px 11px;
+  border-radius: var(--radius-m);
+  font-size: 12px;
+  margin-bottom: 12px;
+}
+.cloud-msg-ok { background: rgba(52, 199, 89, 0.1); color: #1a7f37; }
+.cloud-msg-fail { background: rgba(215, 0, 21, 0.08); color: var(--danger); }
+.cloud-msg-info { background: var(--accent-tint); color: var(--accent); }
+
+/* ---------- 新建工程行 ---------- */
+.cloud-new-row { display: flex; gap: 8px; margin-bottom: 14px; }
+.cloud-new-row .ed-text { flex: 1 1 auto; }
+
+.cloud-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg-secondary);
+  margin: 4px 0 8px;
+}
+
+/* ---------- 工程列表 ---------- */
+.cloud-list { display: flex; flex-direction: column; gap: 4px; }
+.cloud-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-m);
+  background: var(--bg-inset);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+.cloud-item:hover { border-color: var(--hairline-strong); background: var(--bg-panel); }
+.cloud-item.current { border-color: var(--accent); background: var(--accent-tint); }
+.cloud-item-main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+.cloud-item-name { font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cloud-item-sub { font-size: 11px; color: var(--fg-secondary); }
+.cloud-item-actions { display: flex; gap: 4px; flex: 0 0 auto; }
+.cloud-item .cloud-current-tag {
+  font-size: 10px;
+  color: var(--accent);
+  border: 1px solid rgba(0, 113, 227, 0.35);
+  border-radius: var(--radius-pill);
+  padding: 1px 7px;
+}
+
+/* ---------- 空态 / 状态 ---------- */
+.cloud-empty {
+  text-align: center;
+  padding: 28px 12px;
+  color: var(--fg-secondary);
+  font-size: 13px;
+}
+.cloud-empty .cloud-empty-hint { font-size: 12px; color: var(--fg-hint); margin-top: 6px; }
+.cloud-state { padding: 14px; color: var(--fg-secondary); font-size: 12px; }
+.cloud-state.error { color: var(--danger); }
+
+/* ---------- 本地迁移区 ---------- */
+.cloud-migrate {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--hairline);
+}
+.cloud-migrate-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px dashed var(--hairline-strong);
+  border-radius: var(--radius-m);
+}
+.cloud-migrate-row .cloud-item-main { flex: 1 1 auto; }
+
+/* ---------- 危险按钮 ---------- */
+.btn-danger {
+  color: var(--danger);
+  background: rgba(215, 0, 21, 0.08);
+}
+.btn-danger:hover:not(:disabled) { background: rgba(215, 0, 21, 0.16); }
+
+/* ============================================================
+   版本历史抽屉(右侧滑出)
+   ============================================================ */
+.hist-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 190;
+  width: min(380px, 92vw);
+  background: var(--bg-panel);
+  box-shadow: var(--shadow-menu);
+  display: flex;
+  flex-direction: column;
+  animation: hist-slide 0.22s ease;
+}
+@keyframes hist-slide { from { transform: translateX(100%); } to { transform: translateX(0); } }
+.hist-drawer-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 189;
+  background: rgba(0, 0, 0, 0.14);
+}
+.hist-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--hairline);
+  font-weight: 600;
+  font-size: 15px;
+}
+.hist-top {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--hairline);
+  display: flex;
+  gap: 8px;
+}
+.hist-top .ed-text { flex: 1 1 auto; }
+.hist-body { flex: 1 1 auto; overflow: auto; padding: 8px 12px 16px; }
+
+/* 预览态横条 */
+.hist-preview-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0 0 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius-m);
+  background: var(--accent-tint);
+  color: var(--accent);
+  font-size: 12px;
+}
+
+/* 时间线 */
+.hist-timeline { display: flex; flex-direction: column; }
+.hist-entry {
+  position: relative;
+  padding: 8px 8px 8px 22px;
+  border-radius: var(--radius-m);
+  transition: background-color 0.15s ease;
+}
+.hist-entry:hover { background: var(--bg-hover); }
+.hist-entry.previewing { background: var(--accent-tint); }
+.hist-entry::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 14px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--fg-hint);
+  box-shadow: 0 0 0 3px var(--bg-panel);
+}
+.hist-entry.manual::before { background: var(--accent); }
+.hist-entry.restore::before { background: #b25000; }
+/* 连接线 */
+.hist-entry::after {
+  content: '';
+  position: absolute;
+  left: 10.5px;
+  top: 20px;
+  bottom: -8px;
+  width: 1px;
+  background: var(--hairline);
+}
+.hist-entry:last-child::after { display: none; }
+
+.hist-entry-top { display: flex; align-items: baseline; gap: 8px; }
+.hist-kind {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 1px 7px;
+  border-radius: var(--radius-pill);
+  flex: 0 0 auto;
+}
+.hist-kind.manual { color: var(--accent); background: var(--accent-tint); }
+.hist-kind.auto { color: var(--fg-secondary); background: var(--bg-inset); }
+.hist-kind.restore { color: #b25000; background: rgba(255, 149, 0, 0.1); }
+.hist-time { font-size: 11px; color: var(--fg-secondary); font-variant-numeric: tabular-nums; }
+.hist-note {
+  font-size: 12px;
+  color: var(--fg);
+  margin: 3px 0 0;
+  word-break: break-word;
+}
+.hist-entry.auto .hist-note { color: var(--fg-secondary); }
+.hist-entry-actions {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.hist-entry:hover .hist-entry-actions,
+.hist-entry.previewing .hist-entry-actions { opacity: 1; }

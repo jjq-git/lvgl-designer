@@ -1,0 +1,13 @@
+<screen>
+    <view width="240" height="320">
+        <lv_table name="tbl" column_count="3" row_count="3">
+            <lv_table-column column="0" width="60"/>
+            <lv_table-column column="2" width="90"/>
+            <lv_table-cell row="0" column="0" value="Name"/>
+            <lv_table-cell row="0" column="1" value="Qty" ctrl="merge_right|text_crop"/>
+            <lv_table-cell row="1" column="0" value="Apple"/>
+            <lv_table-cell row="1" column="1" value="3"/>
+            <lv_table-cell row="2" column="2" value="total: 3"/>
+        </lv_table>
+    </view>
+</screen>

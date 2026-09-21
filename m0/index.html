@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>LVGL Web Designer — M0 测试台</title>
+<style>
+  :root { color-scheme: dark; }
+  body { font: 14px/1.5 ui-monospace, Consolas, monospace; background: #14171c; color: #d6dae0; margin: 24px; }
+  h1 { font-size: 18px; }
+  #stage { display: flex; gap: 24px; align-items: flex-start; }
+  #canvas-wrap { border: 1px solid #333a44; padding: 8px; background: #0a0c0f; }
+  canvas { display: block; image-rendering: pixelated; }
+  button { font: inherit; padding: 6px 18px; background: #2563eb; color: #fff; border: 0; border-radius: 4px; cursor: pointer; }
+  button:disabled { background: #444; cursor: wait; }
+  table { border-collapse: collapse; margin-top: 12px; width: 100%; max-width: 980px; }
+  th, td { border: 1px solid #333a44; padding: 4px 10px; text-align: left; vertical-align: top; }
+  th { background: #1d2229; }
+  td.pass { color: #4ade80; font-weight: bold; }
+  td.fail { color: #f87171; font-weight: bold; }
+  td.detail { max-width: 560px; word-break: break-all; white-space: pre-wrap; font-size: 12px; color: #9aa3af; }
+  #summary { margin-top: 10px; font-weight: bold; }
+</style>
+</head>
+<body>
+<h1>M0 浏览器测试台(T1~T8)</h1>
+<div id="stage">
+  <div id="canvas-wrap">
+    <canvas id="lvgl-canvas" width="240" height="240"></canvas>
+  </div>
+  <div>
+    <button id="run-btn">Run M0</button>
+    <div id="summary"></div>
+  </div>
+</div>
+<table id="results">
+  <thead><tr><th>ID</th><th>名称</th><th>结果</th><th>ms</th><th>详情</th></tr></thead>
+  <tbody></tbody>
+</table>
+<script type="module" src="./main.mjs"></script>
+</body>
+</html>

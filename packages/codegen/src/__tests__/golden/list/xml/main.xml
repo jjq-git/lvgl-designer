@@ -1,0 +1,9 @@
+<screen>
+    <view width="240" height="320">
+        <lv_list name="lst" width="200" height="200">
+            <lv_list-text name="_x00001701" text="Files"/>
+            <lv_list-button name="btn_open" icon="ico_file" text="Open"/>
+            <lv_list-button name="_x00001703" text="About"/>
+        </lv_list>
+    </view>
+</screen>

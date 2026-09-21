@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>lv_font_conv browser spike</title></head>
+<body>
+<pre id="result">running...</pre>
+<script type="module">
+  import { convertFont } from './browser-bundle.mjs';
+  const el = document.getElementById('result');
+  try {
+    const resp = await fetch('./Montserrat-Medium.ttf');
+    const fontBin = new Uint8Array(await resp.arrayBuffer());
+
+    const bin = await convertFont(fontBin, { size: 16, bpp: 4, format: 'bin', name: 'montserrat_16' });
+    const c   = await convertFont(fontBin, { size: 16, bpp: 4, format: 'lvgl', name: 'montserrat_16' });
+    const cTxt = typeof c === 'string' ? c : new TextDecoder().decode(c);
+
+    el.textContent = 'RESULT:' + JSON.stringify({
+      ok: true,
+      bin_bytes: bin.length,
+      c_bytes: cTxt.length,
+      has_lv_font_t: cTxt.includes('lv_font_t'),
+    });
+  } catch (e) {
+    el.textContent = 'RESULT:' + JSON.stringify({ ok: false, error: String(e && e.stack || e) });
+  }
+</script>
+</body>
+</html>

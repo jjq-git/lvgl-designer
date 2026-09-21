@@ -1,0 +1,9 @@
+<globals>
+    <consts>
+        <int name="gap" value="8"/>
+        <color name="accent" value="0x00a2ff"/>
+    </consts>
+    <styles>
+        <style name="s_accent" bg_color="#accent" radius="8" bg_opa="80%"/>
+    </styles>
+</globals>

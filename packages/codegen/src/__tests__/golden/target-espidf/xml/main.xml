@@ -1,0 +1,12 @@
+<screen>
+    <view width="240" height="320" flex_flow="column">
+        <lv_label name="lbl_title" text="Target demo">
+            <style name="s_title"/>
+        </lv_label>
+        <lv_button name="btn_go" width="100" height="40">
+            <lv_obj-event_cb trigger="clicked" callback="on_go"/>
+            <lv_label name="_x00002402" text="GO"/>
+        </lv_button>
+        <lv_slider name="sld_v" width="150" height="10" value="30"/>
+    </view>
+</screen>

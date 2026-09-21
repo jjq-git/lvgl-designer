@@ -1,0 +1,88 @@
+{
+  "kind": "wf2-web-ui",
+  "schemaVersion": 1,
+  "source": {
+    "kind": "lvgl-ui-project",
+    "schemaVersion": 2,
+    "projectId": "ui:web-minimal",
+    "revision": 7
+  },
+  "uiProject": {
+    "schemaVersion": 2,
+    "kind": "lvgl-ui-project",
+    "meta": {
+      "id": "ui:web-minimal",
+      "revision": 7,
+      "name": "web-minimal",
+      "appVersion": "0.1.0",
+      "createdAt": "2026-09-11T00:00:00.000Z",
+      "modifiedAt": "2026-09-11T00:00:00.000Z"
+    },
+    "designDisplayRef": "display:240x240-rgb565@1",
+    "themes": [
+      {
+        "id": "default",
+        "displayName": "默认",
+        "tokens": []
+      }
+    ],
+    "subjects": [],
+    "styles": [],
+    "consts": [],
+    "assets": {
+      "fonts": [],
+      "images": [],
+      "icons": []
+    },
+    "translations": null,
+    "screens": [
+      {
+        "id": "screen:web-minimal:main",
+        "codeName": "main",
+        "isHome": true,
+        "styles": [],
+        "consts": [],
+        "root": {
+          "id": "node:web-minimal:root",
+          "type": "obj",
+          "props": {},
+          "styleRefs": [],
+          "styles": [],
+          "events": [],
+          "bindings": [],
+          "children": [
+            {
+              "id": "node:label",
+              "type": "label",
+              "props": {
+                "text": "Hello Web UI"
+              },
+              "styleRefs": [],
+              "styles": [],
+              "events": [],
+              "bindings": [],
+              "children": []
+            }
+          ]
+        }
+      }
+    ],
+    "components": []
+  },
+  "displayProfile": {
+    "schemaVersion": 1,
+    "kind": "display-profile",
+    "id": "display:240x240-rgb565",
+    "revision": 1,
+    "displayName": "240×240 圆 RGB565",
+    "logicalSize": {
+      "width": 240,
+      "height": 240
+    },
+    "shape": "round",
+    "colorFormat": "RGB565",
+    "dpi": 130
+  },
+  "actionRegistry": {},
+  "assetManifest": []
+}

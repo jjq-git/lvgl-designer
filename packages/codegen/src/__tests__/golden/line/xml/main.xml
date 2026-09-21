@@ -1,0 +1,5 @@
+<screen>
+    <view width="240" height="320">
+        <lv_line name="ln" points="0,0 50,30 100,0 150,30" y_invert="true" style_line_width="4" style_line_color="0x00a2ff"/>
+    </view>
+</screen>

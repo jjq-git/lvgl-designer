@@ -1,0 +1,9 @@
+node_modules
+.venv
+.git
+auth_data
+lvgl_data
+apps/designer/e2e/artifacts*
+apps/designer/e2e/out-ui*
+runtime/build
+*.log

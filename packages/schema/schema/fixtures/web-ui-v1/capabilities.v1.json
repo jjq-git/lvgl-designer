@@ -1,0 +1,1333 @@
+{
+  "kind": "wf2-web-ui-capabilities",
+  "schemaVersion": 1,
+  "documentSchemaVersion": 1,
+  "widgets": {
+    "animimage": {
+      "props": [
+        "align",
+        "duration",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "repeat_count",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "srcs",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": false
+    },
+    "arc": {
+      "props": [
+        "align",
+        "bg_end_angle",
+        "bg_start_angle",
+        "change_rate",
+        "end_angle",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "knob_offset",
+        "max_value",
+        "min_value",
+        "mode",
+        "rotation",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "start_angle",
+        "value",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [
+        "value"
+      ],
+      "acceptsWidgetChildren": false
+    },
+    "arclabel": {
+      "props": [
+        "align",
+        "angle_size",
+        "angle_start",
+        "center_offset_x",
+        "center_offset_y",
+        "dir",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "offset",
+        "radius",
+        "recolor",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "text",
+        "text_horizontal_align",
+        "text_vertical_align",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": false
+    },
+    "bar": {
+      "props": [
+        "align",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "max_value",
+        "min_value",
+        "mode",
+        "orientation",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "start_value",
+        "start_value_animated",
+        "value",
+        "value_animated",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [
+        "value"
+      ],
+      "acceptsWidgetChildren": false
+    },
+    "button": {
+      "props": [
+        "align",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [
+        "checked"
+      ],
+      "acceptsWidgetChildren": true
+    },
+    "buttonmatrix": {
+      "props": [
+        "align",
+        "ctrl_map",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "map",
+        "one_checked",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "selected_button",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": false
+    },
+    "calendar": {
+      "props": [
+        "align",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "shown_month",
+        "shown_year",
+        "today_day",
+        "today_month",
+        "today_year",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": false
+    },
+    "calendar-header_arrow": {
+      "props": [
+        "align",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": false
+    },
+    "calendar-header_dropdown": {
+      "props": [
+        "align",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": false
+    },
+    "canvas": {
+      "props": [
+        "align",
+        "ext_click_area",
+        "fill_color",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": false
+    },
+    "chart": {
+      "props": [
+        "align",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "hor_div_line_count",
+        "point_count",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "type",
+        "update_mode",
+        "ver_div_line_count",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": false
+    },
+    "chart-axis": {
+      "props": [
+        "axis",
+        "max_value",
+        "min_value"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": false
+    },
+    "chart-cursor": {
+      "props": [
+        "color",
+        "dir",
+        "pos_x",
+        "pos_y"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": false
+    },
+    "chart-series": {
+      "props": [
+        "axis",
+        "color",
+        "values"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": false
+    },
+    "checkbox": {
+      "props": [
+        "align",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "text",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [
+        "checked"
+      ],
+      "acceptsWidgetChildren": false
+    },
+    "dropdown": {
+      "props": [
+        "align",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "options",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "selected",
+        "symbol",
+        "text",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [
+        "value"
+      ],
+      "acceptsWidgetChildren": false
+    },
+    "dropdown-list": {
+      "props": [
+        "align",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": false
+    },
+    "image": {
+      "props": [
+        "align",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "inner_align",
+        "pivot_x",
+        "pivot_y",
+        "rotation",
+        "scale_x",
+        "scale_y",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "src",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [
+        "src"
+      ],
+      "acceptsWidgetChildren": false
+    },
+    "imagebutton": {
+      "props": [
+        "align",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "src_pressed_left",
+        "src_pressed_mid",
+        "src_pressed_right",
+        "src_released_left",
+        "src_released_mid",
+        "src_released_right",
+        "state",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [
+        "checked"
+      ],
+      "acceptsWidgetChildren": true
+    },
+    "keyboard": {
+      "props": [
+        "align",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "mode",
+        "popovers",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "textarea",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": false
+    },
+    "label": {
+      "props": [
+        "align",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "long_mode",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "text",
+        "translation_tag",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [
+        "text"
+      ],
+      "acceptsWidgetChildren": true
+    },
+    "led": {
+      "props": [
+        "align",
+        "brightness",
+        "color",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": false
+    },
+    "line": {
+      "props": [
+        "align",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "points",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "width",
+        "x",
+        "y",
+        "y_invert"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": false
+    },
+    "lottie": {
+      "props": [
+        "align",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "src",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": false
+    },
+    "menu": {
+      "props": [
+        "align",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "mode_header",
+        "mode_root_back_button",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": false
+    },
+    "menu-page": {
+      "props": [
+        "align",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "title",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": true
+    },
+    "msgbox": {
+      "props": [
+        "align",
+        "close_button",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "text",
+        "title",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": true
+    },
+    "msgbox-button": {
+      "props": [
+        "align",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "text",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": false
+    },
+    "obj": {
+      "props": [
+        "align",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [
+        "checked"
+      ],
+      "acceptsWidgetChildren": true
+    },
+    "qrcode": {
+      "props": [
+        "align",
+        "dark_color",
+        "data",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "light_color",
+        "quiet_zone",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "size",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": false
+    },
+    "roller": {
+      "props": [
+        "align",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "options",
+        "options_mode",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "selected",
+        "selected_animated",
+        "visible_row_count",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [
+        "value"
+      ],
+      "acceptsWidgetChildren": false
+    },
+    "scale": {
+      "props": [
+        "align",
+        "angle_range",
+        "draw_ticks_on_top",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "label_show",
+        "major_tick_every",
+        "max_value",
+        "min_value",
+        "mode",
+        "post_draw",
+        "rotation",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "total_tick_count",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": false
+    },
+    "slider": {
+      "props": [
+        "align",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "max_value",
+        "min_value",
+        "mode",
+        "orientation",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "start_value",
+        "start_value_animated",
+        "value",
+        "value_animated",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [
+        "value"
+      ],
+      "acceptsWidgetChildren": false
+    },
+    "spangroup": {
+      "props": [
+        "align",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "indent",
+        "max_lines",
+        "overflow",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": false
+    },
+    "spangroup-span": {
+      "props": [
+        "bind_text",
+        "bind_text_fmt",
+        "style",
+        "text"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": false
+    },
+    "spinbox": {
+      "props": [
+        "align",
+        "dec_point_pos",
+        "digit_count",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "max_value",
+        "min_value",
+        "rollover",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "step",
+        "value",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [
+        "value"
+      ],
+      "acceptsWidgetChildren": false
+    },
+    "spinner": {
+      "props": [
+        "align",
+        "angle",
+        "anim_duration",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": false
+    },
+    "switch": {
+      "props": [
+        "align",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "orientation",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [
+        "checked"
+      ],
+      "acceptsWidgetChildren": false
+    },
+    "table": {
+      "props": [
+        "align",
+        "column_count",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "row_count",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": false
+    },
+    "table-cell": {
+      "props": [
+        "column",
+        "ctrl",
+        "row",
+        "value"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": false
+    },
+    "table-column": {
+      "props": [
+        "column",
+        "width"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": false
+    },
+    "tabview": {
+      "props": [
+        "active",
+        "align",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "tab_bar_position",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": false
+    },
+    "tabview-tab": {
+      "props": [
+        "align",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "text",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": true
+    },
+    "tabview-tab_bar": {
+      "props": [
+        "align",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": false
+    },
+    "tabview-tab_button": {
+      "props": [
+        "align",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "index",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": false
+    },
+    "textarea": {
+      "props": [
+        "align",
+        "cursor_pos",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "max_length",
+        "one_line",
+        "password_mode",
+        "password_show_time",
+        "placeholder_text",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "text",
+        "text_selection",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": false
+    },
+    "tileview": {
+      "props": [
+        "align",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": false
+    },
+    "tileview-tile": {
+      "props": [
+        "align",
+        "col",
+        "dir",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "row",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": true
+    },
+    "win": {
+      "props": [
+        "align",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "title",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": true
+    },
+    "win-button": {
+      "props": [
+        "align",
+        "ext_click_area",
+        "flex_flow",
+        "flex_grow",
+        "height",
+        "icon",
+        "scroll_snap_x",
+        "scroll_snap_y",
+        "scrollbar_mode",
+        "width",
+        "x",
+        "y"
+      ],
+      "bindableProps": [],
+      "acceptsWidgetChildren": false
+    }
+  },
+  "styleProperties": [
+    "align",
+    "anim_duration",
+    "arc_color",
+    "arc_image_src",
+    "arc_opa",
+    "arc_rounded",
+    "arc_width",
+    "base_dir",
+    "bg_color",
+    "bg_grad",
+    "bg_grad_color",
+    "bg_grad_dir",
+    "bg_grad_stop",
+    "bg_image_recolor",
+    "bg_image_recolor_opa",
+    "bg_image_src",
+    "bg_image_tiled",
+    "bg_main_stop",
+    "bg_opa",
+    "bitmap_mask_src",
+    "blend_mode",
+    "border_color",
+    "border_opa",
+    "border_post",
+    "border_side",
+    "border_width",
+    "clip_corner",
+    "color_filter_opa",
+    "flex_cross_place",
+    "flex_flow",
+    "flex_grow",
+    "flex_main_place",
+    "flex_track_place",
+    "grid_cell_column_pos",
+    "grid_cell_column_span",
+    "grid_cell_row_pos",
+    "grid_cell_row_span",
+    "grid_cell_x_align",
+    "grid_cell_y_align",
+    "grid_column_align",
+    "grid_row_align",
+    "height",
+    "image_opa",
+    "image_recolor",
+    "image_recolor_opa",
+    "layout",
+    "length",
+    "line_color",
+    "line_dash_gap",
+    "line_dash_width",
+    "line_opa",
+    "line_rounded",
+    "line_width",
+    "margin_all",
+    "margin_bottom",
+    "margin_hor",
+    "margin_left",
+    "margin_right",
+    "margin_top",
+    "margin_ver",
+    "max_height",
+    "max_width",
+    "min_height",
+    "min_width",
+    "opa",
+    "opa_layered",
+    "outline_color",
+    "outline_opa",
+    "outline_pad",
+    "outline_width",
+    "pad_all",
+    "pad_bottom",
+    "pad_column",
+    "pad_gap",
+    "pad_hor",
+    "pad_left",
+    "pad_radial",
+    "pad_right",
+    "pad_row",
+    "pad_top",
+    "pad_ver",
+    "radial_offset",
+    "radius",
+    "recolor",
+    "recolor_opa",
+    "rotary_sensitivity",
+    "shadow_color",
+    "shadow_offset_x",
+    "shadow_offset_y",
+    "shadow_opa",
+    "shadow_spread",
+    "shadow_width",
+    "text_align",
+    "text_color",
+    "text_decor",
+    "text_font",
+    "text_letter_space",
+    "text_line_space",
+    "text_opa",
+    "transform_height",
+    "transform_pivot_x",
+    "transform_pivot_y",
+    "transform_rotation",
+    "transform_scale_x",
+    "transform_scale_y",
+    "transform_skew_x",
+    "transform_skew_y",
+    "transform_width",
+    "translate_radial",
+    "translate_x",
+    "translate_y",
+    "width"
+  ],
+  "flags": [
+    "adv_hittest",
+    "checkable",
+    "click_focusable",
+    "clickable",
+    "event_bubble",
+    "event_trickle",
+    "flex_in_new_track",
+    "floating",
+    "gesture_bubble",
+    "hidden",
+    "ignore_layout",
+    "overflow_visible",
+    "press_lock",
+    "scroll_chain",
+    "scroll_chain_hor",
+    "scroll_chain_ver",
+    "scroll_elastic",
+    "scroll_momentum",
+    "scroll_on_focus",
+    "scroll_one",
+    "scroll_with_arrow",
+    "scrollable",
+    "send_draw_task_events",
+    "snappable",
+    "state_trickle"
+  ],
+  "states": [
+    "checked",
+    "disabled",
+    "edited",
+    "focus_key",
+    "focused",
+    "hovered",
+    "pressed",
+    "scrolled"
+  ],
+  "events": [
+    "all",
+    "cancel",
+    "child_changed",
+    "child_created",
+    "child_deleted",
+    "clicked",
+    "color_format_changed",
+    "cover_check",
+    "create",
+    "defocused",
+    "delete",
+    "double_clicked",
+    "draw_main",
+    "draw_main_begin",
+    "draw_main_end",
+    "draw_post",
+    "draw_post_begin",
+    "draw_post_end",
+    "draw_task_added",
+    "flush_finish",
+    "flush_start",
+    "flush_wait_finish",
+    "flush_wait_start",
+    "focused",
+    "gesture",
+    "get_self_size",
+    "hit_test",
+    "hover_leave",
+    "hover_over",
+    "indev_reset",
+    "insert",
+    "invalidate_area",
+    "key",
+    "layout_changed",
+    "leave",
+    "long_pressed",
+    "long_pressed_repeat",
+    "press_lost",
+    "pressed",
+    "pressing",
+    "ready",
+    "refr_ext_draw_size",
+    "refr_ready",
+    "refr_request",
+    "refr_start",
+    "refresh",
+    "released",
+    "render_ready",
+    "render_start",
+    "resolution_changed",
+    "rotary",
+    "screen_load_start",
+    "screen_loaded",
+    "screen_unload_start",
+    "screen_unloaded",
+    "scroll",
+    "scroll_begin",
+    "scroll_end",
+    "scroll_throw_begin",
+    "short_clicked",
+    "single_clicked",
+    "size_changed",
+    "style_changed",
+    "triple_clicked",
+    "value_changed",
+    "vsync"
+  ],
+  "actions": {
+    "screen.back": {
+      "id": "screen.back",
+      "displayName": "返回上一屏",
+      "params": []
+    },
+    "screen.create": {
+      "id": "screen.create",
+      "displayName": "创建并打开屏幕",
+      "description": "对应 v1 的 screen_create:目标屏未创建时先创建再加载",
+      "params": [
+        {
+          "name": "screen",
+          "type": "screenRef",
+          "required": true
+        },
+        {
+          "name": "anim",
+          "type": "string"
+        },
+        {
+          "name": "duration",
+          "type": "int"
+        },
+        {
+          "name": "delay",
+          "type": "int"
+        }
+      ]
+    },
+    "screen.open": {
+      "id": "screen.open",
+      "displayName": "打开屏幕",
+      "params": [
+        {
+          "name": "screen",
+          "type": "screenRef",
+          "required": true
+        },
+        {
+          "name": "anim",
+          "type": "string"
+        },
+        {
+          "name": "duration",
+          "type": "int"
+        },
+        {
+          "name": "delay",
+          "type": "int"
+        }
+      ]
+    },
+    "subject.increment": {
+      "id": "subject.increment",
+      "displayName": "递增 Subject",
+      "params": [
+        {
+          "name": "subject",
+          "type": "subjectRef",
+          "required": true
+        },
+        {
+          "name": "step",
+          "type": "int"
+        },
+        {
+          "name": "min",
+          "type": "int"
+        },
+        {
+          "name": "max",
+          "type": "int"
+        },
+        {
+          "name": "rollover",
+          "type": "bool"
+        }
+      ]
+    },
+    "subject.set": {
+      "id": "subject.set",
+      "displayName": "设置 Subject",
+      "params": [
+        {
+          "name": "subject",
+          "type": "subjectRef",
+          "required": true
+        },
+        {
+          "name": "value",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    "subject.toggle": {
+      "id": "subject.toggle",
+      "displayName": "翻转 Subject",
+      "params": [
+        {
+          "name": "subject",
+          "type": "subjectRef",
+          "required": true
+        }
+      ]
+    }
+  },
+  "subjectTypes": [
+    "color",
+    "float",
+    "int",
+    "string"
+  ],
+  "bindingKinds": [
+    "flag",
+    "prop",
+    "state",
+    "style"
+  ],
+  "limits": {
+    "maxJsonBytes": 1048576,
+    "maxScreens": 32,
+    "maxNodes": 2000,
+    "maxDepth": 32,
+    "maxChildrenPerNode": 200,
+    "maxActions": 128,
+    "maxAssets": 256,
+    "maxAssetBytes": 8388608,
+    "maxTotalAssetBytes": 33554432,
+    "maxStringBytes": 16384
+  }
+}

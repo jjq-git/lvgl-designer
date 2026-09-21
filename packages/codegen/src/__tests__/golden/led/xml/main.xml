@@ -1,0 +1,5 @@
+<screen>
+    <view width="240" height="320">
+        <lv_led name="led_status" width="40" height="40" align="center" color="0xff3030" brightness="180"/>
+    </view>
+</screen>

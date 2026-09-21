@@ -1,0 +1,64 @@
+{
+  "screens": [
+    {
+      "name": "main",
+      "lineMap": [
+        {
+          "line": 2,
+          "nodeId": "00000305-0000-4000-8000-000000000000"
+        },
+        {
+          "line": 3,
+          "nodeId": "00000301-0000-4000-8000-000000000000"
+        },
+        {
+          "line": 4,
+          "nodeId": "00000302-0000-4000-8000-000000000000"
+        },
+        {
+          "line": 5,
+          "nodeId": "00000303-0000-4000-8000-000000000000"
+        },
+        {
+          "line": 6,
+          "nodeId": "deadbeef-1234-4abc-8def-cafe00000001"
+        }
+      ],
+      "previewNameToId": {
+        "main": "00000305-0000-4000-8000-000000000000",
+        "btn": "00000301-0000-4000-8000-000000000000",
+        "btn_2": "00000302-0000-4000-8000-000000000000",
+        "btn_3": "00000303-0000-4000-8000-000000000000",
+        "_xdeadbeef": "deadbeef-1234-4abc-8def-cafe00000001"
+      }
+    }
+  ],
+  "xmlDiagnostics": [
+    {
+      "severity": "warning",
+      "code": "W_DUP_NAME",
+      "message": "screen \"main\" 内重名 \"btn\",改为 \"btn_2\"",
+      "nodeId": "00000302-0000-4000-8000-000000000000"
+    },
+    {
+      "severity": "warning",
+      "code": "W_DUP_NAME",
+      "message": "screen \"main\" 内重名 \"btn\",改为 \"btn_3\"",
+      "nodeId": "00000303-0000-4000-8000-000000000000"
+    }
+  ],
+  "cDiagnostics": [
+    {
+      "severity": "warning",
+      "code": "W_DUP_NAME",
+      "message": "screen \"main\" 内重名 \"btn\",改为 \"btn_2\"",
+      "nodeId": "00000302-0000-4000-8000-000000000000"
+    },
+    {
+      "severity": "warning",
+      "code": "W_DUP_NAME",
+      "message": "screen \"main\" 内重名 \"btn\",改为 \"btn_3\"",
+      "nodeId": "00000303-0000-4000-8000-000000000000"
+    }
+  ]
+}

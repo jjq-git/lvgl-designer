@@ -1,0 +1,12 @@
+<screen>
+    <view width="240" height="320">
+        <lv_menu name="mn" width="200" height="200" mode_root_back_button="enabled">
+            <lv_menu-page name="_x00001802" title="Main">
+                <lv_label name="_x00001801" text="Item 1"/>
+            </lv_menu-page>
+            <lv_menu-page name="_x00001804">
+                <lv_label name="_x00001803" text="Item 2"/>
+            </lv_menu-page>
+        </lv_menu>
+    </view>
+</screen>

@@ -1,0 +1,49 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`buildWidgetLines / buildRegistryDoc > registry 文档快照(schema 变了要跟着审) 1`] = `
+"可用 widget(type(中文名) 专有props;[可含子控件]=children 可放任意 widget):
+- obj(面板) [可含子控件]
+- label(标签) text:string long_mode∈(wrap|scroll|scroll_circular|dots|clip) translation_tag:string [可含子控件]
+- button(按钮) [可含子控件]
+- slider(滑条) min_value:int max_value:int value:int start_value:int orientation∈(auto|horizontal|vertical) mode∈(normal|range|symmetrical)
+- switch(开关) orientation∈(auto|horizontal|vertical)
+- checkbox(复选框) text:string
+- bar(进度条) value:int start_value:int min_value:int max_value:int orientation∈(auto|horizontal|vertical) mode∈(normal|range|symmetrical)
+- arc(弧形) start_angle:int end_angle:int bg_start_angle:int bg_end_angle:int rotation:int value:int min_value:int max_value:int mode∈(normal|symmetrical|reverse)
+- image(图片) src:imageRef inner_align∈(top_left|top_mid|top_right|bottom_left|bottom_mid|bottom_right|right_mid|left_mid|center|stretch|tile) rotation:int scale_x:int scale_y:int pivot_x:size pivot_y:size
+- dropdown(下拉框) options:string text:string selected:int symbol:imageRef
+- roller(滚轮) selected:int visible_row_count:int options:string
+- textarea(文本框) text:string placeholder_text:string one_line:bool password_mode:bool password_show_time:int text_selection:bool cursor_pos:int
+- spinbox(数字框) value:int rollover:bool digit_count:int dec_point_pos:int min_value:int max_value:int step:int
+- qrcode(二维码) size:int dark_color:color light_color:color data:string quiet_zone:bool
+- scale(刻度尺) mode∈(horizontal_top|horizontal_bottom|vertical_left|vertical_right|round_inner|round_outer) total_tick_count:int major_tick_every:int label_show:bool post_draw:bool draw_ticks_on_top:bool min_value:int max_value:int angle_range:int rotation:int
+- buttonmatrix(按钮矩阵) map:stringQuotedList ctrl_map:orFlags selected_button:int one_checked:bool
+- calendar(日历) today_year:int today_month:int today_day:int shown_year:int shown_month:int
+- chart(图表) type∈(none|line|bar|stacked|scatter) point_count:int update_mode∈(shift|circular) hor_div_line_count:int ver_div_line_count:int
+- keyboard(键盘) mode∈(text_upper|text_lower|text_arabic|number|special|user_1|user_2|user_3|user_4) popovers:bool
+- spangroup(富文本) overflow∈(clip|ellipsis) max_lines:int indent:int
+- table(表格) column_count:int row_count:int
+- tabview(标签页) active:int tab_bar_position∈(none|top|bottom|left|right|hor|ver|all)
+- led(LED) color:color brightness:int
+- line(折线) points:pointList y_invert:bool
+- spinner(加载圈) anim_duration:int angle:int
+- imagebutton(图片按钮) src_released_left:imageRef src_released_mid:imageRef src_released_right:imageRef src_pressed_left:imageRef src_pressed_mid:imageRef src_pressed_right:imageRef state∈(released|pressed|disabled|checked_released|checked_pressed|checked_disabled) [可含子控件]
+- animimage(动画图片) srcs:stringList duration:int repeat_count:int
+- msgbox(消息框) title:string text:string close_button:bool [可含子控件]
+- list(列表) [可含子控件]
+- menu(菜单) mode_header∈(top_fixed|top_unfixed|bottom_fixed) mode_root_back_button∈(disabled|enabled)
+- win(窗口) title:string [可含子控件]
+- tileview(平铺视图)
+- arclabel(弧形文本) text:string angle_start:int angle_size:int offset:int dir∈(clockwise|counter_clockwise) recolor:bool radius:int center_offset_x:int center_offset_y:int text_vertical_align∈(default|leading|center|trailing) text_horizontal_align∈(default|leading|center|trailing)
+- canvas(画布) fill_color:color
+- lottie(Lottie 动画) src:imageRef
+
+全部 widget 通用属性(props 里直接写):x:size y:size width:size height:size align∈(top_left|top_mid|top_right|bottom_left|bottom_mid|bottom_right|right_mid|left_mid|center) flex_flow∈(column|column_reverse|column_wrap|column_wrap_reverse|row|row_reverse|row_wrap|row_wrap_reverse) flex_grow:int ext_click_area:int scroll_snap_x∈(none|start|center|end) scroll_snap_y∈(none|start|center|end) scrollbar_mode∈(off|on|active|auto)
+类型说明:size=整数px|'content'|'50%';opa=0-255|'n%';color='#RRGGBB';bool=true/false
+通用 flags(布尔,写在 flags 里):hidden|clickable|click_focusable|checkable|scrollable|scroll_elastic|scroll_momentum|scroll_one|scroll_chain_hor|scroll_chain_ver|scroll_chain|scroll_on_focus|scroll_with_arrow|snappable|press_lock|event_bubble|event_trickle|state_trickle|gesture_bubble|adv_hittest|ignore_layout|floating|send_draw_task_events|overflow_visible|flex_in_new_track
+通用 states(布尔,写在 states 里):checked|focused|focus_key|edited|hovered|pressed|scrolled|disabled
+
+常用样式键(写在 inlineStyles[].props 里):radius:size align∈(top_left|top_mid|top_right|bottom_left|bottom_mid|bottom_right|right_mid|left_mid|center) pad_hor:int pad_ver:int pad_all:int bg_opa:opa bg_color:color border_color:color border_width:int border_opa:opa outline_color:color outline_width:int outline_opa:opa outline_pad:int shadow_width:int shadow_color:color shadow_offset_x:int shadow_offset_y:int shadow_spread:int shadow_opa:opa text_color:color text_font:fontRef text_opa:opa text_align∈(left|right|center|auto) opa:opa
+text_font 可选值:montserrat_8…montserrat_48(montserrat_8..48 偶数号,仅英文数字字形)
+selector 语法:inlineStyles 元素可带 selector:{states?:['pressed'|'checked'|'focused'|'disabled'…], part?:'main'|'indicator'|'knob'|'scrollbar'|'selected'|'items'|'cursor'},省略=默认状态主部件"
+`;

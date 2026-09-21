@@ -1,0 +1,5 @@
+<globals>
+    <subjects>
+        <string name="msg" value="hello"/>
+    </subjects>
+</globals>

@@ -1,0 +1,8 @@
+<globals>
+    <subjects>
+        <int name="volume" value="30" min_value="0" max_value="100"/>
+        <int name="muted" value="0"/>
+        <string name="msg" value="hi"/>
+        <color name="accent_c" value="0xff8800"/>
+    </subjects>
+</globals>

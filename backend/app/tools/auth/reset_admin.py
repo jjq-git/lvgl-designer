@@ -96,13 +96,13 @@ def main(argv: list[str] | None = None) -> int:
         password = args.password if args.password is not None else _prompt_password()
         user = reset_admin(args.username, password, create=args.create)
     except ValueError as e:
-        print(f"✗ 失败: {e}", file=sys.stderr)
+        print(f"[ERROR] 失败: {e}", file=sys.stderr)
         return 1
     except Exception as e:  # noqa: BLE001 — 顶层入口需兜底所有异常
-        print(f"✗ 意外错误: {e}", file=sys.stderr)
+        print(f"[ERROR] 意外错误: {e}", file=sys.stderr)
         return 1
 
-    print(f"✓ 已重置账号 '{user['username']}' (id={user['id']}, role={user['role']})")
+    print(f"[OK] 已重置账号 '{user['username']}' (id={user['id']}, role={user['role']})")
     print("  该用户所有现存会话已失效，请用新密码重新登录。")
     return 0
 

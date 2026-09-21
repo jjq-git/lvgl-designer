@@ -38,7 +38,8 @@ cd F:\dengtec\lvgl-designer
 .\scripts\standalone\start.ps1
 ```
 
-安装脚本首次运行时会生成 `.env` 和随机管理员密码。浏览器访问 `http://127.0.0.1:8001/`。
+安装脚本首次运行时会从 `.env.example` 生成 `.env`。浏览器访问 `http://127.0.0.1:8001/`。
+默认管理员账号为 `admin`，密码为 `admin123`；登录页底部可点击账号自动填入。
 
 前端开发服务器：
 

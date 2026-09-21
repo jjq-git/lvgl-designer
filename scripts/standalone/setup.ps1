@@ -20,21 +20,10 @@ function Set-CompatiblePythonHome([string]$VenvRoot) {
 }
 
 if (-not (Test-Path -LiteralPath '.env')) {
-    $bytes = New-Object byte[] 24
-    $rng = [Security.Cryptography.RandomNumberGenerator]::Create()
-    try {
-        $rng.GetBytes($bytes)
-    }
-    finally {
-        $rng.Dispose()
-    }
-    $password = [Convert]::ToBase64String($bytes).TrimEnd('=').Replace('+', 'A').Replace('/', 'B')
     $templatePath = Join-Path $root '.env.example'
     $template = [IO.File]::ReadAllText($templatePath, [Text.Encoding]::UTF8)
-    $template = $template.Replace('change-me-before-first-start', $password)
     [IO.File]::WriteAllText((Join-Path $root '.env'), $template, (New-Object Text.UTF8Encoding($false)))
-    Write-Host "Created administrator: admin / $password" -ForegroundColor Yellow
-    Write-Host 'Save this password. You can change it after the first login.' -ForegroundColor Yellow
+    Write-Host 'Created administrator: admin / admin123' -ForegroundColor Yellow
 }
 
 & corepack pnpm install --frozen-lockfile

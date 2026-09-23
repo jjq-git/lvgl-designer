@@ -34,29 +34,58 @@ def _plan_fields(record: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+DELIVERY_STAGES = ("staticUpload", "stalePageDeletion", "cdnRefresh")
+DELIVERY_STATUSES = {"not_started", "running", "succeeded", "failed", "skipped"}
+
+
+def _empty_delivery() -> dict[str, dict[str, Any]]:
+    return {stage: {"status": "not_started"} for stage in DELIVERY_STAGES}
+
+
 def _delivery(record: dict[str, Any]) -> dict[str, Any]:
     committed = bool(record.get("commitSha"))
     git_status = "rolled_back" if record["status"] == "rolled_back" else ("submitted" if committed else "not_started")
-    return {
-        "git": {"status": git_status, "commitSha": record.get("commitSha")},
-        "staticUpload": {"status": "not_started"},
-        "stalePageDeletion": {"status": "not_started"},
-        "cdnRefresh": {"status": "not_started"},
+    active_commit = record.get("rollbackCommitSha") if record["status"] == "rolled_back" else record.get("commitSha")
+    result = {
+        "git": {"status": git_status, "commitSha": active_commit},
+        **_empty_delivery(),
     }
+    stored = record.get("delivery")
+    if isinstance(stored, dict):
+        for stage in DELIVERY_STAGES:
+            value = stored.get(stage)
+            if isinstance(value, dict) and value.get("status") in DELIVERY_STATUSES:
+                result[stage] = value
+    return result
+
+
+def _deployment_status(delivery: dict[str, Any]) -> str:
+    statuses = [delivery[stage]["status"] for stage in DELIVERY_STAGES]
+    if "failed" in statuses:
+        return "deployment_failed"
+    if all(status == "succeeded" for status in statuses):
+        return "deployed"
+    if delivery["cdnRefresh"]["status"] == "skipped" and all(
+        delivery[stage]["status"] == "succeeded" for stage in ("staticUpload", "stalePageDeletion")
+    ):
+        return "deployment_partial"
+    if any(status in {"running", "succeeded"} for status in statuses):
+        return "deploying"
+    return "git_submitted"
 
 
 def _decorate(record: dict[str, Any], *, include_events: bool = False) -> dict[str, Any]:
     artifact = db.artifact_dir(record["id"])
     preview_available = all((artifact / name).is_file() for name in ("document.json", "renderer.js", "styles.css"))
+    delivery = _delivery(record)
     result = {
-        **record, **_plan_fields(record), "delivery": _delivery(record),
+        **record, **_plan_fields(record), "delivery": delivery,
         "interactivePreviewAvailable": preview_available,
     }
+    if record["status"] in {"git_committed", "rolled_back"}:
+        result["deploymentStatus"] = _deployment_status(delivery)
     if record["status"] == "git_committed":
-        result.update({
-            "previewUrl": f"{git_target.public_base_url()}/?preview={record['demoId']}",
-            "deploymentStatus": "git_submitted",
-        })
+        result["previewUrl"] = f"{git_target.public_base_url()}/?preview={record['demoId']}"
     if include_events:
         result["events"] = db.events(record["ownerUserId"], record["id"])
     return result
@@ -183,7 +212,10 @@ def publish(owner_user_id: int, actor_user_id: int, publication_id: str) -> dict
         result = git_target.publish(record, db.artifact_dir(publication_id))
         committed = db.transition(
             owner_user_id, actor_user_id, publication_id, "git_committed",
-            fields={"commit_sha": result["commitSha"], "published_at": db._now(), "error_json": None},
+            fields={
+                "commit_sha": result["commitSha"], "published_at": db._now(),
+                "delivery_json": json.dumps(_empty_delivery(), separators=(",", ":")), "error_json": None,
+            },
             detail=result,
         )
         return _decorate(committed)
@@ -200,14 +232,17 @@ def rollback(owner_user_id: int, actor_user_id: int, publication_id: str) -> dic
     if record is None:
         raise PublicationError("publication-not-found", "publication not found", status_code=404)
     if record["status"] == "rolled_back":
-        return record
+        return _decorate(record)
     if record["status"] not in {"git_committed", "rollback_failed"}:
         raise PublicationError("publication-state-conflict", "only a Git-committed publication can be rolled back", status_code=409)
     try:
         result = git_target.rollback(record, db.artifact_dir(publication_id))
         rolled_back = db.transition(
             owner_user_id, actor_user_id, publication_id, "rolled_back",
-            fields={"rollback_commit_sha": result["commitSha"], "error_json": None}, detail=result,
+            fields={
+                "rollback_commit_sha": result["commitSha"],
+                "delivery_json": json.dumps(_empty_delivery(), separators=(",", ":")), "error_json": None,
+            }, detail=result,
         )
         return _decorate(rolled_back)  # type: ignore[arg-type]
     except git_target.TargetError as exc:
@@ -226,6 +261,31 @@ def get(owner_user_id: int, publication_id: str) -> dict[str, Any] | None:
 
 def list_for_project(owner_user_id: int, project_id: str) -> list[dict[str, Any]]:
     return [_decorate(record) for record in db.list_for_project(owner_user_id, project_id)]
+
+
+def record_deployment(commit_sha: str, stage: str, status: str, detail: str = "") -> dict[str, Any]:
+    if stage not in DELIVERY_STAGES or status not in DELIVERY_STATUSES:
+        raise PublicationError("deployment-callback-invalid", "invalid deployment stage or status")
+    record = db.get_by_commit(commit_sha)
+    if record is None:
+        raise PublicationError("publication-commit-not-found", "publication commit not found", status_code=404)
+    active_commit = record.get("rollbackCommitSha") if record["status"] == "rolled_back" else record.get("commitSha")
+    if active_commit != commit_sha:
+        raise PublicationError(
+            "publication-commit-superseded", "publication commit has been superseded", status_code=409,
+        )
+    delivery = record.get("delivery") if isinstance(record.get("delivery"), dict) else {}
+    next_delivery = {**_empty_delivery(), **delivery}
+    next_delivery[stage] = {"status": status, "detail": detail[:2000], "updatedAt": db._now()}
+    updated = db.transition(
+        record["ownerUserId"], record["ownerUserId"], record["id"], record["status"],
+        fields={"delivery_json": json.dumps(next_delivery, ensure_ascii=False, separators=(",", ":"))},
+        detail={"source": "target-deployment", "commitSha": commit_sha, "stage": stage,
+                "status": status, "message": detail[:2000]},
+    )
+    if updated is None:
+        raise PublicationError("publication-commit-not-found", "publication commit not found", status_code=404)
+    return _decorate(updated, include_events=True)
 
 
 def thumbnail(owner_user_id: int, publication_id: str) -> tuple[Path, str] | None:

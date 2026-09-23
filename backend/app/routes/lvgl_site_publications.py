@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import base64
+import hmac
+import os
 import uuid
+from typing import Literal
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, Header, HTTPException, Query
 from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel, Field, field_validator
 
@@ -45,6 +48,13 @@ class PrepareRequest(BaseModel):
             raise ValueError("requestId must be a UUID") from exc
 
 
+class DeploymentCallbackRequest(BaseModel):
+    commitSha: str = Field(..., pattern=r"^[0-9a-fA-F]{40}$")
+    stage: Literal["staticUpload", "stalePageDeletion", "cdnRefresh"]
+    status: Literal["not_started", "running", "succeeded", "failed", "skipped"]
+    detail: str = Field("", max_length=2000)
+
+
 def _error(exc: service.PublicationError) -> HTTPException:
     return HTTPException(status_code=exc.status_code,
                          detail={"code": exc.code, "message": str(exc), "detail": exc.detail})
@@ -75,6 +85,25 @@ def prepare_publication(request: PrepareRequest,
             user["id"], user["id"], project_id=request.projectId, frame_id=request.frameId,
             name=request.name, description=request.description, is_public=request.isPublic,
             demo_id=request.demoId, request_id=request.requestId,
+        )
+    except service.PublicationError as exc:
+        raise _error(exc) from exc
+
+
+@router.post("/deployment-callback")
+def deployment_callback(
+    request: DeploymentCallbackRequest,
+    authorization: str | None = Header(default=None),
+):
+    token = os.environ.get("LVGL_PODSC_DEPLOY_CALLBACK_TOKEN", "")
+    if len(token) < 32:
+        raise HTTPException(status_code=503, detail="deployment callback is not configured")
+    supplied = authorization or ""
+    if not hmac.compare_digest(supplied, f"Bearer {token}"):
+        raise HTTPException(status_code=401, detail="invalid deployment callback token")
+    try:
+        return service.record_deployment(
+            request.commitSha.lower(), request.stage, request.status, request.detail,
         )
     except service.PublicationError as exc:
         raise _error(exc) from exc

@@ -18,6 +18,20 @@ function frameLabel(frame: SiteTargetState['frames'][number]): string {
   return `${frame.model} · ${resolution}`;
 }
 
+const deliveryStatusLabel: Record<string, string> = {
+  not_started: '等待中',
+  submitted: '已提交',
+  rolled_back: '已回滚',
+  running: '进行中',
+  succeeded: '已完成',
+  failed: '失败',
+  skipped: '已跳过',
+};
+
+function stageLabel(status: string): string {
+  return deliveryStatusLabel[status] ?? status;
+}
+
 export function SitePublicationModal({ onClose }: { onClose: () => void }): JSX.Element {
   const projectId = useProjectsStore((state) => state.currentId);
   const projectName = useProjectsStore((state) => state.currentName);
@@ -53,6 +67,19 @@ export function SitePublicationModal({ onClose }: { onClose: () => void }): JSX.
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [busy, onClose]);
+
+  useEffect(() => {
+    if (!prepared || !['git_committed', 'rolled_back'].includes(prepared.status)
+      || ['deployed', 'deployment_partial', 'deployment_failed'].includes(prepared.deploymentStatus ?? '')) return;
+    let cancelled = false;
+    const poll = (): void => {
+      void getSitePublication(prepared.id).then((value) => {
+        if (!cancelled) setPrepared(value);
+      }).catch(() => { /* 下一轮继续查询，手动刷新仍可显示错误 */ });
+    };
+    const timer = window.setInterval(poll, 3000);
+    return () => { cancelled = true; window.clearInterval(timer); };
+  }, [prepared?.id, prepared?.status, prepared?.deploymentStatus]);
 
   const selectedDemo = useMemo(
     () => target?.demos.find((item) => item.id === demoId) ?? null,
@@ -172,12 +199,18 @@ export function SitePublicationModal({ onClose }: { onClose: () => void }): JSX.
             {prepared.diffStat && <pre>{prepared.diffStat}</pre>}
             {prepared.manifestChange && <details open><summary>清单记录差异</summary><div className="site-publish-manifest-diff"><div><strong>发布前</strong><pre>{JSON.stringify(prepared.manifestChange.before, null, 2)}</pre></div><div><strong>发布后</strong><pre>{JSON.stringify(prepared.manifestChange.after, null, 2)}</pre></div></div></details>}
             {prepared.changedPaths && <details><summary>允许写入的文件（{prepared.changedPaths.length}）</summary><pre>{prepared.changedPaths.join('\n')}</pre></details>}
-            {prepared.delivery && <dl><div><dt>Git</dt><dd>{prepared.delivery.git.status}</dd></div><div><dt>静态上传</dt><dd>{prepared.delivery.staticUpload.status}</dd></div><div><dt>旧页删除</dt><dd>{prepared.delivery.stalePageDeletion.status}</dd></div><div><dt>CDN 刷新</dt><dd>{prepared.delivery.cdnRefresh.status}</dd></div></dl>}
-            {prepared.status === 'git_committed' && <p className="site-publish-success">Git 已提交。该状态不代表 OSS/CDN 已部署上线。{prepared.previewUrl && <> 预览链接：<a href={prepared.previewUrl} target="_blank" rel="noreferrer">{prepared.previewUrl}</a></>}</p>}
-            {prepared.status === 'rolled_back' && <p className="site-publish-success">已创建补偿提交：{prepared.rollbackCommitSha}</p>}
+            {prepared.delivery && <dl><div><dt>Git</dt><dd>{stageLabel(prepared.delivery.git.status)}</dd></div><div><dt>静态上传</dt><dd>{stageLabel(prepared.delivery.staticUpload.status)}{prepared.delivery.staticUpload.detail && ` · ${prepared.delivery.staticUpload.detail}`}</dd></div><div><dt>旧页删除</dt><dd>{stageLabel(prepared.delivery.stalePageDeletion.status)}{prepared.delivery.stalePageDeletion.detail && ` · ${prepared.delivery.stalePageDeletion.detail}`}</dd></div><div><dt>CDN 刷新</dt><dd>{stageLabel(prepared.delivery.cdnRefresh.status)}{prepared.delivery.cdnRefresh.detail && ` · ${prepared.delivery.cdnRefresh.detail}`}</dd></div></dl>}
+            {prepared.status === 'git_committed' && prepared.deploymentStatus === 'deployed' && <p className="site-publish-success">网站已完成 OSS 上传、旧页清理和 CDN 刷新。{prepared.previewUrl && <> 访问链接：<a href={prepared.previewUrl} target="_blank" rel="noreferrer">{prepared.previewUrl}</a></>}</p>}
+            {prepared.status === 'git_committed' && prepared.deploymentStatus === 'deployment_failed' && <p className="site-publish-error">Git 已提交，但网站部署失败。请查看上方失败阶段或目标仓库 Actions 日志。</p>}
+            {prepared.status === 'git_committed' && prepared.deploymentStatus === 'deployment_partial' && <p className="site-publish-warning">静态文件已上传，但 CDN 刷新被跳过；当前不能确认所有访问节点已经更新。</p>}
+            {prepared.status === 'git_committed' && !['deployed', 'deployment_failed', 'deployment_partial'].includes(prepared.deploymentStatus ?? '') && <p className="site-publish-note">Git 已提交，正在等待目标仓库完成部署。窗口会自动刷新状态。</p>}
+            {prepared.status === 'rolled_back' && prepared.deploymentStatus === 'deployed' && <p className="site-publish-success">补偿提交已部署完成：{prepared.rollbackCommitSha}</p>}
+            {prepared.status === 'rolled_back' && prepared.deploymentStatus === 'deployment_failed' && <p className="site-publish-error">补偿提交已创建，但目标站回退部署失败。请查看上方失败阶段或目标仓库 Actions 日志。</p>}
+            {prepared.status === 'rolled_back' && prepared.deploymentStatus === 'deployment_partial' && <p className="site-publish-warning">补偿文件已上传，但 CDN 刷新被跳过；当前不能确认所有访问节点已经回退。</p>}
+            {prepared.status === 'rolled_back' && !['deployed', 'deployment_failed', 'deployment_partial'].includes(prepared.deploymentStatus ?? '') && <p className="site-publish-note">已创建补偿提交，正在等待目标站完成回退部署：{prepared.rollbackCommitSha}</p>}
           </div>}
         </div>
-        <footer><button className="btn" disabled={busy !== null} onClick={onClose}>关闭</button>{immutable && <button className="btn" disabled={busy !== null} onClick={resetRequest}>返回新发布</button>}{!immutable && <button className="btn primary" disabled={busy !== null || !projectId} onClick={() => void prepare()}>{busy === 'preparing' ? '准备中…' : '准备并检查'}</button>}{prepared?.status === 'preparing' && <button className="btn primary" disabled={busy !== null} onClick={() => void refresh(prepared.id)}>{busy === 'refreshing' ? '刷新中…' : '刷新准备状态'}</button>}{prepared && ['prepared', 'publishing', 'conflict'].includes(prepared.status) && <button className="btn primary" disabled={busy !== null} onClick={() => void publish()}>{busy === 'publishing' ? '提交中…' : '发布到 Git'}</button>}{prepared?.status === 'git_committed' && <button className="btn" disabled={busy !== null} onClick={() => void rollback()}>{busy === 'rolling-back' ? '回滚中…' : '创建补偿回滚'}</button>}</footer>
+        <footer><button className="btn" disabled={busy !== null} onClick={onClose}>关闭</button>{immutable && <button className="btn" disabled={busy !== null} onClick={resetRequest}>返回新发布</button>}{!immutable && <button className="btn primary" disabled={busy !== null || !projectId} onClick={() => void prepare()}>{busy === 'preparing' ? '准备中…' : '准备并检查'}</button>}{prepared?.status === 'preparing' && <button className="btn primary" disabled={busy !== null} onClick={() => void refresh(prepared.id)}>{busy === 'refreshing' ? '刷新中…' : '刷新准备状态'}</button>}{prepared && ['prepared', 'publishing', 'conflict'].includes(prepared.status) && <button className="btn primary" disabled={busy !== null} onClick={() => void publish()}>{busy === 'publishing' ? '提交中…' : '发布到 Git'}</button>}{prepared && ['git_committed', 'rolled_back'].includes(prepared.status) && <button className="btn" disabled={busy !== null} onClick={() => void refresh(prepared.id)}>{busy === 'refreshing' ? '刷新中…' : '刷新部署状态'}</button>}{prepared?.status === 'git_committed' && <button className="btn" disabled={busy !== null} onClick={() => void rollback()}>{busy === 'rolling-back' ? '回滚中…' : '创建补偿回滚'}</button>}</footer>
       </section>
       <style>{`
         .site-publish-mask{position:fixed;inset:0;z-index:9750;background:rgba(0,0,0,.32);display:flex;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(2px)}

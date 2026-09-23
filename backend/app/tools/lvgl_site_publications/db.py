@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS site_publications (
     status TEXT NOT NULL,
     commit_sha TEXT,
     rollback_commit_sha TEXT,
+    delivery_json TEXT NOT NULL DEFAULT '{}',
     error_json TEXT,
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL,
@@ -84,6 +85,8 @@ def init_db() -> None:
             conn.execute("ALTER TABLE site_publications ADD COLUMN rollback_commit_sha TEXT")
         if "request_key" not in columns:
             conn.execute("ALTER TABLE site_publications ADD COLUMN request_key TEXT")
+        if "delivery_json" not in columns:
+            conn.execute("ALTER TABLE site_publications ADD COLUMN delivery_json TEXT NOT NULL DEFAULT '{}'")
         conn.execute(
             "CREATE UNIQUE INDEX IF NOT EXISTS idx_site_publications_owner_request "
             "ON site_publications(owner_user_id, request_key) WHERE request_key IS NOT NULL"
@@ -119,6 +122,7 @@ def _row(row: sqlite3.Row) -> dict[str, Any]:
     ):
         result[new] = result.pop(old)
     result["error"] = _decode(result.pop("error_json"), None)
+    result["delivery"] = _decode(result.pop("delivery_json", None), {})
     repository = result.get("targetRepo")
     if isinstance(repository, str) and "://" in repository:
         parsed = urlsplit(repository)
@@ -221,6 +225,21 @@ def list_for_project(owner_user_id: int, project_id: str) -> list[dict[str, Any]
         conn.close()
 
 
+def get_by_commit(commit_sha: str) -> dict[str, Any] | None:
+    init_db()
+    conn = _connect()
+    try:
+        row = conn.execute(
+            """SELECT * FROM site_publications
+               WHERE commit_sha = ? OR rollback_commit_sha = ?
+               ORDER BY updated_at DESC LIMIT 1""",
+            (commit_sha, commit_sha),
+        ).fetchone()
+        return _row(row) if row else None
+    finally:
+        conn.close()
+
+
 def transition(
     owner_user_id: int,
     actor_user_id: int,
@@ -231,7 +250,8 @@ def transition(
     detail: dict[str, Any] | None = None,
 ) -> dict[str, Any] | None:
     allowed = {
-        "document_sha256", "thumbnail_sha256", "target_base_commit", "commit_sha", "rollback_commit_sha", "error_json", "published_at",
+        "document_sha256", "thumbnail_sha256", "target_base_commit", "commit_sha", "rollback_commit_sha",
+        "delivery_json", "error_json", "published_at",
     }
     values = fields or {}
     if not set(values).issubset(allowed):

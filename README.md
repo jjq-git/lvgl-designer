@@ -93,6 +93,8 @@ corepack pnpm run test:deploy
 
 服务端配置 `LVGL_PODSC_REPOSITORY`、`LVGL_PODSC_BRANCH` 和 `LVGL_PODSC_PUBLIC_URL`。Windows 可用 `LVGL_PODSC_CHROMIUM_PATH` 指向 Chrome；Docker 镜像已经安装 Chromium 和 Git。发布只允许修改版本化的 `site/uis/*`、`site/ui_list.json` 及 SEO 生成输出，`site/frames/` 始终只读。界面显示“Git 已提交”时不代表 OSS/CDN 已完成部署。
 
-每次准备请求带稳定 `requestId`，网络超时重试会恢复同一 publication 和 Demo UUID；发布窗口也可恢复准备中、待提交或已提交的历史任务。准备阶段保存锁定消费者版本的交互 renderer，并在沙箱 iframe 中展示实际预览、缩略图、清单前后差异和写入文件。空白首页、近似纯色 mock、外部资源以及首期不支持的 image/imagebutton/animimage/lottie 素材组件会阻断发布。交付回执分别显示 Git、静态上传、旧页删除和 CDN 刷新状态；首期仅 Git 会进入 `submitted`，其余保持 `not_started`。
+每次准备请求带稳定 `requestId`，网络超时重试会恢复同一 publication 和 Demo UUID；发布窗口也可恢复准备中、待提交或已提交的历史任务。准备阶段保存锁定消费者版本的交互 renderer，并在沙箱 iframe 中展示实际预览、缩略图、清单前后差异和写入文件。空白首页、近似纯色 mock、外部资源以及首期不支持的 image/imagebutton/animimage/lottie 素材组件会阻断发布。交付回执分别显示 Git、静态上传、旧页删除和 CDN 刷新状态；未配置目标仓库流水线时，后三项保持 `not_started`，不能声称已经上线。
+
+目标仓库的 Gitea Actions 可通过 `POST /api/lvgl/site-publications/deployment-callback` 回传 OSS 上传、旧页删除和 CDN 刷新状态。Designer 与目标仓库 Actions 必须配置相同的 `LVGL_PODSC_DEPLOY_CALLBACK_TOKEN`（至少 32 个随机字符），目标仓库另配置回调完整 HTTPS 地址。回调按目标 commit 精确关联 publication，不接受浏览器会话替代机器令牌。
 
 原设计器的详细架构、Schema、Preview、Generator 和验收文档位于 `docs/`。

@@ -45,16 +45,22 @@ export interface SitePublication {
   diffStat?: string;
   changedPaths?: string[];
   previewUrl?: string;
-  deploymentStatus?: 'git_submitted';
+  deploymentStatus?: 'git_submitted' | 'deploying' | 'deployed' | 'deployment_partial' | 'deployment_failed';
   interactivePreviewAvailable?: boolean;
   manifestChange?: { before: SiteDemo | Record<string, unknown> | null; after: SiteDemo | Record<string, unknown> };
   delivery?: {
     git: { status: 'not_started' | 'submitted' | 'rolled_back'; commitSha?: string | null };
-    staticUpload: { status: 'not_started' | 'uploaded' };
-    stalePageDeletion: { status: 'not_started' | 'completed' };
-    cdnRefresh: { status: 'not_started' | 'completed' };
+    staticUpload: DeliveryStage;
+    stalePageDeletion: DeliveryStage;
+    cdnRefresh: DeliveryStage;
   };
   error?: { code: string; message: string; detail?: unknown } | null;
+}
+
+export interface DeliveryStage {
+  status: 'not_started' | 'running' | 'succeeded' | 'failed' | 'skipped';
+  detail?: string;
+  updatedAt?: string;
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {

@@ -134,6 +134,91 @@ def test_publish_is_idempotent_at_database_boundary(isolated_publications, monke
     assert first["delivery"]["staticUpload"]["status"] == "not_started"
 
 
+def test_deployment_callback_is_authenticated_and_persisted(isolated_publications, monkeypatch):
+    install_fakes(monkeypatch)
+    project = project_db.create_project(7, "Panel", snapshot())
+    prepared = service.prepare(
+        7, 7, project_id=project["id"], frame_id="WF2D-8620", name="Deploy",
+        description="", is_public=False, demo_id=None,
+    )
+    commit_sha = "d" * 40
+    monkeypatch.setattr(
+        git_target, "publish",
+        lambda *_args: {"commitSha": commit_sha, "changedPaths": [], "idempotent": False},
+    )
+    service.publish(7, 7, prepared["id"])
+    token = "callback-token-with-at-least-32-characters"
+    monkeypatch.setenv("LVGL_PODSC_DEPLOY_CALLBACK_TOKEN", token)
+    api = FastAPI()
+    api.include_router(routes.router, prefix="/api/lvgl/site-publications")
+    client = TestClient(api)
+    payload = {
+        "commitSha": commit_sha, "stage": "staticUpload", "status": "succeeded",
+        "detail": "uploaded 12 files",
+    }
+    assert client.post("/api/lvgl/site-publications/deployment-callback", json=payload).status_code == 401
+    response = client.post(
+        "/api/lvgl/site-publications/deployment-callback", json=payload,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 200
+    assert response.json()["delivery"]["staticUpload"]["status"] == "succeeded"
+    stored = service.get(7, prepared["id"])
+    assert stored["delivery"]["staticUpload"]["detail"] == "uploaded 12 files"
+    assert stored["deploymentStatus"] == "deploying"
+    for stage in ("stalePageDeletion", "cdnRefresh"):
+        response = client.post(
+            "/api/lvgl/site-publications/deployment-callback",
+            json={"commitSha": commit_sha, "stage": stage, "status": "succeeded"},
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        assert response.status_code == 200
+    assert response.json()["deploymentStatus"] == "deployed"
+
+
+def test_rollback_resets_delivery_and_rejects_superseded_commit(isolated_publications, monkeypatch):
+    install_fakes(monkeypatch)
+    project = project_db.create_project(7, "Panel", snapshot())
+    prepared = service.prepare(
+        7, 7, project_id=project["id"], frame_id="WF2D-8620", name="Rollback",
+        description="", is_public=False, demo_id=None,
+    )
+    original_sha = "c" * 40
+    rollback_sha = "b" * 40
+    monkeypatch.setattr(
+        git_target, "publish",
+        lambda *_args: {"commitSha": original_sha, "changedPaths": [], "idempotent": False},
+    )
+    service.publish(7, 7, prepared["id"])
+    service.record_deployment(original_sha, "staticUpload", "succeeded")
+    monkeypatch.setattr(
+        git_target, "rollback",
+        lambda *_args: {"commitSha": rollback_sha, "changedPaths": [], "idempotent": False},
+    )
+    rolled_back = service.rollback(7, 7, prepared["id"])
+    assert rolled_back["delivery"]["git"] == {"status": "rolled_back", "commitSha": rollback_sha}
+    assert rolled_back["delivery"]["staticUpload"]["status"] == "not_started"
+    assert service.rollback(7, 7, prepared["id"])["deploymentStatus"] == "git_submitted"
+    with pytest.raises(service.PublicationError) as exc_info:
+        service.record_deployment(original_sha, "cdnRefresh", "succeeded")
+    assert exc_info.value.status_code == 409
+    assert service.record_deployment(rollback_sha, "staticUpload", "running")["deploymentStatus"] == "deploying"
+
+
+def test_deployment_callback_rejects_unknown_commit(isolated_publications, monkeypatch):
+    token = "callback-token-with-at-least-32-characters"
+    monkeypatch.setenv("LVGL_PODSC_DEPLOY_CALLBACK_TOKEN", token)
+    api = FastAPI()
+    api.include_router(routes.router, prefix="/api/lvgl/site-publications")
+    client = TestClient(api)
+    response = client.post(
+        "/api/lvgl/site-publications/deployment-callback",
+        json={"commitSha": "e" * 40, "stage": "cdnRefresh", "status": "running"},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 404
+
+
 def test_prepare_request_id_is_idempotent(isolated_publications, monkeypatch):
     install_fakes(monkeypatch)
     project = project_db.create_project(7, "Panel", snapshot())

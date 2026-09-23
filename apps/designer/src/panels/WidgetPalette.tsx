@@ -6,7 +6,16 @@
  */
 import { useMemo, useState } from 'react';
 import { paletteEntries } from '@lvd/schema';
+import { componentType, type ComponentDefV2 } from '@lvd/schema/v2';
 import { startPaletteDrag } from '../canvas/PointerDnd';
+import { useProjectStore } from '../stores/projectStore';
+import { useEditorStore } from '../stores/editorStore';
+import {
+  componentUseCount,
+  deleteUnusedComponent,
+  renameComponent,
+  updateComponentFromNode,
+} from '../services/components';
 import { WidgetThumb } from './WidgetThumb';
 import './WidgetThumbs.css';
 
@@ -44,6 +53,7 @@ const groups = paletteEntries();
 const byType = new Map(groups.flatMap((g) => g.widgets.map((w) => [w.type, w] as const)));
 
 export function WidgetPalette(): JSX.Element {
+  const project = useProjectStore((state) => state.uiProject);
   const [query, setQuery] = useState('');
   const [recent, setRecent] = useState<string[]>(() => loadJson(RECENT_KEY, []));
   const [collapsed, setCollapsed] = useState<string[]>(() => loadJson(COLLAPSED_KEY, []));
@@ -70,6 +80,10 @@ export function WidgetPalette(): JSX.Element {
     () => recent.map((t) => byType.get(t)).filter((w) => w && match(w.type, w.palette!.label)),
     [recent, q],
   );
+  const visibleComponents = project.components.filter((component) => {
+    const text = `${component.displayName ?? ''} ${component.codeName} ${component.root.type}`.toLowerCase();
+    return q === '' || text.includes(q);
+  });
 
   return (
     <div className="palette">
@@ -100,6 +114,23 @@ export function WidgetPalette(): JSX.Element {
         </div>
       )}
 
+      {visibleComponents.length > 0 && (
+        <div className="palette-group">
+          <div className="palette-cat" onClick={() => toggleCat('__components')}>
+            <span className="palette-arrow">{collapsed.includes('__components') ? '▶' : '▼'}</span>
+            可复用组件
+            <span className="palette-count">{visibleComponents.length}</span>
+          </div>
+          {(q !== '' || !collapsed.includes('__components')) && (
+            <div className="palette-rows">
+              {visibleComponents.map((component) => (
+                <ComponentCard key={component.id} component={component} onDrag={onDrag} />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {groups.map(({ category, widgets }) => {
         const visible = widgets.filter((w) => match(w.type, w.palette!.label));
         if (visible.length === 0) return null;
@@ -120,9 +151,61 @@ export function WidgetPalette(): JSX.Element {
         );
       })}
 
-      {q !== '' && groups.every(({ widgets }) => widgets.every((w) => !match(w.type, w.palette!.label))) && (
+      {q !== '' && visibleComponents.length === 0
+        && groups.every(({ widgets }) => widgets.every((w) => !match(w.type, w.palette!.label))) && (
         <div className="palette-empty">没有匹配「{query}」的控件</div>
       )}
+    </div>
+  );
+}
+
+function ComponentCard({ component, onDrag }: {
+  component: ComponentDefV2;
+  onDrag: (e: React.PointerEvent, type: string) => void;
+}): JSX.Element {
+  const type = componentType(component.id);
+  const useCount = useProjectStore((state) => componentUseCount(state.uiProject, component.id));
+  const selectedIds = useEditorStore((state) => state.selectedIds);
+  const selectedId = selectedIds.length === 1 ? selectedIds[0] : undefined;
+  return (
+    <div
+      className="palette-item palette-component"
+      data-widget={type}
+      title={`${component.displayName ?? component.codeName}（关联实例，定义修改后同步）`}
+      onPointerDown={(event) => onDrag(event, type)}
+    >
+      <WidgetThumb type={component.root.type} />
+      <span className="palette-label">{component.displayName ?? component.codeName}</span>
+      <div className="palette-component-actions">
+        <button
+          title="重命名"
+          onPointerDown={(event) => event.stopPropagation()}
+          onClick={(event) => {
+            event.stopPropagation();
+            const name = window.prompt('可复用组件名称', component.displayName ?? component.codeName);
+            if (name !== null) renameComponent(component.id, name);
+          }}
+        >✎</button>
+        <button
+          title={selectedId ? '用当前选中对象更新组件定义' : '先在对象树或画布中选择一个对象'}
+          disabled={!selectedId}
+          onPointerDown={(event) => event.stopPropagation()}
+          onClick={(event) => {
+            event.stopPropagation();
+            if (!selectedId || updateComponentFromNode(component.id, selectedId)) return;
+            useEditorStore.getState().setBanner('无法用当前选择更新组件定义');
+          }}
+        >↻</button>
+        <button
+          title={useCount > 0 ? `已有 ${useCount} 个实例，需先删除或解除关联` : '删除组件定义'}
+          disabled={useCount > 0}
+          onPointerDown={(event) => event.stopPropagation()}
+          onClick={(event) => {
+            event.stopPropagation();
+            deleteUnusedComponent(component.id);
+          }}
+        >×</button>
+      </div>
     </div>
   );
 }

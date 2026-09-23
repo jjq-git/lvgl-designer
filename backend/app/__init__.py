@@ -32,7 +32,7 @@ def _load_env() -> None:
 def create_app() -> FastAPI:
     _load_env()
 
-    from .routes import auth, lvgl, lvgl_assets, lvgl_builds, lvgl_catalog, lvgl_iot, lvgl_projects
+    from .routes import auth, lvgl, lvgl_assets, lvgl_builds, lvgl_catalog, lvgl_iot, lvgl_projects, lvgl_site_publications
     from .tools.auth import db as auth_db
 
     app = FastAPI(
@@ -49,6 +49,7 @@ def create_app() -> FastAPI:
     app.include_router(lvgl_assets.router, prefix="/api/lvgl/assets", tags=["Assets"])
     app.include_router(lvgl_catalog.router, prefix="/api/lvgl/catalog", tags=["Catalog"])
     app.include_router(lvgl_builds.router, prefix="/api/lvgl/builds", tags=["Builds"])
+    app.include_router(lvgl_site_publications.router, prefix="/api/lvgl/site-publications", tags=["Site Publications"])
     app.include_router(lvgl_iot.router, prefix="/api/integrations/iot/v1", tags=["IoT Integration"])
 
     @app.get("/api/health")

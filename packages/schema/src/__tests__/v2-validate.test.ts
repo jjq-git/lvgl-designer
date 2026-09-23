@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import type { UiProject, WidgetNodeV2 } from '../v2/uiProject.js';
 import type { ControllerProfile, DisplayProfile } from '../v2/profiles.js';
 import { validateUiProjectV2, validateDisplayProfile, validateCrossRefs } from '../v2/validate.js';
+import { componentType } from '../v2/components.js';
 
 /* ------------------------------------------------------------------ 基线 */
 
@@ -86,6 +87,18 @@ describe('v2 valid', () => {
     // themes[0] 是 base,它自己就有 color.background
     expect(validateUiProjectV2(p).errors).toEqual([]);
   });
+
+  it('可复用组件定义和关联实例通过', () => {
+    const p = project();
+    p.components.push({
+      id: 'cmp-card', codeName: 'card', api: [], styles: [], consts: [],
+      root: node({ id: 'cmp-root', type: 'button', codeName: 'root' }),
+    });
+    p.screens[0]!.root.children.push(node({
+      id: 'instance-1', type: componentType('cmp-card'), codeName: 'card_1',
+    }));
+    expect(validateUiProjectV2(p).errors).toEqual([]);
+  });
 });
 
 /* -------------------------------------------------------------- 信任层 */
@@ -109,6 +122,43 @@ describe('v2 信任层(§8)', () => {
 /* -------------------------------------------------------------- 语义层 */
 
 describe('v2 语义层', () => {
+  it('组件实例悬空或组件依赖成环会被拒绝', () => {
+    const missing = project();
+    missing.screens[0]!.root.children.push(node({ id: 'instance-x', type: componentType('missing') }));
+    expect(codes(missing)).toContain('component-not-found');
+
+    const cyclic = project();
+    cyclic.components.push(
+      {
+        id: 'cmp-a', codeName: 'cmp_a', api: [], styles: [], consts: [],
+        root: node({ id: 'a-root', children: [node({ id: 'a-b', type: componentType('cmp-b') })] }),
+      },
+      {
+        id: 'cmp-b', codeName: 'cmp_b', api: [], styles: [], consts: [],
+        root: node({ id: 'b-root', children: [node({ id: 'b-a', type: componentType('cmp-a') })] }),
+      },
+    );
+    expect(codes(cyclic)).toContain('component-cycle');
+  });
+
+  it('组件参数校验默认值、实例值和根属性重名', () => {
+    const p = project();
+    p.components.push({
+      id: 'cmp-card', codeName: 'cmp_card',
+      api: [
+        { name: 'caption', type: 'int', default: 'wrong' },
+        { name: 'width', type: 'size', default: 100 },
+      ],
+      styles: [], consts: [], root: node({ id: 'cmp-root', type: 'button' }),
+    });
+    p.screens[0]!.root.children.push(node({
+      id: 'instance-1', type: componentType('cmp-card'), props: { caption: false },
+    }));
+    const result = codes(p);
+    expect(result).toContain('component-api-conflict');
+    expect(result.filter((code) => code === 'component-api-type')).toHaveLength(2);
+  });
+
   it('引用不存在的 token → 拒绝,不静默回退(§4.6)', () => {
     const p = project();
     p.screens[0]!.root.styles = [{ props: { bg_color: { $token: 'color.nope' } } }];
@@ -191,6 +241,28 @@ describe('v2 语义层', () => {
     const c = codes(p);
     expect(c).toContain('subject-not-found');
     expect(c).toContain('style-not-found');
+  });
+
+  it('绑定能力和数据源类型不匹配 → 拒绝', () => {
+    const p = project();
+    p.subjects.push({ id: 'subject:text', codeName: 'text', type: 'string', initial: '1' });
+    p.screens[0]!.root.children = [
+      node({
+        id: 'n-slider', type: 'slider',
+        bindings: [{ kind: 'prop', prop: 'value', subject: 'subject:text' }],
+      }),
+      node({
+        id: 'n-image', type: 'image',
+        bindings: [{ kind: 'prop', prop: 'src', subject: 'subject:text' }],
+      }),
+      node({
+        id: 'n-style', type: 'button',
+        bindings: [{ kind: 'style', styleId: 'st-card', subject: 'subject:text', refValue: 1 }],
+      }),
+    ];
+    const c = codes(p);
+    expect(c).toContain('unbound-prop');
+    expect(c.filter((code) => code === 'binding-subject-type')).toHaveLength(3);
   });
 
   it('styleRefs 指向不存在的命名样式 → 拒绝', () => {

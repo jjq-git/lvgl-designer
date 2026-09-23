@@ -11,7 +11,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useProjectsStore } from '../../stores/projectsStore';
 import { useProjectStore } from '../../stores/projectStore';
-import { useEditorStore } from '../../stores/editorStore';
+import { useEditorStore, type EditorMode } from '../../stores/editorStore';
 import * as cloud from '../../services/cloudStorage';
 import type { VersionMeta } from '../../services/cloudStorage';
 import {
@@ -45,6 +45,8 @@ export function VersionHistoryDrawer({ onClose }: { onClose: () => void }): JSX.
   const [previewSeq, setPreviewSeq] = useState<number | null>(null);
   /** 进入预览前的真实文档快照 */
   const snapshotRef = useRef<StoredProjectDocument | null>(null);
+  /** 进入预览前的编辑/运行模式，退出时原样恢复。 */
+  const modeRef = useRef<EditorMode | null>(null);
 
   const flash = (tone: 'ok' | 'fail', text: string): void => setMsg({ tone, text });
 
@@ -96,6 +98,11 @@ export function VersionHistoryDrawer({ onClose }: { onClose: () => void }): JSX.
       if (home) useEditorStore.getState().setActiveScreen(home.id);
       snapshotRef.current = null;
     }
+    if (modeRef.current) {
+      useEditorStore.getState().setMode(modeRef.current);
+      modeRef.current = null;
+    }
+    useProjectsStore.getState().setCloudSyncPaused(false);
     setPreviewSeq(null);
   };
 
@@ -111,6 +118,9 @@ export function VersionHistoryDrawer({ onClose }: { onClose: () => void }): JSX.
     // 首次进入预览:快照真实文档
     if (!snapshotRef.current) {
       snapshotRef.current = createStoredProjectDocument(useProjectStore.getState().project);
+      modeRef.current = useEditorStore.getState().mode;
+      useEditorStore.getState().setMode('play');
+      useProjectsStore.getState().setCloudSyncPaused(true);
     }
     const preview = loadProjectDocument(r.data).project;
     useProjectStore.getState().loadProject(preview);

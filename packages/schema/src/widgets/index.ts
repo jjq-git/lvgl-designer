@@ -22,6 +22,13 @@ import {
 
 export { OBJ_BASE };
 export { BUTTONMATRIX_CTRL_TOKENS, TABLE_CELL_CTRL_TOKENS } from './complexWidgets.js';
+export {
+  CHILD_INTERACTIONS,
+  SCREEN_INTERACTION,
+  WIDGET_INTERACTIONS,
+  getWidgetInteraction,
+  type WidgetInteractionSpec,
+} from './interactions.js';
 
 /** 官方 XML parser 的 22 个(M1 15 + M2 7) */
 export const OFFICIAL_WIDGETS: readonly WidgetSpec[] = [

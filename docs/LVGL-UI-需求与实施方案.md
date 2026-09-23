@@ -151,7 +151,7 @@ JSON 至少描述：
 | **13 个自研 XML parser 需要自行维护** | `runtime/src/xml_parsers_extra/` 共 14 个 `.c`：13 个控件 parser（`animimage` `arclabel` `canvas` `imagebutton` `led` `line` `list` `lottie` `menu` `msgbox` `spinner` `tileview` `win`）+ 1 个聚合器 `lvd_xml_extra.c` | **【阶段 0 修正】** 静态审计已完成：13 个 parser 的 **widget API 侧零破坏**，耦合 100% 集中在 9.5 已删除的 XML 宿主层。因此不是「适配 parser」问题，而是「宿主消失」问题；其业务知识沉淀在 `manifest.json`（属性名→C setter 映射），该映射可原样升格为 IR lowering 表。见修订后的 §2.6 |
 | ~~Preview 依赖 Codegen~~ **主通道已修复** | Designer 通过 `@lvd/preview-compiler` 生成 POD PreviewProgram；仅在加载旧 9.4 runtime、缺失 Preview ABI 时调用 XML adapter | 接入 Schema v2 后删除 9.4 XML adapter、`localEmitXml.ts` 与 Designer 的 codegen 预览依赖 |
 | ~~runtime 构建不可复现~~ **已修复** | 旧脚本硬编码单机 emsdk 路径且失败被 `2>/dev/null` 吞掉；vendored LVGL 未声明可核验版本 | **【已交付】** `runtime/build.sh` 按固件 `build_web.sh` 模式重写：`LVGL_TAG` 默认 `v9.5.0` 可覆盖、`EMSDK_DIR` 参数化、缺失即显式失败、多源回退；另加固件脚本没有的**版本断言**（源码版本与 tag 不符即失败）与**构建 manifest**（LVGL commit / `lv_conf.h` 哈希 / emcc 版本）。`CMakeLists.txt` 的 LVGL 路径改为 `-DLVD_LVGL_DIR` 参数。失败路径由 `packages/lvgl-runtime/src/buildScript.test.ts` 覆盖（不需 emsdk） |
-| Components 未闭环 | 类型已存在，但 Validator 对非空 `components` 直接报错 | 在 Schema 评审后打通 Preview/Codegen/Editor |
+| ~~Components 未闭环~~ **已修复** | Schema v2 使用 `component:<id>` 保存关联实例；编辑器支持从子树创建、重复拖放、更新定义、解除关联与安全删除 | Preview、LVGL 9.5 C 和 Web UI JSON 在发布投影阶段确定性展开；v1 的非空 `components` 阻断仅作为旧格式兼容边界保留 |
 | `cPatch` 信任边界 | 普通 Project/JSON 导入已由 Validator 拒绝；9.5 emitter 也报 `E_CPATCH_FORBIDDEN` 且不落盘片段；9.4 仅保留存量兼容 | 完成 calendar/chart typed property，再设计带权限、签名/哈希与人工审批的独立 trusted extension |
 | ~~色彩预览固定 32bpp~~ **已修复** | 9.5 host 运行时调用 `lv_display_set_color_format` 并重建 partial buffer；Canvas flush 显式转换五种格式 | 由 `BuildTarget` 传入目标格式；用固件 simulator/真机截图继续校准像素阈值 |
 

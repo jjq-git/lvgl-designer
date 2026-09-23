@@ -138,7 +138,7 @@ TS 契约 = design/02 §3.1 的 `LvglRuntime` 类(错误统一 `LvglError` + 日
 - C 输出布局:`src/ui/`(CMakeLists/ui.h/ui.c/ui_conf.h/objects.h/styles.*/subjects.*/screens/*/fonts/images/actions.h + actions_default.c(weak)+ actions.c(只生成一次,用户所有))。`emitC94` 保留历史兼容；`emitC95` 是产品目标，对三种 target 生成精确钉死 9.5.0 的说明和 `build-manifest.json`（含资源哈希与未实现 Action）。详见 `lvgl-generator.md`。
 - 事件回调保护 = **分文件 + weak 兜底**(纯写入结构上不可能吞用户代码)。
 - 测试:golden 文本快照 + host gcc 编译冒烟(CI 必跑);XML↔C 像素对拍推迟 M3+/nightly(评审 O2)。
-- 一期 XML emitter 只输出 `<screen>` 文档,components 非空即校验拒绝(评审 G7)。
+- 旧 v1 XML emitter 仍只输出 `<screen>` 文档并拒绝非空 `components`；当前 v2 编辑模型以 `component:<id>` 保存关联实例，在进入 Preview/C/Web emitter 前展开为普通 Widget Tree。
 
 ### 3.7 前端(design/04,按裁决修正)
 

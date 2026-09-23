@@ -82,6 +82,7 @@ const SIGS: Record<string, [string | null, string[]]> = {
   lvd_preview_bind_prop: ['number', ['string', 'string', 'string', 'string']],
   lvd_preview_bind_flag: ['number', ['string', 'string', 'string', 'string', 'number']],
   lvd_preview_bind_state: ['number', ['string', 'string', 'string', 'string', 'number']],
+  lvd_preview_bind_style: ['number', ['string', 'string', 'string', 'string', 'string', 'number']],
   lvd_preview_add_callback_event: ['number', ['string', 'string', 'string', 'string', 'number']],
   lvd_preview_add_subject_set_event: ['number', ['string', 'string', 'string', 'string', 'string']],
   lvd_preview_add_subject_toggle_event: ['number', ['string', 'string', 'string']],
@@ -108,7 +109,7 @@ const PREVIEW_EXPORTS = [
   'lvd_preview_set_flag',
   'lvd_preview_set_state', 'lvd_preview_set_style_i32', 'lvd_preview_set_style_string',
   'lvd_preview_add_style', 'lvd_preview_bind_prop', 'lvd_preview_bind_flag',
-  'lvd_preview_bind_state', 'lvd_preview_add_callback_event',
+  'lvd_preview_bind_state', 'lvd_preview_bind_style', 'lvd_preview_add_callback_event',
   'lvd_preview_add_subject_set_event', 'lvd_preview_add_subject_toggle_event',
   'lvd_preview_add_subject_increment_event', 'lvd_preview_add_screen_event',
   'lvd_preview_finish',
@@ -484,6 +485,8 @@ export class LvglRuntime implements LvglRuntimeApi {
         call('lvd_preview_bind_flag', name, flag, op, subjectName, refValue),
       bindState: (name, state, op, subjectName, refValue) =>
         call('lvd_preview_bind_state', name, state, op, subjectName, refValue),
+      bindStyle: (name, styleName, part, states, subjectName, refValue) =>
+        call('lvd_preview_bind_style', name, styleName, part, states, subjectName, refValue),
       addCallbackEvent: (name, trigger, callback, userData, hasUserData) =>
         call('lvd_preview_add_callback_event', name, trigger, callback, userData, Number(hasUserData)),
       addSubjectSetEvent: (name, trigger, subjectName, subjectType, value) =>

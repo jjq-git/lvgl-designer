@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node server-ai.mjs",
     "migrate": "node migrate.mjs",
-    "test": "node --experimental-test-module-mocks --test snapshot-policy.test.mjs handlers-logic.test.mjs",
+    "test": "node --test snapshot-policy.test.mjs handlers-logic.test.mjs",
     "test:db": "node test-db-integration.mjs"
   },
   "dependencies": {

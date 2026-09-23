@@ -9,13 +9,16 @@ RUN corepack enable \
     && corepack pnpm install --frozen-lockfile \
     && corepack pnpm --filter @lvd/designer build \
     && corepack pnpm --filter @lvd/build-worker build \
-    && corepack pnpm --filter @lvd/preview-host build
+    && corepack pnpm --filter @lvd/preview-host build \
+    && mkdir -p /workspace/publisher_node_modules \
+    && cp -LR node_modules/playwright /workspace/publisher_node_modules/playwright \
+    && cp -LR node_modules/.pnpm/playwright@*/node_modules/playwright-core /workspace/publisher_node_modules/playwright-core
 
 FROM python:3.11-slim AS runtime
 
 WORKDIR /workspace
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends build-essential cmake ninja-build \
+    && apt-get install -y --no-install-recommends build-essential cmake ninja-build git chromium \
     && rm -rf /var/lib/apt/lists/*
 
 COPY backend/requirements.txt ./backend/requirements.txt
@@ -28,11 +31,14 @@ COPY --from=web /usr/local/bin/node /usr/local/bin/node
 COPY --from=web /workspace/apps/designer/dist/ ./apps/designer/dist/
 COPY --from=web /workspace/apps/build-worker/dist/ ./apps/build-worker/dist/
 COPY --from=web /workspace/apps/preview-host/dist/ ./apps/preview-host/dist/
+COPY --from=web /workspace/publisher_node_modules/ ./node_modules/
 
 ENV AUTH_DATA_DIR=/workspace/auth_data \
     LVGL_DATA_DIR=/workspace/lvgl_data \
     LVD_STATIC_DIR=/workspace/apps/designer/dist \
     LVGL_BUILD_WORKER_PATH=/workspace/apps/build-worker/dist/lvgl-build-worker.mjs \
+    LVGL_SITE_PUBLICATION_WORKER_PATH=/workspace/apps/build-worker/dist/lvgl-site-publication-worker.mjs \
+    LVGL_PODSC_CHROMIUM_PATH=/usr/bin/chromium \
     LVGL_HOST_SOURCE_DIR=/workspace/lvgl-source \
     LVGL_CMAKE_BINARY=/usr/bin/cmake \
     LVGL_BUILD_COMPILE_GATE=host

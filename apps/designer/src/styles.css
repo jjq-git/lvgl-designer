@@ -319,6 +319,19 @@ select.ed-select:focus-visible,
   transform: translateY(-1px);
 }
 .palette-item:active { cursor: grabbing; box-shadow: 0 1px 4px rgba(0, 113, 227, 0.2); transform: none; }
+.palette-component { position: relative; border-style: dashed; }
+.palette-component::before {
+  content: "关联"; position: absolute; left: 5px; top: 4px;
+  color: var(--accent); font-size: 9px; line-height: 1;
+}
+.palette-component-actions { position: absolute; right: 2px; top: 1px; display: flex; }
+.palette-component-actions button {
+  width: 17px; height: 18px; padding: 0; border: 0; border-radius: 50%;
+  background: transparent; color: var(--fg-dim); cursor: pointer; line-height: 18px;
+}
+.palette-component-actions button:hover:not(:disabled) { background: var(--bg-hover); color: var(--accent); }
+.palette-component-actions button:last-child:hover:not(:disabled) { color: #d70015; }
+.palette-component-actions button:disabled { opacity: 0.25; cursor: not-allowed; }
 .palette-label {
   max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   color: var(--fg); font-weight: 500;
@@ -359,7 +372,22 @@ select.ed-select:focus-visible,
 .tree-row.sel .tree-type { color: rgba(255, 255, 255, 0.75); }
 .tree-row.dragging { opacity: 0.5; }
 .tree-type { color: var(--fg-secondary); font-size: 11px; flex: 0 0 auto; }
-.tree-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tree-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tree-action {
+  display: none;
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.tree-row:hover .tree-action, .tree-row.sel .tree-action { display: inline-grid; place-items: center; }
+.tree-action:hover { background: rgba(0, 0, 0, 0.08); }
+.tree-row.sel .tree-action:hover { background: rgba(255, 255, 255, 0.2); }
 
 .ctx-menu {
   position: fixed;
@@ -744,6 +772,40 @@ input::placeholder { color: var(--fg-hint); }
 .child-head .clickable { flex: 1 1 auto; cursor: pointer; user-select: none; }
 .child-head .icon-btn.active { color: var(--accent); }
 .child-body { padding: 0 6px 6px; }
+.companion-row { padding-left: 10px; }
+.companion-row label::before { content: '↳ '; color: var(--fg-hint); }
+
+/* ---------- 交互 / 数据绑定 ---------- */
+.interaction-title { display: flex; align-items: center; gap: 6px; }
+.interaction-title > span { flex: 1 1 auto; }
+.binding-add-row { display: flex; margin: 4px 0 6px; }
+.binding-add-row .ed-select { flex: 1 1 auto; min-width: 0; }
+.action-create-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 5px;
+  margin: 6px 0;
+}
+.action-create-row .btn { justify-self: end; }
+
+.named-style-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0;
+}
+
+.named-style-usage {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.action-registry-item code { overflow-wrap: anywhere; }
+.subject-item .child-head > span { flex: 1 1 auto; }
 
 /* ---------- 表格网格 ---------- */
 .table-grid { margin: 4px 0; }

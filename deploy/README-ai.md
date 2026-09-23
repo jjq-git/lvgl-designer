@@ -156,7 +156,7 @@ cd deploy && pnpm install --ignore-workspace   # deploy 不属根 workspace,须 
 
 - 本机(无 DATABASE_URL):`npm test` —— `snapshot-policy.test.mjs`(快照滚动/去抖纯逻辑 + DB 降级 + 503 分支)
   与 `handlers-logic.test.mjs`(内存假库驱动真实 handler,验乐观锁 409 / owner 越权 404 / restore 备份 / 级联删)。
-  共 16 项全绿(handlers 用 `--experimental-test-module-mocks`,test 脚本已带该 flag)。
+  共 16 项全绿(handlers 通过显式测试数据库适配器注入，兼容项目要求的 Node 20+)。
 - 真库:`test-db-integration.mjs` 需真实 `DATABASE_URL`,在服务器容器网络内跑
   (如 `docker run --rm --network exam-notebook_app-net -e DATABASE_URL=... node ... node test-db-integration.mjs`)。
   已在服务器 `en-postgres`(postgres:16-alpine)上用 psql 跑通 `migrate` 的 SQL:两次连跑均成功、第二次仅

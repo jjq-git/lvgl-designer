@@ -15,6 +15,7 @@ import {
   type PreviewColorFormat,
 } from './stores/buildTargetStore';
 import { getPipeline } from './canvas/reloadPipeline';
+import { hasPermission, useAuthStore } from './stores/authStore';
 
 // 预设来自本机仓库实际在用的屏(2026-07-02 全仓盘点,详见 docs/screen-inventory.md)
 const SIZE_PRESETS = [
@@ -46,6 +47,8 @@ export function Toolbar(): JSX.Element {
   const colorFormatConfirmed = useBuildTargetStore((s) => s.colorFormatConfirmed);
   const controllerPreset = useBuildTargetStore((s) => s.controllerPreset);
   const catalogTargetRef = useBuildTargetStore((s) => s.catalogTargetRef);
+  const canPublishSite = useAuthStore((state) => hasPermission(state.me, 'tool.lvgl.publish'));
+  const cloudProjectId = useProjectsStore((state) => state.currentId);
 
   const [customOpen, setCustomOpen] = useState(false);
   const [creatingProject, setCreatingProject] = useState(false);
@@ -138,10 +141,10 @@ export function Toolbar(): JSX.Element {
         目标与构建
       </button>
       <span className="sep" />
-      <button className="btn" disabled={!canUndo} title="Ctrl+Z" onClick={() => useProjectStore.getState().undo()}>
+      <button className="btn" disabled={!canUndo || mode !== 'design'} title="Ctrl+Z" onClick={() => useProjectStore.getState().undo()}>
         ↶ 撤销
       </button>
-      <button className="btn" disabled={!canRedo} title="Ctrl+Y" onClick={() => useProjectStore.getState().redo()}>
+      <button className="btn" disabled={!canRedo || mode !== 'design'} title="Ctrl+Y" onClick={() => useProjectStore.getState().redo()}>
         ↷ 重做
       </button>
       <span className="sep" />
@@ -267,6 +270,14 @@ export function Toolbar(): JSX.Element {
         onClick={() => { void exportWebUiJson(useProjectStore.getState().project); }}
       >
         导出网页 UI JSON
+      </button>
+      <button
+        className="btn"
+        disabled={!canPublishSite || cloudProjectId === null}
+        title={!canPublishSite ? '需要 tool.lvgl.publish 权限' : cloudProjectId === null ? '请先保存为云端工程' : '准备并发布到 ui.podsc.com；不会修改设备外框'}
+        onClick={() => window.dispatchEvent(new Event('lvd:open-site-publication'))}
+      >
+        发布到 ui.podsc.com
       </button>
       <span className="sep" />
       <button

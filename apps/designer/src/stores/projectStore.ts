@@ -10,6 +10,7 @@ import { applyPatches, enablePatches, produceWithPatches, type Patch } from 'imm
 import { createEmptyProject, type DisplayConfig, type LvProject } from '@lvd/schema';
 import {
   snapshotToEditorProject,
+  type ActionRegistry,
   type ProjectSnapshotV2,
   type UiProject,
 } from '@lvd/schema/v2';
@@ -24,6 +25,8 @@ export interface HistoryEntry {
   /** Present for edits whose canonical target is UiProject v2. */
   uiPatches?: Patch[];
   uiInversePatches?: Patch[];
+  actionRegistryBefore?: ActionRegistry;
+  actionRegistryAfter?: ActionRegistry;
   coalesceKey?: string;
   ts: number;
 }
@@ -63,6 +66,7 @@ export interface ProjectStoreState {
   /** DisplayProfile 兼容控件专用；不能修改 UiProject 树。 */
   mutateDisplay(label: string, recipe: (draft: DisplayConfig) => void, opts?: MutateOptions): void;
   mutateV2(label: string, recipe: (draft: UiProject) => void, opts?: MutateOptions): void;
+  mutateActionRegistry(label: string, recipe: (draft: ActionRegistry) => void): void;
   beginInteraction(label: string, coalesceKey: string): void;
   commitInteraction(): void;
   abortInteraction(): void;
@@ -203,6 +207,31 @@ export const useProjectStore = create<ProjectStoreState>()((set, get) => ({
     });
   },
 
+  mutateActionRegistry(label, recipe) {
+    if (interaction) get().commitInteraction();
+    const s = get();
+    const current = useBuildTargetStore.getState().actionRegistry;
+    const [next, patches] = produceWithPatches(current, recipe);
+    if (patches.length === 0) return;
+    useBuildTargetStore.getState().replaceActionRegistry(next);
+    const entry: HistoryEntry = {
+      label,
+      patches: [],
+      inversePatches: [],
+      actionRegistryBefore: current,
+      actionRegistryAfter: next,
+      ts: Date.now(),
+    };
+    set({
+      revision: s.revision + 1,
+      dirty: true,
+      lastPatches: [],
+      lastChangeKind: 'mutate',
+      undoStack: recordHistory(s.undoStack, entry),
+      redoStack: [],
+    });
+  },
+
   beginInteraction(label, coalesceKey) {
     if (interaction) get().commitInteraction();
     interaction = {
@@ -264,6 +293,18 @@ export const useProjectStore = create<ProjectStoreState>()((set, get) => ({
     const s = get();
     const entry = s.undoStack[s.undoStack.length - 1];
     if (!entry) return;
+    if (entry.actionRegistryBefore) {
+      useBuildTargetStore.getState().replaceActionRegistry(entry.actionRegistryBefore);
+      set({
+        revision: s.revision + 1,
+        dirty: true,
+        lastPatches: [],
+        lastChangeKind: 'undo',
+        undoStack: s.undoStack.slice(0, -1),
+        redoStack: [...s.redoStack, entry],
+      });
+      return;
+    }
     const uiProject = entry.uiInversePatches
       ? applyPatches(s.uiProject, entry.uiInversePatches)
       : s.uiProject;
@@ -291,6 +332,18 @@ export const useProjectStore = create<ProjectStoreState>()((set, get) => ({
     const s = get();
     const entry = s.redoStack[s.redoStack.length - 1];
     if (!entry) return;
+    if (entry.actionRegistryAfter) {
+      useBuildTargetStore.getState().replaceActionRegistry(entry.actionRegistryAfter);
+      set({
+        revision: s.revision + 1,
+        dirty: true,
+        lastPatches: [],
+        lastChangeKind: 'redo',
+        undoStack: [...s.undoStack, entry],
+        redoStack: s.redoStack.slice(0, -1),
+      });
+      return;
+    }
     const uiProject = entry.uiPatches ? applyPatches(s.uiProject, entry.uiPatches) : s.uiProject;
     const project = entry.uiPatches ? projectFromUi(uiProject) : applyPatches(s.project, entry.patches);
     if (entry.uiPatches) {

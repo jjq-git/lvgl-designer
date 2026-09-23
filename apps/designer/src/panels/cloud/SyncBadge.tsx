@@ -18,6 +18,7 @@ export function SyncBadge(): JSX.Element | null {
   const cloudEnabled = useProjectsStore((s) => s.cloudEnabled);
   const syncState = useProjectsStore((s) => s.syncState);
   const currentId = useProjectsStore((s) => s.currentId);
+  const cloudSyncPaused = useProjectsStore((s) => s.cloudSyncPaused);
 
   if (!cloudEnabled) {
     return (
@@ -51,13 +52,14 @@ export function SyncBadge(): JSX.Element | null {
 
   return (
     <button
-      className={`sync-badge ${l.cls}`}
+      className={`sync-badge ${cloudSyncPaused ? 'local' : l.cls}`}
       onClick={onClick}
-      disabled={syncState === 'saving'}
-      title={title}
+      disabled={syncState === 'saving' || cloudSyncPaused}
+      title={cloudSyncPaused ? '正在预览历史版本，已暂停云同步' : title}
     >
-      <span className="sync-dot">{syncState === 'synced' ? '✓' : l.dot}</span> {l.text}
-      {syncState === 'conflict' && <span>· 强制保存</span>}
+      <span className="sync-dot">{cloudSyncPaused ? '●' : syncState === 'synced' ? '✓' : l.dot}</span>{' '}
+      {cloudSyncPaused ? '预览中' : l.text}
+      {!cloudSyncPaused && syncState === 'conflict' && <span>· 强制保存</span>}
     </button>
   );
 }

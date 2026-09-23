@@ -23,9 +23,10 @@ import {
   type LvProject,
   type WidgetNode,
 } from '@lvd/schema';
+import type { WidgetNodeV2 } from '@lvd/schema/v2';
 import { emitXml } from '../services/codegen/adapter';
 import { fmtStyleValue, keyMapFor, selectorSuffix } from '../services/codegen/localEmitXml';
-import { findNodeById, useProjectStore } from '../stores/projectStore';
+import { findNodeById, findNodeByIdV2, useProjectStore } from '../stores/projectStore';
 import {
   runtimeColorFormat as resolvedRuntimeColorFormat,
   useBuildTargetStore,
@@ -465,7 +466,12 @@ export class ReloadPipeline {
   nodeIdAt(x: number, y: number): string | null {
     const name = this.runtime.hitTest(x, y);
     if (!name) return null;
-    return this.nameToId.get(name) ?? null;
+    const runtimeId = this.nameToId.get(name);
+    if (!runtimeId) return null;
+    const uiProject = useProjectStore.getState().uiProject;
+    if (findNodeByIdV2(uiProject, runtimeId)) return runtimeId;
+    const instanceId = runtimeId.split('::', 1)[0];
+    return instanceId && findNodeByIdV2(uiProject, instanceId) ? instanceId : runtimeId;
   }
 
   nameOf(nodeId: string): string | null {
@@ -491,12 +497,12 @@ export class ReloadPipeline {
    * 走 getObjRects(新语义:返回 Map,缺失/负尺寸的键不在 map 里)。
    */
   activeScreenNodeRects(): Map<string, LvdRect> {
-    const project = useProjectStore.getState().project;
+    const project = useProjectStore.getState().uiProject;
     const activeId = useEditorStore.getState().activeScreenId;
     const screen = project.screens.find((s) => s.id === activeId) ?? project.screens[0];
     if (!screen) return new Map();
     const ids: string[] = [];
-    const walk = (n: WidgetNode): void => {
+    const walk = (n: WidgetNodeV2): void => {
       for (const c of n.children) {
         ids.push(c.id); // 屏根不选,只收子孙
         walk(c);

@@ -68,6 +68,8 @@ function fakeBridge(calls: string[]): PreviewBridge {
       (calls.push(`bind-flag:${name}:${flag}:${op}:${subject}:${refValue}`), 0),
     bindState: (name, state, op, subject, refValue) =>
       (calls.push(`bind-state:${name}:${state}:${op}:${subject}:${refValue}`), 0),
+    bindStyle: (name, styleName, part, states, subject, refValue) =>
+      (calls.push(`bind-style:${name}:${styleName}:${part}:${states}:${subject}:${refValue}`), 0),
     addCallbackEvent: (name, trigger, callback, userData, hasUserData) =>
       (calls.push(`event-callback:${name}:${trigger}:${callback}:${userData}:${hasUserData}`), 0),
     addSubjectSetEvent: (name, trigger, subject, type, value) =>
@@ -101,6 +103,20 @@ describe('PreviewProgram runtime executor', () => {
     expect(calls.at(-1)).toBe('finish:main');
   });
 
+  it('通用 align 属性通过现有 style bridge 预览并校验枚举', () => {
+    const p = program();
+    const label = p.screens[0]!.root.children[0]!.children[0]!;
+    label.props.align = 'top_mid';
+    const calls: string[] = [];
+    expect(validatePreviewProgramSupport(p)).toEqual([]);
+    executePreviewProgram(p, fakeBridge(calls));
+    expect(calls).toContain('style-str:title:align:top_mid:main:');
+
+    label.props.align = 'not-an-align';
+    expect(validatePreviewProgramSupport(p).map((entry) => entry.code))
+      .toContain('E_PREVIEW_PROP_ENUM_INVALID');
+  });
+
   it('一期常用 inline style 保留 selector 并走受控 bridge', () => {
     const p = program();
     p.screens[0]!.root.inlineStyles.push({
@@ -131,6 +147,24 @@ describe('PreviewProgram runtime executor', () => {
     expect(calls).toContain('named-style-str:card:bg_opa:80%');
     expect(calls).toContain('add-style:main:card:main:pressed');
     expect(calls.indexOf('create-style:card')).toBeLessThan(calls.indexOf('screen:main'));
+  });
+
+  it('命名 style 可由 int 数据源按目标值动态启用', () => {
+    const p = program();
+    p.globals.styles.push({ name: 'alarm', props: { bg_color: '#ff0000' } });
+    p.globals.subjects.push({ name: 'alarm_on', type: 'int', initial: 0 });
+    p.screens[0]!.root.children[0]!.bindings.push({
+      kind: 'style', styleName: 'alarm', selector: { states: ['pressed'] },
+      subject: 'alarm_on', refValue: 1,
+    });
+    const calls: string[] = [];
+    expect(validatePreviewProgramSupport(p)).toEqual([]);
+    executePreviewProgram(p, fakeBridge(calls));
+    expect(calls).toContain('bind-style:panel:alarm:main:pressed:alarm_on:1');
+
+    p.globals.subjects[0] = { name: 'alarm_on', type: 'string', initial: 'no' };
+    expect(validatePreviewProgramSupport(p).map((entry) => entry.code))
+      .toContain('E_PREVIEW_BINDING_UNSUPPORTED');
   });
 
   it('执行 tabview/list add/getter 与 table virtual 结构子元素', () => {

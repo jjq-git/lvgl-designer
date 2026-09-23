@@ -66,7 +66,10 @@ function resolveStyleName(
   screen: ScreenDef,
   project: LvProject,
 ): CName | undefined {
-  const s = screen.styles.find((x) => x.id === styleId) ?? project.styles.find((x) => x.id === styleId);
+  // 普通 style usage 保存 UUID；v1 Binding.styleRef 按历史契约保存 CName。
+  // 两条输入都会经过 normalize，因此这里同时接受 id/name，避免 v2 snapshot 降级后悬空。
+  const matches = (style: ScreenDef['styles'][number]): boolean => style.id === styleId || style.name === styleId;
+  const s = screen.styles.find(matches) ?? project.styles.find(matches);
   return s?.name;
 }
 
@@ -231,7 +234,7 @@ function normalizeNode(
   // ---- 绑定
   const bindings: IRBinding[] = [];
   for (const b of node.bindings) {
-    const irb = normalizeBinding(b, spec, node, ctx);
+    const irb = normalizeBinding(b, spec, node, screen, project, ctx);
     if (irb) bindings.push(irb);
   }
 
@@ -263,22 +266,49 @@ function normalizeBinding(
   b: Binding,
   spec: WidgetSpec | undefined,
   node: WidgetNode,
+  screen: ScreenDef,
+  project: LvProject,
   ctx: Ctx,
 ): IRBinding | null {
-  if (b.kind === 'style') {
-    warn(ctx, 'W_UNSUPPORTED_BINDING', 'bind_style 一期不实现,已跳过', node.id);
-    return null;
-  }
-  if (!ctx.subjectTypes.has(b.subject)) {
+  const subjectType = ctx.subjectTypes.get(b.subject);
+  if (!subjectType) {
     err(ctx, 'E_DANGLING_SUBJECT', `绑定引用不存在的 subject:${b.subject}`, node.id);
     return null;
+  }
+  if (b.kind === 'style') {
+    const styleName = resolveStyleName(b.styleRef, screen, project);
+    if (!styleName) {
+      err(ctx, 'E_DANGLING_STYLE', `样式绑定引用不存在的 style:${b.styleRef}`, node.id);
+      return null;
+    }
+    if (subjectType !== 'int') {
+      err(ctx, 'E_BINDING_SUBJECT_TYPE', `样式绑定只支持 int subject:${b.subject}`, node.id);
+      return null;
+    }
+    return {
+      kind: 'style', styleName, selector: b.selector,
+      subject: b.subject, refValue: b.refValue,
+    };
   }
   if (b.kind === 'prop') {
     if (!spec || !spec.bindableProps.includes(b.prop)) {
       err(ctx, 'E_UNBINDABLE_PROP', `${node.type} 不支持 bind_${b.prop}`, node.id);
       return null;
     }
+    const validType = b.prop === 'text'
+      ? subjectType === 'int' || subjectType === 'float' || subjectType === 'string'
+      : b.prop === 'checked'
+        ? subjectType === 'int'
+        : subjectType === 'int' || subjectType === 'float';
+    if (!validType) {
+      err(ctx, 'E_BINDING_SUBJECT_TYPE', `${node.type}.bind_${b.prop} 不支持 ${subjectType} subject`, node.id);
+      return null;
+    }
     return { kind: 'prop', prop: b.prop, subject: b.subject, fmt: b.fmt };
+  }
+  if (subjectType !== 'int') {
+    err(ctx, 'E_BINDING_SUBJECT_TYPE', `${b.kind} 条件绑定只支持 int subject:${b.subject}`, node.id);
+    return null;
   }
   if (b.kind === 'flag') {
     return { kind: 'flag', flag: b.flag, op: b.op, subject: b.subject, refValue: b.refValue };

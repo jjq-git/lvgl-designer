@@ -25,6 +25,7 @@ import { CloudPanels } from './panels/cloud/CloudPanels';
 import { copySelection, pasteClipboard, duplicateSelection } from './services/clipboard';
 import { ShortcutsHelp } from './panels/ShortcutsHelp';
 import { CatalogPanel } from './panels/catalog/CatalogPanel';
+import { SitePublicationModal } from './panels/SitePublicationModal';
 
 let bootstrapped = false;
 
@@ -33,6 +34,7 @@ export function App(): JSX.Element {
   const [leftTab, setLeftTab] = useState<'widgets' | 'assets'>('widgets');
   const [helpOpen, setHelpOpen] = useState(false);
   const [catalogOpen, setCatalogOpen] = useState(false);
+  const [sitePublicationOpen, setSitePublicationOpen] = useState(false);
 
   /* 启动:恢复最近工程 + 自动保存 + 全局快捷键 */
   useEffect(() => {
@@ -76,8 +78,9 @@ export function App(): JSX.Element {
     const onKey = (e: KeyboardEvent): void => {
       const t = e.target as HTMLElement;
       const typing = t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement || t.isContentEditable;
+      const isDesignMode = useEditorStore.getState().mode === 'design';
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !e.shiftKey) {
-        if (typing) return;
+        if (typing || !isDesignMode) return;
         e.preventDefault();
         useProjectStore.getState().undo();
         return;
@@ -86,26 +89,26 @@ export function App(): JSX.Element {
         (e.ctrlKey || e.metaKey) &&
         (e.key.toLowerCase() === 'y' || (e.key.toLowerCase() === 'z' && e.shiftKey))
       ) {
-        if (typing) return;
+        if (typing || !isDesignMode) return;
         e.preventDefault();
         useProjectStore.getState().redo();
         return;
       }
       // 复制 / 粘贴 / 复刻(仅设计态;typing 守卫)
       if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'c') {
-        if (typing || useEditorStore.getState().mode !== 'design') return;
+        if (typing || !isDesignMode) return;
         e.preventDefault();
         copySelection();
         return;
       }
       if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'v') {
-        if (typing || useEditorStore.getState().mode !== 'design') return;
+        if (typing || !isDesignMode) return;
         e.preventDefault();
         pasteClipboard();
         return;
       }
       if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'd') {
-        if (typing || useEditorStore.getState().mode !== 'design') return;
+        if (typing || !isDesignMode) return;
         e.preventDefault();
         duplicateSelection();
         return;
@@ -153,11 +156,14 @@ export function App(): JSX.Element {
   useEffect(() => {
     const onOpenHelp = (): void => setHelpOpen(true);
     const onOpenCatalog = (): void => setCatalogOpen(true);
+    const onOpenSitePublication = (): void => setSitePublicationOpen(true);
     window.addEventListener('lvd:open-help', onOpenHelp);
     window.addEventListener('lvd:open-catalog', onOpenCatalog);
+    window.addEventListener('lvd:open-site-publication', onOpenSitePublication);
     return () => {
       window.removeEventListener('lvd:open-help', onOpenHelp);
       window.removeEventListener('lvd:open-catalog', onOpenCatalog);
+      window.removeEventListener('lvd:open-site-publication', onOpenSitePublication);
     };
   }, []);
 
@@ -204,6 +210,7 @@ export function App(): JSX.Element {
       <CloudPanels />
       {helpOpen && <ShortcutsHelp onClose={() => setHelpOpen(false)} />}
       {catalogOpen && <CatalogPanel onClose={() => setCatalogOpen(false)} />}
+      {sitePublicationOpen && <SitePublicationModal onClose={() => setSitePublicationOpen(false)} />}
     </div>
   );
 }

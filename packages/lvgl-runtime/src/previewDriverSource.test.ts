@@ -48,6 +48,7 @@ describe('preview_driver.c 协议边界', () => {
       'lvd_preview_bind_prop',
       'lvd_preview_bind_flag',
       'lvd_preview_bind_state',
+      'lvd_preview_bind_style',
       'lvd_preview_add_callback_event',
       'lvd_preview_add_subject_set_event',
       'lvd_preview_add_subject_toggle_event',

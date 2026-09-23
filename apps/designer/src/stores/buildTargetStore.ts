@@ -370,6 +370,7 @@ export interface BuildTargetStoreState extends TargetDraft {
   syncProject(project: LvProject): boolean;
   loadSnapshot(project: LvProject, snapshot: ProjectSnapshotV2): void;
   replaceUiProject(project: LvProject, uiProject: UiProject): void;
+  replaceActionRegistry(actionRegistry: ActionRegistry): void;
   confirmColorFormat(format: PreviewColorFormat): boolean;
   clearColorFormatConfirmation(): void;
   selectController(preset: ControllerPreset | null): void;
@@ -416,6 +417,7 @@ export const useBuildTargetStore = create<BuildTargetStoreState>()((set, get) =>
       next = {
         ...next,
         uiProject: preserveV2Data(state.uiProject, state.sourceProject, project, next.uiProject),
+        actionRegistry: { ...state.actionRegistry, ...inferActionRegistry(next.uiProject) },
       };
     }
     const uiRef = `${next.uiProject.meta.id}@${next.uiProject.meta.revision}` as `ui:${string}@${number}`;
@@ -477,6 +479,15 @@ export const useBuildTargetStore = create<BuildTargetStoreState>()((set, get) =>
         uiProjectRef: uiRef,
         themeRef: `${uiRef}#theme:${themeId}`,
       },
+      catalogTargetRef: null,
+      revision: state.revision + 1,
+    });
+  },
+
+  replaceActionRegistry(actionRegistry) {
+    const state = get();
+    set({
+      actionRegistry,
       catalogTargetRef: null,
       revision: state.revision + 1,
     });

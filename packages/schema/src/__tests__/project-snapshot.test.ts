@@ -6,6 +6,7 @@ import {
   snapshotToEditorProject,
   type ProjectSnapshotV2,
 } from '../v2/projectSnapshot.js';
+import { componentType } from '../v2/components.js';
 
 function snapshotOf(name = 'snapshot-test'): { source: ReturnType<typeof createEmptyProject>; snapshot: ProjectSnapshotV2 } {
   const source = createEmptyProject(name);
@@ -73,5 +74,39 @@ describe('ProjectSnapshot v2 persistence', () => {
     expect(snapshot.uiProject.screens[0]!.root.styles[0]!.props.text_color)
       .toEqual({ $token: 'color.text' });
     expect(snapshot.uiProject.assets.icons).toHaveLength(1);
+  });
+
+  it('lowers linked reusable components for preview/codegen while preserving the v2 definition', () => {
+    const { snapshot } = snapshotOf();
+    snapshot.uiProject.components.push({
+      id: 'cmp-card', codeName: 'status_card', displayName: '状态卡片',
+      api: [{ name: 'caption', type: 'string', default: 'Ready' }], styles: [], consts: [],
+      root: {
+        id: 'cmp-root', type: 'button', codeName: 'root', props: { x: 0, y: 0, width: 120, height: 48 },
+        styleRefs: [], styles: [], events: [], bindings: [],
+        children: [{
+          id: 'cmp-label', type: 'label', codeName: 'caption', props: { text: '$caption' },
+          styleRefs: [], styles: [], events: [], bindings: [], children: [],
+        }],
+      },
+    });
+    snapshot.uiProject.screens[0]!.root.children.push({
+      id: 'instance-1', type: componentType('cmp-card'), codeName: 'status_1',
+      props: { x: 33, y: 44, caption: 'Online' },
+      styleRefs: [], styles: [], events: [], bindings: [], children: [],
+    });
+
+    const projected = snapshotToEditorProject(snapshot);
+    const instance = projected.screens[0]!.root.children[0]!;
+    expect(projected.components).toEqual([]);
+    expect(snapshot.uiProject.components).toHaveLength(1);
+    expect(instance.type).toBe('button');
+    expect(instance.id).toBe('instance-1');
+    expect(instance.name).toBe('status_1');
+    expect(instance.props).toMatchObject({ x: 33, y: 44, width: 120, height: 48 });
+    expect(instance.props).not.toHaveProperty('caption');
+    expect(instance.children[0]!.type).toBe('label');
+    expect(instance.children[0]!.name).toMatch(/^status_1_caption_/);
+    expect(instance.children[0]!.props.text).toBe('Online');
   });
 });

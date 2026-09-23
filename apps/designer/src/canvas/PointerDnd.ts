@@ -5,8 +5,8 @@
  * 落点在 WASM canvas 内部,必须问 runtime.hitTest 找容器(obj/screen 根),
  * 蓝框高亮候选容器;pointerup → projectStore.mutate 插入 → L3 热重载。
  */
-import { REGISTRY, autoName, createNode, findChildSpec, type LvProject } from '@lvd/schema';
-import type { WidgetNodeV2 } from '@lvd/schema/v2';
+import { REGISTRY, autoName, createNode, findChildSpec, newUuid, type LvProject } from '@lvd/schema';
+import { componentIdFromType, type WidgetNodeV2 } from '@lvd/schema/v2';
 import { getPipeline } from './reloadPipeline';
 import {
   findNodeById,
@@ -60,12 +60,16 @@ export function ascendToContainer(project: LvProject, nodeId: string | null, scr
 /** palette item pointerdown 入口 */
 export function startPaletteDrag(e: PointerEvent, widgetType: string): void {
   const spec = REGISTRY.get(widgetType);
-  if (!spec) return;
+  const componentId = componentIdFromType(widgetType);
+  const component = componentId === null
+    ? undefined
+    : useProjectStore.getState().uiProject.components.find((item) => item.id === componentId);
+  if (!spec && !component) return;
   e.preventDefault();
 
   const ghost = document.createElement('div');
   ghost.className = 'dnd-ghost';
-  ghost.textContent = spec.palette?.label ?? widgetType;
+  ghost.textContent = spec?.palette?.label ?? component?.displayName ?? component?.codeName ?? widgetType;
   document.body.appendChild(ghost);
   const moveGhost = (x: number, y: number): void => {
     ghost.style.transform = `translate(${x + 12}px, ${y + 12}px)`;
@@ -83,7 +87,11 @@ export function startPaletteDrag(e: PointerEvent, widgetType: string): void {
     }
     const pipeline = getPipeline();
     const hitId = pipeline ? pipeline.nodeIdAt(Math.round(l.x), Math.round(l.y)) : null;
-    const containerId = ascendToContainer(st.project, hitId, ed.activeScreenId);
+    let containerId = ascendToContainer(st.project, hitId, ed.activeScreenId);
+    const editableContainer = findNodeByIdV2(st.uiProject, containerId);
+    if (editableContainer && componentIdFromType(editableContainer.node.type) !== null) {
+      containerId = editableContainer.parent?.id ?? editableContainer.screen.root.id;
+    }
     ed.setDropTarget(containerId);
   };
 
@@ -100,26 +108,21 @@ export function startPaletteDrag(e: PointerEvent, widgetType: string): void {
 
     const pipeline = getPipeline();
     const contRect = pipeline?.rectOf(containerId) ?? { x: 0, y: 0, w: 0, h: 0 };
-    const created = createNode(widgetType);
-    const node: WidgetNodeV2 = {
-      id: created.id,
-      type: created.type,
-      props: {
-        ...created.props,
-        x: Math.max(0, Math.round(l.x - contRect.x)),
-        y: Math.max(0, Math.round(l.y - contRect.y)),
-      },
-      styleRefs: [],
-      styles: [],
-      events: [],
-      bindings: [],
-      children: [],
+    const x = Math.max(0, Math.round(l.x - contRect.x));
+    const y = Math.max(0, Math.round(l.y - contRect.y));
+    const created = spec ? createNode(widgetType) : null;
+    const node: WidgetNodeV2 = created ? {
+      id: created.id, type: created.type, props: { ...created.props, x, y },
+      styleRefs: [], styles: [], events: [], bindings: [], children: [],
+    } : {
+      id: newUuid(), type: widgetType, props: { x, y },
+      styleRefs: [], styles: [], events: [], bindings: [], children: [],
     };
 
-    st.mutateV2(`添加 ${spec.palette?.label ?? widgetType}`, (draft) => {
+    st.mutateV2(`添加 ${spec?.palette?.label ?? component?.displayName ?? component?.codeName ?? widgetType}`, (draft) => {
       const screen = draft.screens.find((s) => s.id === ed.activeScreenId) ?? draft.screens[0];
       if (!screen) return;
-      node.codeName = autoName(widgetType, namesInScreenV2(screen));
+      node.codeName = autoName(component?.codeName ?? widgetType, namesInScreenV2(screen));
       const container = findNodeByIdV2(draft, containerId)?.node ?? screen.root;
       container.children.push(node);
     });

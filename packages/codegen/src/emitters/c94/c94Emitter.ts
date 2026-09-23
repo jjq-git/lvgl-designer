@@ -448,8 +448,10 @@ function emitNodeBody(
       }
     } else if (b.kind === 'flag') {
       w.push(`lv_obj_bind_flag_if_${b.op}(${objExpr}, &subject_${b.subject}, LV_OBJ_FLAG_${b.flag.toUpperCase()}, ${b.refValue});`);
-    } else {
+    } else if (b.kind === 'state') {
       w.push(`lv_obj_bind_state_if_${b.op}(${objExpr}, &subject_${b.subject}, LV_STATE_${b.state.toUpperCase()}, ${b.refValue});`);
+    } else {
+      w.push(`lv_obj_bind_style(${objExpr}, &style_${b.styleName}, ${cSelector(b.selector)}, &subject_${b.subject}, ${b.refValue});`);
     }
   }
 

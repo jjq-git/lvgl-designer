@@ -10,6 +10,19 @@ const { Pool } = pg;
 let _pool = null;          // 已建的连接池(单例)
 let _poolTried = false;    // 是否已尝试建池(避免反复 new)
 let _enabled = null;       // isDbEnabled 缓存
+let _testAdapter = null;   // node:test 注入的内存适配器(Node 20 兼容)
+
+/**
+ * 仅供 `node --test` 使用的数据库适配器注入点。
+ * Node 20 没有 `mock.module`,所以测试通过稳定的显式边界替换数据库实现。
+ */
+export function setTestDbAdapter(adapter) {
+  if (!process.env.NODE_TEST_CONTEXT) {
+    throw new Error('setTestDbAdapter is only available under node --test');
+  }
+  _testAdapter = adapter;
+  _enabled = null;
+}
 
 function hasUrl() {
   return typeof process.env.DATABASE_URL === 'string' && process.env.DATABASE_URL.trim() !== '';
@@ -17,6 +30,7 @@ function hasUrl() {
 
 // 是否启用数据库:仅看有无 DATABASE_URL(连不连得上是运行期的事,由 query catch 处理)。
 export function isDbEnabled() {
+  if (_testAdapter) return _testAdapter.isDbEnabled();
   if (_enabled === null) _enabled = hasUrl();
   return _enabled;
 }
@@ -24,6 +38,7 @@ export function isDbEnabled() {
 // lazy 建 pg.Pool;无 DATABASE_URL 返回 null。建池本身不发起连接,失败极少;
 // 万一构造抛错也 catch 掉,返回 null,让上层降级。
 export function getPool() {
+  if (_testAdapter) return _testAdapter.getPool();
   if (!hasUrl()) return null;
   if (_pool) return _pool;
   if (_poolTried) return _pool; // 已试过且失败,别再刷日志
@@ -48,6 +63,7 @@ export function getPool() {
 
 // 单条查询。无池 → 抛 DB_DISABLED,让上层转 503;连接/SQL 错误原样抛给 caller 处理。
 export async function query(sql, params) {
+  if (_testAdapter) return _testAdapter.query(sql, params);
   const pool = getPool();
   if (!pool) {
     const err = new Error('database not configured');
@@ -60,6 +76,7 @@ export async function query(sql, params) {
 // 事务:拿一条连接,BEGIN → fn(client) → COMMIT;抛错则 ROLLBACK。
 // fn 收到的 client 有 .query(sql,params)。
 export async function tx(fn) {
+  if (_testAdapter) return _testAdapter.tx(fn);
   const pool = getPool();
   if (!pool) {
     const err = new Error('database not configured');
@@ -82,6 +99,7 @@ export async function tx(fn) {
 
 // 探活:能连上且 select 1 通过返回 true。启动时可用来决定是否 fallback,不抛。
 export async function ping() {
+  if (_testAdapter) return _testAdapter.ping();
   if (!isDbEnabled()) return false;
   try {
     await query('SELECT 1');
@@ -94,6 +112,7 @@ export async function ping() {
 
 // 优雅关闭(测试/退出用)。
 export async function closePool() {
+  if (_testAdapter) return _testAdapter.closePool();
   if (_pool) {
     const p = _pool;
     _pool = null;

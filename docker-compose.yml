@@ -10,6 +10,9 @@ services:
       DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
       DEEPSEEK_BASE_URL: ${DEEPSEEK_BASE_URL:-https://api.deepseek.com}
       LVGL_BUILD_COMPILE_GATE: ${LVGL_BUILD_COMPILE_GATE:-host}
+      LVGL_PODSC_REPOSITORY: ${LVGL_PODSC_REPOSITORY:-http://192.168.1.88:3000/wf2/ui.podsc.com.git}
+      LVGL_PODSC_BRANCH: ${LVGL_PODSC_BRANCH:-main}
+      LVGL_PODSC_PUBLIC_URL: ${LVGL_PODSC_PUBLIC_URL:-https://ui.podsc.com}
     volumes:
       - ./auth_data:/workspace/auth_data
       - ./lvgl_data:/workspace/lvgl_data

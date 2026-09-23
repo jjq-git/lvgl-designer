@@ -8,7 +8,7 @@
  * - 一次操作一条 undo;粘贴后选中新控件。
  */
 import { autoName, newUuid } from '@lvd/schema';
-import type { ScreenDefV2, WidgetNodeV2 } from '@lvd/schema/v2';
+import { componentForNode, type ScreenDefV2, type UiProject, type WidgetNodeV2 } from '@lvd/schema/v2';
 import { findNodeByIdV2, namesInScreenV2, useProjectStore } from '../stores/projectStore';
 import {
   getClipboard,
@@ -30,18 +30,18 @@ function findInScreen(root: WidgetNodeV2, id: string): WidgetNodeV2 | null {
  * 深拷贝一棵子树并递归重生成 id;name 用 usedNames 去重(就地累积,
  * 保证同一次粘贴的多个节点/兄弟之间也不撞名)。原节点无 name 的保持匿名。
  */
-function cloneWithFreshIds(node: WidgetNodeV2, usedNames: Set<string>): WidgetNodeV2 {
+function cloneWithFreshIds(node: WidgetNodeV2, usedNames: Set<string>, project: UiProject): WidgetNodeV2 {
   const copy: WidgetNodeV2 = structuredClone(node);
   copy.id = newUuid();
   if (node.codeName != null) {
     // 用原 name 的类型段做基,交给 autoName 取最小可用序号
-    const fresh = autoName(node.type, usedNames);
+    const fresh = autoName(componentForNode(project, node)?.codeName ?? node.type, usedNames);
     copy.codeName = fresh;
     usedNames.add(fresh);
   } else {
     delete copy.codeName;
   }
-  copy.children = node.children.map((c) => cloneWithFreshIds(c, usedNames));
+  copy.children = node.children.map((c) => cloneWithFreshIds(c, usedNames, project));
   return copy;
 }
 
@@ -98,7 +98,8 @@ function pasteInto(sources: WidgetNodeV2[], offset: number, label: string): void
 
   // name 去重基线 = 该屏现有全部 name(粘贴过程就地累积)
   const usedNames = namesInScreenV2(screen);
-  const clones = sources.map((n) => cloneWithFreshIds(n, usedNames));
+  const project = useProjectStore.getState().uiProject;
+  const clones = sources.map((n) => cloneWithFreshIds(n, usedNames, project));
 
   // 位置偏移:仅对带数值 x/y 的顶层克隆生效(content/百分比/绝对布局之外的不动)
   if (offset !== 0) {

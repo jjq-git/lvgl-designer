@@ -28,6 +28,8 @@ export {
   REGISTRY, OBJ_BASE, ALL_WIDGETS, OFFICIAL_WIDGETS, EXTRA_WIDGETS,
   getWidgetSpec, findChildSpec, paletteEntries,
   BUTTONMATRIX_CTRL_TOKENS, TABLE_CELL_CTRL_TOKENS,
+  CHILD_INTERACTIONS, SCREEN_INTERACTION, WIDGET_INTERACTIONS, getWidgetInteraction,
+  type WidgetInteractionSpec,
 } from './widgets/index.js';
 
 // 样式属性表

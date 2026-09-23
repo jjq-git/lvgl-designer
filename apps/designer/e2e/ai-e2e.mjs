@@ -7,7 +7,7 @@
  *   A3 Ctrl+Z 撤销               A4 设置弹层(温度持久化 + 测试连接走 mock)
  *   A5 错误路径(坏 JSON → 气泡报错、工程无变化)
  */
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
@@ -52,7 +52,10 @@ const step = (name) => results.push(`--- ${name} ---`);
 
 let browser = null;
 try {
-  browser = await chromium.launch();
+  const systemChrome = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
+  browser = await chromium.launch(
+    process.platform === 'win32' && existsSync(systemChrome) ? { executablePath: systemChrome } : {},
+  );
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
   const page = await context.newPage();
   const pushErr = (m) => (phase === 'badjson' ? errsBadJson : errsMain).push(m);
@@ -61,7 +64,7 @@ try {
   page.on('dialog', (d) => d.type() === 'prompt' ? d.accept('e2e-project') : d.accept());
 
   let mockHits = 0;
-  await page.route('**/api/deepseek/chat', async (route) => {
+  await page.route('**/api/lvgl/deepseek/chat', async (route) => {
     mockHits++;
     await route.fulfill({
       status: 200,
@@ -190,8 +193,8 @@ try {
   /* ---------- A5 错误路径:坏 JSON ---------- */
   step('A5 mock 改坏 JSON → 气泡报错、工程无变化');
   phase = 'badjson';
-  await page.unroute('**/api/deepseek/chat');
-  await page.route('**/api/deepseek/chat', (route) =>
+  await page.unroute('**/api/lvgl/deepseek/chat');
+  await page.route('**/api/lvgl/deepseek/chat', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: 'this is {{ not json' }),
   );
   const beforeErr = await model();

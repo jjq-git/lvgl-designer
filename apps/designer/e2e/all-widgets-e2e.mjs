@@ -105,6 +105,14 @@ const WIDGETS = [
   // 多媒体
   'image', 'animimage', 'canvas', 'lottie',
 ];
+const INTERACTION_WIDGETS = new Set([
+  'label', 'button', 'spangroup',
+  'slider', 'switch', 'checkbox', 'arc', 'dropdown', 'roller', 'textarea',
+  'spinbox', 'buttonmatrix', 'keyboard', 'imagebutton',
+  'bar', 'calendar', 'table',
+  'obj', 'list', 'menu', 'tileview', 'tabview',
+  'chart',
+]);
 /* 拖上后额外设的 props/内联样式(裸控件不可见/需要素材的) */
 const EXTRA_PROPS = {
   line: { props: { points: [0, 60, 40, 5, 80, 40, 120, 0] } },
@@ -368,6 +376,11 @@ try {
     let mm = await model();
     const node = mm.nodes.find((n) => n.type === w && n.parentType === 'root');
     assert(node, `P2 [${w}] 入树`);
+    const hasInteraction = await page.locator('.tabs button', { hasText: '交互' }).count() === 1;
+    assert(
+      hasInteraction === INTERACTION_WIDGETS.has(w),
+      `P2 [${w}] 交互页${hasInteraction ? '显示' : '隐藏'}符合能力矩阵`,
+    );
     const extra = EXTRA_PROPS[w];
     if (extra) {
       await setProps(node.id, extra.props, extra.style);

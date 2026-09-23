@@ -13,12 +13,19 @@ import {
   M1_TEXT_FONTS,
   OBJ_BASE,
   REGISTRY,
+  SCREEN_INTERACTION,
   STATE_TOKENS,
   STYLE_PROPS,
   checkCName,
   findChildSpec,
+  getWidgetInteraction,
   newUuid,
+  type BindableProp,
   type ChildSpec,
+  type CmpOp,
+  type CompanionSpec,
+  type ObjFlagKey,
+  type ObjStateKey,
   type PropSpec,
   type Selector,
   type StateToken,
@@ -27,10 +34,18 @@ import {
   type WidgetSpec,
 } from '@lvd/schema';
 import {
+  BUILTIN_ACTIONS,
+  componentForNode,
   isTokenRef,
   tokenAssignableTo,
+  type ActionParamSpec,
+  type ActionSpec,
+  type BindingV2,
+  type ComponentApiPropV2,
   type LocalStyleGroup,
   type PropValueV2,
+  type SubjectDefV2,
+  type UiEvent,
   type WidgetNodeV2,
 } from '@lvd/schema/v2';
 import {
@@ -39,6 +54,7 @@ import {
   useProjectStore,
 } from '../stores/projectStore';
 import { useEditorStore } from '../stores/editorStore';
+import { useBuildTargetStore } from '../stores/buildTargetStore';
 import { AssetMultiPicker, AssetPicker } from './AssetPicker';
 
 const GROUP_ORDER: { key: PropSpec['ui']['group']; label: string }[] = [
@@ -51,7 +67,7 @@ const GROUP_ORDER: { key: PropSpec['ui']['group']; label: string }[] = [
 export function Inspector(): JSX.Element {
   const selectedIds = useEditorStore((s) => s.selectedIds);
   const project = useProjectStore((s) => s.uiProject);
-  const [tab, setTab] = useState<'props' | 'style'>('props');
+  const [tab, setTab] = useState<'props' | 'style' | 'interaction'>('props');
 
   if (selectedIds.length === 0) {
     return <div className="inspector empty">未选中对象</div>;
@@ -61,14 +77,21 @@ export function Inspector(): JSX.Element {
   }
   const hit = findNodeByIdV2(project, selectedIds[0]!);
   if (!hit) return <div className="inspector empty">节点不存在</div>;
+  const interaction = interactionCapabilities(hit.node, hit.node === hit.screen.root);
+  const activeTab = tab === 'interaction' && !interaction.visible ? 'props' : tab;
 
   return (
     <div className="inspector">
       <div className="tabs">
-        <button className={tab === 'props' ? 'active' : ''} onClick={() => setTab('props')}>属性</button>
-        <button className={tab === 'style' ? 'active' : ''} onClick={() => setTab('style')}>样式</button>
+        <button className={activeTab === 'props' ? 'active' : ''} onClick={() => setTab('props')}>属性</button>
+        <button className={activeTab === 'style' ? 'active' : ''} onClick={() => setTab('style')}>样式</button>
+        {interaction.visible && (
+          <button className={activeTab === 'interaction' ? 'active' : ''} onClick={() => setTab('interaction')}>交互</button>
+        )}
       </div>
-      {tab === 'props' ? <PropsTab node={hit.node} isRoot={hit.node === hit.screen.root} /> : <StyleTab node={hit.node} />}
+      {activeTab === 'props' && <PropsTab node={hit.node} isRoot={hit.node === hit.screen.root} />}
+      {activeTab === 'style' && <StyleTab node={hit.node} />}
+      {activeTab === 'interaction' && <InteractionTab node={hit.node} capabilities={interaction} />}
     </div>
   );
 }
@@ -90,7 +113,10 @@ function mutateProp(nodeId: string, key: string, value: PropValueV2 | undefined,
 }
 
 function PropsTab({ node, isRoot }: { node: WidgetNodeV2; isRoot: boolean }): JSX.Element {
-  const spec = REGISTRY.get(node.type);
+  const project = useProjectStore((state) => state.uiProject);
+  const component = componentForNode(project, node);
+  const effectiveType = component?.root.type ?? node.type;
+  const spec = REGISTRY.get(effectiveType);
   const childInfo = useMemo(() => (spec ? undefined : findChildSpec(node.type)), [spec, node.type]);
   const cs = childInfo?.child;
 
@@ -107,11 +133,25 @@ function PropsTab({ node, isRoot }: { node: WidgetNodeV2; isRoot: boolean }): JS
 
   return (
     <div className="insp-body">
+      {component && (
+        <div className="insp-note">
+          关联组件：{component.displayName ?? component.codeName}。此处修改的是当前实例覆盖值。
+        </div>
+      )}
       {!isRoot && showObjExtras && <NameRow node={node} />}
+      {component && component.api.length > 0 && (
+        <ComponentApiSection node={node} api={component.api} />
+      )}
       {cs && (
         <div className="insp-note">
           结构子元素 <code>{node.type}</code>(属于 {childInfo!.parent.palette?.label ?? childInfo!.parent.type})
         </div>
+      )}
+      {node.type === 'button' && (
+        <section className="insp-group">
+          <div className="panel-subtitle">内容</div>
+          <ButtonTextRow node={node} />
+        </section>
       )}
       {GROUP_ORDER.map(({ key, label }) => {
         const props = allProps.filter((p) => p.ui.group === key);
@@ -125,9 +165,92 @@ function PropsTab({ node, isRoot }: { node: WidgetNodeV2; isRoot: boolean }): JS
           </section>
         );
       })}
-      {spec && spec.children && spec.children.length > 0 && <ChildrenSection node={node} spec={spec} />}
+      {!component && spec?.children && spec.children.length > 0 && <ChildrenSection node={node} spec={spec} />}
       {showObjExtras && <FlagsSection node={node} kind="flags" title="标志 (flags)" keys={OBJ_BASE.flags} />}
       {showObjExtras && <FlagsSection node={node} kind="states" title="状态 (states)" keys={OBJ_BASE.states} />}
+    </div>
+  );
+}
+
+const COMPONENT_API_TYPE_LABELS: Record<ComponentApiPropV2['type'], string> = {
+  int: '整数', float: '小数', bool: '开关', string: '文本', color: '颜色', size: '尺寸', imageRef: '图片',
+};
+
+function ComponentApiSection({ node, api }: { node: WidgetNodeV2; api: ComponentApiPropV2[] }): JSX.Element {
+  return (
+    <section className="insp-group">
+      <div className="panel-subtitle">组件参数</div>
+      {api.map((prop) => {
+        const value = node.props[prop.name];
+        return (
+          <div key={prop.name} className={`prop-row ${value === undefined ? 'unset' : ''}`}>
+            <label title={`${prop.name} · ${COMPONENT_API_TYPE_LABELS[prop.type]}`}>{prop.name}</label>
+            <ValueEditor
+              node={node}
+              propKey={prop.name}
+              type={prop.type}
+              value={value}
+              defaultValue={prop.default}
+              onChange={(next) => mutateProp(node.id, prop.name, next, `改组件参数 ${prop.name}`)}
+            />
+            {value !== undefined && (
+              <button className="icon-btn" title="恢复组件默认值" onClick={() => mutateProp(
+                node.id, prop.name, undefined, `重置组件参数 ${prop.name}`,
+              )}>↺</button>
+            )}
+          </div>
+        );
+      })}
+    </section>
+  );
+}
+
+/**
+ * LVGL button 本身没有 text 属性，标准做法是在内部放一个 label。
+ * 检查器把这层结构细节收起来：用户直接编辑“按钮文字”，首次输入时自动创建
+ * 居中的 label；已有直接 label 时则原位更新，保留它的样式和其它属性。
+ */
+function ButtonTextRow({ node }: { node: WidgetNodeV2 }): JSX.Element {
+  const label = node.children.find((child) => child.type === 'label');
+  const value = label ? String(label.props.text ?? 'Text') : '';
+
+  const setText = (text: string): void => {
+    if (!label && text === '') return;
+    useProjectStore.getState().mutateV2(
+      '改按钮文字',
+      (draft) => {
+        const hit = findNodeByIdV2(draft, node.id);
+        if (!hit) return;
+        let textNode = hit.node.children.find((child) => child.type === 'label');
+        if (!textNode) {
+          textNode = {
+            id: newUuid(),
+            type: 'label',
+            props: { text, align: 'center' },
+            styleRefs: [],
+            styles: [],
+            events: [],
+            bindings: [],
+            children: [],
+          };
+          hit.node.children.push(textNode);
+        } else {
+          textNode.props.text = text;
+        }
+      },
+      { coalesceKey: `button-text:${node.id}` },
+    );
+  };
+
+  return (
+    <div className="prop-row">
+      <label title="内部自动创建或更新居中的 Label">按钮文字</label>
+      <input
+        className="ed-text"
+        value={value}
+        placeholder="输入文字（自动创建标签）"
+        onChange={(event) => setText(event.target.value)}
+      />
     </div>
   );
 }
@@ -185,27 +308,63 @@ function PropRowEditor({ node, spec }: { node: WidgetNodeV2; spec: PropSpec }): 
     mutateProp(node.id, spec.key, v, `改 ${spec.ui.label}`);
 
   return (
-    <div className={`prop-row ${isSet ? '' : 'unset'}`}>
-      <label title={spec.key}>
-        {spec.ui.label}
-        {spec.channel === 'c-only' && (
-          <span className="badge-conly" title="XML parser 未实现:预览画布不生效,仅进导出 C 代码">仅C</span>
+    <>
+      <div className={`prop-row ${isSet ? '' : 'unset'}`}>
+        <label title={spec.key}>
+          {spec.ui.label}
+          {spec.channel === 'c-only' && (
+            <span className="badge-conly" title="XML parser 未实现:预览画布不生效,仅进导出 C 代码">仅C</span>
+          )}
+        </label>
+        <ValueEditor
+          node={node}
+          propKey={spec.key}
+          type={spec.type}
+          tokens={spec.enum?.tokens}
+          min={spec.min}
+          max={spec.max}
+          value={value}
+          defaultValue={spec.default}
+          onChange={onChange}
+        />
+        {isSet && (
+          <button className="icon-btn" title="重置为默认" onClick={() => onChange(undefined)}>↺</button>
         )}
-      </label>
+      </div>
+      {(spec.companions ?? []).map((companion) => (
+        <CompanionRow key={companion.key} node={node} parent={spec} companion={companion} />
+      ))}
+    </>
+  );
+}
+
+const COMPANION_LABELS: Record<string, string> = {
+  value_animated: '当前值动画',
+  start_value_animated: '起始值动画',
+  selected_animated: '切换动画',
+  options_mode: '选项模式',
+  bind_text_fmt: '绑定格式',
+};
+
+function CompanionRow(props: { node: WidgetNodeV2; parent: PropSpec; companion: CompanionSpec }): JSX.Element {
+  const { node, parent, companion } = props;
+  const value = node.props[companion.key];
+  const isSet = value !== undefined && value !== null;
+  const label = COMPANION_LABELS[companion.key] ?? `${parent.ui.label}选项`;
+  const onChange = (next: PropValueV2 | undefined): void =>
+    mutateProp(node.id, companion.key, next, `改 ${label}`);
+  return (
+    <div className={`prop-row companion-row ${isSet ? '' : 'unset'}`}>
+      <label title={companion.xmlAttr}>{label}</label>
       <ValueEditor
         node={node}
-        propKey={spec.key}
-        type={spec.type}
-        tokens={spec.enum?.tokens}
-        min={spec.min}
-        max={spec.max}
+        propKey={companion.key}
+        type={companion.type}
+        tokens={companion.enum?.tokens}
         value={value}
-        defaultValue={spec.default}
         onChange={onChange}
       />
-      {isSet && (
-        <button className="icon-btn" title="重置为默认" onClick={() => onChange(undefined)}>↺</button>
-      )}
+      {isSet && <button className="icon-btn" title="重置为默认" onClick={() => onChange(undefined)}>↺</button>}
     </div>
   );
 }
@@ -479,6 +638,781 @@ function TableCellInput(props: { r: number; c: number; value: string; onCommit: 
   );
 }
 
+/* ================= 交互:数据源 / 事件 / 绑定 ================= */
+
+const EVENT_LABELS: Record<string, string> = {
+  clicked: '点击',
+  pressed: '按下',
+  pressing: '持续按下',
+  press_lost: '按压移出',
+  released: '释放',
+  short_clicked: '短按',
+  double_clicked: '双击',
+  long_pressed: '长按',
+  value_changed: '值改变',
+  insert: '输入前',
+  scroll_begin: '开始滚动',
+  scroll: '滚动中',
+  scroll_end: '结束滚动',
+  focused: '获得焦点',
+  defocused: '失去焦点',
+  ready: '完成',
+  cancel: '取消',
+  screen_load_start: '屏幕开始加载',
+  screen_loaded: '屏幕已加载',
+  screen_unload_start: '屏幕开始卸载',
+  screen_unloaded: '屏幕已卸载',
+  resolution_changed: '分辨率改变',
+};
+
+const ACTION_PARAM_LABELS: Record<string, string> = {
+  screen: '目标屏幕',
+  subject: '数据源',
+  value: '值',
+  anim: '切换动画',
+  duration: '动画时长',
+  delay: '延迟',
+  step: '步长',
+  min: '下限',
+  max: '上限',
+  rollover: '循环',
+  userData: '附加数据',
+};
+
+const BINDABLE_LABELS: Record<BindableProp, string> = {
+  value: '值',
+  checked: '选中状态',
+  text: '文本',
+  src: '素材',
+  min_value: '最小值',
+  max_value: '最大值',
+};
+
+interface InteractionCapabilities {
+  visible: boolean;
+  events: readonly string[];
+  bindings: boolean;
+  subjects: boolean;
+}
+
+function interactionCapabilities(node: WidgetNodeV2, isRoot: boolean): InteractionCapabilities {
+  const project = useProjectStore.getState().uiProject;
+  const effectiveType = componentForNode(project, node)?.root.type ?? node.type;
+  const interaction = isRoot ? SCREEN_INTERACTION : getWidgetInteraction(effectiveType);
+  const events = [...interaction.events];
+  // 老工程或高级能力产生的事件必须继续可见、可编辑。
+  for (const event of node.events) if (!events.includes(event.on)) events.push(event.on);
+  const bindings = !isRoot
+    && ((REGISTRY.get(effectiveType)?.bindableProps.length ?? 0) > 0 || node.bindings.length > 0);
+  const subjects = interaction.usesSubjects === true || subjectProps(node).length > 0;
+  return { visible: events.length > 0 || bindings || subjects, events, bindings, subjects };
+}
+
+function InteractionTab(props: { node: WidgetNodeV2; capabilities: InteractionCapabilities }): JSX.Element {
+  const { node, capabilities } = props;
+  return (
+    <div className="insp-body interaction-tab">
+      <SubjectSection />
+      <ActionRegistrySection />
+      {capabilities.events.length > 0 && <EventSection node={node} triggers={capabilities.events} />}
+      {capabilities.bindings && <BindingSection node={node} />}
+    </div>
+  );
+}
+
+function visitNodes(nodes: WidgetNodeV2[], visit: (node: WidgetNodeV2) => void): void {
+  for (const node of nodes) {
+    visit(node);
+    visitNodes(node.children, visit);
+  }
+}
+
+function subjectProps(node: WidgetNodeV2): PropSpec[] {
+  const project = useProjectStore.getState().uiProject;
+  const effectiveType = componentForNode(project, node)?.root.type ?? node.type;
+  const widget = REGISTRY.get(effectiveType);
+  const child = widget ? undefined : findChildSpec(effectiveType)?.child;
+  const props = widget?.props ?? [...(child?.createProps ?? []), ...(child?.props ?? [])];
+  return props.filter((prop) => prop.type === 'subject');
+}
+
+function subjectUseCount(subject: SubjectDefV2): number {
+  const project = useProjectStore.getState().uiProject;
+  let count = 0;
+  visitNodes([
+    ...project.screens.map((screen) => screen.root),
+    ...project.components.map((component) => component.root),
+  ], (node) => {
+    count += node.bindings.filter((binding) => binding.subject === subject.id).length;
+    count += node.events.filter((event) => event.args?.['subject'] === subject.id).length;
+    count += subjectProps(node).filter((prop) => node.props[prop.key] === subject.codeName).length;
+  });
+  return count;
+}
+
+function actionUseCount(actionId: string): number {
+  const project = useProjectStore.getState().uiProject;
+  let count = 0;
+  visitNodes([
+    ...project.screens.map((screen) => screen.root),
+    ...project.components.map((component) => component.root),
+  ], (node) => {
+    count += node.events.filter((event) => event.action === actionId).length;
+  });
+  return count;
+}
+
+function ActionRegistrySection(): JSX.Element {
+  const registry = useBuildTargetStore((state) => state.actionRegistry);
+  const customActions = useMemo(
+    () => Object.values(registry)
+      .filter((action) => action.id.startsWith('custom.'))
+      .sort((a, b) => a.id.localeCompare(b.id)),
+    [registry],
+  );
+  const [open, setOpen] = useState(false);
+  const [codeName, setCodeName] = useState('');
+  const [displayName, setDisplayName] = useState('');
+
+  const addAction = (): void => {
+    const suffix = codeName.trim().toLowerCase();
+    const id = `custom.${suffix}`;
+    if (!/^[a-z][a-z0-9_]*$/.test(suffix)) {
+      useEditorStore.getState().setBanner('业务动作代码名只能使用小写字母、数字和下划线，并以字母开头');
+      return;
+    }
+    if (registry[id]) {
+      useEditorStore.getState().setBanner(`业务动作 ${id} 已存在`);
+      return;
+    }
+    useProjectStore.getState().mutateActionRegistry('新建业务动作', (draft) => {
+      draft[id] = {
+        id,
+        displayName: displayName.trim() || suffix,
+        description: '导出为设备端 LVGL 事件回调；业务逻辑在 actions.c 中实现。',
+        params: [{ name: 'userData', type: 'string' }],
+      };
+    });
+    setCodeName('');
+    setDisplayName('');
+    setOpen(true);
+  };
+
+  return (
+    <section className="insp-group" data-section="action-registry">
+      <div className="panel-subtitle interaction-title">
+        <span className="clickable" onClick={() => setOpen(!open)}>
+          {open ? '▾' : '▸'} 设备业务动作{customActions.length > 0 ? ` (${customActions.length})` : ''}
+        </span>
+      </div>
+      {open && (
+        <>
+          <div className="insp-note">
+            事件触发后调用主机固件中的同名 C 回调；预览态只记录触发，不执行设备业务。
+          </div>
+          <div className="action-create-row">
+            <input
+              className="ed-text"
+              value={codeName}
+              placeholder="代码名，例如 wifi_scan"
+              onChange={(event) => setCodeName(event.target.value)}
+              onKeyDown={(event) => event.key === 'Enter' && addAction()}
+            />
+            <input
+              className="ed-text"
+              value={displayName}
+              placeholder="显示名称（可选）"
+              onChange={(event) => setDisplayName(event.target.value)}
+              onKeyDown={(event) => event.key === 'Enter' && addAction()}
+            />
+            <button className="btn btn-sm" disabled={codeName.trim() === ''} onClick={addAction}>+ 新建</button>
+          </div>
+          {customActions.map((action) => (
+            <ActionRegistryItem key={action.id} action={action} />
+          ))}
+          {customActions.length === 0 && <div className="insp-note">暂无业务动作。</div>}
+        </>
+      )}
+    </section>
+  );
+}
+
+function ActionRegistryItem({ action }: { action: ActionSpec }): JSX.Element {
+  const used = actionUseCount(action.id);
+  const callbackName = action.id.slice('custom.'.length);
+  const updateDisplayName = (value: string): void => {
+    useProjectStore.getState().mutateActionRegistry('改业务动作显示名称', (draft) => {
+      const current = draft[action.id];
+      if (!current) return;
+      if (value.trim() === '') delete current.displayName;
+      else current.displayName = value.trim();
+    });
+  };
+  const remove = (): void => {
+    if (used > 0) {
+      useEditorStore.getState().setBanner(`业务动作 ${action.id} 正被 ${used} 个事件使用，请先解除引用`);
+      return;
+    }
+    useProjectStore.getState().mutateActionRegistry('删除业务动作', (draft) => {
+      delete draft[action.id];
+    });
+  };
+  return (
+    <div className="child-item action-registry-item" data-action-id={action.id}>
+      <div className="child-head">
+        <span>{action.displayName || callbackName}</span>
+        <button className="icon-btn" title={used > 0 ? `正被 ${used} 个事件使用` : '删除未使用的业务动作'} onClick={remove}>✕</button>
+      </div>
+      <div className="child-body">
+        <div className="prop-row">
+          <label>回调函数</label>
+          <code>{callbackName}</code>
+        </div>
+        <div className="prop-row">
+          <label>显示名称</label>
+          <TextCommitEditor value={action.displayName ?? ''} placeholder={callbackName} onCommit={updateDisplayName} />
+        </div>
+        <div className="insp-note">导出声明：<code>void {callbackName}(lv_event_t * e);</code></div>
+      </div>
+    </div>
+  );
+}
+
+function SubjectSection(): JSX.Element {
+  const subjects = useProjectStore((state) => state.uiProject.subjects);
+  const [open, setOpen] = useState(false);
+
+  const addSubject = (): void => {
+    useProjectStore.getState().mutateV2('新建数据源', (draft) => {
+      const used = new Set(draft.subjects.map((subject) => subject.codeName));
+      let ordinal = draft.subjects.length + 1;
+      while (used.has(`subject_${ordinal}`)) ordinal += 1;
+      draft.subjects.push({
+        id: newUuid(),
+        codeName: `subject_${ordinal}`,
+        displayName: `数据源 ${ordinal}`,
+        type: 'int',
+        initial: 0,
+      });
+    });
+    setOpen(true);
+  };
+
+  return (
+    <section className="insp-group">
+      <div className="panel-subtitle interaction-title">
+        <span className="clickable" onClick={() => setOpen(!open)}>
+          {open ? '▾' : '▸'} 工程数据源{subjects.length > 0 ? ` (${subjects.length})` : ''}
+        </span>
+        <button className="btn btn-sm" onClick={addSubject}>+ 新建</button>
+      </div>
+      {open && (
+        <>
+          <div className="insp-note">用于组件值、文本、状态的动态绑定，也可由事件修改。</div>
+          {subjects.map((subject) => <SubjectItem key={subject.id} subject={subject} />)}
+          {subjects.length === 0 && <div className="insp-note">暂无数据源。</div>}
+        </>
+      )}
+    </section>
+  );
+}
+
+function SubjectItem({ subject }: { subject: SubjectDefV2 }): JSX.Element {
+  const update = (label: string, apply: (current: SubjectDefV2) => void): void => {
+    useProjectStore.getState().mutateV2(label, (draft) => {
+      const current = draft.subjects.find((item) => item.id === subject.id);
+      if (current) apply(current);
+    });
+  };
+
+  const rename = (nextValue: string): void => {
+    const next = nextValue.trim();
+    if (next === subject.codeName || next === '') return;
+    const error = checkCName(next);
+    const project = useProjectStore.getState().uiProject;
+    if (error || project.subjects.some((item) => item.id !== subject.id && item.codeName === next)) {
+      useEditorStore.getState().setBanner(error ? `数据源名称非法:${error.message}` : `数据源名称 ${next} 已存在`);
+      return;
+    }
+    useProjectStore.getState().mutateV2('重命名数据源', (draft) => {
+      const current = draft.subjects.find((item) => item.id === subject.id);
+      if (!current) return;
+      const previous = current.codeName;
+      current.codeName = next;
+      visitNodes([
+        ...draft.screens.map((screen) => screen.root),
+        ...draft.components.map((component) => component.root),
+      ], (node) => {
+        for (const prop of subjectProps(node)) {
+          if (node.props[prop.key] === previous) node.props[prop.key] = next;
+        }
+      });
+    });
+  };
+
+  const changeType = (type: SubjectDefV2['type']): void => {
+    useProjectStore.getState().mutateV2('改数据源类型', (draft) => {
+      const index = draft.subjects.findIndex((item) => item.id === subject.id);
+      if (index < 0) return;
+      const common = {
+        id: subject.id,
+        codeName: subject.codeName,
+        ...(subject.displayName === undefined ? {} : { displayName: subject.displayName }),
+      };
+      draft.subjects[index] = type === 'string'
+        ? { ...common, type, initial: '' }
+        : type === 'color'
+          ? { ...common, type, initial: '#000000' }
+          : { ...common, type, initial: 0 };
+    });
+  };
+
+  const remove = (): void => {
+    const used = subjectUseCount(subject);
+    if (used > 0) {
+      useEditorStore.getState().setBanner(`数据源 ${subject.codeName} 正被 ${used} 处引用，请先解除绑定`);
+      return;
+    }
+    useProjectStore.getState().mutateV2('删除数据源', (draft) => {
+      draft.subjects = draft.subjects.filter((item) => item.id !== subject.id);
+    });
+  };
+
+  return (
+    <div className="child-item subject-item" data-subject-id={subject.id}>
+      <div className="child-head">
+        <span>{subject.displayName || subject.codeName}</span>
+        <button className="icon-btn" title="删除未使用的数据源" onClick={remove}>✕</button>
+      </div>
+      <div className="child-body">
+        <div className="prop-row">
+          <label>代码名</label>
+          <TextCommitEditor value={subject.codeName} onCommit={rename} />
+        </div>
+        <div className="prop-row">
+          <label>显示名称</label>
+          <TextCommitEditor value={subject.displayName ?? ''} placeholder={subject.codeName} onCommit={(value) => update('改数据源显示名称', (current) => {
+            if (value.trim() === '') delete current.displayName;
+            else current.displayName = value.trim();
+          })} />
+        </div>
+        <div className="prop-row">
+          <label>类型</label>
+          <select className="ed-select" value={subject.type} onChange={(event) => changeType(event.target.value as SubjectDefV2['type'])}>
+            <option value="int">整数</option>
+            <option value="float">小数</option>
+            <option value="string">文本</option>
+            <option value="color">颜色</option>
+          </select>
+        </div>
+        <div className="prop-row">
+          <label>初始值</label>
+          {subject.type === 'string' && (
+            <TextCommitEditor value={subject.initial} onCommit={(value) => update('改数据源初始值', (current) => {
+              if (current.type === 'string') current.initial = value;
+            })} />
+          )}
+          {subject.type === 'color' && (
+            <ValueEditor type="color" value={subject.initial} onChange={(value) => update('改数据源初始值', (current) => {
+              if (current.type === 'color' && typeof value === 'string') current.initial = value;
+            })} />
+          )}
+          {(subject.type === 'int' || subject.type === 'float') && (
+            <input className="ed-num" type="number" value={subject.initial} onChange={(event) => {
+              const value = Number(event.target.value);
+              if (Number.isFinite(value)) update('改数据源初始值', (current) => {
+                if (current.type === 'int' || current.type === 'float') current.initial = value;
+              });
+            }} />
+          )}
+        </div>
+        {(subject.type === 'int' || subject.type === 'float') && (
+          <>
+            <div className="prop-row unset">
+              <label>最小值</label>
+              <input className="ed-num" type="number" value={subject.min ?? ''} placeholder="不限制" onChange={(event) => {
+                const raw = event.target.value;
+                update('改数据源最小值', (current) => {
+                  if (current.type !== 'int' && current.type !== 'float') return;
+                  if (raw === '') delete current.min;
+                  else current.min = Number(raw);
+                });
+              }} />
+            </div>
+            <div className="prop-row unset">
+              <label>最大值</label>
+              <input className="ed-num" type="number" value={subject.max ?? ''} placeholder="不限制" onChange={(event) => {
+                const raw = event.target.value;
+                update('改数据源最大值', (current) => {
+                  if (current.type !== 'int' && current.type !== 'float') return;
+                  if (raw === '') delete current.max;
+                  else current.max = Number(raw);
+                });
+              }} />
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function defaultActionArgs(spec: ActionSpec): UiEvent['args'] | undefined {
+  const project = useProjectStore.getState().uiProject;
+  const args: NonNullable<UiEvent['args']> = {};
+  for (const param of spec.params) {
+    let value = param.default;
+    if (value === undefined && param.required) {
+      if (param.type === 'screenRef') value = project.screens[0]?.id;
+      else if (param.type === 'subjectRef') value = project.subjects[0]?.id;
+      else if (param.type === 'bool') value = false;
+      else if (param.type === 'int' || param.type === 'float') value = param.min ?? 0;
+      else if (param.type === 'color') value = '#000000';
+      else value = '';
+    }
+    if (value !== undefined) args[param.name] = value;
+  }
+  return Object.keys(args).length > 0 ? args : undefined;
+}
+
+function EventSection({ node, triggers }: { node: WidgetNodeV2; triggers: readonly string[] }): JSX.Element {
+  const customActions = useBuildTargetStore((state) => state.actionRegistry);
+  const actions = useMemo(() => ({ ...BUILTIN_ACTIONS, ...customActions }), [customActions]);
+  const actionList = Object.values(actions)
+    .filter((action) => action.id !== 'screen.back')
+    .sort((a, b) => a.id.localeCompare(b.id));
+
+  const update = (index: number, next: UiEvent): void => {
+    useProjectStore.getState().mutateV2('改事件', (draft) => {
+      const hit = findNodeByIdV2(draft, node.id);
+      if (hit?.node.events[index]) hit.node.events[index] = next;
+    });
+  };
+  const add = (): void => {
+    const spec = actions['screen.open'] ?? actionList[0];
+    if (!spec) return;
+    useProjectStore.getState().mutateV2('添加事件', (draft) => {
+      const hit = findNodeByIdV2(draft, node.id);
+      hit?.node.events.push({ on: triggers[0] ?? 'clicked', action: spec.id, args: defaultActionArgs(spec) });
+    });
+  };
+  const remove = (index: number): void => {
+    useProjectStore.getState().mutateV2('删除事件', (draft) => {
+      const hit = findNodeByIdV2(draft, node.id);
+      hit?.node.events.splice(index, 1);
+    });
+  };
+
+  return (
+    <section className="insp-group">
+      <div className="panel-subtitle interaction-title">
+        <span>事件 ({node.events.length})</span>
+        <button className="btn btn-sm" onClick={add}>+ 添加</button>
+      </div>
+      <div className="insp-note">这里只列出该组件常用的触发时机；动作和参数会按类型联动。</div>
+      {node.events.map((event, index) => {
+        const spec = actions[event.action];
+        return (
+          <div className="child-item" key={`${index}:${event.on}:${event.action}`} data-event-index={index}>
+            <div className="child-head">
+              <span>{EVENT_LABELS[event.on] ?? event.on} → {spec?.displayName ?? event.action}</span>
+              <button className="icon-btn" title="删除事件" onClick={() => remove(index)}>✕</button>
+            </div>
+            <div className="child-body">
+              <div className="prop-row">
+                <label>触发时机</label>
+                <select className="ed-select" value={event.on} onChange={(e) => update(index, { ...event, on: e.target.value })}>
+                  {triggers.map((token) => (
+                    <option key={token} value={token}>{EVENT_LABELS[token] ? `${EVENT_LABELS[token]} (${token})` : token}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="prop-row">
+                <label>执行动作</label>
+                <select className="ed-select" value={event.action} onChange={(e) => {
+                  const nextSpec = actions[e.target.value];
+                  if (nextSpec) update(index, { on: event.on, action: nextSpec.id, args: defaultActionArgs(nextSpec) });
+                }}>
+                  {!spec && <option value={event.action}>{event.action}（已失效）</option>}
+                  {event.action === 'screen.back' && (
+                    <option value="screen.back">返回上一屏（旧工程，请改为打开指定屏幕）</option>
+                  )}
+                  {actionList.map((action) => {
+                    const needsSubject = action.params.some((param) => param.required && param.type === 'subjectRef');
+                    const unavailable = needsSubject && useProjectStore.getState().uiProject.subjects.length === 0;
+                    return (
+                      <option key={action.id} value={action.id} disabled={unavailable}>
+                        {action.displayName ?? action.id}{unavailable ? '（需先新建数据源）' : ''}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+              {spec?.params.map((param) => (
+                <ActionArgRow key={param.name} param={param} value={event.args?.[param.name]} onChange={(value) => {
+                  const args = { ...(event.args ?? {}) };
+                  if (value === undefined) delete args[param.name];
+                  else args[param.name] = value;
+                  update(index, { ...event, args: Object.keys(args).length > 0 ? args : undefined });
+                }} />
+              ))}
+            </div>
+          </div>
+        );
+      })}
+      {node.events.length === 0 && <div className="insp-note">尚未设置事件。</div>}
+    </section>
+  );
+}
+
+type ActionArgValue = NonNullable<UiEvent['args']>[string];
+
+function ActionArgRow(props: {
+  param: ActionParamSpec;
+  value: ActionArgValue | undefined;
+  onChange: (value: ActionArgValue | undefined) => void;
+}): JSX.Element {
+  const { param, value, onChange } = props;
+  const project = useProjectStore((state) => state.uiProject);
+  let editor: JSX.Element;
+  if (param.enum) {
+    editor = (
+      <select className="ed-select" value={typeof value === 'string' ? value : ''} onChange={(e) => onChange(e.target.value || undefined)}>
+        <option value="">(未设置)</option>
+        {param.enum.map((item) => <option key={item} value={item}>{item}</option>)}
+      </select>
+    );
+  } else if (param.type === 'screenRef') {
+    editor = (
+      <select className="ed-select" value={typeof value === 'string' ? value : ''} onChange={(e) => onChange(e.target.value || undefined)}>
+        <option value="">(请选择)</option>
+        {project.screens.map((screen) => <option key={screen.id} value={screen.id}>{screen.displayName || screen.codeName}</option>)}
+      </select>
+    );
+  } else if (param.type === 'subjectRef') {
+    editor = (
+      <select className="ed-select" value={typeof value === 'string' ? value : ''} onChange={(e) => onChange(e.target.value || undefined)}>
+        <option value="">{project.subjects.length === 0 ? '(请先新建数据源)' : '(请选择)'}</option>
+        {project.subjects.map((subject) => <option key={subject.id} value={subject.id}>{subject.displayName || subject.codeName}</option>)}
+      </select>
+    );
+  } else if (param.type === 'bool') {
+    editor = <input type="checkbox" checked={value === true} onChange={(e) => onChange(e.target.checked)} />;
+  } else if (param.type === 'int' || param.type === 'float') {
+    editor = (
+      <input className="ed-num" type="number" min={param.min} max={param.max} value={typeof value === 'number' ? value : ''}
+        onChange={(e) => onChange(e.target.value === '' ? undefined : Number(e.target.value))} />
+    );
+  } else if (param.type === 'color') {
+    editor = <ValueEditor type="color" value={value as PropValueV2 | undefined} onChange={(next) => onChange(next as ActionArgValue | undefined)} />;
+  } else {
+    editor = <TextCommitEditor value={typeof value === 'string' ? value : ''} onCommit={(next) => onChange(next || undefined)} />;
+  }
+  return (
+    <div className={`prop-row ${value === undefined ? 'unset' : ''}`}>
+      <label title={param.name}>{ACTION_PARAM_LABELS[param.name] ?? param.name}{param.required ? ' *' : ''}</label>
+      {editor}
+      {value !== undefined && !param.required && <button className="icon-btn" title="清除" onClick={() => onChange(undefined)}>↺</button>}
+    </div>
+  );
+}
+
+const CMP_OP_LABELS: Record<CmpOp, string> = {
+  eq: '等于', not_eq: '不等于', gt: '大于', ge: '大于等于', lt: '小于', le: '小于等于',
+};
+
+function BindingSection({ node }: { node: WidgetNodeV2 }): JSX.Element {
+  const project = useProjectStore((state) => state.uiProject);
+  const effectiveType = componentForNode(project, node)?.root.type ?? node.type;
+  const spec = REGISTRY.get(effectiveType);
+  const screenStyles = findNodeByIdV2(project, node.id)?.screen.styles ?? [];
+  const styles = [...project.styles, ...screenStyles]
+    .filter((style, index, list) => list.findIndex((item) => item.id === style.id) === index);
+  const usedDescriptors = new Set(node.bindings.map((binding) => binding.kind === 'prop'
+    ? `prop:${binding.prop}`
+    : binding.kind === 'flag'
+      ? `flag:${binding.flag}`
+      : binding.kind === 'state'
+        ? `state:${binding.state}`
+        : `style:${binding.styleId}`));
+
+  const add = (descriptor: string): void => {
+    if (descriptor === '') return;
+    const [kind, target] = descriptor.split(':');
+    const firstSubject = project.subjects.find((subject) => subjectMatchesDescriptor(subject, kind!, target!));
+    if (!firstSubject) {
+      useEditorStore.getState().setBanner(`没有与“${bindingDescriptorLabel(kind!, target!)}”兼容的数据源`);
+      return;
+    }
+    let binding: BindingV2 | undefined;
+    if (kind === 'prop') binding = { kind, prop: target as BindableProp, subject: firstSubject.id };
+    else if (kind === 'flag') binding = { kind, flag: target as ObjFlagKey, op: 'eq', subject: firstSubject.id, refValue: 1 };
+    else if (kind === 'state') binding = { kind, state: target as ObjStateKey, op: 'eq', subject: firstSubject.id, refValue: 1 };
+    else if (kind === 'style') binding = { kind, styleId: target!, subject: firstSubject.id, refValue: 1 };
+    if (!binding) return;
+    useProjectStore.getState().mutateV2('添加绑定', (draft) => {
+      findNodeByIdV2(draft, node.id)?.node.bindings.push(binding!);
+    });
+  };
+
+  const update = (index: number, binding: BindingV2): void => {
+    useProjectStore.getState().mutateV2('改绑定', (draft) => {
+      const hit = findNodeByIdV2(draft, node.id);
+      if (hit?.node.bindings[index]) hit.node.bindings[index] = binding;
+    });
+  };
+  const remove = (index: number): void => {
+    useProjectStore.getState().mutateV2('删除绑定', (draft) => {
+      findNodeByIdV2(draft, node.id)?.node.bindings.splice(index, 1);
+    });
+  };
+
+  return (
+    <section className="insp-group">
+      <div className="panel-subtitle">数据绑定 ({node.bindings.length})</div>
+      <div className="binding-add-row">
+        <select className="ed-select" defaultValue="" disabled={project.subjects.length === 0} onChange={(e) => {
+          add(e.target.value);
+          e.target.value = '';
+        }}>
+          <option value="">{project.subjects.length > 0 ? '+ 新增绑定…' : '请先新建数据源'}</option>
+          {(spec?.bindableProps ?? []).map((prop) => (
+            <option key={prop} value={`prop:${prop}`}
+              disabled={usedDescriptors.has(`prop:${prop}`) || !project.subjects.some((subject) => subjectMatchesDescriptor(subject, 'prop', prop))}>
+              属性 · {BINDABLE_LABELS[prop]}{!project.subjects.some((subject) => subjectMatchesDescriptor(subject, 'prop', prop)) ? `（需${bindingTypeHint('prop', prop)}数据源）` : ''}
+            </option>
+          ))}
+          {OBJ_BASE.flags.map((flag) => (
+            <option key={`flag:${flag}`} value={`flag:${flag}`}
+              disabled={usedDescriptors.has(`flag:${flag}`) || !project.subjects.some((subject) => subjectMatchesDescriptor(subject, 'flag', flag))}>
+              标志 · {flag}{!project.subjects.some((subject) => subjectMatchesDescriptor(subject, 'flag', flag)) ? '（需整数数据源）' : ''}
+            </option>
+          ))}
+          {OBJ_BASE.states.map((state) => (
+            <option key={`state:${state}`} value={`state:${state}`}
+              disabled={usedDescriptors.has(`state:${state}`) || !project.subjects.some((subject) => subjectMatchesDescriptor(subject, 'state', state))}>
+              状态 · {state}{!project.subjects.some((subject) => subjectMatchesDescriptor(subject, 'state', state)) ? '（需整数数据源）' : ''}
+            </option>
+          ))}
+          {styles.map((style) => (
+            <option key={`style:${style.id}`} value={`style:${style.id}`}
+              disabled={!project.subjects.some((subject) => subjectMatchesDescriptor(subject, 'style', style.id))}>
+              样式 · {style.displayName || style.codeName || style.id}{!project.subjects.some((subject) => subjectMatchesDescriptor(subject, 'style', style.id)) ? '（需整数数据源）' : ''}
+            </option>
+          ))}
+        </select>
+      </div>
+      {node.bindings.map((binding, index) => (
+        <BindingItem key={`${index}:${binding.kind}`} binding={binding} subjects={project.subjects}
+          styles={styles} parts={spec?.parts ?? ['main']}
+          onChange={(next) => update(index, next)} onRemove={() => remove(index)} />
+      ))}
+      {node.bindings.length === 0 && <div className="insp-note">可把组件属性、显示标志或状态连接到数据源。</div>}
+    </section>
+  );
+}
+
+function bindingTypeHint(kind: string, target: string): string {
+  if (kind !== 'prop' || target === 'checked') return '整数';
+  if (target === 'text') return '整数、浮点或文本';
+  return '整数或浮点';
+}
+
+function bindingDescriptorLabel(kind: string, target: string): string {
+  if (kind === 'prop') return `属性 · ${BINDABLE_LABELS[target as BindableProp] ?? target}`;
+  if (kind === 'style') return '命名样式';
+  return `${kind === 'flag' ? '标志' : '状态'} · ${target}`;
+}
+
+function subjectMatchesDescriptor(subject: SubjectDefV2, kind: string, target: string): boolean {
+  if (kind !== 'prop') return subject.type === 'int';
+  if (target === 'checked') return subject.type === 'int';
+  if (target === 'text') return subject.type === 'int' || subject.type === 'float' || subject.type === 'string';
+  return subject.type === 'int' || subject.type === 'float';
+}
+
+function BindingItem(props: {
+  binding: BindingV2;
+  subjects: SubjectDefV2[];
+  styles: { id: string; codeName?: string; displayName?: string }[];
+  parts: readonly string[];
+  onChange: (binding: BindingV2) => void;
+  onRemove: () => void;
+}): JSX.Element {
+  const { binding, subjects, styles, parts, onChange, onRemove } = props;
+  const style = binding.kind === 'style' ? styles.find((item) => item.id === binding.styleId) : undefined;
+  const target = binding.kind === 'prop' ? BINDABLE_LABELS[binding.prop]
+    : binding.kind === 'flag' ? `标志 · ${binding.flag}`
+      : binding.kind === 'state' ? `状态 · ${binding.state}`
+        : `样式 · ${style?.displayName || style?.codeName || binding.styleId}`;
+  const missing = !subjects.some((subject) => subject.id === binding.subject);
+  const incompatible = subjects.some((subject) => subject.id === binding.subject
+    && !subjectMatchesDescriptor(subject, binding.kind, binding.kind === 'prop' ? binding.prop : ''));
+  return (
+    <div className="child-item" data-binding-kind={binding.kind}>
+      <div className="child-head">
+        <span>{target}</span>
+        <button className="icon-btn" title="删除绑定" onClick={onRemove}>✕</button>
+      </div>
+      <div className="child-body">
+        <div className="prop-row">
+          <label>数据源</label>
+          <select className="ed-select" value={binding.subject} onChange={(e) => onChange({ ...binding, subject: e.target.value })}>
+            {missing && <option value={binding.subject}>{binding.subject}（已失效）</option>}
+            {subjects.map((subject) => {
+              const compatible = subjectMatchesDescriptor(subject, binding.kind, binding.kind === 'prop' ? binding.prop : '');
+              return <option key={subject.id} value={subject.id} disabled={!compatible}>{subject.displayName || subject.codeName} · {subject.type}{compatible ? '' : '（类型不兼容）'}</option>;
+            })}
+          </select>
+        </div>
+        {incompatible && <div className="insp-note warning">当前数据源类型不兼容，请更换后再导出。</div>}
+        {(binding.kind === 'flag' || binding.kind === 'state') && (
+          <>
+            <div className="prop-row">
+              <label>条件</label>
+              <select className="ed-select" value={binding.op} onChange={(e) => onChange({ ...binding, op: e.target.value as CmpOp })}>
+                {(Object.keys(CMP_OP_LABELS) as CmpOp[]).map((op) => <option key={op} value={op}>{CMP_OP_LABELS[op]}</option>)}
+              </select>
+            </div>
+            <div className="prop-row">
+              <label>比较值</label>
+              <input className="ed-num" type="number" value={binding.refValue} onChange={(e) => onChange({ ...binding, refValue: Number(e.target.value) })} />
+            </div>
+          </>
+        )}
+        {binding.kind === 'prop' && binding.prop === 'text' && (
+          <div className="prop-row">
+            <label>格式</label>
+            <TextCommitEditor value={binding.fmt ?? ''} placeholder="%s" onCommit={(fmt) => onChange({ ...binding, fmt: fmt || undefined })} />
+          </div>
+        )}
+        {binding.kind === 'style' && (
+          <>
+            <div className="prop-row">
+              <label>应用部件</label>
+              <select className="ed-select" value={binding.selector?.part ?? 'main'} onChange={(e) => onChange({
+                ...binding,
+                selector: normSelector(binding.selector?.states?.[0] ?? 'default', e.target.value),
+              })}>
+                {parts.map((part) => <option key={part} value={part}>{part}</option>)}
+              </select>
+            </div>
+            <div className="prop-row">
+              <label>组件状态</label>
+              <select className="ed-select" value={binding.selector?.states?.[0] ?? 'default'} onChange={(e) => onChange({
+                ...binding,
+                selector: normSelector(e.target.value as StateToken, binding.selector?.part ?? 'main'),
+              })}>
+                {STATE_TOKENS.map((state) => <option key={state} value={state}>{state}</option>)}
+              </select>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 /* ================= 样式页 ================= */
 
 function normSelector(state: StateToken, part: string): Selector | undefined {
@@ -499,8 +1433,24 @@ function sameSelector(a: Selector | undefined, b: Selector | undefined): boolean
   return pa === pb && sa.length === sb.length && sa.every((x) => sb.includes(x));
 }
 
+function namedStyleUseCount(styleId: string): number {
+  const project = useProjectStore.getState().uiProject;
+  let count = 0;
+  visitNodes([
+    ...project.screens.map((screen) => screen.root),
+    ...project.components.map((component) => component.root),
+  ], (node) => {
+    count += node.styleRefs.filter((usage) => usage.styleId === styleId).length;
+    count += node.bindings.filter((binding) => binding.kind === 'style' && binding.styleId === styleId).length;
+  });
+  return count;
+}
+
 function StyleTab({ node }: { node: WidgetNodeV2 }): JSX.Element {
-  const spec = REGISTRY.get(node.type);
+  const uiProject = useProjectStore((state) => state.uiProject);
+  const component = componentForNode(uiProject, node);
+  const effectiveType = component?.root.type ?? node.type;
+  const spec = REGISTRY.get(effectiveType);
   const fonts = useProjectStore((s) => s.project.assets.fonts);
   const fontTokens = useMemo(
     () => [
@@ -511,14 +1461,33 @@ function StyleTab({ node }: { node: WidgetNodeV2 }): JSX.Element {
   );
   const [state, setState] = useState<StateToken>('default');
   const [part, setPart] = useState<string>('main');
+  const [styleTarget, setStyleTarget] = useState<string>('local');
   const parts = spec?.parts ?? ['main'];
   const selector = normSelector(state, part);
   const group: LocalStyleGroup | undefined = node.styles.find((g) => sameSelector(g.selector, selector));
+  const screenStyles = findNodeByIdV2(uiProject, node.id)?.screen.styles ?? [];
+  const namedStyles = [...uiProject.styles, ...screenStyles]
+    .filter((style, index, list) => list.findIndex((item) => item.id === style.id) === index);
+  const namedTarget = styleTarget === 'local'
+    ? undefined
+    : namedStyles.find((style) => style.id === styleTarget);
+  const styleValues = namedTarget?.props ?? group?.props;
+  const appliedAtSelector = (styleId: string): boolean => node.styleRefs.some(
+    (usage) => usage.styleId === styleId && sameSelector(usage.selector, selector),
+  );
 
   const setStyleProp = (key: string, v: PropValueV2 | undefined): void => {
     useProjectStore.getState().mutateV2(
       `改样式 ${key}`,
       (draft) => {
+        if (namedTarget) {
+          const current = draft.styles.find((style) => style.id === namedTarget.id)
+            ?? draft.screens.flatMap((screen) => screen.styles).find((style) => style.id === namedTarget.id);
+          if (!current) return;
+          if (v === undefined) delete current.props[key];
+          else current.props[key] = v;
+          return;
+        }
         const hit = findNodeByIdV2(draft, node.id);
         if (!hit) return;
         let g = hit.node.styles.find((x) => sameSelector(x.selector, selector));
@@ -536,12 +1505,77 @@ function StyleTab({ node }: { node: WidgetNodeV2 }): JSX.Element {
         }
         g.props[key] = v;
       },
-      v === undefined ? {} : { coalesceKey: `style:${node.id}:${state}:${part}:${key}` },
+      v === undefined ? {} : {
+        coalesceKey: namedTarget
+          ? `named-style:${namedTarget.id}:${key}`
+          : `style:${node.id}:${state}:${part}:${key}`,
+      },
     );
+  };
+
+  const extractNamedStyle = (): void => {
+    if (!group || Object.keys(group.props).length === 0) return;
+    // Immer recipe 里的 current 是 Proxy，不能直接 structuredClone；在进入事务前复制普通状态值。
+    const extractedProps = structuredClone(group.props);
+    const allCodeNames = new Set(namedStyles.map((style) => style.codeName).filter(Boolean));
+    let ordinal = namedStyles.length + 1;
+    while (allCodeNames.has(`style_${ordinal}`)) ordinal += 1;
+    const id = newUuid();
+    useProjectStore.getState().mutateV2('提取复用样式', (draft) => {
+      const hit = findNodeByIdV2(draft, node.id);
+      if (!hit) return;
+      const current = hit.node.styles.find((item) => sameSelector(item.selector, selector));
+      if (!current || Object.keys(current.props).length === 0) return;
+      draft.styles.push({
+        id, codeName: `style_${ordinal}`, displayName: `复用样式 ${ordinal}`,
+        props: extractedProps,
+      });
+      hit.node.styles = hit.node.styles.filter((item) => item !== current);
+      hit.node.styleRefs.push(selector ? { styleId: id, selector } : { styleId: id });
+    });
+    setStyleTarget(id);
+  };
+
+  const applyNamedStyle = (): void => {
+    if (!namedTarget || appliedAtSelector(namedTarget.id)) return;
+    useProjectStore.getState().mutateV2('应用复用样式', (draft) => {
+      const hit = findNodeByIdV2(draft, node.id);
+      if (hit) hit.node.styleRefs.push(selector
+        ? { styleId: namedTarget.id, selector }
+        : { styleId: namedTarget.id });
+    });
+  };
+
+  const removeStyleUsage = (index: number): void => {
+    useProjectStore.getState().mutateV2('解除复用样式', (draft) => {
+      findNodeByIdV2(draft, node.id)?.node.styleRefs.splice(index, 1);
+    });
+  };
+
+  const deleteNamedStyle = (): void => {
+    if (!namedTarget) return;
+    const uses = namedStyleUseCount(namedTarget.id);
+    if (uses > 0) {
+      useEditorStore.getState().setBanner(`复用样式正被 ${uses} 处使用，请先解除应用或绑定`);
+      return;
+    }
+    if (!uiProject.styles.some((style) => style.id === namedTarget.id)) {
+      useEditorStore.getState().setBanner('屏幕局部命名样式暂不在此处删除');
+      return;
+    }
+    useProjectStore.getState().mutateV2('删除复用样式', (draft) => {
+      draft.styles = draft.styles.filter((style) => style.id !== namedTarget.id);
+    });
+    setStyleTarget('local');
   };
 
   return (
     <div className="insp-body">
+      {component && (
+        <div className="insp-note">
+          关联组件：{component.displayName ?? component.codeName}。此处修改的是当前实例覆盖值。
+        </div>
+      )}
       <div className="prop-row">
         <label>状态</label>
         <select className="ed-select" value={state} onChange={(e) => setState(e.target.value as StateToken)}>
@@ -554,7 +1588,38 @@ function StyleTab({ node }: { node: WidgetNodeV2 }): JSX.Element {
           {parts.map((p) => <option key={p} value={p}>{p}</option>)}
         </select>
       </div>
-      <div className="panel-subtitle">内联样式(style_*)</div>
+      <section className="insp-group named-style-section">
+        <div className="panel-subtitle">复用样式</div>
+        <div className="prop-row">
+          <label>编辑目标</label>
+          <select className="ed-select" value={namedTarget?.id ?? 'local'} onChange={(e) => setStyleTarget(e.target.value)}>
+            <option value="local">当前组件局部样式</option>
+            {namedStyles.map((style) => (
+              <option key={style.id} value={style.id}>{style.displayName || style.codeName || style.id}</option>
+            ))}
+          </select>
+        </div>
+        <div className="named-style-actions">
+          <button className="btn btn-sm" disabled={!group || Object.keys(group.props).length === 0}
+            onClick={extractNamedStyle}>提取当前样式</button>
+          <button className="btn btn-sm" disabled={!namedTarget || appliedAtSelector(namedTarget.id)}
+            onClick={applyNamedStyle}>应用到当前状态/部件</button>
+          <button className="btn btn-sm" disabled={!namedTarget} onClick={deleteNamedStyle}>删除样式</button>
+        </div>
+        {node.styleRefs.map((usage, index) => {
+          const style = namedStyles.find((item) => item.id === usage.styleId);
+          const usagePart = usage.selector?.part ?? 'main';
+          const usageStates = (usage.selector?.states ?? []).filter((item) => item !== 'default').join('|') || 'default';
+          return (
+            <div className="named-style-usage" key={`${usage.styleId}:${index}`}>
+              <span>{style?.displayName || style?.codeName || `${usage.styleId}（已失效）`} · {usagePart}/{usageStates}</span>
+              <button className="icon-btn" title="解除复用样式" onClick={() => removeStyleUsage(index)}>✕</button>
+            </div>
+          );
+        })}
+        {namedStyles.length === 0 && <div className="insp-note">先设置局部样式，再点击“提取当前样式”即可复用和动态绑定。</div>}
+      </section>
+      <div className="panel-subtitle">{namedTarget ? `命名样式 · ${namedTarget.displayName || namedTarget.codeName || namedTarget.id}` : '局部样式(style_*)'}</div>
       {M1_INSPECTOR_STYLE_KEYS.map((key) => {
         const sp = STYLE_PROPS[key];
         if (!sp) return null;
@@ -563,7 +1628,7 @@ function StyleTab({ node }: { node: WidgetNodeV2 }): JSX.Element {
             key={key}
             spec={sp}
             fontTokens={fontTokens}
-            value={group?.props[key]}
+            value={styleValues?.[key]}
             onChange={(v) => setStyleProp(key, v)}
           />
         );
@@ -671,7 +1736,8 @@ function ValueEditor(props: {
 }): JSX.Element {
   const { type, tokens, min, max, value, defaultValue, onChange, node, propKey } = props;
   const ph = defaultValue !== undefined ? String(defaultValue) : '';
-  const themes = useProjectStore((state) => state.uiProject.themes);
+  const uiProject = useProjectStore((state) => state.uiProject);
+  const themes = uiProject.themes;
   const themeTokens = useMemo(() => {
     const tokenTargetTypes = new Set<StylePropType>([
       'size', 'int', 'color', 'opa', 'fontRef', 'imageRef',
@@ -758,6 +1824,63 @@ function ValueEditor(props: {
           onChange={onChange}
         />
       );
+    case 'float':
+      return (
+        <input
+          className="ed-num"
+          type="number"
+          step="any"
+          min={min}
+          max={max}
+          placeholder={ph}
+          value={typeof value === 'number' ? value : ''}
+          onChange={(e) => onChange(e.target.value === '' ? undefined : Number(e.target.value))}
+        />
+      );
+    case 'subject': {
+      const current = typeof value === 'string' ? value : '';
+      return (
+        <select
+          className="ed-select"
+          value={current}
+          onChange={(event) => onChange(event.target.value === '' ? undefined : event.target.value)}
+          title={uiProject.subjects.length === 0 ? '请先在“交互”页新建数据源' : undefined}
+        >
+          <option value="">{uiProject.subjects.length === 0 ? '(暂无数据源)' : '(未绑定)'}</option>
+          {current !== '' && !uiProject.subjects.some((subject) => subject.codeName === current) && (
+            <option value={current}>{current}（已失效）</option>
+          )}
+          {uiProject.subjects.map((subject) => (
+            <option key={subject.id} value={subject.codeName}>
+              {subject.displayName || subject.codeName} · {subject.type}
+            </option>
+          ))}
+        </select>
+      );
+    }
+    case 'styleRef': {
+      const current = typeof value === 'string' ? value : '';
+      const screenStyles = node ? findNodeByIdV2(uiProject, node.id)?.screen.styles ?? [] : [];
+      const styles = [...uiProject.styles, ...screenStyles]
+        .filter((style, index, list) => list.findIndex((item) => item.id === style.id) === index);
+      return (
+        <select
+          className="ed-select"
+          value={current}
+          onChange={(event) => onChange(event.target.value === '' ? undefined : event.target.value)}
+        >
+          <option value="">{styles.length === 0 ? '(暂无命名样式)' : '(未设置)'}</option>
+          {current !== '' && !styles.some((style) => style.codeName === current) && (
+            <option value={current}>{current}（已失效）</option>
+          )}
+          {styles.map((style) => (
+            <option key={style.id} value={style.codeName ?? ''} disabled={style.codeName === undefined}>
+              {style.displayName || style.codeName || style.id}
+            </option>
+          ))}
+        </select>
+      );
+    }
     case 'stringList':
       // animimage.srcs = imageRef 帧序列 → 素材多选;其它 stringList 走空格分隔文本
       if (node?.type === 'animimage' && propKey === 'srcs') {

@@ -353,9 +353,7 @@
         "x",
         "y"
       ],
-      "bindableProps": [
-        "src"
-      ],
+      "bindableProps": [],
       "acceptsWidgetChildren": false
     },
     "imagebutton": {

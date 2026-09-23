@@ -67,4 +67,25 @@ describe('projectStore native UiProject edits', () => {
     expect(useProjectStore.getState().uiProject.screens[0]!.root.styles[0]!.props.text_color)
       .toBe('#000000');
   });
+
+  it('persists custom device actions and includes them in undo/redo', () => {
+    useProjectStore.getState().mutateActionRegistry('add device action', (draft) => {
+      draft['custom.wifi_scan'] = {
+        id: 'custom.wifi_scan',
+        displayName: '扫描 Wi-Fi',
+        params: [{ name: 'userData', type: 'string' }],
+      };
+    });
+
+    expect(useBuildTargetStore.getState().actionRegistry['custom.wifi_scan']?.displayName)
+      .toBe('扫描 Wi-Fi');
+    expect(createStoredProjectDocument(useProjectStore.getState().project)
+      .actionRegistry['custom.wifi_scan']?.id).toBe('custom.wifi_scan');
+
+    useProjectStore.getState().undo();
+    expect(useBuildTargetStore.getState().actionRegistry['custom.wifi_scan']).toBeUndefined();
+    useProjectStore.getState().redo();
+    expect(useBuildTargetStore.getState().actionRegistry['custom.wifi_scan']?.id)
+      .toBe('custom.wifi_scan');
+  });
 });

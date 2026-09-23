@@ -424,6 +424,49 @@ def restore_version(owner_user_id: int, project_id: str, version_seq: int) -> di
         conn.close()
 
 
+def lock_project_version(owner_user_id: int, project_id: str, note: str = "") -> dict | None:
+    """Atomically persist and return an immutable copy of the current cloud revision."""
+
+    init_db()
+    conn = _get_conn()
+    try:
+        conn.execute("BEGIN IMMEDIATE")
+        project = conn.execute(
+            "SELECT * FROM projects WHERE owner_user_id = ? AND id = ?",
+            (owner_user_id, project_id),
+        ).fetchone()
+        if project is None:
+            return None
+        seq = _next_seq(conn, project_id)
+        stamp = _now()
+        conn.execute(
+            """
+            INSERT INTO project_versions
+                (id, project_id, owner_user_id, version, seq, kind, note, doc, created_at)
+            VALUES (?, ?, ?, ?, ?, 'manual', ?, ?, ?)
+            """,
+            (
+                uuid.uuid4().hex,
+                project_id,
+                owner_user_id,
+                project["version"],
+                seq,
+                note.strip(),
+                project["doc"],
+                stamp,
+            ),
+        )
+        conn.commit()
+        return {
+            "seq": seq,
+            "projectVersion": int(project["version"]),
+            "doc": _decode_doc(project["doc"]),
+            "createdAt": stamp,
+        }
+    finally:
+        conn.close()
+
+
 def resolve_ui_build_input(
     owner_user_id: int,
     ui_reference: str,

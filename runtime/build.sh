@@ -19,6 +19,7 @@ set -euo pipefail
 RUNTIME_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(dirname "$RUNTIME_DIR")"
 DIST_DIR="$REPO_ROOT/packages/lvgl-runtime/dist"
+BUILD_DIR="${BUILD_DIR:-$RUNTIME_DIR/build}"
 
 # 目标版本 = 产品基线 9.5.0（docs/lvgl-version-baseline.md §1.1）。
 # 9.5 使用 preview_host.c + preview_driver.c，不依赖 XML。
@@ -152,12 +153,12 @@ NINJA_SHA="$([ -n "$NINJA_PATH" ] && sha256_of "$NINJA_PATH" || echo unavailable
 JOBS="$( (command -v nproc >/dev/null 2>&1 && nproc) || echo 4 )"
 
 cd "$RUNTIME_DIR"
-emcmake cmake -B build "${GEN[@]}" -DCMAKE_BUILD_TYPE=Release \
+emcmake cmake -B "$BUILD_DIR" "${GEN[@]}" -DCMAKE_BUILD_TYPE=Release \
     -DLVD_LVGL_DIR="$LVGL_DIR" -DLVD_LEGACY_XML_BRIDGE="$LEGACY_XML_BRIDGE"
-cmake --build build -j "$JOBS"
+cmake --build "$BUILD_DIR" -j "$JOBS"
 
 mkdir -p "$DIST_DIR"
-cp build/lvgl_runtime.mjs build/lvgl_runtime.wasm "$DIST_DIR/"
+cp "$BUILD_DIR/lvgl_runtime.mjs" "$BUILD_DIR/lvgl_runtime.wasm" "$DIST_DIR/"
 
 # ── 构建 manifest ─────────────────────────────────────────────────────────────
 # 方案 §6.2:「像素一致」以截图 diff 为准，而 diff 结果必须能溯源到具体构建。

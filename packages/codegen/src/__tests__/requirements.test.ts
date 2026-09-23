@@ -101,6 +101,20 @@ describe('collectRequirements', () => {
 });
 
 describe('多目标导出', () => {
+  it('命名样式条件绑定导出为 LVGL 9.5 observer 调用', () => {
+    const p = chartQrFontProject();
+    p.subjects.push({ name: 'theme', type: 'int', initial: 0 });
+    p.styles.push({ id: 'st-dark', name: 'dark', props: { bg_color: '#101010' } });
+    p.screens[0]!.root.bindings.push({
+      kind: 'style', styleRef: 'st-dark', selector: { states: ['pressed'] },
+      subject: 'theme', refValue: 1,
+    });
+    const screen = emitC94(p).files.find((file) => file.path === 'screens/main.c')!.content;
+    expect(screen).toContain(
+      'lv_obj_bind_style(root, &style_dark, LV_STATE_PRESSED, &subject_theme, 1);',
+    );
+  });
+
   it('esp-idf(默认)= idf_component_register;cmake = add_library;bare 无 CMakeLists', () => {
     const p = caseTargets();
     const espidf = emitC94(p).files;

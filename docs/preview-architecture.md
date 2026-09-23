@@ -12,7 +12,7 @@
 | --- | --- | --- |
 | 目标版本仍是 9.4 | `packages/schema/src/project.ts:38` `lvglVersion: '9.4'`;`validate.ts:63` `z.literal('9.4')`;`factory.ts:62` 写死 `'9.4'` | ✓ |
 | Preview 依赖 Codegen | 9.5 主通道已由 `apps/designer` 直接调用 `@lvd/preview-compiler`；`@lvd/codegen.emitXml()` 仅保留给旧 9.4 WASM 的迁移回退 | ◐ 主通道已解耦 |
-| Components 未闭环 | `validate.ts:76` `components: z.array(z.unknown())`;`:353-355` 非空即报 `components-not-supported` | ✓ |
+| Components 未闭环 | v2 已按 `component:<id>` 打通 Editor/Preview/C/Web 发布投影；定义变化同步所有实例，v1 Validator 的阻断仅保留给旧文件兼容入口 | ✅ 已修复 |
 | `cPatch` 可进工程 | v1 类型仅为存量迁移保留;Validator 已报 `cpatch-forbidden`,9.5 emitter 已报 `E_CPATCH_FORBIDDEN`;9.4 emitter 仅保留历史兼容 | ◐ 已阻断普通入口 |
 | 色彩预览固定 32bpp | `runtime/lv_conf.h:18` `LV_COLOR_DEPTH 32` | ✓ |
 | runtime 构建不可复现 | `runtime/build.sh` 已参数化 emsdk/LVGL 路径,增加 v9.5.0 版本断言、显式失败与构建 manifest | ✅ 已修复 |

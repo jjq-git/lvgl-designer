@@ -2,8 +2,9 @@
 // 验证乐观锁冲突、owner 越权拦截、restore 产生备份快照、快照滚动。
 // 需要模块 mock:运行 `node --experimental-test-module-mocks --test handlers-logic.test.mjs`
 // (test-all.mjs 会带上这个 flag;单跑 snapshot-policy.test.mjs 不需要。)
-import { test, mock, before } from 'node:test';
+import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { setTestDbAdapter } from './db.mjs';
 
 // —— 内存假库:只实现 projects.mjs 用到的那几条 SQL 的语义 ——
 // 数据模型
@@ -156,11 +157,8 @@ const fakeDb = {
   async closePool() {},
 };
 
-let handleProjectRoutes;
-before(async () => {
-  mock.module('./db.mjs', { exports: fakeDb });
-  ({ handleProjectRoutes } = await import('./projects.mjs?fakedb'));
-});
+setTestDbAdapter(fakeDb);
+const { handleProjectRoutes } = await import('./projects.mjs');
 
 // —— mock req/res ——
 function mockRes() {

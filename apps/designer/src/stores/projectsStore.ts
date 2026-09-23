@@ -66,6 +66,8 @@ export interface ProjectsStoreState {
   listError: string | null;
   /** 当前打开的云面板(工程列表 / 版本历史 / 无) */
   panel: CloudPanel;
+  /** 版本预览期间暂停任何自动/手动云保存，避免预览快照覆盖当前工程。 */
+  cloudSyncPaused: boolean;
 
   openPanel(p: CloudPanel): void;
   /** 探测云存储并记录 cloudEnabled(启动调一次) */
@@ -80,12 +82,13 @@ export interface ProjectsStoreState {
   /** dirty 变化触发的防抖保存 */
   scheduleSave(): void;
   renameCurrent(name: string): Promise<void>;
-  deleteProject(id: string): Promise<void>;
+  deleteProject(id: string): Promise<boolean>;
   /** 把一个纯本地工程(doc)上传到云,成为云工程 */
   uploadLocal(name: string, doc: LvProject): Promise<cloud.CloudResult<{ id: string }>>;
   /** 网络恢复:冲刷 pendingSync 队列 */
   flushPending(): Promise<void>;
   setSyncState(s: SyncState): void;
+  setCloudSyncPaused(paused: boolean): void;
 }
 
 /** 把 doc + 名字灌进编辑器(loadProject + 定位首屏)。
@@ -122,6 +125,7 @@ export const useProjectsStore = create<ProjectsStoreState>()((set, get) => ({
   listLoading: false,
   listError: null,
   panel: null,
+  cloudSyncPaused: false,
 
   openPanel: (panel) => set({ panel }),
 
@@ -148,6 +152,15 @@ export const useProjectsStore = create<ProjectsStoreState>()((set, get) => ({
   },
 
   openProject: async (id) => {
+    if (id === get().currentId) return;
+    // 切换工程前结清当前工程的待保存内容。否则旧 debounce 可能在新工程
+    // 载入后执行，导致旧改动丢失，甚至把新文档写到错误的工程 id。
+    if (saveTimer !== null) {
+      clearTimeout(saveTimer);
+      saveTimer = null;
+    }
+    if (useProjectStore.getState().dirty) await get().saveCurrent();
+
     const r = await cloud.getProject(id);
     if (r.ok) {
       const doc = r.data.doc;
@@ -244,6 +257,7 @@ export const useProjectsStore = create<ProjectsStoreState>()((set, get) => ({
   },
 
   scheduleSave: () => {
+    if (get().cloudSyncPaused) return;
     if (saveTimer !== null) clearTimeout(saveTimer);
     saveTimer = window.setTimeout(() => {
       saveTimer = null;
@@ -252,6 +266,7 @@ export const useProjectsStore = create<ProjectsStoreState>()((set, get) => ({
   },
 
   saveCurrent: async (force = false) => {
+    if (get().cloudSyncPaused) return;
     const { currentId, currentVersion, currentName, cloudEnabled } = get();
     const doc = useProjectStore.getState().project;
     const stored = createStoredProjectDocument(doc);
@@ -324,17 +339,21 @@ export const useProjectsStore = create<ProjectsStoreState>()((set, get) => ({
     const { cloudEnabled } = get();
     if (cloudEnabled) {
       const r = await cloud.deleteProject(id);
-      if (!r.ok && r.kind !== 'notFound' && r.kind !== 'offline') {
-        banner(`删除失败:${r.message}`);
-        return;
+      if (!r.ok && r.kind !== 'notFound') {
+        banner(r.kind === 'offline' ? '当前离线，无法删除云端工程' : `删除失败:${r.message}`);
+        return false;
       }
     }
     await deleteCloudCache(id);
     set((s) => ({ list: s.list.filter((p) => p.id !== id) }));
     // 删的是当前工程 → 清空当前指针(App 层可引导新建/打开其它)
     if (get().currentId === id) {
-      set({ currentId: null, currentName: '', currentVersion: 0, syncState: 'synced' });
+      const blank = createEmptyProject();
+      loadIntoEditor(createNewStoredProjectDocument(blank));
+      set({ currentId: null, currentName: blank.meta.name, currentVersion: 0, syncState: 'synced' });
+      banner('当前工程已删除，已切换到新的本地空工程');
     }
+    return true;
   },
 
   uploadLocal: async (name, doc) => {
@@ -379,6 +398,13 @@ export const useProjectsStore = create<ProjectsStoreState>()((set, get) => ({
   },
 
   setSyncState: (syncState) => set({ syncState }),
+  setCloudSyncPaused: (cloudSyncPaused) => {
+    if (cloudSyncPaused && saveTimer !== null) {
+      clearTimeout(saveTimer);
+      saveTimer = null;
+    }
+    set({ cloudSyncPaused });
+  },
 }));
 
 /**

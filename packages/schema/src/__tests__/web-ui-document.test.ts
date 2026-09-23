@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { createEmptyProject } from '../index.js';
 import { ALL_WIDGETS } from '../widgets/index.js';
 import { migrateV1ToV2 } from '../v2/migrate.js';
+import { componentType } from '../v2/components.js';
 import type { ProjectSnapshotV2 } from '../v2/projectSnapshot.js';
 import type { WidgetNodeV2 } from '../v2/uiProject.js';
 import {
@@ -148,6 +149,26 @@ describe('WebUiDocumentV1 冻结契约', () => {
     expect(document.actionRegistry).toHaveProperty('screen.open');
     expect(validateWebUiDocument(document).errors).toEqual([]);
     expect(canonicalJson(document)).not.toMatch(/"type":"list(?:-text|-button)?"/);
+  });
+
+  it('发布前展开关联组件，不把设计器私有定义泄漏给运行端', () => {
+    const input = snapshot('web-component');
+    input.uiProject.components.push({
+      id: 'cmp-card', codeName: 'card', api: [], styles: [], consts: [],
+      root: node('component-root', 'button', { width: 100, height: 40 }),
+    });
+    input.uiProject.screens[0]!.root.children.push({
+      ...node('component-instance', componentType('cmp-card'), { x: 12, y: 18 }),
+      codeName: 'card_1',
+    });
+
+    const document = createWebUiDocument(input);
+    expect(document.uiProject.components).toEqual([]);
+    expect(document.uiProject.screens[0]!.root.children[0]).toMatchObject({
+      id: 'component-instance', type: 'button', codeName: 'card_1',
+      props: { x: 12, y: 18, width: 100, height: 40 },
+    });
+    expect(validateWebUiDocument(document).errors).toEqual([]);
   });
 
   it('兼容导出 buttonmatrix 和 spinbox 的完整属性契约', () => {

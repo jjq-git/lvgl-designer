@@ -11,6 +11,7 @@
     "build:services": "corepack pnpm --filter @lvd/build-worker build && corepack pnpm --filter @lvd/preview-host build",
     "start": "python -m uvicorn app:app --app-dir backend --host 127.0.0.1 --port 8001",
     "test": "corepack pnpm -r test",
+    "test:deploy": "corepack pnpm --dir deploy --ignore-workspace test",
     "test:backend": "python -m pytest backend/tests -q",
     "typecheck": "corepack pnpm -r typecheck",
     "audit:lvgl-diff": "node scripts/audit-lvgl-version-diff.mjs"

@@ -166,6 +166,19 @@ try {
   const treeRows = await page.locator('.tree-row').count();
   assert(treeRows === 4, `E2 对象树 = 屏根 + 3 节点(行数=${treeRows})`);
   // 像素:三个 widget 中心颜色 vs 空白底色点(120,225)→ 画布非默认底色
+  const buttonTreeRow = page.locator('.tree-row', { hasText: 'button_1' });
+  await buttonTreeRow.hover();
+  await buttonTreeRow.locator('.tree-action').click();
+  await page.waitForTimeout(300);
+  m = await model();
+  assert(
+    m.children.filter((child) => child.type === 'button').length === 2,
+    'E2 对象树复刻按钮可复制完整组件子树',
+  );
+  await page.keyboard.press('Control+z');
+  await page.waitForTimeout(300);
+  m = await model();
+  assert(m.children.length === 3, 'E2 复刻操作可单步撤销');
   const centers = [];
   for (const t of ['button', 'label', 'slider']) {
     const r = await rectOfType(t);
@@ -180,6 +193,83 @@ try {
   );
   await shotArt('e2-three-widgets.png');
   await shotArt('e2-page-full.png', true);
+
+  /* ================= E2.1 按钮文字快捷编辑 ================= */
+  step('E2.1 按钮文字直接编辑');
+  await page.locator('.tree-row', { hasText: 'button_1' }).click();
+  const buttonTextInput = page
+    .locator('.prop-row', { has: page.locator('label', { hasText: '按钮文字' }) })
+    .locator('input.ed-text');
+  await buttonTextInput.fill('确定');
+  await page.waitForTimeout(400);
+  const buttonText = await page.evaluate(() => {
+    const button = window.__lvd.projectStore.getState().project.screens[0].root.children
+      .find((node) => node.type === 'button');
+    const label = button?.children.find((node) => node.type === 'label');
+    return label ? { text: label.props.text, align: label.props.align } : null;
+  });
+  assert(
+    buttonText?.text === '确定' && buttonText.align === 'center',
+    `E2.1 输入按钮文字自动创建居中 label(实际 ${JSON.stringify(buttonText)})`,
+  );
+  assert(await page.locator('.tree-row').count() === 5, 'E2.1 对象树同步出现按钮内部标签');
+  await shotArt('e2-button-text.png');
+
+  /* ================= E2.2 关联可复用组件 ================= */
+  step('E2.2 创建、复用并选择关联组件');
+  const reusableButtonRow = page.locator('.tree-row', { hasText: 'button_1' }).first();
+  await reusableButtonRow.click({ button: 'right' });
+  await page.locator('.ctx-menu button', { hasText: '创建可复用组件' }).click();
+  await page.waitForTimeout(500);
+  let componentState = await page.evaluate(() => {
+    const state = window.__lvd.projectStore.getState();
+    return {
+      definitions: state.uiProject.components.length,
+      linked: state.uiProject.screens[0].root.children.filter((node) => node.type.startsWith('component:')).length,
+      projectedButtons: state.project.screens[0].root.children.filter((node) => node.type === 'button').length,
+    };
+  });
+  assert(
+    componentState.definitions === 1 && componentState.linked === 1 && componentState.projectedButtons === 1,
+    `E2.2 子树转关联组件且预览投影保持 button(实际 ${JSON.stringify(componentState)})`,
+  );
+  const componentCard = page.locator('.palette-component').first();
+  assert(await componentCard.count() === 1, 'E2.2 可复用组件出现在组件面板');
+  await componentCard.scrollIntoViewIfNeeded();
+  const componentBox = await componentCard.boundingBox();
+  ci = await canvasInfo();
+  await dragMouse(
+    { x: componentBox.x + componentBox.width / 2, y: componentBox.y + componentBox.height / 2 },
+    ci.toPage(185, 185),
+  );
+  await page.waitForTimeout(600);
+  componentState = await page.evaluate(() => {
+    const state = window.__lvd.projectStore.getState();
+    return {
+      linked: state.uiProject.screens[0].root.children.filter((node) => node.type.startsWith('component:')).length,
+      projectedButtons: state.project.screens[0].root.children.filter((node) => node.type === 'button').length,
+    };
+  });
+  assert(
+    componentState.linked === 2 && componentState.projectedButtons === 2,
+    `E2.2 面板拖放创建第二个关联实例(实际 ${JSON.stringify(componentState)})`,
+  );
+  await page.locator('.toolbar button', { hasText: '撤销' }).click();
+  await page.waitForTimeout(500);
+  const buttonRect = await rectOfType('button');
+  ci = await canvasInfo();
+  const buttonCenter = ci.toPage(buttonRect.rect.x + buttonRect.rect.w / 2, buttonRect.rect.y + buttonRect.rect.h / 2);
+  await page.mouse.click(buttonCenter.x, buttonCenter.y);
+  await page.waitForTimeout(250);
+  const linkedSelection = await page.evaluate(() => {
+    const state = window.__lvd.projectStore.getState();
+    const selected = window.__lvd.editorStore.getState().selectedIds[0];
+    return state.uiProject.screens[0].root.children.some(
+      (node) => node.id === selected && node.type.startsWith('component:'),
+    );
+  });
+  assert(linkedSelection, 'E2.2 点击组件内部文字仍选中可编辑的关联实例根');
+  await shotArt('e2-linked-component.png', true);
 
   /* ================= E3 Inspector 改 width/value + 拖动移动 ================= */
   step('E3 检查器改 width/value + 画布拖动');
@@ -216,6 +306,63 @@ try {
   const slNode = m.children.find((c) => c.type === 'slider');
   assert(slNode.props.value === 60 && slNode.props.width === 200, 'E3 模型 props: width=200, value=60');
   await shotArt('e3-width200-value60.png');
+
+  /* ================= E3.1 伴生属性 / 事件 / 数据绑定 ================= */
+  step('E3.1 组件完整交互配置');
+  const animatedRow = page.locator('.prop-row', { has: page.locator('label[title="value-animated"]') });
+  assert(await animatedRow.count() === 1, 'E3.1 slider 的“当前值动画”伴生属性可编辑');
+  await page.locator('.tabs button', { hasText: '交互' }).click();
+  const sourceSection = page.locator('.insp-group', { has: page.locator('.panel-subtitle', { hasText: '数据源' }) });
+  await sourceSection.locator('button', { hasText: '+ 新建' }).click();
+  const bindingSection = page.locator('.insp-group', { has: page.locator('.panel-subtitle', { hasText: '数据绑定' }) });
+  await bindingSection.locator('select').first().selectOption('prop:value');
+  const eventSection = page.locator('.insp-group', { has: page.locator('.panel-subtitle', { hasText: '事件' }) });
+  await eventSection.locator('button', { hasText: '+ 添加' }).click();
+  await page.waitForTimeout(500);
+  const interactionModel = await page.evaluate(() => {
+    const st = window.__lvd.projectStore.getState();
+    const slider = st.uiProject.screens[0].root.children.find((item) => item.type === 'slider');
+    return {
+      subjects: st.uiProject.subjects.map((subject) => ({ id: subject.id, codeName: subject.codeName })),
+      bindings: slider?.bindings ?? [],
+      events: slider?.events ?? [],
+      firstScreenId: st.uiProject.screens[0].id,
+    };
+  });
+  assert(interactionModel.subjects.length === 1, 'E3.1 可在检查器新建工程数据源');
+  assert(
+    interactionModel.bindings[0]?.kind === 'prop' && interactionModel.bindings[0]?.prop === 'value'
+      && interactionModel.bindings[0]?.subject === interactionModel.subjects[0].id,
+    'E3.1 slider.value 已绑定到新数据源',
+  );
+  assert(
+    interactionModel.events[0]?.on === 'value_changed' && interactionModel.events[0]?.action === 'screen.open'
+      && interactionModel.events[0]?.args?.screen === interactionModel.firstScreenId,
+    'E3.1 slider 默认事件为“值变化 → 打开屏幕”，目标屏幕有效',
+  );
+  step('E3.2 设备业务 Action 配置');
+  const actionRegistrySection = page.locator('[data-section="action-registry"]');
+  await actionRegistrySection.locator('.panel-subtitle .clickable').click();
+  await actionRegistrySection.locator('.action-create-row input').nth(0).fill('wifi_scan');
+  await actionRegistrySection.locator('.action-create-row input').nth(1).fill('扫描 Wi-Fi');
+  await actionRegistrySection.locator('.action-create-row button').click();
+  assert(
+    await actionRegistrySection.locator('[data-action-id="custom.wifi_scan"]').count() === 1,
+    'E3.2 可在交互页新建设备业务动作 custom.wifi_scan',
+  );
+  await eventSection.locator('button', { hasText: '+ 添加' }).click();
+  await eventSection.locator('[data-event-index="1"] select').nth(1).selectOption('custom.wifi_scan');
+  const customEvent = await page.evaluate(() => {
+    const st = window.__lvd.projectStore.getState();
+    const slider = st.uiProject.screens[0].root.children.find((item) => item.type === 'slider');
+    return slider?.events[1] ?? null;
+  });
+  assert(
+    customEvent?.action === 'custom.wifi_scan' && customEvent?.on === 'value_changed',
+    'E3.2 组件事件可直接选择设备业务动作',
+  );
+  await shotArt('e3-interaction.png', true);
+  await page.locator('.tabs button', { hasText: '属性' }).click();
 
   // 画布拖动移动 → 松手后位置持久
   const rectBeforeDrag = sl.rect;
@@ -318,6 +465,40 @@ try {
   await shotArt('e5-restored.png');
   await shotArt('e5-page-full.png', true);
 
+  /* ================= E5.1 复用样式 + 条件绑定 ================= */
+  step('E5.1 局部样式提取为复用样式并绑定数据源');
+  await page.locator('.tree-row', { hasText: 'slider_1' }).click();
+  await page.locator('.tabs button', { hasText: '样式' }).click();
+  await page.locator('.named-style-actions button', { hasText: '提取当前样式' }).click();
+  await page.waitForTimeout(500);
+  const extractedStyle = await page.evaluate(() => {
+    const st = window.__lvd.projectStore.getState();
+    const slider = st.uiProject.screens[0].root.children.find((item) => item.type === 'slider');
+    return { style: st.uiProject.styles[0], local: slider?.styles ?? [], refs: slider?.styleRefs ?? [] };
+  });
+  assert(
+    extractedStyle.style?.props?.bg_color === '#ff3300'
+      && extractedStyle.local.length === 0 && extractedStyle.refs.length === 1,
+    'E5.1 提取后局部样式迁入全局复用样式，并保持当前组件挂载',
+  );
+  await page.locator('.named-style-usage .icon-btn').click();
+  await page.locator('.tabs button', { hasText: '交互' }).click();
+  const styleBindingSection = page.locator('.insp-group', { has: page.locator('.panel-subtitle', { hasText: '数据绑定' }) });
+  await styleBindingSection.locator('.binding-add-row select').selectOption(`style:${extractedStyle.style.id}`);
+  await page.waitForTimeout(500);
+  const styleBindingModel = await page.evaluate(() => {
+    const st = window.__lvd.projectStore.getState();
+    const slider = st.uiProject.screens[0].root.children.find((item) => item.type === 'slider');
+    return { refs: slider?.styleRefs ?? [], bindings: slider?.bindings ?? [] };
+  });
+  assert(
+    styleBindingModel.refs.length === 0
+      && styleBindingModel.bindings.some((binding) => binding.kind === 'style'
+        && binding.styleId === extractedStyle.style.id && binding.refValue === 1),
+    'E5.1 复用样式可按整数数据源条件启用，且不依赖静态样式挂载',
+  );
+  await shotArt('e5-style-binding.png', true);
+
   /* ================= E6 导出 zip ================= */
   step('E6 导出 C 代码 zip');
   await page.selectOption('[aria-label="目标颜色格式"]', 'RGB565');
@@ -341,6 +522,16 @@ try {
   assert(mainC.includes('lv_slider_create'), 'E6 screens/main.c 含 lv_slider_create');
   assert(mainC.includes('lv_button_create') && mainC.includes('lv_label_create'), 'E6 screens/main.c 含 button/label create');
   assert(mainC.includes('lv_slider_set_value'), 'E6 screens/main.c 含 lv_slider_set_value(value=60)');
+  assert(mainC.includes('lv_slider_bind_value'), 'E6 数据绑定生成 lv_slider_bind_value');
+  assert(mainC.includes('lv_obj_bind_style') && mainC.includes('&style_style_1'), 'E6 条件样式绑定生成 lv_obj_bind_style');
+  assert(mainC.includes('LV_EVENT_VALUE_CHANGED') && mainC.includes('lv_screen_load_anim'), 'E6 事件生成值变化回调与屏幕动作');
+  const actionsH = dec.decode(unzipped['actions.h']);
+  const actionsC = dec.decode(unzipped['actions.c']);
+  assert(actionsH.includes('void wifi_scan(lv_event_t * e);'), 'E6 actions.h 声明设备业务回调 wifi_scan');
+  assert(actionsC.includes('void wifi_scan(lv_event_t * e)'), 'E6 actions.c 生成且保留业务回调实现骨架');
+  assert(mainC.includes('lv_obj_add_event_cb') && mainC.includes('wifi_scan'), 'E6 组件事件连接到 wifi_scan 回调');
+  const subjectsC = dec.decode(unzipped['subjects.c']);
+  assert(subjectsC.includes('lv_subject_init_int'), 'E6 新建数据源生成 Subject 初始化代码');
   // 落地 zip 内容供 EspIdf 阶段用
   for (const [p, data] of Object.entries(unzipped)) {
     const dst = join(outUiDir, p);

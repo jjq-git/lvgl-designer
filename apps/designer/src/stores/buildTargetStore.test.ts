@@ -118,6 +118,23 @@ describe('BuildTarget/DisplayProfile preview sidecar', () => {
     expect(validateReleaseTarget(state).ready).toBe(true);
   });
 
+  it('legacy projection refresh keeps manually configured device actions', () => {
+    const state = useBuildTargetStore.getState();
+    useBuildTargetStore.getState().replaceActionRegistry({
+      ...state.actionRegistry,
+      'custom.wifi_scan': {
+        id: 'custom.wifi_scan',
+        displayName: '扫描 Wi-Fi',
+        params: [{ name: 'userData', type: 'string' }],
+      },
+    });
+    const edited = structuredClone(useBuildTargetStore.getState().sourceProject);
+    edited.screens[0]!.root.props.x = 31;
+    useBuildTargetStore.getState().syncProject(edited);
+    expect(useBuildTargetStore.getState().actionRegistry['custom.wifi_scan']?.id)
+      .toBe('custom.wifi_scan');
+  });
+
   it('旧投影编辑不会覆盖未触及的 Theme Token 和 icons', () => {
     const source = createEmptyProject('v2-preserve');
     const migrated = migrateV1ToV2(source);

@@ -18,9 +18,11 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { REGISTRY, findChildSpec } from '@lvd/schema';
-import type { WidgetNodeV2 } from '@lvd/schema/v2';
+import { componentIdFromType, type WidgetNodeV2 } from '@lvd/schema/v2';
 import { findNodeByIdV2, useProjectStore } from '../stores/projectStore';
 import { useEditorStore } from '../stores/editorStore';
+import { duplicateSelection } from '../services/clipboard';
+import { createComponentFromNode, detachComponentInstance } from '../services/components';
 
 interface Menu {
   x: number;
@@ -87,6 +89,8 @@ export function ObjectTree(): JSX.Element {
     const ed = useEditorStore.getState();
     ed.select(ed.selectedIds.filter((x) => x !== nodeId));
   };
+  const menuNode = menu ? findNodeByIdV2(project, menu.nodeId)?.node : undefined;
+  const menuComponentId = menuNode ? componentIdFromType(menuNode.type) : null;
 
   return (
     <div className="tree" onClick={() => setMenu(null)}>
@@ -95,6 +99,37 @@ export function ObjectTree(): JSX.Element {
       </DndContext>
       {menu && (
         <div ref={menuRef} className="ctx-menu" style={{ left: menu.x, top: menu.y }}>
+          {menuComponentId === null ? (
+            <button
+              onClick={() => {
+                const node = findNodeByIdV2(project, menu.nodeId)?.node;
+                const fallback = `${node?.displayName ?? node?.codeName ?? '新建'} 组件`;
+                const name = window.prompt('可复用组件名称', fallback);
+                if (name !== null) createComponentFromNode(menu.nodeId, name);
+                setMenu(null);
+              }}
+            >
+              创建可复用组件
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                detachComponentInstance(menu.nodeId);
+                setMenu(null);
+              }}
+            >
+              解除组件关联
+            </button>
+          )}
+          <button
+            onClick={() => {
+              useEditorStore.getState().select([menu.nodeId]);
+              duplicateSelection();
+              setMenu(null);
+            }}
+          >
+            复刻
+          </button>
           <button
             onClick={() => {
               deleteNode(menu.nodeId);
@@ -137,6 +172,7 @@ function TreeRow(props: {
   onMenu: (m: Menu | null) => void;
 }): JSX.Element {
   const { node, depth, isRoot, onMenu } = props;
+  const components = useProjectStore((state) => state.uiProject.components);
   const selected = useEditorStore((s) => s.selectedIds.includes(node.id));
   const hovered = useEditorStore((s) => s.hoverId === node.id);
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -144,7 +180,10 @@ function TreeRow(props: {
     disabled: isRoot,
   });
   const spec = REGISTRY.get(node.type);
+  const componentId = componentIdFromType(node.type);
+  const component = componentId === null ? undefined : components.find((item) => item.id === componentId);
   const typeLabel = spec?.palette?.label
+    ?? component?.displayName
     ?? (findChildSpec(node.type) ? node.type.split('-').slice(1).join('-') : node.type);
   const label = node.displayName ?? node.codeName ?? `${node.type}_${node.id.slice(0, 6)}`;
 
@@ -177,6 +216,22 @@ function TreeRow(props: {
     >
       <span className="tree-type">{typeLabel}</span>
       <span className="tree-name">{isRoot ? '(屏根)' : label}</span>
+      {!isRoot && (
+        <button
+          className="tree-action"
+          title="复刻组件及全部子项"
+          aria-label={`复刻 ${label}`}
+          onPointerDown={(event) => event.stopPropagation()}
+          onClick={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            useEditorStore.getState().select([node.id]);
+            duplicateSelection();
+          }}
+        >
+          ⧉
+        </button>
+      )}
     </div>
   );
 }

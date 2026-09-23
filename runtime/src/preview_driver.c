@@ -2330,6 +2330,27 @@ int lvd_preview_bind_state(const char * name, const char * state, const char * o
 }
 
 EMSCRIPTEN_KEEPALIVE
+int lvd_preview_bind_style(const char * name, const char * style_name,
+                           const char * part, const char * states,
+                           const char * subject_name, int32_t ref_value)
+{
+    if(!name || !style_name || !part || !states || !subject_name) return -3;
+    lvd_preview_node_rec_t * node = find_rec(name);
+    lvd_preview_style_rec_t * style = find_style(style_name);
+    lvd_preview_subject_rec_t * subject = find_subject(subject_name);
+    if(!node || !node->obj || !style || !subject) return -2;
+    if(subject->type != LVD_SUBJECT_INT) return -4;
+    uint32_t selector;
+    if(selector_from(part, states, &selector) != 0) return -4;
+#if LV_USE_OBSERVER
+    return lv_obj_bind_style(node->obj, &style->style, selector,
+                             &subject->subject, ref_value) ? 0 : -4;
+#else
+    return -4;
+#endif
+}
+
+EMSCRIPTEN_KEEPALIVE
 int lvd_preview_set_style_string(const char * name, const char * key, const char * value,
                                  const char * part, const char * states)
 {

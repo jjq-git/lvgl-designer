@@ -62,7 +62,8 @@ export interface IRNode {
 export type IRBinding =
   | { kind: 'prop'; prop: BindableProp; subject: CName; fmt?: string }
   | { kind: 'flag'; flag: ObjFlagKey; op: CmpOp; subject: CName; refValue: number }
-  | { kind: 'state'; state: ObjStateKey; op: CmpOp; subject: CName; refValue: number };
+  | { kind: 'state'; state: ObjStateKey; op: CmpOp; subject: CName; refValue: number }
+  | { kind: 'style'; styleName: CName; selector?: Selector; subject: CName; refValue: number };
 
 export type IREvent =
   | { kind: 'callback'; trigger: string; callback: CName; userData?: string }

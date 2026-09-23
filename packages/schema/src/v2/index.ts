@@ -12,6 +12,7 @@ export * from './refs.js';
 export * from './profiles.js';
 export * from './theme.js';
 export * from './uiProject.js';
+export * from './components.js';
 export * from './trustedExtension.js';
 export * from './migrate.js';
 export * from './projectSnapshot.js';

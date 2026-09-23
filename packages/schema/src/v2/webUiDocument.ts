@@ -16,6 +16,7 @@ import {
   type WidgetNodeV2,
 } from './uiProject.js';
 import { validateDisplayProfile, validateUiProjectV2 } from './validate.js';
+import { expandComponentTree } from './components.js';
 
 export const WEB_UI_DOCUMENT_KIND = 'wf2-web-ui' as const;
 export const WEB_UI_DOCUMENT_SCHEMA_VERSION = 1 as const;
@@ -193,8 +194,18 @@ function publishedNode(
 }
 
 function publishedProject(project: UiProject): WebUiProjectV1 {
-  const { editor: _editor, screens, components, ...published } = project;
-  const usedIds = collectNodeIds(project);
+  const lowered: UiProject = {
+    ...project,
+    screens: project.screens.map((screen) => ({
+      ...screen,
+      root: expandComponentTree(screen.root, project.components).root,
+    })),
+    components: [],
+    styles: [...project.styles, ...project.components.flatMap((component) => component.styles)],
+    consts: [...project.consts, ...project.components.flatMap((component) => component.consts)],
+  };
+  const { editor: _editor, screens, components, ...published } = lowered;
+  const usedIds = collectNodeIds(lowered);
   return {
     ...jsonClone(published),
     screens: screens.map((screen) => ({

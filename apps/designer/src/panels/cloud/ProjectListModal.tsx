@@ -8,6 +8,7 @@
  */
 import { useEffect, useState } from 'react';
 import { useProjectsStore } from '../../stores/projectsStore';
+import { useProjectStore } from '../../stores/projectStore';
 import { renameProject as cloudRenameProject } from '../../services/cloudStorage';
 import { loadLastProject } from '../../services/storage';
 import type { LvProject } from '@lvd/schema';
@@ -51,18 +52,24 @@ export function ProjectListModal({ onClose }: { onClose: () => void }): JSX.Elem
       flash('fail', '请填写工程名');
       return;
     }
+    const previousProjectId = useProjectStore.getState().uiProject.meta.id;
     setBusy(true);
     await useProjectsStore.getState().newProject(name);
     setBusy(false);
-    setNewName('');
-    onClose();
+    if (useProjectStore.getState().uiProject.meta.id !== previousProjectId) {
+      setNewName('');
+      onClose();
+    } else {
+      flash('fail', '新建工程失败，请检查网络或服务状态');
+    }
   };
 
   const onOpen = async (id: string): Promise<void> => {
     setBusy(true);
     await useProjectsStore.getState().openProject(id);
     setBusy(false);
-    onClose();
+    if (useProjectsStore.getState().currentId === id) onClose();
+    else flash('fail', '工程未能打开，请检查网络或本地缓存');
   };
 
   const onRename = async (id: string, oldName: string): Promise<void> => {
@@ -75,7 +82,7 @@ export function ProjectListModal({ onClose }: { onClose: () => void }): JSX.Elem
     } else {
       // 非当前工程:直接调云端 rename + 刷新
       const r = await cloudRenameProject(id, trimmed);
-      if (!r.ok && r.kind !== 'offline') {
+      if (!r.ok) {
         flash('fail', `重命名失败:${r.message}`);
         return;
       }
@@ -87,9 +94,9 @@ export function ProjectListModal({ onClose }: { onClose: () => void }): JSX.Elem
   const onDelete = async (id: string, name: string): Promise<void> => {
     if (!window.confirm(`确认删除工程「${name}」?此操作不可撤销(含其云端版本历史)。`)) return;
     setBusy(true);
-    await useProjectsStore.getState().deleteProject(id);
+    const deleted = await useProjectsStore.getState().deleteProject(id);
     setBusy(false);
-    flash('ok', `已删除「${name}」`);
+    flash(deleted ? 'ok' : 'fail', deleted ? `已删除「${name}」` : `未能删除「${name}」`);
   };
 
   const onUploadLocal = async (): Promise<void> => {

@@ -9,7 +9,7 @@
  */
 import { zUiProject } from './schemas.js';
 import { STYLE_PROPS } from '../styleProps.js';
-import { REGISTRY, findChildSpec } from '../widgets/index.js';
+import { OBJ_BASE, REGISTRY, findChildSpec } from '../widgets/index.js';
 import { checkCName } from '../ids.js';
 import { PART_TOKENS, STATE_TOKENS } from '../enums.js';
 import type { ValidationIssue, ValidationResult } from '../validate.js';
@@ -21,8 +21,9 @@ import {
 } from './profiles.js';
 import { TOKEN_ID_RE, isTokenRef, resolveTheme, tokenAssignableTo, type ThemeToken } from './theme.js';
 import {
-  BUILTIN_ACTIONS, type ActionRegistry, type UiProject, type WidgetNodeV2,
+  BUILTIN_ACTIONS, type ActionRegistry, type ComponentDefV2, type UiProject, type WidgetNodeV2,
 } from './uiProject.js';
+import { componentIdFromType } from './components.js';
 
 /* ------------------------------------------------------------------ 上下文 */
 
@@ -95,9 +96,23 @@ interface NodeCtx {
   codeNames: Map<string, string>;   // codeName -> 首次出现的 path
   styleIds: Set<string>;
   subjectIds: Set<string>;
+  subjectTypes: Map<string, UiProject['subjects'][number]['type']>;
   screenIds: Set<string>;
+  components: Map<string, ComponentDefV2>;
   actions: ActionRegistry;
   tokens: Map<string, ThemeToken> | null;
+}
+
+function componentApiValueMatches(type: ComponentDefV2['api'][number]['type'], value: unknown): boolean {
+  if (type === 'int') return typeof value === 'number' && Number.isInteger(value);
+  if (type === 'float') return typeof value === 'number' && Number.isFinite(value);
+  if (type === 'bool') return typeof value === 'boolean';
+  if (type === 'size') return typeof value === 'number'
+    || value === 'content'
+    || (typeof value === 'string' && /^-?\d+(?:\.\d+)?%$/.test(value));
+  if (type === 'color') return typeof value === 'string'
+    && /^#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?$/.test(value);
+  return typeof value === 'string';
 }
 
 function validateNode(
@@ -121,14 +136,30 @@ function validateNode(
   }
 
   /* 类型解析:widget 或父 widget 声明的结构子元素 */
-  const spec = REGISTRY.get(node.type);
-  const asChild = findChildSpec(node.type);
-  if (spec === undefined && asChild === undefined) {
+  const componentId = componentIdFromType(node.type);
+  const component = componentId === null ? undefined : nc.components.get(componentId);
+  const effectiveType = component?.root.type ?? node.type;
+  const spec = REGISTRY.get(effectiveType);
+  const asChild = componentId === null ? findChildSpec(node.type) : undefined;
+  if (componentId !== null && component === undefined) {
+    err(ctx, path, 'component-not-found', `引用了不存在的可复用组件 "${componentId}"`);
+  } else if (componentId !== null && node.children.length > 0) {
+    err(ctx, `${path}.children`, 'component-instance-children', '组件实例不能直接包含子节点；请编辑组件定义');
+  } else if (spec === undefined && asChild === undefined) {
     err(ctx, path, 'unknown-widget', `未登记的 widget 类型 "${node.type}"`);
   } else if (spec === undefined && asChild !== undefined && asChild.parent.type !== parentType) {
     // 结构子元素(如 chart-series)只能出现在声明它的 widget 之下
     err(ctx, path, 'misplaced-child',
       `"${node.type}" 只能作为 "${asChild.parent.type}" 的子元素,当前父节点是 "${parentType ?? '(根)'}"`);
+  }
+  if (component !== undefined) {
+    for (const prop of component.api) {
+      const value = node.props[prop.name];
+      if (value !== undefined && !componentApiValueMatches(prop.type, value)) {
+        err(ctx, `${path}.props.${prop.name}`, 'component-api-type',
+          `组件参数 "${prop.name}" 需要 ${prop.type}，当前值类型不匹配`);
+      }
+    }
   }
 
   /* 样式 */
@@ -190,8 +221,24 @@ function validateNode(
   /* 绑定 */
   for (const [i, b] of node.bindings.entries()) {
     const p = `${path}.bindings[${i}]`;
-    if (!nc.subjectIds.has(b.subject)) {
+    const subjectType = nc.subjectTypes.get(b.subject);
+    if (subjectType === undefined) {
       err(ctx, p, 'subject-not-found', `绑定引用了不存在的 subject "${b.subject}"`);
+    }
+    if (b.kind === 'prop') {
+      if (spec === undefined || !spec.bindableProps.includes(b.prop)) {
+        err(ctx, p, 'unbound-prop', `组件 "${node.type}" 不支持属性绑定 "${b.prop}"`);
+      }
+      const typeOk = b.prop === 'text'
+        ? subjectType === 'int' || subjectType === 'float' || subjectType === 'string'
+        : b.prop === 'checked'
+          ? subjectType === 'int'
+          : subjectType === 'int' || subjectType === 'float';
+      if (subjectType !== undefined && !typeOk) {
+        err(ctx, p, 'binding-subject-type', `属性 "${b.prop}" 不支持 ${subjectType} 数据源`);
+      }
+    } else if (subjectType !== undefined && subjectType !== 'int') {
+      err(ctx, p, 'binding-subject-type', `${b.kind} 条件绑定只支持 int 数据源`);
     }
     if (b.kind === 'style') {
       if (!nc.styleIds.has(b.styleId)) {
@@ -282,6 +329,9 @@ export function validateUiProjectV2(doc: unknown, opts: ValidateV2Options = {}):
   };
   collectStyleIds(p.styles, 'styles');
   for (const [i, sc] of p.screens.entries()) collectStyleIds(sc.styles, `screens[${i}].styles`);
+  for (const [i, component] of p.components.entries()) {
+    collectStyleIds(component.styles, `components[${i}].styles`);
+  }
 
   const subjectIds = new Set(p.subjects.map((s) => s.id));
   if (subjectIds.size !== p.subjects.length) {
@@ -300,13 +350,60 @@ export function validateUiProjectV2(doc: unknown, opts: ValidateV2Options = {}):
   /* ---- 样式属性 / token ---- */
   for (const [i, s] of p.styles.entries()) checkStyleProps(ctx, s.props, `styles[${i}].props`, tokens);
 
+  const components = new Map<string, ComponentDefV2>();
+  const componentCodeNames = new Set<string>();
+  for (const [i, component] of p.components.entries()) {
+    if (components.has(component.id)) {
+      err(ctx, `components[${i}].id`, 'duplicate-component-id', `重复的组件 id "${component.id}"`);
+    } else {
+      components.set(component.id, component);
+    }
+    const nameError = checkCName(component.codeName);
+    if (nameError !== null) {
+      err(ctx, `components[${i}].codeName`, 'bad-code-name', `组件 codeName 非法:${nameError.message}`);
+    }
+    if (componentCodeNames.has(component.codeName)) {
+      err(ctx, `components[${i}].codeName`, 'duplicate-component-code-name',
+        `重复的组件 codeName "${component.codeName}"`);
+    }
+    componentCodeNames.add(component.codeName);
+    const apiNames = new Set<string>();
+    const rootSpec = REGISTRY.get(component.root.type);
+    const rootPropNames = new Set([
+      ...OBJ_BASE.props.map((prop) => prop.key),
+      ...(rootSpec?.props.map((prop) => prop.key) ?? []),
+    ]);
+    for (const [apiIndex, prop] of component.api.entries()) {
+      const apiError = checkCName(prop.name);
+      if (apiError !== null) {
+        err(ctx, `components[${i}].api[${apiIndex}].name`, 'bad-code-name',
+          `组件参数名非法:${apiError.message}`);
+      }
+      if (apiNames.has(prop.name)) {
+        err(ctx, `components[${i}].api[${apiIndex}].name`, 'duplicate-component-api',
+          `重复的组件参数 "${prop.name}"`);
+      }
+      if (rootPropNames.has(prop.name)) {
+        err(ctx, `components[${i}].api[${apiIndex}].name`, 'component-api-conflict',
+          `组件参数 "${prop.name}" 与根 widget 属性同名，请换一个参数名`);
+      }
+      if (prop.default !== undefined && !componentApiValueMatches(prop.type, prop.default)) {
+        err(ctx, `components[${i}].api[${apiIndex}].default`, 'component-api-type',
+          `组件参数 "${prop.name}" 的默认值不符合 ${prop.type}`);
+      }
+      apiNames.add(prop.name);
+    }
+  }
+
   /* ---- 树 ---- */
   const nc: NodeCtx = {
     ids: new Set(),
     codeNames: new Map(),
     styleIds,
     subjectIds,
+    subjectTypes: new Map(p.subjects.map((subject) => [subject.id, subject.type])),
     screenIds,
+    components,
     actions: { ...BUILTIN_ACTIONS, ...(opts.actions ?? {}) },
     tokens,
   };
@@ -321,6 +418,46 @@ export function validateUiProjectV2(doc: unknown, opts: ValidateV2Options = {}):
     }
     validateNode(ctx, sc.root, `screens[${i}].root`, nc, null);
   }
+
+  for (const [i, component] of p.components.entries()) {
+    for (const [j, style] of component.styles.entries()) {
+      checkStyleProps(ctx, style.props, `components[${i}].styles[${j}].props`, tokens);
+    }
+    if (componentIdFromType(component.root.type) !== null) {
+      err(ctx, `components[${i}].root`, 'component-root-instance',
+        '组件定义的根必须是普通 widget；可在根节点的 children 中组合其他组件');
+    }
+    const definitionCtx: NodeCtx = { ...nc, codeNames: new Map() };
+    validateNode(ctx, component.root, `components[${i}].root`, definitionCtx, null);
+  }
+
+  const dependencies = new Map<string, Set<string>>();
+  const collectDependencies = (node: WidgetNodeV2, out: Set<string>): void => {
+    const id = componentIdFromType(node.type);
+    if (id !== null) out.add(id);
+    node.children.forEach((child) => collectDependencies(child, out));
+  };
+  for (const component of p.components) {
+    const refs = new Set<string>();
+    collectDependencies(component.root, refs);
+    dependencies.set(component.id, refs);
+  }
+  const visiting = new Set<string>();
+  const visited = new Set<string>();
+  const visit = (id: string, chain: readonly string[]): void => {
+    if (visiting.has(id)) {
+      err(ctx, 'components', 'component-cycle', `组件依赖形成循环:${[...chain, id].join(' -> ')}`);
+      return;
+    }
+    if (visited.has(id)) return;
+    visiting.add(id);
+    for (const next of dependencies.get(id) ?? []) {
+      if (components.has(next)) visit(next, [...chain, id]);
+    }
+    visiting.delete(id);
+    visited.add(id);
+  };
+  for (const id of components.keys()) visit(id, []);
 
   return { valid: ctx.errors.length === 0, errors: ctx.errors, warnings: ctx.warnings };
 }

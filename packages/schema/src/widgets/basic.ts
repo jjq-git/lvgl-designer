@@ -106,7 +106,9 @@ export const imageSpec: WidgetSpec = {
       ui: { group: 'value', label: '轴心 Y', control: 'number' },
     },
   ],
-  bindableProps: ['src'],          // bind_src
+  // lv_image_bind_src 只接受 pointer subject；当前工程数据源模型没有 pointer，
+  // 因此不能把一个必然无效的 src 绑定暴露给设计器。
+  bindableProps: [],
   parts: ['main'],
   acceptsWidgetChildren: false,
   palette: { category: 'media', label: '图片', icon: 'image' },

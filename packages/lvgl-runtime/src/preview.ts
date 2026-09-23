@@ -33,7 +33,7 @@ const STRUCTURAL_TYPES = new Map<string, { kind: PreviewNode['kind']; parent: st
   ['chart-axis', { kind: 'virtual', parent: 'chart' }],
 ]);
 const COMMON_I32_PROPS = new Set(['x', 'y', 'width', 'height', 'flex_grow', 'ext_click_area']);
-const COMMON_STRING_PROPS = new Set(['x', 'y', 'width', 'height']);
+const COMMON_STRING_PROPS = new Set(['x', 'y', 'width', 'height', 'align']);
 const TYPE_I32_PROPS: Record<string, ReadonlySet<string>> = {
   obj: new Set(), label: new Set(), button: new Set(), switch: new Set(), checkbox: new Set(),
   image: new Set(['rotation', 'scale_x', 'scale_y', 'pivot_x', 'pivot_y']),
@@ -265,6 +265,10 @@ export interface PreviewBridge {
   bindProp(runtimeName: string, prop: string, subjectName: string, format: string): number;
   bindFlag(runtimeName: string, flag: string, op: string, subjectName: string, refValue: number): number;
   bindState(runtimeName: string, state: string, op: string, subjectName: string, refValue: number): number;
+  bindStyle(
+    runtimeName: string, styleName: string, part: string, states: string,
+    subjectName: string, refValue: number,
+  ): number;
   addCallbackEvent(
     runtimeName: string, trigger: string, callback: string, userData: string, hasUserData: boolean,
   ): number;
@@ -510,6 +514,7 @@ function validateBindings(
   node: PreviewNode,
   path: string,
   subjects: ReadonlyMap<string, PreviewSubject>,
+  styleNames: ReadonlySet<string>,
   out: PreviewSupportIssue[],
 ): void {
   for (let index = 0; index < node.bindings.length; index++) {
@@ -540,7 +545,7 @@ function validateBindings(
         issue(out, 'E_PREVIEW_BINDING_UNSUPPORTED', bindingPath,
           `v1 driver 不支持 ${node.type}.bind_${binding.prop}`);
       }
-    } else {
+    } else if (binding.kind === 'flag' || binding.kind === 'state') {
       if (subject.type !== 'int') {
         issue(out, 'E_PREVIEW_BINDING_UNSUPPORTED', bindingPath, 'flag/state 条件绑定仅支持 int subject');
       }
@@ -554,6 +559,18 @@ function validateBindings(
       if (binding.kind === 'state' && !SUPPORTED_STATES.has(binding.state)) {
         issue(out, 'E_PREVIEW_STATE_UNSUPPORTED', `${bindingPath}.state`, `不支持 state:${binding.state}`);
       }
+    } else {
+      if (!styleNames.has(binding.styleName)) {
+        issue(out, 'E_PREVIEW_STYLE_MISSING', `${bindingPath}.styleName`, `命名 style 不存在:${binding.styleName}`);
+      }
+      if (subject.type !== 'int') {
+        issue(out, 'E_PREVIEW_BINDING_UNSUPPORTED', bindingPath, '样式条件绑定仅支持 int subject');
+      }
+      if (!Number.isInteger(binding.refValue)
+        || binding.refValue < -2147483648 || binding.refValue > 2147483647) {
+        issue(out, 'E_PREVIEW_BINDING_CONDITION_INVALID', bindingPath, '样式绑定 refValue 非法');
+      }
+      validateSelector(binding.selector, `${bindingPath}.selector`, out);
     }
   }
 }
@@ -915,7 +932,7 @@ function validateNode(
     }
     validateSelector(styleUse.selector, `${usePath}.selector`, out);
   }
-  validateBindings(node, path, subjects, out);
+  validateBindings(node, path, subjects, styleNames, out);
   validateEvents(node, path, subjects, screenNames, out);
 
   for (const [key, sourceValue] of Object.entries(node.props)) {
@@ -961,7 +978,9 @@ function validateNode(
         && (key === 'width' || key === 'height')) {
         issue(out, 'E_PREVIEW_SIZE_UNSUPPORTED', valuePath,
           `${node.type}.${key} only supports px integers`);
-      } else if (COMMON_STRING_PROPS.has(key) && !isRuntimeSizeString(value)) {
+      } else if (key === 'align' && !STYLE_ENUM_VALUES.align!.has(value)) {
+        issue(out, 'E_PREVIEW_PROP_ENUM_INVALID', valuePath, `align 非法:${value}`);
+      } else if (COMMON_STRING_PROPS.has(key) && !isRuntimeSizeString(value) && key !== 'align') {
         issue(out, 'E_PREVIEW_SIZE_UNSUPPORTED', valuePath, `不支持的 size:${value}`);
       } else if (node.type === 'qrcode' && (key === 'dark_color' || key === 'light_color')
         && !/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(value)) {
@@ -1380,7 +1399,14 @@ function applyNode(
     const value = resolveValue(sourceValue, consts, `${node.runtimeName}.${key}`);
     if (value === UNRESOLVED) throw new Error(`preview unresolved const:${node.runtimeName}.${key}`);
     if (typeof value === 'string') {
-      check(bridge.setString(node.runtimeName, key, value), `preview.setString(${node.runtimeName}.${key})`);
+      // align 是所有 lv_obj 的通用属性；现有 WASM bridge 已通过 style string
+      // 完整支持它，复用该稳定通道可避免普通属性路径无故拒绝 AI/检查器产物。
+      if (key === 'align') {
+        check(bridge.setStyleString(node.runtimeName, key, value, 'main', ''),
+          `preview.setStyleString(${node.runtimeName}.${key})`);
+      } else {
+        check(bridge.setString(node.runtimeName, key, value), `preview.setString(${node.runtimeName}.${key})`);
+      }
     } else if (typeof value === 'number' || typeof value === 'boolean') {
       check(bridge.setI32(node.runtimeName, key, typeof value === 'boolean' ? Number(value) : value),
         `preview.setI32(${node.runtimeName}.${key})`);
@@ -1437,10 +1463,15 @@ function applyNode(
       check(bridge.bindFlag(
         node.runtimeName, binding.flag, binding.op, binding.subject, binding.refValue,
       ), `preview.bindFlag(${node.runtimeName}.${binding.flag}:${binding.subject})`);
-    } else {
+    } else if (binding.kind === 'state') {
       check(bridge.bindState(
         node.runtimeName, binding.state, binding.op, binding.subject, binding.refValue,
       ), `preview.bindState(${node.runtimeName}.${binding.state}:${binding.subject})`);
+    } else {
+      const [part, states] = selectorArgs(binding.selector);
+      check(bridge.bindStyle(
+        node.runtimeName, binding.styleName, part, states, binding.subject, binding.refValue,
+      ), `preview.bindStyle(${node.runtimeName}:${binding.styleName}:${binding.subject})`);
     }
   }
   for (const event of node.events) {

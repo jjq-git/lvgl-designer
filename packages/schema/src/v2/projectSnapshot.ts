@@ -6,7 +6,7 @@
  * only as the current editor's in-memory compatibility view.
  */
 import type {
-  Binding, ComponentDef, EventAction, FontAsset, ImageAsset, InlineStyleGroup,
+  Binding, EventAction, FontAsset, ImageAsset, InlineStyleGroup,
   LvProject, NamedStyle, PropValue, ScreenDef, ScreenLoadAnim, StyleUsage, SubjectDef, WidgetNode,
 } from '../project.js';
 import { loadProjectJson, ProjectFormatError } from '../migrations.js';
@@ -16,9 +16,10 @@ import type { ControllerProfile, DisplayProfile } from './profiles.js';
 import { isRefOfKind, parseRef, parseThemeRef } from './refs.js';
 import { isTokenRef, resolveTheme, type ThemeToken } from './theme.js';
 import type {
-  AssetEntry, BindingV2, ComponentDefV2, LocalStyleGroup, NamedStyleV2,
+  AssetEntry, BindingV2, LocalStyleGroup, NamedStyleV2,
   ActionRegistry, PropValueV2, ScreenDefV2, SubjectDefV2, UiEvent, UiProject, WidgetNodeV2,
 } from './uiProject.js';
+import { expandComponentTree } from './components.js';
 import { validateCrossRefs, validateDisplayProfile, validateUiProjectV2 } from './validate.js';
 
 export interface ProjectSnapshotV2 {
@@ -340,6 +341,12 @@ export function snapshotToEditorProject(snapshot: ProjectSnapshotV2): LvProject 
   ]));
   const screenIds = new Set(snapshot.uiProject.screens.map((screen) => screen.id));
 
+  const expandedScreens = snapshot.uiProject.screens.map((screen) => {
+    const expanded = expandComponentTree(screen.root, snapshot.uiProject.components);
+    issues.push(...expanded.issues);
+    return expanded.root;
+  });
+
   const screenV1 = (screen: ScreenDefV2, index: number): ScreenDef => ({
     id: screen.id, name: screen.codeName,
     ...(screen.displayName === undefined ? {} : { displayName: screen.displayName }),
@@ -348,21 +355,8 @@ export function snapshotToEditorProject(snapshot: ProjectSnapshotV2): LvProject 
       styleV1(style, `screens[${index}].styles[${styleIndex}]`, issues, resolvedTokens)),
     consts: screen.consts,
     root: nodeV1(
-      screen.root, subjects, styleNames, screenIds, `screens[${index}].root`, issues, resolvedTokens,
-    ),
-  });
-  const componentV1 = (component: ComponentDefV2, index: number): ComponentDef => ({
-    id: component.id, name: component.codeName,
-    ...(component.displayName === undefined ? {} : { displayName: component.displayName }),
-    api: component.api.map((prop) => ({
-      name: prop.name, type: prop.type,
-      ...(prop.default === undefined ? {} : { default: String(prop.default) }),
-    })),
-    styles: component.styles.map((style, styleIndex) =>
-      styleV1(style, `components[${index}].styles[${styleIndex}]`, issues, resolvedTokens)),
-    consts: component.consts,
-    root: nodeV1(
-      component.root, subjects, styleNames, screenIds, `components[${index}].root`, issues, resolvedTokens,
+      expandedScreens[index] ?? screen.root,
+      subjects, styleNames, screenIds, `screens[${index}].root`, issues, resolvedTokens,
     ),
   });
 
@@ -383,10 +377,21 @@ export function snapshotToEditorProject(snapshot: ProjectSnapshotV2): LvProject 
       ...(snapshot.displayProfile.dpi === undefined ? {} : { dpi: snapshot.displayProfile.dpi }),
     },
     screens: snapshot.uiProject.screens.map(screenV1),
-    components: snapshot.uiProject.components.map(componentV1),
-    styles: snapshot.uiProject.styles.map((style, index) =>
-      styleV1(style, `styles[${index}]`, issues, resolvedTokens)),
-    consts: snapshot.uiProject.consts,
+    // Components are linked in the persisted v2 model and lowered above. Keeping this runtime-only
+    // v1 field empty prevents legacy validators/emitters from entering their intentionally blocked path.
+    components: [],
+    styles: [
+      ...snapshot.uiProject.styles.map((style, index) =>
+        styleV1(style, `styles[${index}]`, issues, resolvedTokens)),
+      ...snapshot.uiProject.components.flatMap((component, componentIndex) =>
+        component.styles.map((style, styleIndex) => styleV1(
+          style, `components[${componentIndex}].styles[${styleIndex}]`, issues, resolvedTokens,
+        ))),
+    ],
+    consts: [
+      ...snapshot.uiProject.consts,
+      ...snapshot.uiProject.components.flatMap((component) => component.consts),
+    ],
     subjects: snapshot.uiProject.subjects.map(subjectV1),
     assets: {
       fonts: snapshot.uiProject.assets.fonts.map((asset, index) => fontV1(asset, `assets.fonts[${index}]`, issues)),

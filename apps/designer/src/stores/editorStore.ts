@@ -46,15 +46,17 @@ export function registerFitStageElement(el: HTMLElement | null): void {
 }
 
 function centeredPan(
-  displaySize: { width: number; height: number },
+  bounds: { x?: number; y?: number; width: number; height: number },
   zoom: number,
 ): { x: number; y: number } | null {
-  if (!stageElForFit || displaySize.width <= 0 || displaySize.height <= 0) return null;
+  if (!stageElForFit || bounds.width <= 0 || bounds.height <= 0) return null;
   const rect = stageElForFit.getBoundingClientRect();
   if (rect.width <= 0 || rect.height <= 0) return null;
+  const x = bounds.x ?? 0;
+  const y = bounds.y ?? 0;
   return {
-    x: (rect.width - displaySize.width * zoom) / 2,
-    y: (rect.height - displaySize.height * zoom) / 2,
+    x: (rect.width - bounds.width * zoom) / 2 - x * zoom,
+    y: (rect.height - bounds.height * zoom) / 2 - y * zoom,
   };
 }
 
@@ -64,6 +66,8 @@ export interface EditorStoreState {
   zoom: number;
   pan: { x: number; y: number };
   mode: EditorMode;
+  /** 仅影响设计器陈列效果，不写入工程或构建产物。 */
+  showDeviceFrame: boolean;
   activeScreenId: string;
   /** 管线每次应用完 runtime 变更后 +1,Overlay 靠它重读 rect */
   overlayTick: number;
@@ -80,6 +84,7 @@ export interface EditorStoreState {
   setZoom(zoom: number): void;
   setPan(pan: { x: number; y: number }): void;
   setMode(mode: EditorMode): void;
+  toggleDeviceFrame(): void;
   setActiveScreen(id: string): void;
   bumpOverlay(): void;
   setRuntimeKind(k: 'none' | 'wasm' | 'mock'): void;
@@ -88,9 +93,9 @@ export interface EditorStoreState {
   setGuides(g: GuideLines | null): void;
   setMarquee(m: MarqueeRect | null): void;
   /** 视图复位:zoom=1,内容在可视区水平垂直居中 */
-  resetView(displaySize: { width: number; height: number }): void;
+  resetView(bounds: { x?: number; y?: number; width: number; height: number }): void;
   /** 适应窗口:内容(display.width×height)居中 + ~10% 边距 */
-  fitToScreen(displaySize: { width: number; height: number }): void;
+  fitToScreen(bounds: { x?: number; y?: number; width: number; height: number }): void;
 }
 
 export const useEditorStore = create<EditorStoreState>()((set, get) => ({
@@ -99,6 +104,7 @@ export const useEditorStore = create<EditorStoreState>()((set, get) => ({
   zoom: 1,
   pan: { x: 40, y: 40 },
   mode: 'design',
+  showDeviceFrame: true,
   activeScreenId: '',
   overlayTick: 0,
   runtimeKind: 'none',
@@ -116,6 +122,7 @@ export const useEditorStore = create<EditorStoreState>()((set, get) => ({
   setZoom: (zoom) => set({ zoom: Math.min(8, Math.max(0.25, zoom)) }),
   setPan: (pan) => set({ pan }),
   setMode: (mode) => set({ mode }),
+  toggleDeviceFrame: () => set((state) => ({ showDeviceFrame: !state.showDeviceFrame })),
   setActiveScreen: (activeScreenId) => set({ activeScreenId, selectedIds: [], hoverId: null }),
   bumpOverlay: () => set((s) => ({ overlayTick: s.overlayTick + 1 })),
   setRuntimeKind: (runtimeKind) => set({ runtimeKind }),
@@ -124,15 +131,15 @@ export const useEditorStore = create<EditorStoreState>()((set, get) => ({
   setGuides: (guides) => set({ guides }),
   setMarquee: (marquee) => set({ marquee }),
 
-  resetView: (displaySize) => set({
+  resetView: (bounds) => set({
     zoom: 1,
-    pan: centeredPan(displaySize, 1) ?? { x: 40, y: 40 },
+    pan: centeredPan(bounds, 1) ?? { x: 40, y: 40 },
   }),
 
-  fitToScreen: (displaySize) => {
+  fitToScreen: (bounds) => {
     const el = stageElForFit;
-    const cw = displaySize.width;
-    const ch = displaySize.height;
+    const cw = bounds.width;
+    const ch = bounds.height;
     if (!el || cw <= 0 || ch <= 0) {
       // 兜底:拿不到 stage 尺寸就退回复位视图
       set({ zoom: 1, pan: { x: 40, y: 40 } });
@@ -151,10 +158,7 @@ export const useEditorStore = create<EditorStoreState>()((set, get) => ({
     // 与 setZoom 同样钳制在 [0.25, 8]
     const zoom = Math.min(8, Math.max(0.25, zoomRaw));
     // 让内容居中:pan 使 (cw/2,ch/2)*zoom 落在可视区中心
-    const pan = {
-      x: (vw - cw * zoom) / 2,
-      y: (vh - ch * zoom) / 2,
-    };
+    const pan = centeredPan(bounds, zoom) ?? { x: 40, y: 40 };
     set({ zoom, pan });
   },
 }));

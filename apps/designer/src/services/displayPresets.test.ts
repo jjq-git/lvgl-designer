@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
+  DEVICE_FRAME_PREVIEWS,
+  deviceFrameForDisplay,
   displayPresetsFromFrames,
   displayPresetLabel,
   FALLBACK_DISPLAY_PRESETS,
@@ -52,5 +54,17 @@ describe('site frame display presets', () => {
       shape: 'rect',
     })]);
     expect(presets.unresolved).toEqual([]);
+  });
+
+  it('maps every built-in display to its local device frame', () => {
+    for (const preset of FALLBACK_DISPLAY_PRESETS.fixed) {
+      expect(deviceFrameForDisplay(preset)).toEqual(expect.objectContaining({
+        frameId: preset.frameId,
+        assetUrl: `frames/${preset.frameId}.svg`,
+        svgMarkup: expect.stringContaining('<svg'),
+      }));
+    }
+    expect(DEVICE_FRAME_PREVIEWS).toHaveLength(5);
+    expect(deviceFrameForDisplay({ width: 320, height: 240, shape: 'rect' })).toBeNull();
   });
 });

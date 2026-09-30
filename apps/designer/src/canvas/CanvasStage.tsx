@@ -14,6 +14,10 @@ import { computeSnap } from './snap';
 import { findNodeById, findNodeByIdV2, useProjectStore } from '../stores/projectStore';
 import { registerFitStageElement, useEditorStore } from '../stores/editorStore';
 import { syncProjectAssetsToRuntime } from '../services/assets';
+import {
+  deviceFrameForDisplay,
+  type DeviceFramePreview,
+} from '../services/displayPresets';
 
 /** 多选拖动时每个受动节点的起始状态(相对父的原始 x/y + 起始 rect) */
 interface DragItem {
@@ -52,6 +56,28 @@ type Session =
     };
 
 const MIN_VISIBLE_CANVAS_PX = 64;
+
+export function deviceFrameBounds(
+  display: { width: number; height: number },
+  frame: DeviceFramePreview,
+): { x: number; y: number; width: number; height: number } {
+  const width = display.width / frame.aperture.width;
+  const height = display.height / frame.aperture.height;
+  return {
+    x: -frame.aperture.x * width,
+    y: -frame.aperture.y * height,
+    width,
+    height,
+  };
+}
+
+function activeViewBounds(
+  display: { width: number; height: number; shape: 'round' | 'rect' },
+  showDeviceFrame: boolean,
+): { x?: number; y?: number; width: number; height: number } {
+  const frame = showDeviceFrame ? deviceFrameForDisplay(display) : null;
+  return frame ? deviceFrameBounds(display, frame) : display;
+}
 
 export function constrainCanvasPan(
   pan: { x: number; y: number },
@@ -126,11 +152,15 @@ export function CanvasStage(): JSX.Element {
   const zoom = useEditorStore((s) => s.zoom);
   const pan = useEditorStore((s) => s.pan);
   const mode = useEditorStore((s) => s.mode);
+  const showDeviceFrame = useEditorStore((s) => s.showDeviceFrame);
   const activeScreenId = useEditorStore((s) => s.activeScreenId);
   const runtimeKind = useEditorStore((s) => s.runtimeKind);
   const selectedIds = useEditorStore((s) => s.selectedIds);
   const canUndo = useProjectStore((s) => s.undoStack.length > 0);
   const canRedo = useProjectStore((s) => s.redoStack.length > 0);
+  const availableDeviceFrame = deviceFrameForDisplay(display);
+  const deviceFrame = showDeviceFrame ? availableDeviceFrame : null;
+  const frameBounds = deviceFrame ? deviceFrameBounds(display, deviceFrame) : null;
 
   const cancelActiveSession = useCallback((): void => {
     const session = sessionRef.current;
@@ -200,7 +230,9 @@ export function CanvasStage(): JSX.Element {
   /* 首次进入及切换屏幕规格时，以 100% 缩放把设备屏幕放到内容区正中央。 */
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
-      useEditorStore.getState().resetView({ width: display.width, height: display.height });
+      const currentDisplay = useProjectStore.getState().project.display;
+      const editor = useEditorStore.getState();
+      editor.resetView(activeViewBounds(currentDisplay, editor.showDeviceFrame));
     });
     return () => cancelAnimationFrame(frame);
   }, [activeScreenId, display.height, display.width]);
@@ -248,7 +280,8 @@ export function CanvasStage(): JSX.Element {
       if (!interactive && e.shiftKey && (e.key === '!' || e.code === 'Digit1')) {
         e.preventDefault();
         const disp = useProjectStore.getState().project.display;
-        useEditorStore.getState().fitToScreen({ width: disp.width, height: disp.height });
+        const editor = useEditorStore.getState();
+        editor.fitToScreen(activeViewBounds(disp, editor.showDeviceFrame));
         return;
       }
       // 方向键微移(nudge):焦点不在输入框 + 设计态 + 有选中
@@ -643,10 +676,8 @@ export function CanvasStage(): JSX.Element {
           aria-label="适应窗口"
           onClick={() => {
             const currentDisplay = useProjectStore.getState().project.display;
-            useEditorStore.getState().fitToScreen({
-              width: currentDisplay.width,
-              height: currentDisplay.height,
-            });
+            const editor = useEditorStore.getState();
+            editor.fitToScreen(activeViewBounds(currentDisplay, editor.showDeviceFrame));
           }}
         >
           <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -660,10 +691,8 @@ export function CanvasStage(): JSX.Element {
           aria-label="重置视图"
           onClick={() => {
             const currentDisplay = useProjectStore.getState().project.display;
-            useEditorStore.getState().resetView({
-              width: currentDisplay.width,
-              height: currentDisplay.height,
-            });
+            const editor = useEditorStore.getState();
+            editor.resetView(activeViewBounds(currentDisplay, editor.showDeviceFrame));
           }}
         >
           <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -671,18 +700,50 @@ export function CanvasStage(): JSX.Element {
             <path d="M12 3v4M12 17v4M3 12h4M17 12h4" />
           </svg>
         </button>
+        <button
+          type="button"
+          className={`canvas-tool-btn ${deviceFrame ? 'active' : ''}`}
+          disabled={availableDeviceFrame === null}
+          title={availableDeviceFrame === null
+            ? '当前自定义屏幕没有匹配的设备外壳'
+            : deviceFrame ? '隐藏设备外壳' : '显示设备外壳'}
+          aria-label={deviceFrame ? '隐藏设备外壳' : '显示设备外壳'}
+          aria-pressed={deviceFrame !== null}
+          onClick={() => useEditorStore.getState().toggleDeviceFrame()}
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="3" />
+            <rect x="7" y="7" width="10" height="10" rx="1.5" />
+          </svg>
+        </button>
       </div>
       <div
         className="world"
         style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }}
       >
+        {deviceFrame && frameBounds && (
+          <div
+            className="device-frame"
+            aria-hidden="true"
+            style={{
+              left: frameBounds.x,
+              top: frameBounds.y,
+              width: frameBounds.width,
+              height: frameBounds.height,
+            }}
+            dangerouslySetInnerHTML={{ __html: deviceFrame.svgMarkup }}
+          />
+        )}
         <canvas
           ref={canvasRef}
           id="lvgl-canvas"
           width={display.width}
           height={display.height}
           aria-hidden="true"
-          style={{ imageRendering: zoom >= 2 ? 'pixelated' : 'auto' }}
+          style={{
+            imageRendering: zoom >= 2 ? 'pixelated' : 'auto',
+            borderRadius: deviceFrame?.aperture.radius,
+          }}
         />
         <Overlay />
       </div>

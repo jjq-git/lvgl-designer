@@ -82,6 +82,9 @@ function AiPanelBody(): JSX.Element {
     const onKeyDown = (event: KeyboardEvent): void => {
       if (event.key !== 'Escape') return;
       if (document.querySelector('[aria-modal="true"]')) return;
+      const panel = document.querySelector('.ai-panel');
+      const target = event.target;
+      if (!(target instanceof Node) || !panel?.contains(target)) return;
       event.preventDefault();
       useAiStore.getState().setPanelOpen(false);
     };

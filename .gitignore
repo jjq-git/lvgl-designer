@@ -19,6 +19,8 @@ apps/designer/e2e/out-ui*/
 apps/designer/restyle/shots/
 m0/artifacts/
 scripts/out/
+/artifacts/
+/tmp/
 esp-smoke/build/
 !packages/lvgl-runtime/dist/
 !packages/lvgl-runtime/dist/**

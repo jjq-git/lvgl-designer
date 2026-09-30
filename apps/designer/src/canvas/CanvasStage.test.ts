@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { createEmptyProject, createNode } from '@lvd/schema';
-import { constrainCanvasPan, selectedIdFromPointerTarget, topLevelMovableIds } from './CanvasStage';
+import {
+  constrainCanvasPan,
+  deviceFrameBounds,
+  selectedIdFromPointerTarget,
+  topLevelMovableIds,
+} from './CanvasStage';
+import { deviceFrameForDisplay } from '../services/displayPresets';
 
 describe('constrainCanvasPan', () => {
   it('keeps at least 64px of a large screen visible on every edge', () => {
@@ -20,6 +26,19 @@ describe('constrainCanvasPan', () => {
       { width: 240, height: 240 },
       0.25,
     )).toEqual({ x: 0, y: 740 });
+  });
+});
+
+describe('deviceFrameBounds', () => {
+  it('places the logical canvas exactly in the manifest aperture', () => {
+    const display = { width: 240, height: 240, shape: 'round' as const };
+    const frame = deviceFrameForDisplay(display)!;
+    const bounds = deviceFrameBounds(display, frame);
+
+    expect(bounds.x + frame.aperture.x * bounds.width).toBeCloseTo(0);
+    expect(bounds.y + frame.aperture.y * bounds.height).toBeCloseTo(0);
+    expect(frame.aperture.width * bounds.width).toBeCloseTo(display.width);
+    expect(frame.aperture.height * bounds.height).toBeCloseTo(display.height);
   });
 });
 

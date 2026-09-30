@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import mimetypes
 import os
 from pathlib import Path
 
@@ -31,6 +32,11 @@ def _load_env() -> None:
 
 def create_app() -> FastAPI:
     _load_env()
+
+    # Windows registry commonly reports .svg as the non-standard image/svg.
+    # Chromium refuses to decode that response in an <img>; force the IANA type
+    # before StaticFiles asks mimetypes to build its Content-Type header.
+    mimetypes.add_type("image/svg+xml", ".svg")
 
     from .routes import auth, lvgl, lvgl_assets, lvgl_builds, lvgl_catalog, lvgl_iot, lvgl_projects, lvgl_site_publications
     from .tools.auth import db as auth_db

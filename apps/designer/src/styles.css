@@ -905,6 +905,10 @@ body.tree-resizing * { cursor: row-resize !important; user-select: none !importa
   color: var(--accent);
   background: var(--accent-tint);
 }
+.canvas-tool-btn.active {
+  color: var(--accent);
+  background: var(--accent-tint);
+}
 .canvas-tool-btn:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 1px;
@@ -929,7 +933,23 @@ body.tree-resizing * { cursor: row-resize !important; user-select: none !importa
   line-height: 28px;
 }
 .world { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.device-frame {
+  position: absolute;
+  z-index: 0;
+  display: block;
+  max-width: none;
+  pointer-events: none;
+  user-select: none;
+  filter: drop-shadow(0 12px 22px rgba(0, 0, 0, 0.22));
+}
+.device-frame > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
 .world canvas {
+  position: relative;
+  z-index: 1;
   display: block;
   background: #000;
   box-shadow:
@@ -939,6 +959,7 @@ body.tree-resizing * { cursor: row-resize !important; user-select: none !importa
 }
 .overlay {
   position: absolute;
+  z-index: 2;
   left: 0;
   top: 0;
   pointer-events: none;

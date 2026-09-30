@@ -7,6 +7,7 @@ import { useEditorStore } from '../stores/editorStore';
 import { useProjectStore } from '../stores/projectStore';
 import { getPipeline } from './reloadPipeline';
 import type { LvdRect } from '@lvd/lvgl-runtime';
+import { deviceFrameForDisplay } from '../services/displayPresets';
 
 export const HANDLES = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'] as const;
 export type HandleDir = (typeof HANDLES)[number];
@@ -41,6 +42,7 @@ export function Overlay(): JSX.Element | null {
   const hoverId = useEditorStore((s) => s.hoverId);
   const zoom = useEditorStore((s) => s.zoom);
   const mode = useEditorStore((s) => s.mode);
+  const showDeviceFrame = useEditorStore((s) => s.showDeviceFrame);
   const dropTargetId = useEditorStore((s) => s.dropTargetId);
   const guides = useEditorStore((s) => s.guides);
   const marquee = useEditorStore((s) => s.marquee);
@@ -50,6 +52,7 @@ export function Overlay(): JSX.Element | null {
   const pipeline = getPipeline();
 
   const round = display.shape === 'round';
+  const frameVisible = showDeviceFrame && deviceFrameForDisplay(display) !== null;
   const r = Math.min(w, h) / 2;
   const cx = w / 2;
   const cy = h / 2;
@@ -62,7 +65,7 @@ export function Overlay(): JSX.Element | null {
     // 运行态:overlay 隐藏,仅保留圆屏遮罩
     return (
       <svg className="overlay" aria-hidden="true" viewBox={`0 0 ${w} ${h}`} width={w} height={h}>
-        {round && <path d={maskPath} fillRule="evenodd" fill="rgba(10,10,12,0.75)" />}
+        {round && !frameVisible && <path d={maskPath} fillRule="evenodd" fill="rgba(10,10,12,0.75)" />}
       </svg>
     );
   }
@@ -134,8 +137,8 @@ export function Overlay(): JSX.Element | null {
         />
       )}
       {/* 圆屏遮罩(最上层,pointer-events 由 CSS 关) */}
-      {round && <path d={maskPath} fillRule="evenodd" fill="rgba(10,10,12,0.75)" />}
-      {round && (
+      {round && !frameVisible && <path d={maskPath} fillRule="evenodd" fill="rgba(10,10,12,0.75)" />}
+      {round && !frameVisible && (
         <circle cx={cx} cy={cy} r={r - 0.5} fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth={1 / zoom} />
       )}
     </svg>

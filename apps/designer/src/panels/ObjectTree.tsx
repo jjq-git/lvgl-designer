@@ -37,6 +37,7 @@ const MENU_VIEWPORT_MARGIN = 8;
 export function ObjectTree(): JSX.Element {
   const project = useProjectStore((s) => s.uiProject);
   const activeScreenId = useEditorStore((s) => s.activeScreenId);
+  const [query, setQuery] = useState('');
   const [menu, setMenu] = useState<Menu | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const menuNodeRef = useRef<string | null>(null);
@@ -90,8 +91,25 @@ export function ObjectTree(): JSX.Element {
 
   const screen = project.screens.find((s) => s.id === activeScreenId) ?? project.screens[0];
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+  const normalizedQuery = query.trim().toLocaleLowerCase();
+  const matchesQuery = (node: WidgetNodeV2): boolean => {
+    if (!normalizedQuery) return true;
+    const spec = REGISTRY.get(node.type);
+    const componentId = componentIdFromType(node.type);
+    const component = componentId === null
+      ? undefined
+      : project.components.find((item) => item.id === componentId);
+    const text = [
+      node.type,
+      node.codeName,
+      node.displayName,
+      spec?.palette?.label,
+      component?.displayName,
+    ].filter(Boolean).join(' ').toLocaleLowerCase();
+    return text.includes(normalizedQuery) || node.children.some(matchesQuery);
+  };
 
-  if (!screen) return <div className="tree" />;
+  if (!screen) return <div className="tree-shell" />;
 
   const onDragEnd = (ev: DragEndEvent): void => {
     const activeId = String(ev.active.id);
@@ -128,10 +146,34 @@ export function ObjectTree(): JSX.Element {
   const menuComponentId = menuNode ? componentIdFromType(menuNode.type) : null;
 
   return (
-    <div className="tree" role="tree" aria-label="对象树" onClick={() => setMenu(null)}>
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
-        <TreeNode node={screen.root} depth={0} isRoot onMenu={setMenu} />
-      </DndContext>
+    <div className="tree-shell">
+      <label className="tree-search">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="10.5" cy="10.5" r="6.5" />
+          <path d="m15.5 15.5 4 4" />
+        </svg>
+        <input
+          type="search"
+          value={query}
+          placeholder="搜索对象…"
+          aria-label="搜索对象树"
+          onChange={(event) => setQuery(event.target.value)}
+        />
+      </label>
+      <div className="tree-scroll">
+        <div className="tree" role="tree" aria-label="对象树" onClick={() => setMenu(null)}>
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+            <TreeNode
+              node={screen.root}
+              depth={0}
+              isRoot
+              onMenu={setMenu}
+              filterActive={normalizedQuery.length > 0}
+              matchesQuery={matchesQuery}
+            />
+          </DndContext>
+        </div>
+      </div>
       {menu && createPortal(
         <div
           ref={menuRef}
@@ -212,24 +254,35 @@ function TreeNode(props: {
   depth: number;
   isRoot?: boolean;
   onMenu: (m: Menu | null) => void;
+  filterActive: boolean;
+  matchesQuery: (node: WidgetNodeV2) => boolean;
 }): JSX.Element {
-  const { node, depth, isRoot, onMenu } = props;
+  const { node, depth, isRoot, onMenu, filterActive, matchesQuery } = props;
   const [expanded, setExpanded] = useState(true);
+  const visibleChildren = filterActive ? node.children.filter(matchesQuery) : node.children;
+  const childrenExpanded = filterActive || expanded;
   return (
     <div role="none">
       <TreeRow
         node={node}
         depth={depth}
         isRoot={isRoot}
-        expanded={expanded}
+        expanded={childrenExpanded}
         onToggle={() => setExpanded((value) => !value)}
         onMenu={onMenu}
       />
-      {expanded && node.children.length > 0 && (
+      {childrenExpanded && visibleChildren.length > 0 && (
         <div role="group">
-          <SortableContext items={node.children.map((c) => c.id)} strategy={verticalListSortingStrategy}>
-            {node.children.map((c) => (
-              <TreeNode key={c.id} node={c} depth={depth + 1} onMenu={onMenu} />
+          <SortableContext items={visibleChildren.map((c) => c.id)} strategy={verticalListSortingStrategy}>
+            {visibleChildren.map((c) => (
+              <TreeNode
+                key={c.id}
+                node={c}
+                depth={depth + 1}
+                onMenu={onMenu}
+                filterActive={filterActive}
+                matchesQuery={matchesQuery}
+              />
             ))}
           </SortableContext>
         </div>

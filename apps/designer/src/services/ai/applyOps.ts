@@ -17,7 +17,7 @@
  * 全部通过才返回 recipe;recipe 在 immer draft 上重放同一套确定性逻辑。
  */
 import {
-  OBJ_BASE, PART_TOKENS, REGISTRY, STATE_TOKENS, STYLE_PROPS,
+  OBJ_BASE, PART_TOKENS, REGISTRY, STATE_TOKENS, STYLE_PROPS, findChildSpec,
   checkCName, isColorHex, isConstRef, newUuid,
   type EnumSpec, type PropSpec, type Selector,
 } from '@lvd/schema';
@@ -139,6 +139,35 @@ function findByName(
 function collectNames(node: WidgetNodeV2, into: Set<string>): void {
   if (node.codeName) into.add(node.codeName);
   for (const c of node.children) collectNames(c, into);
+}
+
+function acceptsWidgetChildren(node: WidgetNodeV2): boolean {
+  const widgetSpec = REGISTRY.get(node.type);
+  if (widgetSpec) return widgetSpec.acceptsWidgetChildren;
+  return findChildSpec(node.type)?.child.acceptsWidgetChildren ?? false;
+}
+
+function createDefaultStructuralContainer(parentType: string): WidgetNodeV2 | null {
+  const childSpec = REGISTRY.get(parentType)?.children?.find((child) => (
+    child.kind === 'add' && child.isObj && child.acceptsWidgetChildren
+  ));
+  if (!childSpec) return null;
+
+  const props: Record<string, PropValueV2> = {};
+  for (const prop of childSpec.createProps ?? []) {
+    if (prop.default !== undefined) props[prop.key] = prop.default as PropValueV2;
+    else if (!prop.optional) return null;
+  }
+  return {
+    id: newUuid(),
+    type: childSpec.type,
+    props,
+    styleRefs: [],
+    styles: [],
+    events: [],
+    bindings: [],
+    children: [],
+  };
 }
 
 /* --------------------------------------------------------------- 上下文 */
@@ -368,10 +397,25 @@ function runOps(screen: ScreenDefV2, ops: AiOp[], errors: AiOpError[], warnings:
           }
           parent = hit.node;
         }
-        const parentSpec = REGISTRY.get(parent.type);
-        if (parentSpec && !parentSpec.acceptsWidgetChildren) {
-          warn(ctx, i, `${p}.parent`, 'children-not-accepted',
-            `${parent.type} 通常不接受子 widget(照加,但画布可能不显示)`);
+        if (!acceptsWidgetChildren(parent)) {
+          let structuralContainer = parent.children.find((child) => {
+            const structuralSpec = findChildSpec(child.type);
+            return structuralSpec?.parent.type === parent!.type
+              && structuralSpec.child.isObj
+              && structuralSpec.child.acceptsWidgetChildren;
+          });
+          if (!structuralContainer) {
+            structuralContainer = createDefaultStructuralContainer(parent.type) ?? undefined;
+            if (structuralContainer) parent.children.push(structuralContainer);
+          }
+          if (!structuralContainer) {
+            err(ctx, i, `${p}.parent`, 'children-not-accepted',
+              `${parent.type} 不接受普通子组件，请先创建可承载组件的结构子节点`);
+            return;
+          }
+          warn(ctx, i, `${p}.parent`, 'child-routed-to-structural-container',
+            `${parent.type} 不直接接受普通子组件，已添加到 ${structuralContainer.type}`);
+          parent = structuralContainer;
         }
         const node = materialize(ctx, i, `${p}.node`, op.node, { prefillDefaultSize: true });
         if (node) parent.children.push(node);

@@ -61,6 +61,62 @@ try {
 
   await page.goto(url);
   await page.waitForSelector('.rt-badge.rt-wasm', { timeout: 30_000 });
+  assert(await page.locator('.ai-panel').isVisible(), 'AI panel is expanded by default');
+  const paletteIconState = await page.locator('.palette-item').evaluateAll((items) => ({
+    count: items.length,
+    allSemanticSvg: items.every((item) => {
+      const icon = item.querySelector('svg.wthumb');
+      return icon !== null && icon.querySelector('path, rect, circle') !== null;
+    }),
+  }));
+  assert(paletteIconState.count > 0, 'widget palette is populated');
+  assert(paletteIconState.allSemanticSvg, 'every visible palette item uses a semantic SVG icon');
+  const leftBox = await page.locator('.side-left').boundingBox();
+  const treeBox = await page.locator('.tree-dock').boundingBox();
+  const canvasBoxBeforeCollapse = await page.locator('.canvas-panel').boundingBox();
+  assert(leftBox && treeBox && treeBox.x >= leftBox.x + leftBox.width,
+    'object tree is docked between the palette and canvas');
+  assert(await page.locator('.tree-dock-body').isVisible(), 'object tree dock is expanded by default');
+  assert(await page.locator('.tree-search input').isVisible(), 'object tree search is available');
+  await page.locator('.tree-dock-toggle').click();
+  await page.waitForTimeout(250);
+  const canvasBoxAfterCollapse = await page.locator('.canvas-panel').boundingBox();
+  assert(await page.locator('.tree-dock').evaluate((element) => element.classList.contains('collapsed')),
+    'object tree enters its collapsed state');
+  assert(await page.locator('.tree-dock').evaluate((element) => element.getBoundingClientRect().width) < 1,
+    'collapsed object tree does not keep an empty vertical rail');
+  assert(await page.locator('.tree-canvas-resize-handle').evaluate(
+    (element) => element.getBoundingClientRect().width,
+  ) < 1, 'collapsed object tree hides its resize handle');
+  assert(await page.locator('.tree-dock-collapsed-toggle').isVisible(),
+    'collapsed object tree keeps only its expand button');
+  assert(canvasBoxBeforeCollapse && canvasBoxAfterCollapse
+    && canvasBoxAfterCollapse.width > canvasBoxBeforeCollapse.width,
+  'canvas expands when the object tree is collapsed');
+  await page.locator('.tree-dock-collapsed-toggle').click();
+  await page.waitForSelector('.tree-dock-body');
+  const rightWidthBeforeTreeResize = await page.locator('.side-right').evaluate(
+    (element) => element.getBoundingClientRect().width,
+  );
+  const paletteWidthBeforeTreeResize = await page.locator('.side-left').evaluate(
+    (element) => element.getBoundingClientRect().width,
+  );
+  const treeResizeHandle = await page.locator('.tree-canvas-resize-handle').boundingBox();
+  if (!treeResizeHandle) throw new Error('Object tree resize handle is unavailable');
+  await page.mouse.move(treeResizeHandle.x + treeResizeHandle.width / 2, treeResizeHandle.y + 180);
+  await page.mouse.down();
+  await page.mouse.move(treeResizeHandle.x + treeResizeHandle.width / 2 + 40, treeResizeHandle.y + 180, { steps: 6 });
+  await page.mouse.up();
+  const rightWidthAfterTreeResize = await page.locator('.side-right').evaluate(
+    (element) => element.getBoundingClientRect().width,
+  );
+  const paletteWidthAfterTreeResize = await page.locator('.side-left').evaluate(
+    (element) => element.getBoundingClientRect().width,
+  );
+  assert(Math.abs(rightWidthAfterTreeResize - rightWidthBeforeTreeResize) < 1,
+    'resizing the object tree does not resize the inspector');
+  assert(Math.abs(paletteWidthAfterTreeResize - paletteWidthBeforeTreeResize) < 1,
+    'resizing the object tree does not resize the component palette');
   await page.evaluate(() => {
     const projectStore = window.__lvd.projectStore.getState();
     const editorStore = window.__lvd.editorStore.getState();
@@ -121,6 +177,12 @@ try {
     window.__interactionSmoke = { parentId, childId, siblingId, offscreenId };
   });
   await page.waitForTimeout(250);
+  await page.locator('.tree-search input').fill('smoke_child');
+  assert(await page.getByText('smoke_child', { exact: true }).isVisible(),
+    'object tree search keeps matching nodes visible');
+  assert(await page.getByText('smoke_sibling', { exact: true }).count() === 0,
+    'object tree search filters non-matching branches');
+  await page.locator('.tree-search input').fill('');
 
   const stage = page.locator('.stage');
   const ids = await page.evaluate(() => window.__interactionSmoke);
@@ -229,6 +291,11 @@ try {
     selectionScopedUndo: 'passed',
     escapeCancellation: 'passed',
     offscreenDragRecovery: 'passed',
+    aiDefaultOpen: 'passed',
+    semanticPaletteIcons: 'passed',
+    objectTreeDock: 'passed',
+    objectTreeSearch: 'passed',
+    objectTreeResizeIsolation: 'passed',
     pageErrors: errors,
   }, null, 2));
 } finally {

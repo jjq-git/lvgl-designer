@@ -5,11 +5,15 @@
  */
 import {
   useEffect,
+  useRef,
   useState,
-  type KeyboardEvent as ReactKeyboardEvent,
-  type PointerEvent as ReactPointerEvent,
 } from 'react';
-import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
+import {
+  Panel,
+  PanelGroup,
+  PanelResizeHandle,
+  type ImperativePanelHandle,
+} from 'react-resizable-panels';
 import { Toolbar } from './Toolbar';
 import { CanvasStage } from './canvas/CanvasStage';
 import { WidgetPalette } from './panels/WidgetPalette';
@@ -35,45 +39,15 @@ import { AppDialogHost } from './panels/AppDialogHost';
 import { useBuildTargetStore } from './stores/buildTargetStore';
 
 let bootstrapped = false;
-const TREE_HEIGHT_STORAGE_KEY = 'lvd:left-tree-height';
-const TREE_COLLAPSED_STORAGE_KEY = 'lvd:left-tree-collapsed';
-const DEFAULT_TREE_HEIGHT = 180;
-const MIN_TREE_HEIGHT = 96;
-const MAX_TREE_HEIGHT = 520;
-const MAX_TREE_HEIGHT_RATIO = 0.45;
-
-function clampTreeHeight(value: number, panelHeight?: number): number {
-  const responsiveMax = panelHeight === undefined
-    ? MAX_TREE_HEIGHT
-    : Math.min(MAX_TREE_HEIGHT, Math.floor(panelHeight * MAX_TREE_HEIGHT_RATIO));
-  return Math.max(MIN_TREE_HEIGHT, Math.min(Math.round(value), responsiveMax));
-}
-
-function loadTreeHeight(): number {
-  if (typeof window === 'undefined') return DEFAULT_TREE_HEIGHT;
-  try {
-    const value = Number(window.localStorage.getItem(TREE_HEIGHT_STORAGE_KEY));
-    return Number.isFinite(value) && value > 0 ? clampTreeHeight(value) : DEFAULT_TREE_HEIGHT;
-  } catch {
-    return DEFAULT_TREE_HEIGHT;
-  }
-}
-
-function saveTreeHeight(value: number): void {
-  try {
-    window.localStorage.setItem(TREE_HEIGHT_STORAGE_KEY, String(value));
-  } catch {
-    // localStorage may be unavailable in privacy-restricted browsers.
-  }
-}
+const TREE_COLLAPSED_STORAGE_KEY = 'lvd:tree-dock-collapsed';
 
 function loadTreeCollapsed(): boolean {
-  if (typeof window === 'undefined') return true;
+  if (typeof window === 'undefined') return false;
   try {
     const value = window.localStorage.getItem(TREE_COLLAPSED_STORAGE_KEY);
-    return value === null ? true : value === '1';
+    return value === '1';
   } catch {
-    return true;
+    return false;
   }
 }
 
@@ -92,69 +66,19 @@ export function App(): JSX.Element {
   const [helpOpen, setHelpOpen] = useState(false);
   const [catalogOpen, setCatalogOpen] = useState(false);
   const [sitePublicationOpen, setSitePublicationOpen] = useState(false);
-  const [treeHeight, setTreeHeight] = useState(loadTreeHeight);
   const [treeCollapsed, setTreeCollapsed] = useState(loadTreeCollapsed);
-  const [treeResizing, setTreeResizing] = useState(false);
+  const treePanelRef = useRef<ImperativePanelHandle | null>(null);
 
   const toggleTreeCollapsed = (): void => {
-    setTreeCollapsed((current) => {
-      const next = !current;
-      saveTreeCollapsed(next);
-      return next;
-    });
-  };
-
-  const startTreeResize = (event: ReactPointerEvent<HTMLDivElement>): void => {
-    if (event.button !== 0) return;
-    event.preventDefault();
-    const panel = event.currentTarget.parentElement;
+    const panel = treePanelRef.current;
     if (!panel) return;
-    const startY = event.clientY;
-    const startHeight = treeHeight;
-    const panelHeight = panel.getBoundingClientRect().height;
-    let finalHeight = startHeight;
-
-    setTreeResizing(true);
-    document.body.classList.add('tree-resizing');
-    const onMove = (moveEvent: PointerEvent): void => {
-      finalHeight = clampTreeHeight(startHeight - (moveEvent.clientY - startY), panelHeight);
-      setTreeHeight(finalHeight);
-    };
-    const onEnd = (): void => {
-      window.removeEventListener('pointermove', onMove);
-      window.removeEventListener('pointerup', onEnd);
-      window.removeEventListener('pointercancel', onEnd);
-      window.removeEventListener('blur', onEnd);
-      document.body.classList.remove('tree-resizing');
-      setTreeResizing(false);
-      saveTreeHeight(finalHeight);
-    };
-    window.addEventListener('pointermove', onMove);
-    window.addEventListener('pointerup', onEnd);
-    window.addEventListener('pointercancel', onEnd);
-    window.addEventListener('blur', onEnd);
+    if (panel.isCollapsed()) panel.expand();
+    else panel.collapse();
   };
 
-  const resetTreeHeight = (): void => {
-    setTreeHeight(DEFAULT_TREE_HEIGHT);
-    saveTreeHeight(DEFAULT_TREE_HEIGHT);
-  };
-
-  const resizeTreeWithKeyboard = (event: ReactKeyboardEvent<HTMLDivElement>): void => {
-    if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown' && event.key !== 'Home') return;
-    event.preventDefault();
-    if (event.key === 'Home') {
-      resetTreeHeight();
-      return;
-    }
-    const panelHeight = event.currentTarget.parentElement?.getBoundingClientRect().height;
-    setTreeHeight((current) => {
-      const delta = event.key === 'ArrowUp' ? 16 : -16;
-      const next = clampTreeHeight(current + delta, panelHeight);
-      saveTreeHeight(next);
-      return next;
-    });
-  };
+  useEffect(() => {
+    if (treeCollapsed) treePanelRef.current?.collapse();
+  }, []);
 
   /* 启动:恢复最近工程 + 自动保存 + 全局快捷键 */
   useEffect(() => {
@@ -309,71 +233,106 @@ export function App(): JSX.Element {
       <Toolbar />
       <PanelGroup direction="horizontal" className="main">
         <Panel
-          defaultSize={compactLayout ? 20 : 14}
-          minSize={compactLayout ? 18 : 12}
-          maxSize={compactLayout ? 25 : 22}
-          className="side side-left"
+          defaultSize={compactLayout ? 75 : 82}
+          minSize={compactLayout ? 68 : 70}
+          maxSize={compactLayout ? 78 : 84}
+          className="workspace-shell"
         >
-          <div className="panel-title left-tabs">
-            <button
-              className={`left-tab ${leftTab === 'widgets' ? 'active' : ''}`}
-              onClick={() => setLeftTab('widgets')}
-            >组件</button>
-            <button
-              className={`left-tab ${leftTab === 'assets' ? 'active' : ''}`}
-              onClick={() => setLeftTab('assets')}
-            >素材</button>
-          </div>
-          <div className="side-section palette-section">
-            {leftTab === 'widgets' ? <WidgetPalette /> : <AssetPanel />}
-          </div>
-          <div className="screens-section"><ScreenList /></div>
-          {!treeCollapsed && (
-            <div
-              className={`tree-resize-handle ${treeResizing ? 'active' : ''}`}
-              role="separator"
-              aria-label="调整对象树高度"
-              aria-orientation="horizontal"
-              aria-valuemin={MIN_TREE_HEIGHT}
-              aria-valuemax={MAX_TREE_HEIGHT}
-              aria-valuenow={treeHeight}
-              tabIndex={0}
-              title="拖动调整对象树高度；双击恢复默认"
-              onPointerDown={startTreeResize}
-              onDoubleClick={resetTreeHeight}
-              onKeyDown={resizeTreeWithKeyboard}
+          <PanelGroup direction="horizontal" className="workspace-main">
+            <Panel
+              defaultSize={compactLayout ? 25 : 17}
+              minSize={compactLayout ? 22 : 14}
+              maxSize={compactLayout ? 32 : 26}
+              className="side side-left"
             >
-              <span className="tree-resize-grip" aria-hidden="true" />
-            </div>
-          )}
-          <div className="tree-panel-header">
-            <button
-              className="tree-panel-toggle"
-              type="button"
-              aria-expanded={!treeCollapsed}
-              aria-controls="object-tree-section"
-              title={treeCollapsed ? '展开对象树' : '收起对象树'}
-              onClick={toggleTreeCollapsed}
-            >
-              <span className="tree-panel-label">对象树</span>
-              <span className="tree-toggle-caret" aria-hidden="true">
-                {treeCollapsed ? '▾' : '▴'}
-              </span>
-            </button>
-          </div>
-          {!treeCollapsed && (
-            <div
-              id="object-tree-section"
-              className="side-section tree-section"
-              style={{ height: treeHeight, flexBasis: treeHeight }}
-            >
-              <ObjectTree />
-            </div>
-          )}
-        </Panel>
-        <PanelResizeHandle className="resize-handle" aria-label="调整左侧面板宽度" />
-        <Panel defaultSize={compactLayout ? 55 : 68} minSize={compactLayout ? 40 : 38} className="canvas-panel">
-          <CanvasStage />
+              <div className="panel-title left-tabs">
+                <button
+                  className={`left-tab ${leftTab === 'widgets' ? 'active' : ''}`}
+                  onClick={() => setLeftTab('widgets')}
+                >组件</button>
+                <button
+                  className={`left-tab ${leftTab === 'assets' ? 'active' : ''}`}
+                  onClick={() => setLeftTab('assets')}
+                >素材</button>
+              </div>
+              <div className="side-section palette-section">
+                {leftTab === 'widgets' ? <WidgetPalette /> : <AssetPanel />}
+              </div>
+            </Panel>
+            <PanelResizeHandle className="resize-handle" aria-label="调整组件面板宽度" />
+            <Panel defaultSize={compactLayout ? 75 : 83} minSize={60} className="design-shell">
+              <PanelGroup direction="horizontal" className="design-main">
+                <Panel
+                  ref={treePanelRef}
+                  id="object-tree-dock"
+                  defaultSize={compactLayout ? 31 : 18}
+                  minSize={compactLayout ? 25 : 14}
+                  maxSize={compactLayout ? 40 : 30}
+                  collapsedSize={0}
+                  collapsible
+                  className={`side tree-dock ${treeCollapsed ? 'collapsed' : ''}`}
+                  onCollapse={() => {
+                    setTreeCollapsed(true);
+                    saveTreeCollapsed(true);
+                  }}
+                  onExpand={() => {
+                    setTreeCollapsed(false);
+                    saveTreeCollapsed(false);
+                  }}
+                >
+                  {!treeCollapsed && (
+                    <>
+                      <div className="tree-dock-header">
+                        <button
+                          className="tree-dock-toggle"
+                          type="button"
+                          aria-expanded="true"
+                          aria-controls="object-tree-section"
+                          title="收起对象树"
+                          onClick={toggleTreeCollapsed}
+                        >
+                          <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <rect x="4" y="4" width="6" height="6" rx="1" />
+                            <rect x="14" y="4" width="6" height="6" rx="1" />
+                            <rect x="9" y="14" width="6" height="6" rx="1" />
+                            <path d="M7 10v2h10v-2M12 12v2" />
+                          </svg>
+                          <span className="tree-dock-title">对象树</span>
+                          <span className="tree-dock-caret" aria-hidden="true">‹</span>
+                        </button>
+                      </div>
+                      <div className="screens-section"><ScreenList /></div>
+                      <div id="object-tree-section" className="tree-dock-body"><ObjectTree /></div>
+                    </>
+                  )}
+                </Panel>
+                <PanelResizeHandle
+                  className={`resize-handle tree-canvas-resize-handle ${treeCollapsed ? 'collapsed' : ''}`}
+                  aria-label="调整对象树宽度"
+                />
+                <Panel defaultSize={compactLayout ? 69 : 82} minSize={60} className="canvas-panel">
+                  <CanvasStage />
+                </Panel>
+              </PanelGroup>
+              {treeCollapsed && (
+                <button
+                  className="tree-dock-collapsed-toggle"
+                  type="button"
+                  aria-expanded="false"
+                  aria-controls="object-tree-section"
+                  title="展开对象树"
+                  onClick={toggleTreeCollapsed}
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="4" y="4" width="6" height="6" rx="1" />
+                    <rect x="14" y="4" width="6" height="6" rx="1" />
+                    <rect x="9" y="14" width="6" height="6" rx="1" />
+                    <path d="M7 10v2h10v-2M12 12v2" />
+                  </svg>
+                </button>
+              )}
+            </Panel>
+          </PanelGroup>
         </Panel>
         <PanelResizeHandle className="resize-handle" aria-label="调整右侧面板宽度" />
         <Panel

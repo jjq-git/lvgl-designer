@@ -92,7 +92,7 @@ export interface AiStoreState {
 }
 
 export const useAiStore = create<AiStoreState>()((set, get) => ({
-  panelOpen: false,
+  panelOpen: true,
   settingsOpen: false,
   busy: false,
   model: readModel(),

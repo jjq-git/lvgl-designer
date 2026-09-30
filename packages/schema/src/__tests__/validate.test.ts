@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createEmptyProject, createNode } from '../factory.js';
 import { validateProject } from '../validate.js';
 import { loadProjectJson, ProjectFormatError, ProjectTooNewError, ProjectValidationError } from '../migrations.js';
-import { autoName, checkCName, previewName } from '../ids.js';
+import { autoName, checkCName, newUuid, previewName } from '../ids.js';
 import { SCHEMA_VERSION, type LvProject } from '../project.js';
 
 function proj(): LvProject {
@@ -164,6 +164,15 @@ describe('loadProjectJson(迁移框架)', () => {
 });
 
 describe('ids', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('newUuid falls back when randomUUID is unavailable', () => {
+    vi.stubGlobal('crypto', {});
+    expect(newUuid()).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+  });
+
   it('checkCName:合法/非法样例', () => {
     expect(checkCName('btn_start')).toBeNull();
     expect(checkCName('Btn')).toMatchObject({ code: 'pattern' });

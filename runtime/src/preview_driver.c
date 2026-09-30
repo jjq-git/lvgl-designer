@@ -1325,6 +1325,41 @@ int lvd_preview_set_string(const char * name, const char * key, const char * val
 #endif
         return -4;
     }
+    if(strcmp(key, "flex_flow") == 0) {
+        lv_flex_flow_t flow;
+        if(strcmp(value, "row") == 0) flow = LV_FLEX_FLOW_ROW;
+        else if(strcmp(value, "row_wrap") == 0) flow = LV_FLEX_FLOW_ROW_WRAP;
+        else if(strcmp(value, "row_reverse") == 0) flow = LV_FLEX_FLOW_ROW_REVERSE;
+        else if(strcmp(value, "row_wrap_reverse") == 0) flow = LV_FLEX_FLOW_ROW_WRAP_REVERSE;
+        else if(strcmp(value, "column") == 0) flow = LV_FLEX_FLOW_COLUMN;
+        else if(strcmp(value, "column_wrap") == 0) flow = LV_FLEX_FLOW_COLUMN_WRAP;
+        else if(strcmp(value, "column_reverse") == 0) flow = LV_FLEX_FLOW_COLUMN_REVERSE;
+        else if(strcmp(value, "column_wrap_reverse") == 0) flow = LV_FLEX_FLOW_COLUMN_WRAP_REVERSE;
+        else return -4;
+        lv_obj_set_flex_flow(r->obj, flow);
+        return 0;
+    }
+    if(strcmp(key, "scroll_snap_x") == 0 || strcmp(key, "scroll_snap_y") == 0) {
+        lv_scroll_snap_t snap;
+        if(strcmp(value, "none") == 0) snap = LV_SCROLL_SNAP_NONE;
+        else if(strcmp(value, "start") == 0) snap = LV_SCROLL_SNAP_START;
+        else if(strcmp(value, "center") == 0) snap = LV_SCROLL_SNAP_CENTER;
+        else if(strcmp(value, "end") == 0) snap = LV_SCROLL_SNAP_END;
+        else return -4;
+        if(strcmp(key, "scroll_snap_x") == 0) lv_obj_set_scroll_snap_x(r->obj, snap);
+        else lv_obj_set_scroll_snap_y(r->obj, snap);
+        return 0;
+    }
+    if(strcmp(key, "scrollbar_mode") == 0) {
+        lv_scrollbar_mode_t mode;
+        if(strcmp(value, "off") == 0) mode = LV_SCROLLBAR_MODE_OFF;
+        else if(strcmp(value, "on") == 0) mode = LV_SCROLLBAR_MODE_ON;
+        else if(strcmp(value, "active") == 0) mode = LV_SCROLLBAR_MODE_ACTIVE;
+        else if(strcmp(value, "auto") == 0) mode = LV_SCROLLBAR_MODE_AUTO;
+        else return -4;
+        lv_obj_set_scrollbar_mode(r->obj, mode);
+        return 0;
+    }
     if(strcmp(key, "x") == 0 || strcmp(key, "y") == 0
        || strcmp(key, "width") == 0 || strcmp(key, "height") == 0) {
         int32_t size;
@@ -1910,6 +1945,8 @@ int lvd_preview_set_style_i32(const char * name, const char * key, int32_t value
     else if(strcmp(key, "shadow_spread") == 0) lv_obj_set_style_shadow_spread(r->obj, value, selector);
     else if(strcmp(key, "shadow_opa") == 0) lv_obj_set_style_shadow_opa(r->obj, value, selector);
     else if(strcmp(key, "text_opa") == 0) lv_obj_set_style_text_opa(r->obj, value, selector);
+    else if(strcmp(key, "line_width") == 0) lv_obj_set_style_line_width(r->obj, value, selector);
+    else if(strcmp(key, "arc_width") == 0) lv_obj_set_style_arc_width(r->obj, value, selector);
     else if(strcmp(key, "opa") == 0) lv_obj_set_style_opa(r->obj, value, selector);
     else return -4;
     return 0;
@@ -2087,6 +2124,8 @@ int lvd_preview_set_named_style_i32(const char * name, const char * key, int32_t
     else if(strcmp(key, "shadow_spread") == 0) lv_style_set_shadow_spread(&r->style, value);
     else if(strcmp(key, "shadow_opa") == 0) lv_style_set_shadow_opa(&r->style, value);
     else if(strcmp(key, "text_opa") == 0) lv_style_set_text_opa(&r->style, value);
+    else if(strcmp(key, "line_width") == 0) lv_style_set_line_width(&r->style, value);
+    else if(strcmp(key, "arc_width") == 0) lv_style_set_arc_width(&r->style, value);
     else if(strcmp(key, "opa") == 0) lv_style_set_opa(&r->style, value);
     else return -4;
     return 0;
@@ -2100,14 +2139,17 @@ int lvd_preview_set_named_style_string(const char * name, const char * key, cons
     if(!r) return -2;
     if(strcmp(key, "bg_color") == 0 || strcmp(key, "border_color") == 0
        || strcmp(key, "outline_color") == 0 || strcmp(key, "shadow_color") == 0
-       || strcmp(key, "text_color") == 0) {
+       || strcmp(key, "text_color") == 0 || strcmp(key, "line_color") == 0
+       || strcmp(key, "arc_color") == 0) {
         lv_color_t color;
         if(color_from_hex(value, &color) != 0) return -4;
         if(strcmp(key, "bg_color") == 0) lv_style_set_bg_color(&r->style, color);
         else if(strcmp(key, "border_color") == 0) lv_style_set_border_color(&r->style, color);
         else if(strcmp(key, "outline_color") == 0) lv_style_set_outline_color(&r->style, color);
         else if(strcmp(key, "shadow_color") == 0) lv_style_set_shadow_color(&r->style, color);
-        else lv_style_set_text_color(&r->style, color);
+        else if(strcmp(key, "text_color") == 0) lv_style_set_text_color(&r->style, color);
+        else if(strcmp(key, "line_color") == 0) lv_style_set_line_color(&r->style, color);
+        else lv_style_set_arc_color(&r->style, color);
         return 0;
     }
     if(strcmp(key, "align") == 0) {
@@ -2362,14 +2404,17 @@ int lvd_preview_set_style_string(const char * name, const char * key, const char
 
     if(strcmp(key, "bg_color") == 0 || strcmp(key, "border_color") == 0
        || strcmp(key, "outline_color") == 0 || strcmp(key, "shadow_color") == 0
-       || strcmp(key, "text_color") == 0) {
+       || strcmp(key, "text_color") == 0 || strcmp(key, "line_color") == 0
+       || strcmp(key, "arc_color") == 0) {
         lv_color_t color;
         if(color_from_hex(value, &color) != 0) return -4;
         if(strcmp(key, "bg_color") == 0) lv_obj_set_style_bg_color(r->obj, color, selector);
         else if(strcmp(key, "border_color") == 0) lv_obj_set_style_border_color(r->obj, color, selector);
         else if(strcmp(key, "outline_color") == 0) lv_obj_set_style_outline_color(r->obj, color, selector);
         else if(strcmp(key, "shadow_color") == 0) lv_obj_set_style_shadow_color(r->obj, color, selector);
-        else lv_obj_set_style_text_color(r->obj, color, selector);
+        else if(strcmp(key, "text_color") == 0) lv_obj_set_style_text_color(r->obj, color, selector);
+        else if(strcmp(key, "line_color") == 0) lv_obj_set_style_line_color(r->obj, color, selector);
+        else lv_obj_set_style_arc_color(r->obj, color, selector);
         return 0;
     }
     if(strcmp(key, "align") == 0) {

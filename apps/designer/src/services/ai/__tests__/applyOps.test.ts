@@ -63,6 +63,21 @@ describe('applyAiOps — 错误路径', () => {
     expect(r.errors[0]!.code).toBe('bad-value');
   });
 
+  it('line 字符串坐标自动规范为 pointList 数组', () => {
+    const { next, result } = apply(proj(), [{
+      op: 'add', parent: null,
+      node: {
+        type: 'line', name: 'line_1', props: { points: '0,50 30.5,0 60,40' },
+        inlineStyles: [{ props: { line_color: '#1188ff', line_width: 3 } }],
+      },
+    }]);
+    expect(result.errors).toEqual([]);
+    expect(result.warnings).toContainEqual(expect.objectContaining({ code: 'point-list-normalized' }));
+    const node = byName(next.screens[0]!.root, 'line_1')!;
+    expect(node.props['points']).toEqual([0, 50, 30.5, 0, 60, 40]);
+    expect(node.styles[0]!.props).toEqual({ line_color: '#1188ff', line_width: 3 });
+  });
+
   it('update/remove 的 target 不存在 → error', () => {
     const r = applyAiOps(proj(), [
       { op: 'update', target: 'ghost', props: { x: 1 } },

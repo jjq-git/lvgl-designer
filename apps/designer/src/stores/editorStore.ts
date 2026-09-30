@@ -45,6 +45,19 @@ export function registerFitStageElement(el: HTMLElement | null): void {
   stageElForFit = el;
 }
 
+function centeredPan(
+  displaySize: { width: number; height: number },
+  zoom: number,
+): { x: number; y: number } | null {
+  if (!stageElForFit || displaySize.width <= 0 || displaySize.height <= 0) return null;
+  const rect = stageElForFit.getBoundingClientRect();
+  if (rect.width <= 0 || rect.height <= 0) return null;
+  return {
+    x: (rect.width - displaySize.width * zoom) / 2,
+    y: (rect.height - displaySize.height * zoom) / 2,
+  };
+}
+
 export interface EditorStoreState {
   selectedIds: string[];
   hoverId: string | null;
@@ -74,8 +87,8 @@ export interface EditorStoreState {
   setDropTarget(id: string | null): void;
   setGuides(g: GuideLines | null): void;
   setMarquee(m: MarqueeRect | null): void;
-  /** 视图复位:zoom=1 / pan=(40,40) */
-  resetView(): void;
+  /** 视图复位:zoom=1,内容在可视区水平垂直居中 */
+  resetView(displaySize: { width: number; height: number }): void;
   /** 适应窗口:内容(display.width×height)居中 + ~10% 边距 */
   fitToScreen(displaySize: { width: number; height: number }): void;
 }
@@ -111,7 +124,10 @@ export const useEditorStore = create<EditorStoreState>()((set, get) => ({
   setGuides: (guides) => set({ guides }),
   setMarquee: (marquee) => set({ marquee }),
 
-  resetView: () => set({ zoom: 1, pan: { x: 40, y: 40 } }),
+  resetView: (displaySize) => set({
+    zoom: 1,
+    pan: centeredPan(displaySize, 1) ?? { x: 40, y: 40 },
+  }),
 
   fitToScreen: (displaySize) => {
     const el = stageElForFit;

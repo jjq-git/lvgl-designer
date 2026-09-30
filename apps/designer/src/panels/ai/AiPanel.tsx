@@ -78,6 +78,17 @@ function AiPanelBody(): JSX.Element {
   /* 卸载时中断在途请求 */
   useEffect(() => () => abortRef.current?.abort(), []);
 
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent): void => {
+      if (event.key !== 'Escape') return;
+      if (document.querySelector('[aria-modal="true"]')) return;
+      event.preventDefault();
+      useAiStore.getState().setPanelOpen(false);
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, []);
+
   const send = async (raw: string): Promise<void> => {
     const text = raw.trim();
     const ai = useAiStore.getState();
@@ -174,6 +185,7 @@ function AiPanelBody(): JSX.Element {
       <SelectionHint />
       <div className="ai-inputbar">
         <textarea
+          aria-label="向 AI 描述界面或修改"
           className="ai-input"
           rows={2}
           placeholder="描述你要的界面/修改…(Enter 发送,Shift+Enter 换行)"
@@ -206,6 +218,7 @@ function AiPanelHeader({ busy, model }: { busy: boolean; model: AiModel }): JSX.
     <div className="ai-head">
       <span className="ai-title">AI 画 UI</span>
       <select
+        aria-label="AI 模型"
         className="ed-select ai-model-select"
         value={model}
         disabled={busy}

@@ -12,9 +12,12 @@ import { useProjectStore } from '../../stores/projectStore';
 import { renameProject as cloudRenameProject } from '../../services/cloudStorage';
 import { loadLastProject } from '../../services/storage';
 import type { LvProject } from '@lvd/schema';
+import { useDialogFocus } from '../useDialogFocus';
+import { requestConfirmation, requestText } from '../../services/appDialogs';
 import './cloud.css';
 
 export function ProjectListModal({ onClose }: { onClose: () => void }): JSX.Element {
+  const dialogRef = useDialogFocus<HTMLDivElement>(onClose);
   const cloudEnabled = useProjectsStore((s) => s.cloudEnabled);
   const list = useProjectsStore((s) => s.list);
   const currentId = useProjectsStore((s) => s.currentId);
@@ -33,17 +36,6 @@ export function ProjectListModal({ onClose }: { onClose: () => void }): JSX.Elem
   }, [cloudEnabled]);
 
   /* Esc 关闭模态(与 UserMenu 一致风格) */
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent): void => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        onClose();
-      }
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
-
   const flash = (tone: 'ok' | 'fail' | 'info', text: string): void => setMsg({ tone, text });
 
   const onCreate = async (): Promise<void> => {
@@ -73,7 +65,12 @@ export function ProjectListModal({ onClose }: { onClose: () => void }): JSX.Elem
   };
 
   const onRename = async (id: string, oldName: string): Promise<void> => {
-    const name = window.prompt('重命名工程:', oldName);
+    const name = await requestText({
+      title: '重命名工程',
+      label: '工程名称',
+      defaultValue: oldName,
+      confirmLabel: '保存',
+    });
     if (name == null) return;
     const trimmed = name.trim();
     if (trimmed === '' || trimmed === oldName) return;
@@ -92,7 +89,12 @@ export function ProjectListModal({ onClose }: { onClose: () => void }): JSX.Elem
   };
 
   const onDelete = async (id: string, name: string): Promise<void> => {
-    if (!window.confirm(`确认删除工程「${name}」?此操作不可撤销(含其云端版本历史)。`)) return;
+    if (!await requestConfirmation({
+      title: `删除工程「${name}」`,
+      message: '此操作不可撤销，并会删除云端版本历史。',
+      confirmLabel: '删除工程',
+      danger: true,
+    })) return;
     setBusy(true);
     const deleted = await useProjectsStore.getState().deleteProject(id);
     setBusy(false);
@@ -102,7 +104,12 @@ export function ProjectListModal({ onClose }: { onClose: () => void }): JSX.Elem
   const onUploadLocal = async (): Promise<void> => {
     if (!localProj) return;
     const suggested = localProj.meta.name || 'untitled';
-    const name = window.prompt('上传本地工程到云,工程名:', suggested);
+    const name = await requestText({
+      title: '上传本地工程到云',
+      label: '工程名称',
+      defaultValue: suggested,
+      confirmLabel: '上传',
+    });
     if (name == null) return;
     const trimmed = name.trim() || suggested;
     setBusy(true);
@@ -114,7 +121,15 @@ export function ProjectListModal({ onClose }: { onClose: () => void }): JSX.Elem
 
   return (
     <div className="cloud-mask" onClick={onClose}>
-      <div className="cloud-modal" onClick={(e) => e.stopPropagation()}>
+      <div
+        ref={dialogRef}
+        className="cloud-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label="我的工程"
+        tabIndex={-1}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="cloud-modal-head">
           <span>我的工程</span>
           <button className="icon-btn" title="关闭" onClick={onClose}>✕</button>

@@ -125,7 +125,7 @@ try {
 
   /* ================= E1 新建工程(240 圆屏) ================= */
   step('E1 新建工程(240 圆屏)');
-  await page.locator('.toolbar button', { hasText: '新建' }).click(); // confirm 已被 dialog handler 接受
+  await page.getByRole('button', { name: '新建项目' }).click(); // confirm 已被 dialog handler 接受
   await page.waitForTimeout(800);
   let m = await model();
   assert(
@@ -254,7 +254,7 @@ try {
     componentState.linked === 2 && componentState.projectedButtons === 2,
     `E2.2 面板拖放创建第二个关联实例(实际 ${JSON.stringify(componentState)})`,
   );
-  await page.locator('.toolbar button', { hasText: '撤销' }).click();
+  await page.getByRole('button', { name: '撤销' }).click();
   await page.waitForTimeout(500);
   const buttonRect = await rectOfType('button');
   ci = await canvasInfo();
@@ -501,11 +501,11 @@ try {
 
   /* ================= E6 导出 zip ================= */
   step('E6 导出 C 代码 zip');
-  await page.selectOption('[aria-label="目标颜色格式"]', 'RGB565');
+  await page.evaluate(() => window.__lvd.buildTargetStore.getState().confirmColorFormat('RGB565'));
   await page.selectOption('[aria-label="目标控制器"]', 'screen-only');
   const [download] = await Promise.all([
     page.waitForEvent('download', { timeout: 15000 }),
-    page.locator('.toolbar button', { hasText: '导出 C 代码' }).click(),
+    page.getByRole('button', { name: '导出 C 代码' }).click(),
   ]);
   const zipPath = join(artDir, 'ui.zip');
   await download.saveAs(zipPath);

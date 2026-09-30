@@ -51,7 +51,7 @@ function createScreen(name: string): ScreenDef {
 }
 
 /**
- * 空工程:240x240 圆屏默认(GC9A01 场景),16bpp,单屏 main。
+ * 空工程:240x240 圆屏默认（site frame WF2D-8620）,16bpp,单屏 main。
  */
 export function createEmptyProject(name = 'untitled'): LvProject {
   const now = new Date().toISOString();

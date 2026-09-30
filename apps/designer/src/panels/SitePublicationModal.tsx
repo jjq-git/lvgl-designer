@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
+import { newUuid } from '@lvd/schema';
+import { requestConfirmation } from '../services/appDialogs';
 import {
   getSiteTargetState,
   getSitePublication,
@@ -6,16 +8,26 @@ import {
   prepareSitePublication,
   publishSitePublication,
   rollbackSitePublication,
+  matchingSiteFrameId,
+  siteFrameCompatibility,
   sitePublicationThumbnailUrl,
   sitePublicationPreviewUrl,
+  siteFrameSpecsLabel,
+  siteFrameDemoSizeLabel,
   type SitePublication,
   type SiteTargetState,
 } from '../services/sitePublications';
+import { useProjectStore } from '../stores/projectStore';
 import { useProjectsStore } from '../stores/projectsStore';
+import { useDialogFocus } from './useDialogFocus';
 
 function frameLabel(frame: SiteTargetState['frames'][number]): string {
-  const resolution = frame.resolution ? `${frame.resolution.width}×${frame.resolution.height}` : '分辨率待登记';
-  return `${frame.model} · ${resolution}`;
+  const label = siteFrameSpecsLabel(frame);
+  if (frame.resolution) return label;
+  const demoSizes = siteFrameDemoSizeLabel(frame);
+  return demoSizes
+    ? `${label} · ${demoSizes} Demo 画布（硬件分辨率待登记）`
+    : `${label}（分辨率待登记）`;
 }
 
 const deliveryStatusLabel: Record<string, string> = {
@@ -35,6 +47,7 @@ function stageLabel(status: string): string {
 export function SitePublicationModal({ onClose }: { onClose: () => void }): JSX.Element {
   const projectId = useProjectsStore((state) => state.currentId);
   const projectName = useProjectsStore((state) => state.currentName);
+  const display = useProjectStore((state) => state.project.display);
   const [target, setTarget] = useState<SiteTargetState | null>(null);
   const [mode, setMode] = useState<'new' | 'update'>('new');
   const [demoId, setDemoId] = useState('');
@@ -45,28 +58,23 @@ export function SitePublicationModal({ onClose }: { onClose: () => void }): JSX.
   const [visibilityTouched, setVisibilityTouched] = useState(false);
   const [prepared, setPrepared] = useState<SitePublication | null>(null);
   const [publications, setPublications] = useState<SitePublication[]>([]);
-  const [requestId, setRequestId] = useState(() => crypto.randomUUID());
+  const [requestId, setRequestId] = useState(newUuid);
   const [busy, setBusy] = useState<'loading' | 'preparing' | 'publishing' | 'rolling-back' | 'refreshing' | null>('loading');
   const [error, setError] = useState<string | null>(null);
+  const dialogRef = useDialogFocus<HTMLElement>(onClose, busy === null);
 
   useEffect(() => {
     void Promise.all([getSiteTargetState(), projectId ? listSitePublications(projectId) : Promise.resolve([])])
       .then(([value, history]) => {
         setTarget(value);
-        setFrameId(value.frames[0]?.id ?? '');
+        setFrameId(matchingSiteFrameId(value.frames, display));
         setPublications(history);
         setBusy(null);
       }).catch((reason: unknown) => {
         setError(reason instanceof Error ? reason.message : String(reason));
         setBusy(null);
       });
-  }, [projectId]);
-
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent): void => { if (event.key === 'Escape' && busy === null) onClose(); };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [busy, onClose]);
+  }, [display.height, display.shape, display.width, projectId]);
 
   useEffect(() => {
     if (!prepared || !['git_committed', 'rolled_back'].includes(prepared.status)
@@ -85,6 +93,11 @@ export function SitePublicationModal({ onClose }: { onClose: () => void }): JSX.
     () => target?.demos.find((item) => item.id === demoId) ?? null,
     [demoId, target],
   );
+  const selectedFrame = useMemo(
+    () => target?.frames.find((item) => item.id === frameId) ?? null,
+    [frameId, target],
+  );
+  const frameError = selectedFrame ? siteFrameCompatibility(selectedFrame, display) : null;
 
   const selectDemo = (id: string): void => {
     setDemoId(id);
@@ -96,17 +109,18 @@ export function SitePublicationModal({ onClose }: { onClose: () => void }): JSX.
     setIsPublic(demo.isPublic);
     setVisibilityTouched(false);
     setPrepared(null);
-    setRequestId(crypto.randomUUID());
+    setRequestId(newUuid());
   };
 
   const resetRequest = (): void => {
     setPrepared(null);
-    setRequestId(crypto.randomUUID());
+    setRequestId(newUuid());
   };
 
   const prepare = async (): Promise<void> => {
     if (!projectId) { setError('请先把工程保存到“我的工程”'); return; }
     if (!frameId || name.trim() === '') { setError('请选择设备型号并填写 Demo 名称'); return; }
+    if (frameError) { setError(frameError); return; }
     if (mode === 'update' && !selectedDemo) { setError('请选择要更新的 Demo UUID'); return; }
     setBusy('preparing');
     setError(null);
@@ -145,7 +159,11 @@ export function SitePublicationModal({ onClose }: { onClose: () => void }): JSX.
   };
 
   const publish = async (): Promise<void> => {
-    if (!prepared || !window.confirm('确认把已准备且锁定的产物提交到目标 Git 分支？')) return;
+    if (!prepared || !await requestConfirmation({
+      title: '确认发布',
+      message: '把已准备且锁定的产物提交到目标 Git 分支？',
+      confirmLabel: '发布',
+    })) return;
     setBusy('publishing');
     setError(null);
     try {
@@ -158,7 +176,12 @@ export function SitePublicationModal({ onClose }: { onClose: () => void }): JSX.
   };
 
   const rollback = async (): Promise<void> => {
-    if (!prepared || !window.confirm('确认创建补偿提交，只撤销这次发布的清单和资源？')) return;
+    if (!prepared || !await requestConfirmation({
+      title: '确认回滚发布',
+      message: '将创建补偿提交，只撤销这次发布的清单和资源。',
+      confirmLabel: '创建补偿提交',
+      danger: true,
+    })) return;
     setBusy('rolling-back');
     setError(null);
     try {
@@ -171,9 +194,19 @@ export function SitePublicationModal({ onClose }: { onClose: () => void }): JSX.
   };
 
   const immutable = prepared !== null;
+  const artifactsAvailable = prepared !== null
+    && ['prepared', 'publishing', 'git_committed', 'conflict', 'rolled_back'].includes(prepared.status);
   return (
     <div className="site-publish-mask" onClick={busy === null ? onClose : undefined} role="presentation">
-      <section className="site-publish-modal" role="dialog" aria-label="发布到 ui.podsc.com" onClick={(event) => event.stopPropagation()}>
+      <section
+        ref={dialogRef}
+        className="site-publish-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label="发布到 ui.podsc.com"
+        tabIndex={-1}
+        onClick={(event) => event.stopPropagation()}
+      >
         <header><div><strong>发布到 ui.podsc.com</strong><small>生成 UI、缩略图并更新目标清单；设备外框保持只读</small></div><button className="icon-btn" disabled={busy !== null} onClick={onClose}>✕</button></header>
         <div className="site-publish-body">
           {!projectId && <p className="site-publish-error">当前是本地工程，请先在“我的工程”中创建或上传云端工程。</p>}
@@ -185,7 +218,8 @@ export function SitePublicationModal({ onClose }: { onClose: () => void }): JSX.
               <button className={mode === 'update' ? 'active' : ''} onClick={() => { setMode('update'); resetRequest(); }}>更新已发布 Demo</button>
             </div>
             {mode === 'update' && <label>Demo UUID<select value={demoId} onChange={(event) => selectDemo(event.target.value)}><option value="">请选择（显式绑定）</option>{target.demos.map((demo) => <option key={demo.id} value={demo.id}>{demo.name} · {demo.id}</option>)}</select></label>}
-            <label>设备型号<select value={frameId} disabled={mode === 'update' && selectedDemo !== null} onChange={(event) => { setFrameId(event.target.value); resetRequest(); }}>{target.frames.map((frame) => <option key={frame.id} value={frame.id}>{frameLabel(frame)}</option>)}</select></label>
+            <label>设备型号<select value={frameId} disabled={mode === 'update' && selectedDemo !== null} onChange={(event) => { setFrameId(event.target.value); resetRequest(); }}><option value="">请选择与当前画布兼容的型号</option>{target.frames.map((frame) => <option key={frame.id} value={frame.id}>{frameLabel(frame)}{siteFrameCompatibility(frame, display) ? '（不兼容）' : ''}</option>)}</select></label>
+            {frameError && <p className="site-publish-error">{frameError}</p>}
             <label>Demo 名称<input value={name} maxLength={160} onChange={(event) => { setName(event.target.value); resetRequest(); }} /></label>
             <label>说明（可选）<textarea value={description} maxLength={1000} rows={3} onChange={(event) => { setDescription(event.target.value); resetRequest(); }} /></label>
             <label className="site-publish-check"><input type="checkbox" checked={isPublic} onChange={(event) => { setIsPublic(event.target.checked); setVisibilityTouched(true); resetRequest(); }} />首页展示 <small>关闭只是不在首页列出，不代表私密访问</small></label>
@@ -193,7 +227,8 @@ export function SitePublicationModal({ onClose }: { onClose: () => void }): JSX.
             {publications.some((item) => ['preparing', 'prepared', 'publishing', 'conflict', 'git_committed', 'rollback_failed'].includes(item.status)) && <div className="site-publish-history"><strong>恢复发布任务</strong>{publications.filter((item) => ['preparing', 'prepared', 'publishing', 'conflict', 'git_committed', 'rollback_failed'].includes(item.status)).slice(0, 8).map((item) => <button key={item.id} className="btn" onClick={() => void refresh(item.id)}>{item.name} · {item.status} · {item.demoId.slice(0, 8)}</button>)}</div>}
           </>}
           {prepared && <div className="site-publish-result">
-            {prepared.status !== 'preparing' && <div className="site-publish-previews"><div><strong>可交互目标预览</strong>{prepared.interactivePreviewAvailable ? <iframe src={sitePublicationPreviewUrl(prepared.id)} title="目标 Renderer 可交互预览" sandbox="allow-scripts" /> : <p className="site-publish-warning">旧任务没有保存目标 Renderer，请重新准备后查看交互预览。</p>}</div><div><strong>发布缩略图</strong><div className="site-publish-preview"><img src={sitePublicationThumbnailUrl(prepared.id)} alt="目标 Renderer 生成的 UI 缩略图" /></div></div></div>}
+            {artifactsAvailable && <div className="site-publish-previews"><div><strong>可交互目标预览</strong>{prepared.interactivePreviewAvailable ? <iframe src={sitePublicationPreviewUrl(prepared.id)} title="目标 Renderer 可交互预览" sandbox="allow-scripts" /> : <p className="site-publish-warning">旧任务没有保存目标 Renderer，请重新准备后查看交互预览。</p>}</div><div><strong>发布缩略图</strong><div className="site-publish-preview"><img src={sitePublicationThumbnailUrl(prepared.id)} alt="目标 Renderer 生成的 UI 缩略图" /></div></div></div>}
+            {prepared.error && <p className="site-publish-error">{prepared.error.message}</p>}
             <dl><div><dt>Demo UUID</dt><dd>{prepared.demoId}</dd></div><div><dt>锁定版本</dt><dd>云端 v{prepared.sourceProjectVersion} / 快照 #{prepared.sourceSnapshotSeq}</dd></div><div><dt>文档哈希</dt><dd>{prepared.documentSha256?.slice(0, 20)}…</dd></div><div><dt>状态</dt><dd>{prepared.status}</dd></div>{prepared.commitSha && <div><dt>Commit</dt><dd>{prepared.commitSha}</dd></div>}</dl>
             {prepared.diagnostics?.map((item) => <p className="site-publish-warning" key={`${item.code}:${item.path}`}>{item.message}</p>)}
             {prepared.diffStat && <pre>{prepared.diffStat}</pre>}

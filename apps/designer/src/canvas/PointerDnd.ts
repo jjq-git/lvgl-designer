@@ -57,6 +57,48 @@ export function ascendToContainer(project: LvProject, nodeId: string | null, scr
   return rootId;
 }
 
+/** Keyboard-accessible palette action: add the selected widget to the active screen center. */
+export function addPaletteWidgetAtCenter(widgetType: string): boolean {
+  const spec = REGISTRY.get(widgetType);
+  const componentId = componentIdFromType(widgetType);
+  const component = componentId === null
+    ? undefined
+    : useProjectStore.getState().uiProject.components.find((item) => item.id === componentId);
+  const editor = useEditorStore.getState();
+  const store = useProjectStore.getState();
+  if ((!spec && !component) || editor.mode !== 'design') return false;
+  const screen = store.uiProject.screens.find((item) => item.id === editor.activeScreenId)
+    ?? store.uiProject.screens[0];
+  if (!screen) return false;
+  const created = spec ? createNode(widgetType) : null;
+  const node: WidgetNodeV2 = created ? {
+    id: created.id,
+    type: created.type,
+    props: {
+      ...created.props,
+      x: Math.round(store.project.display.width / 2),
+      y: Math.round(store.project.display.height / 2),
+    },
+    styleRefs: [], styles: [], events: [], bindings: [], children: [],
+  } : {
+    id: newUuid(),
+    type: widgetType,
+    props: {
+      x: Math.round(store.project.display.width / 2),
+      y: Math.round(store.project.display.height / 2),
+    },
+    styleRefs: [], styles: [], events: [], bindings: [], children: [],
+  };
+  store.mutateV2(`添加 ${spec?.palette?.label ?? component?.displayName ?? component?.codeName ?? widgetType}`, (draft) => {
+    const target = draft.screens.find((item) => item.id === editor.activeScreenId) ?? draft.screens[0];
+    if (!target) return;
+    node.codeName = autoName(component?.codeName ?? widgetType, namesInScreenV2(target));
+    target.root.children.push(node);
+  });
+  editor.select([node.id]);
+  return true;
+}
+
 /** palette item pointerdown 入口 */
 export function startPaletteDrag(e: PointerEvent, widgetType: string): void {
   const spec = REGISTRY.get(widgetType);

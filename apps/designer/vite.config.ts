@@ -12,6 +12,33 @@ export default defineConfig(({ mode }) => {
     exclude: ['@lvd/lvgl-runtime'],
   },
   assetsInclude: ['**/*.wasm'],
+  build: {
+    // browser-bundle is an intentionally lazy-loaded asset conversion worker;
+    // keep warnings focused on unexpectedly large eager chunks.
+    chunkSizeWarningLimit: 850,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          const path = id.replace(/\\/g, '/');
+          if (path.includes('/node_modules/')) {
+            if (path.includes('/react/') || path.includes('/react-dom/') || path.includes('/scheduler/')) {
+              return 'react-vendor';
+            }
+            if (path.includes('/zod/')) return 'validation-vendor';
+            return 'vendor';
+          }
+          if (path.includes('/packages/lvgl-runtime/')) return 'lvgl-runtime';
+          if (
+            path.includes('/packages/schema/')
+            || path.includes('/packages/codegen/')
+            || path.includes('/packages/compiler-core/')
+            || path.includes('/packages/preview-compiler/')
+          ) return 'lvd-core';
+          return undefined;
+        },
+      },
+    },
+  },
   server: {
     proxy: {
       '/api': env.LVD_API_TARGET || 'http://127.0.0.1:8001',

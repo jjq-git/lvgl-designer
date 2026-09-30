@@ -117,6 +117,31 @@ describe('PreviewProgram runtime executor', () => {
       .toContain('E_PREVIEW_PROP_ENUM_INVALID');
   });
 
+  it('通用布局枚举属性通过受控 string bridge', () => {
+    const p = program();
+    const checkbox = p.screens[0]!.root.children[0]!;
+    checkbox.type = 'checkbox';
+    checkbox.props = {
+      text: 'Accept',
+      flex_flow: 'row_wrap',
+      scroll_snap_x: 'center',
+      scroll_snap_y: 'end',
+      scrollbar_mode: 'auto',
+    };
+    checkbox.children = [];
+    const calls: string[] = [];
+    expect(validatePreviewProgramSupport(p)).toEqual([]);
+    executePreviewProgram(p, fakeBridge(calls));
+    expect(calls).toContain('str:panel:flex_flow:row_wrap');
+    expect(calls).toContain('str:panel:scroll_snap_x:center');
+    expect(calls).toContain('str:panel:scroll_snap_y:end');
+    expect(calls).toContain('str:panel:scrollbar_mode:auto');
+
+    checkbox.props.flex_flow = 'invalid_flow';
+    expect(validatePreviewProgramSupport(p).map((entry) => entry.code))
+      .toContain('E_PREVIEW_PROP_ENUM_INVALID');
+  });
+
   it('一期常用 inline style 保留 selector 并走受控 bridge', () => {
     const p = program();
     p.screens[0]!.root.inlineStyles.push({
@@ -520,6 +545,47 @@ describe('PreviewProgram runtime executor', () => {
     expect(calls).toContain('i32:panel:y_invert:1');
   });
 
+  it('line 兼容旧字符串坐标并支持线条颜色和宽度', () => {
+    const p = program();
+    const line = p.screens[0]!.root.children[0]!;
+    line.type = 'line';
+    line.props = { points: '0,50 30.5,0 60,40' };
+    line.inlineStyles = [{
+      selector: { part: 'main', states: [] },
+      props: { line_color: '#1188ff', line_width: 3 },
+    }];
+    const calls: string[] = [];
+    expect(validatePreviewProgramSupport(p)).toEqual([]);
+    executePreviewProgram(p, fakeBridge(calls));
+    expect(calls).toContain('points:panel:points:0,50 30.5,0 60,40');
+    expect(calls).toContain('style-str:panel:line_color:#1188ff:main:');
+    expect(calls).toContain('style-i32:panel:line_width:3:main:');
+  });
+
+  it('arc 支持轨道和指示器的颜色与宽度样式', () => {
+    const p = program();
+    const arc = p.screens[0]!.root.children[0]!;
+    arc.type = 'arc';
+    arc.props = { min_value: 0, max_value: 100, value: 75 };
+    arc.inlineStyles = [
+      {
+        selector: { part: 'main', states: [] },
+        props: { arc_color: '#dddddd', arc_width: 5 },
+      },
+      {
+        selector: { part: 'indicator', states: [] },
+        props: { arc_color: '#1188ff', arc_width: 3 },
+      },
+    ];
+    const calls: string[] = [];
+    expect(validatePreviewProgramSupport(p)).toEqual([]);
+    executePreviewProgram(p, fakeBridge(calls));
+    expect(calls).toContain('style-str:panel:arc_color:#dddddd:main:');
+    expect(calls).toContain('style-i32:panel:arc_width:5:main:');
+    expect(calls).toContain('style-str:panel:arc_color:#1188ff:indicator:');
+    expect(calls).toContain('style-i32:panel:arc_width:3:indicator:');
+  });
+
   it('line 拒绝空、奇数长度和非有限点列表', () => {
     for (const points of [[], [1], [1, 2, Number.NaN], [1, Number.POSITIVE_INFINITY]]) {
       const p = program();
@@ -529,6 +595,13 @@ describe('PreviewProgram runtime executor', () => {
       expect(validatePreviewProgramSupport(p).map((entry) => entry.code))
         .toContain('E_PREVIEW_POINT_LIST_INVALID');
     }
+
+    const p = program();
+    const line = p.screens[0]!.root.children[0]!;
+    line.type = 'line';
+    line.props = { points: '0,0 20' };
+    expect(validatePreviewProgramSupport(p).map((entry) => entry.code))
+      .toContain('E_PREVIEW_POINT_LIST_INVALID');
   });
 
   it('arclabel 的标量、布尔和枚举属性通过受控 bridge', () => {

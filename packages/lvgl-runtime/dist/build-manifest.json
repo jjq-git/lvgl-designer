@@ -2,12 +2,12 @@
   "lvglTag": "v9.5.0",
   "lvglVersion": "9.5.0",
   "lvglCommit": "85aa60d18b3d5e5588d7b247abf90198f07c8a63",
-  "lvConfSha256": "37827f4fd2ef9316c77fdd61dd48e53b696e5c994a073276a44838c0132718e7",
-  "emcc": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.9 (4e4223852a0835923411059a3929907d7df1232e)",
+  "lvConfSha256": "896f211bdbc5a2857ac7bbce426a58378500745cf16ee318d7c020228f854cec",
+  "emcc": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 5.0.6 (6ea9c28c38cdd40c1032fa04400c9d16230ee180)",
   "toolchain": {
-    "emcc": {"version": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.9 (4e4223852a0835923411059a3929907d7df1232e)", "path": "/mnt/f/dengtec/38_index/tmp/emsdk/upstream/emscripten/emcc", "sha256": "498eba9b6aacffca1c358ba340fc7b37015d7867cb211c7f2d45784ee9310f03"},
-    "cmake": {"version": "cmake version 4.4.3", "path": "/home/jjq/.local/bin/cmake", "sha256": "871dbae75e8e3793e919594ee4617b2ccd9470392c39c718dcdfbda27cbf1158"},
-    "ninja": {"version": "unavailable", "path": "", "sha256": "unavailable"}
+    "emcc": {"version": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 5.0.6 (6ea9c28c38cdd40c1032fa04400c9d16230ee180)", "path": "/opt/emsdk/upstream/emscripten/emcc", "sha256": "498eba9b6aacffca1c358ba340fc7b37015d7867cb211c7f2d45784ee9310f03"},
+    "cmake": {"version": "cmake version 3.28.3", "path": "/usr/bin/cmake", "sha256": "1c5227af4edd22d8d689def545e18ee458260c0fd579eba2187967f38817e638"},
+    "ninja": {"version": "1.11.1", "path": "/usr/bin/ninja", "sha256": "5965527e09fe2b3787772aa4f711d6a36b393e7f2fcaa744a7a96c5a4ddf59cb"}
   },
   "runtimeMode": "preview-program",
   "rendererBackend": "sw",

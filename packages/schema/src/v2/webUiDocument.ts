@@ -88,6 +88,11 @@ export interface WebUiDocumentV1 {
   assetManifest: WebUiAssetManifestEntryV1[];
 }
 
+export interface WebUiDocumentOptions {
+  /** ui.podsc.com 的静态网页契约固定使用 RGB565，与设备驱动字节序解耦。 */
+  podscRgb565?: boolean;
+}
+
 export interface WebUiExportV1 {
   document: WebUiDocumentV1;
   /** UTF-8、对象键按 ECMAScript UTF-16 code unit 排序、无空白、无末尾换行。 */
@@ -115,6 +120,15 @@ const WEB_EVENT_SET = new Set<string>(TRIGGER_TOKENS);
 const WEB_FLAG_SET = new Set<string>(OBJ_BASE.flags);
 const WEB_STATE_SET = new Set<string>(OBJ_BASE.states);
 const SHA256_RE = /^[0-9a-f]{64}$/;
+const PODSC_REMOTE_REFERENCE_RE = /^(?:https?:|data:|blob:|file:|\/\/)/i;
+/** Resource-backed widgets that the current ui.podsc.com static renderer cannot publish. */
+export const PODSC_STATIC_RESOURCE_WIDGET_TYPES = Object.freeze([
+  'image',
+  'imagebutton',
+  'animimage',
+  'lottie',
+] as const);
+const PODSC_RESOURCE_WIDGETS = new Set<string>(PODSC_STATIC_RESOURCE_WIDGET_TYPES);
 
 function jsonClone<T>(value: T): T {
   return JSON.parse(JSON.stringify(value)) as T;
@@ -504,8 +518,19 @@ export function validateWebUiDocument(raw: unknown): ValidationResult {
 }
 
 /** 从编辑快照创建无 editor/build/private 字段的确定性发布文档。 */
-export function createWebUiDocument(snapshot: ProjectSnapshotV2): WebUiDocumentV1 {
+export function createWebUiDocument(
+  snapshot: ProjectSnapshotV2,
+  options: WebUiDocumentOptions = {},
+): WebUiDocumentV1 {
   const uiProject = publishedProject(snapshot.uiProject);
+  const displayProfile = jsonClone(snapshot.displayProfile);
+  if (options.podscRgb565) {
+    const { width, height } = displayProfile.logicalSize;
+    displayProfile.id = `display:${width}x${height}-rgb565`;
+    displayProfile.displayName = `${width}×${height} ${displayProfile.shape === 'round' ? '圆' : '方'} RGB565`;
+    displayProfile.colorFormat = 'RGB565';
+    uiProject.designDisplayRef = `${displayProfile.id}@${displayProfile.revision}` as UiProject['designDisplayRef'];
+  }
   const document: WebUiDocumentV1 = {
     kind: WEB_UI_DOCUMENT_KIND,
     schemaVersion: WEB_UI_DOCUMENT_SCHEMA_VERSION,
@@ -516,12 +541,53 @@ export function createWebUiDocument(snapshot: ProjectSnapshotV2): WebUiDocumentV
       revision: uiProject.meta.revision,
     },
     uiProject,
-    displayProfile: jsonClone(snapshot.displayProfile),
+    displayProfile,
     actionRegistry: publishedActions(uiProject, snapshot.actionRegistry),
     assetManifest: assetEntries(uiProject),
   };
   const validation = validateWebUiDocument(document);
   if (!validation.valid) throw new WebUiDocumentError(validation.errors);
+  return document;
+}
+
+/** ui.podsc.com 当前静态站契约：不携带素材、不引用远程资源、不发布依赖素材的组件。 */
+export function podscStaticIssues(document: WebUiDocumentV1): ValidationIssue[] {
+  const issues: ValidationIssue[] = [];
+  const scan = (value: unknown, path: string): void => {
+    if (typeof value === 'string') {
+      if (PODSC_REMOTE_REFERENCE_RE.test(value.trim())) issues.push({
+        path,
+        code: 'E_PODSC_EXTERNAL_REFERENCE',
+        message: `ui.podsc.com 首期不允许外部或内联资源引用：${path}`,
+      });
+      return;
+    }
+    if (Array.isArray(value)) {
+      value.forEach((item, index) => scan(item, `${path}[${index}]`));
+      return;
+    }
+    if (value === null || typeof value !== 'object') return;
+    const record = value as Record<string, unknown>;
+    if (typeof record.type === 'string' && PODSC_RESOURCE_WIDGETS.has(record.type)) issues.push({
+      path: `${path}.type`,
+      code: 'E_PODSC_RESOURCE_WIDGET_UNSUPPORTED',
+      message: `ui.podsc.com 首期不支持依赖素材的组件 ${record.type}；请移除组件或等待目标站支持素材发布`,
+    });
+    Object.entries(record).forEach(([key, child]) => scan(child, path ? `${path}.${key}` : key));
+  };
+  scan(document.uiProject, 'uiProject');
+  document.assetManifest.forEach((asset, index) => issues.push({
+    path: `assetManifest[${index}]`,
+    code: 'E_PODSC_ASSET_UNSUPPORTED',
+    message: `ui.podsc.com 首期不支持素材：${asset.assetId}`,
+  }));
+  return issues;
+}
+
+export function createPodscStaticWebUiDocument(snapshot: ProjectSnapshotV2): WebUiDocumentV1 {
+  const document = createWebUiDocument(snapshot, { podscRgb565: true });
+  const issues = podscStaticIssues(document);
+  if (issues.length > 0) throw new WebUiDocumentError(issues);
   return document;
 }
 
@@ -591,8 +657,9 @@ export async function verifyWebUiAssets(
 export async function createWebUiExport(
   snapshot: ProjectSnapshotV2,
   resolveAssets?: WebUiAssetResolver,
+  options: WebUiDocumentOptions = {},
 ): Promise<WebUiExportV1> {
-  const document = createWebUiDocument(snapshot);
+  const document = createWebUiDocument(snapshot, options);
   if (document.assetManifest.length > 0) {
     if (resolveAssets === undefined) {
       throw new WebUiDocumentError(document.assetManifest.map((asset, index) => ({
@@ -602,6 +669,17 @@ export async function createWebUiExport(
     const result = await verifyWebUiAssets(document, resolveAssets);
     if (!result.valid) throw new WebUiDocumentError(result.errors);
   }
+  const json = canonicalJson(document);
+  const sha256 = await sha256Utf8(json);
+  const slug = document.source.projectId.replace(/^ui:/, '').replace(/[^a-zA-Z0-9._-]+/g, '-');
+  return { document, json, sha256, fileName: `${slug || 'ui'}-wf2-web-ui.v1.json` };
+}
+
+/** 生成可直接交给 ui.podsc.com 当前静态站的无素材发布文件。 */
+export async function createPodscStaticWebUiExport(
+  snapshot: ProjectSnapshotV2,
+): Promise<WebUiExportV1> {
+  const document = createPodscStaticWebUiDocument(snapshot);
   const json = canonicalJson(document);
   const sha256 = await sha256Utf8(json);
   const slug = document.source.projectId.replace(/^ui:/, '').replace(/[^a-zA-Z0-9._-]+/g, '-');

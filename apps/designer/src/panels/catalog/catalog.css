@@ -22,6 +22,9 @@
 .catalog-editor { grid-row: span 2; display: flex; flex-direction: column; min-height: 520px; }
 .catalog-editor-toolbar { display: flex; gap: 7px; margin-bottom: 8px; }
 .catalog-json { flex: 1 1 auto; min-height: 430px; resize: vertical; padding: 10px; border: 1px solid var(--hairline-strong); border-radius: var(--radius-s); background: #111827; color: #d1fae5; font: 11px/1.5 ui-monospace, SFMono-Regular, Consolas, monospace; tab-size: 2; }
+.catalog-device-format { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 7px; padding-bottom: 9px; }
+.catalog-device-format label { font-size: 12px; }
+.catalog-device-format .catalog-hint { grid-column: 1 / -1; padding: 0; line-height: 1.45; }
 .catalog-target { display: flex; align-items: center; gap: 7px; padding: 7px 0; border-top: 1px solid var(--hairline); }
 .catalog-target:first-of-type { border-top: 0; }
 .catalog-target > div { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; font-size: 12px; }

@@ -91,6 +91,13 @@ function valueMatchesType(v: PropValueV2, spec: ValueSpec): string | null {
     }
     case 'intList':
       return Array.isArray(v) && v.every((x) => typeof x === 'number') ? null : '应为数值数组';
+    case 'pointList':
+      return Array.isArray(v)
+        && v.length >= 2
+        && v.length % 2 === 0
+        && v.every((x) => typeof x === 'number' && Number.isFinite(x))
+        ? null
+        : '应为有限数值坐标数组 [x1,y1,x2,y2,…]';
     case 'stringQuotedList':
       return Array.isArray(v) && v.every((x) => typeof x === 'string') ? null : '应为字符串数组';
     default:
@@ -192,12 +199,22 @@ function validateProps(
       warn(ctx, opIndex, `${path}.${key}`, 'unknown-prop', `${type} 无属性 ${key},已丢弃`);
       continue;
     }
-    const msg = valueMatchesType(value, spec);
+    let normalized = value;
+    if (spec.type === 'pointList' && typeof value === 'string') {
+      const coordinates = value.trim().split(/[\s,]+/).map(Number);
+      if (coordinates.length >= 2 && coordinates.length % 2 === 0
+        && coordinates.every((coordinate) => Number.isFinite(coordinate))) {
+        normalized = coordinates;
+        warn(ctx, opIndex, `${path}.${key}`, 'point-list-normalized',
+          `${key} 已转换为数值坐标数组`);
+      }
+    }
+    const msg = valueMatchesType(normalized, spec);
     if (msg) {
       err(ctx, opIndex, `${path}.${key}`, spec.type === 'enum' ? 'bad-enum' : 'bad-value', `${key}:${msg}`);
       continue;
     }
-    kept[key] = value;
+    kept[key] = normalized;
   }
   return kept;
 }

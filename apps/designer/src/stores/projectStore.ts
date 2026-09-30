@@ -7,7 +7,7 @@
  */
 import { create } from 'zustand';
 import { applyPatches, enablePatches, produceWithPatches, type Patch } from 'immer';
-import { createEmptyProject, type DisplayConfig, type LvProject } from '@lvd/schema';
+import { type DisplayConfig, type LvProject } from '@lvd/schema';
 import {
   snapshotToEditorProject,
   type ActionRegistry,
@@ -15,6 +15,7 @@ import {
   type UiProject,
 } from '@lvd/schema/v2';
 import { inferActionRegistry, useBuildTargetStore } from './buildTargetStore';
+import { createDesignerProject } from '../services/projectDefaults';
 
 enablePatches();
 
@@ -40,6 +41,7 @@ export interface MutateOptions {
 interface Interaction {
   label: string;
   coalesceKey: string;
+  dirtyBefore: boolean;
   patches: Patch[];
   inversePatches: Patch[];
   uiPatches: Patch[];
@@ -75,12 +77,17 @@ export interface ProjectStoreState {
   canUndo(): boolean;
   canRedo(): boolean;
   loadProject(p: LvProject): void;
-  markSaved(): void;
+  markSaved(expectedRevision?: number): void;
 }
 
 let interaction: Interaction | null = null;
 
-const initialProject = createEmptyProject();
+/** 持久化层用它避开尚未 commit/abort 的拖拽中间帧。 */
+export function isProjectInteractionActive(): boolean {
+  return interaction !== null;
+}
+
+const initialProject = createDesignerProject();
 useBuildTargetStore.getState().syncProject(initialProject);
 
 function projectSnapshot(uiProject: UiProject): ProjectSnapshotV2 {
@@ -235,7 +242,13 @@ export const useProjectStore = create<ProjectStoreState>()((set, get) => ({
   beginInteraction(label, coalesceKey) {
     if (interaction) get().commitInteraction();
     interaction = {
-      label, coalesceKey, patches: [], inversePatches: [], uiPatches: [], uiInversePatches: [],
+      label,
+      coalesceKey,
+      dirtyBefore: get().dirty,
+      patches: [],
+      inversePatches: [],
+      uiPatches: [],
+      uiInversePatches: [],
     };
   },
 
@@ -283,6 +296,7 @@ export const useProjectStore = create<ProjectStoreState>()((set, get) => ({
         ? uiProject
         : useBuildTargetStore.getState().uiProject,
       revision: s.revision + 1,
+      dirty: it.dirtyBefore,
       lastPatches: it.inversePatches,
       lastChangeKind: 'mutate',
     });
@@ -329,6 +343,7 @@ export const useProjectStore = create<ProjectStoreState>()((set, get) => ({
   },
 
   redo() {
+    if (interaction) get().commitInteraction();
     const s = get();
     const entry = s.redoStack[s.redoStack.length - 1];
     if (!entry) return;
@@ -383,7 +398,8 @@ export const useProjectStore = create<ProjectStoreState>()((set, get) => ({
     });
   },
 
-  markSaved() {
+  markSaved(expectedRevision) {
+    if (expectedRevision !== undefined && get().revision !== expectedRevision) return;
     set({ dirty: false });
   },
 }));

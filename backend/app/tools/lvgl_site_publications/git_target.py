@@ -143,24 +143,70 @@ def _ui_list(root: Path) -> dict[str, Any]:
     return value
 
 
+def _demo_logical_sizes(root: Path, listing: dict[str, Any]) -> dict[str, list[dict[str, Any]]]:
+    """Read existing target UI documents without treating their canvas as a hardware resolution."""
+    site_root = (root / "site").resolve()
+    ui_root = (site_root / "uis").resolve()
+    sizes: dict[str, list[dict[str, Any]]] = {}
+    seen: dict[str, set[tuple[int, int, str]]] = {}
+    for item in listing["items"]:
+        if not isinstance(item, dict) or not isinstance(item.get("frameId"), str):
+            continue
+        document_url = item.get("documentUrl")
+        if not isinstance(document_url, str) or not document_url.startswith("uis/") or not document_url.endswith(".json"):
+            continue
+        document_path = (site_root / document_url).resolve()
+        try:
+            document_path.relative_to(ui_root)
+        except ValueError:
+            continue
+        if not document_path.is_file() or document_path.is_symlink():
+            continue
+        document = _read_json(document_path)
+        profile = document.get("displayProfile") if isinstance(document.get("displayProfile"), dict) else {}
+        logical = profile.get("logicalSize") if isinstance(profile.get("logicalSize"), dict) else {}
+        width, height, shape = logical.get("width"), logical.get("height"), profile.get("shape")
+        if not isinstance(width, int) or isinstance(width, bool) or width <= 0:
+            continue
+        if not isinstance(height, int) or isinstance(height, bool) or height <= 0:
+            continue
+        if shape not in ("round", "rect"):
+            continue
+        frame_id = item["frameId"]
+        key = (width, height, shape)
+        if key in seen.setdefault(frame_id, set()):
+            continue
+        seen[frame_id].add(key)
+        sizes.setdefault(frame_id, []).append({"width": width, "height": height, "shape": shape})
+    return sizes
+
+
 def read_state() -> dict[str, Any]:
     repository, branch = configuration()
     with Checkout(repository, branch) as root:
         commit = _run(["git", "rev-parse", "HEAD"], root)
         manifest = _manifest(root)
         listing = _ui_list(root)
+        demo_sizes = _demo_logical_sizes(root, listing)
         frames = []
         for raw in manifest["frames"]:
             if not isinstance(raw, dict) or not isinstance(raw.get("id"), str):
                 continue
             resolution = raw.get("resolution") if isinstance(raw.get("resolution"), dict) else None
+            match = raw.get("match") if isinstance(raw.get("match"), dict) else {}
             frames.append({
                 "id": raw["id"],
                 "model": raw.get("model") or raw["id"],
                 "nameCn": raw.get("name_cn"),
                 "nameEn": raw.get("name_en"),
+                "screenSizeInches": raw.get("screenSizeInches"),
+                "physicalSize": raw.get("physicalSize") if isinstance(raw.get("physicalSize"), dict) else None,
+                "screenPhysicalSize": raw.get("screenPhysicalSize") if isinstance(raw.get("screenPhysicalSize"), dict) else None,
                 "resolution": resolution,
-                "shape": raw.get("match", {}).get("shape") if isinstance(raw.get("match"), dict) else None,
+                "demoLogicalSizes": demo_sizes.get(raw["id"], []),
+                "shape": match.get("shape"),
+                "aspectRatio": match.get("aspectRatio"),
+                "aspectRatioTolerance": match.get("aspectRatioTolerance"),
             })
         demos = [{
             "id": item.get("id"), "frameId": item.get("frameId"), "name": item.get("name", ""),
@@ -183,6 +229,29 @@ def validate_frame(document: dict[str, Any], frame: dict[str, Any]) -> list[dict
             diagnostics.append({"severity": "error", "code": "E_FRAME_RESOLUTION_MISMATCH", "path": "displayProfile.logicalSize", "message": f"画布必须为 {resolution.get('width')}×{resolution.get('height')}"})
     else:
         diagnostics.append({"severity": "warning", "code": "W_FRAME_RESOLUTION_UNREGISTERED", "path": "displayProfile.logicalSize", "message": f"{frame['id']} 尚未登记分辨率；本次沿用工程逻辑尺寸"})
+    expected_ratio = match.get("aspectRatio")
+    if isinstance(expected_ratio, str) and ":" in expected_ratio:
+        try:
+            ratio_width, ratio_height = (float(value) for value in expected_ratio.split(":", 1))
+            logical_width = float(logical.get("width"))
+            logical_height = float(logical.get("height"))
+            tolerance = float(match.get("aspectRatioTolerance", 0))
+            if ratio_width <= 0 or ratio_height <= 0 or logical_width <= 0 or logical_height <= 0:
+                raise ValueError
+            if abs(logical_width / logical_height - ratio_width / ratio_height) > tolerance:
+                diagnostics.append({
+                    "severity": "error",
+                    "code": "E_FRAME_ASPECT_RATIO_MISMATCH",
+                    "path": "displayProfile.logicalSize",
+                    "message": f"画布比例必须为 {expected_ratio}",
+                })
+        except (TypeError, ValueError):
+            diagnostics.append({
+                "severity": "error",
+                "code": "E_FRAME_ASPECT_RATIO_INVALID",
+                "path": "frame.match.aspectRatio",
+                "message": f"{frame['id']} 的 aspectRatio 配置无效",
+            })
     return diagnostics
 
 

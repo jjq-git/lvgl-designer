@@ -9,6 +9,7 @@ import type { ProjectSnapshotV2 } from '../v2/projectSnapshot.js';
 import type { WidgetNodeV2 } from '../v2/uiProject.js';
 import {
   canonicalJson,
+  createPodscStaticWebUiDocument,
   createWebUiDocument,
   createWebUiExport,
   sha256Utf8,
@@ -104,6 +105,41 @@ function p0Document(): WebUiDocumentV1 {
 }
 
 describe('WebUiDocumentV1 冻结契约', () => {
+  it('为 podsc-static 派生固定 RGB565 的网页 DisplayProfile，不污染设备构建快照', () => {
+    const input = snapshot('web-podsc-rgb565');
+    input.displayProfile.id = 'display:240x240-rgb565-swapped';
+    input.displayProfile.colorFormat = 'RGB565_SWAPPED';
+    input.uiProject.designDisplayRef = 'display:240x240-rgb565-swapped@1';
+
+    const document = createPodscStaticWebUiDocument(input);
+
+    expect(document.displayProfile.colorFormat).toBe('RGB565');
+    expect(document.displayProfile.id).toBe('display:240x240-rgb565');
+    expect(document.uiProject.designDisplayRef).toBe('display:240x240-rgb565@1');
+    expect(input.displayProfile.colorFormat).toBe('RGB565_SWAPPED');
+    expect(input.uiProject.designDisplayRef).toBe('display:240x240-rgb565-swapped@1');
+    expect(validateWebUiDocument(document).errors).toEqual([]);
+  });
+
+  it('podsc-static 与正式发布共用无素材、无远程引用约束', () => {
+    const input = snapshot('web-podsc-constraints');
+    input.uiProject.assets.images.push({
+      id: 'image:remote', codeName: 'remote',
+      file: { fileName: 'remote.png', sha256: 'a'.repeat(64), byteSize: 10 },
+    });
+    input.uiProject.screens[0]!.root.children.push(
+      node('node:remote-image', 'image', { src: 'https://example.test/private.png' }),
+    );
+
+    expect(() => createPodscStaticWebUiDocument(input)).toThrowError(expect.objectContaining({
+      issues: expect.arrayContaining([
+        expect.objectContaining({ code: 'E_PODSC_EXTERNAL_REFERENCE' }),
+        expect.objectContaining({ code: 'E_PODSC_RESOURCE_WIDGET_UNSUPPORTED' }),
+        expect.objectContaining({ code: 'E_PODSC_ASSET_UNSUPPORTED' }),
+      ]),
+    }));
+  });
+
   it('从 ProjectSnapshotV2 裁剪私有字段、未引用 Action，并生成稳定摘要', async () => {
     const document = minimalDocument();
     expect(validateWebUiDocument(document).errors).toEqual([]);

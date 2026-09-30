@@ -4,7 +4,8 @@
  * ctrl+滚轮缩放 / 空格拖平移;设计态指针状态机(选中/拖动/缩放 = L1 每帧 updateAttrs);
  * 运行态 overlay 隐藏、事件透传给 canvas(SDL 自行监听)。
  */
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
+import type { LvProject, WidgetNode } from '@lvd/schema';
 import { LvglRuntime, createMockRuntime, type LvdRect, type LvglRuntimeApi } from '@lvd/lvgl-runtime';
 import { ReloadPipeline, getPipeline, setPipeline } from './reloadPipeline';
 import { Overlay, type HandleDir } from './Overlay';
@@ -50,6 +51,24 @@ type Session =
       baseIds: string[]; // Shift 追加时的初始选中集
     };
 
+const MIN_VISIBLE_CANVAS_PX = 64;
+
+export function constrainCanvasPan(
+  pan: { x: number; y: number },
+  viewport: { width: number; height: number },
+  displaySize: { width: number; height: number },
+  zoom: number,
+): { x: number; y: number } {
+  const contentWidth = Math.max(0, displaySize.width * zoom);
+  const contentHeight = Math.max(0, displaySize.height * zoom);
+  const visibleX = Math.min(MIN_VISIBLE_CANVAS_PX, contentWidth, Math.max(0, viewport.width));
+  const visibleY = Math.min(MIN_VISIBLE_CANVAS_PX, contentHeight, Math.max(0, viewport.height));
+  return {
+    x: Math.min(viewport.width - visibleX, Math.max(visibleX - contentWidth, pan.x)),
+    y: Math.min(viewport.height - visibleY, Math.max(visibleY - contentHeight, pan.y)),
+  };
+}
+
 function setNodeProps(id: string, label: string, props: Record<string, number>): void {
   useProjectStore.getState().mutateV2(
     label,
@@ -87,6 +106,7 @@ export function CanvasStage(): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const bootRef = useRef(false);
   const sessionRef = useRef<Session | null>(null);
+  const activePointerIdRef = useRef<number | null>(null);
   const spaceRef = useRef(false);
   const prevModeRef = useRef<'design' | 'play'>('design');
 
@@ -96,6 +116,27 @@ export function CanvasStage(): JSX.Element {
   const mode = useEditorStore((s) => s.mode);
   const activeScreenId = useEditorStore((s) => s.activeScreenId);
   const runtimeKind = useEditorStore((s) => s.runtimeKind);
+  const selectedIds = useEditorStore((s) => s.selectedIds);
+  const canUndo = useProjectStore((s) => s.undoStack.length > 0);
+  const canRedo = useProjectStore((s) => s.redoStack.length > 0);
+
+  const cancelActiveSession = useCallback((): void => {
+    const session = sessionRef.current;
+    sessionRef.current = null;
+    const pointerId = activePointerIdRef.current;
+    activePointerIdRef.current = null;
+    const stage = stageRef.current;
+    if (pointerId !== null && stage?.hasPointerCapture(pointerId)) {
+      stage.releasePointerCapture(pointerId);
+    }
+    const editor = useEditorStore.getState();
+    editor.setMarquee(null);
+    editor.setGuides(null);
+    if (session?.kind === 'drag' || session?.kind === 'resize') {
+      useProjectStore.getState().abortInteraction();
+      editor.bumpOverlay();
+    }
+  }, []);
 
   /* ---------- 运行时启动(单例;main.tsx 未用 StrictMode) ---------- */
   useEffect(() => {
@@ -130,7 +171,10 @@ export function CanvasStage(): JSX.Element {
       }
       const p = new ReloadPipeline(rt);
       setPipeline(p);
-      const home = proj.screens.find((s) => s.isHome) ?? proj.screens[0];
+      // Runtime/WASM 初始化期间可能已异步恢复了本地或云工程，不能再用挂载时捕获的旧工程
+      // 覆盖 activeScreenId；管线启动也会从 store 读取同一份最新文档。
+      const latestProject = useProjectStore.getState().project;
+      const home = latestProject.screens.find((s) => s.isHome) ?? latestProject.screens[0];
       if (home) ed.setActiveScreen(home.id);
       p.start();
     })();
@@ -141,8 +185,17 @@ export function CanvasStage(): JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  /* 首次进入及切换屏幕规格时，以 100% 缩放把设备屏幕放到内容区正中央。 */
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      useEditorStore.getState().resetView({ width: display.width, height: display.height });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [activeScreenId, display.height, display.width]);
+
   /* ---------- 模式切换:runtime.setMode;退出运行态强制 L3 复位(评审 G8) ---------- */
   useEffect(() => {
+    if (mode === 'play') cancelActiveSession();
     const p = getPipeline();
     if (!p) {
       prevModeRef.current = mode;
@@ -151,7 +204,7 @@ export function CanvasStage(): JSX.Element {
     p.runtime.setMode(mode);
     if (prevModeRef.current === 'play' && mode === 'design') p.resetActiveScreen();
     prevModeRef.current = mode;
-  }, [mode, runtimeKind]);
+  }, [cancelActiveSession, mode, runtimeKind]);
 
   /* ---------- 切屏 ---------- */
   useEffect(() => {
@@ -162,33 +215,43 @@ export function CanvasStage(): JSX.Element {
   /* ---------- 空格平移 / Esc 取消 / 方向键微移 ---------- */
   useEffect(() => {
     const down = (e: KeyboardEvent): void => {
+      if (e.defaultPrevented) return;
       const t = e.target as HTMLElement | null;
       const typing =
-        t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement || !!t?.isContentEditable;
-      if (e.code === 'Space' && !typing) {
+        t instanceof HTMLInputElement
+        || t instanceof HTMLTextAreaElement
+        || t instanceof HTMLSelectElement
+        || !!t?.isContentEditable;
+      const commandControl = t instanceof HTMLButtonElement
+        || !!t?.closest('[role="button"], [role="menuitem"], [role="tab"]');
+      const interactive = typing || commandControl;
+      if (e.code === 'Space' && !interactive) {
         spaceRef.current = true;
       }
       if (e.key === 'Escape' && sessionRef.current) {
-        const s = sessionRef.current;
-        sessionRef.current = null;
-        if (s.kind === 'drag' || s.kind === 'resize') {
-          useProjectStore.getState().abortInteraction();
-          useEditorStore.getState().setGuides(null);
-        }
+        e.preventDefault();
+        cancelActiveSession();
       }
       // Shift+1:适应窗口(内容居中缩放)
-      if (!typing && e.shiftKey && (e.key === '!' || e.code === 'Digit1')) {
+      if (!interactive && e.shiftKey && (e.key === '!' || e.code === 'Digit1')) {
         e.preventDefault();
         const disp = useProjectStore.getState().project.display;
         useEditorStore.getState().fitToScreen({ width: disp.width, height: disp.height });
         return;
       }
       // 方向键微移(nudge):焦点不在输入框 + 设计态 + 有选中
-      if (!typing && (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+      if (!interactive && (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
         const ed = useEditorStore.getState();
         if (ed.mode !== 'design' || ed.selectedIds.length === 0 || sessionRef.current) return;
         e.preventDefault(); // 防页面滚动
         const step = e.shiftKey ? 10 : 1;
+        if (e.ctrlKey || e.metaKey) {
+          resizeSelection(
+            e.key === 'ArrowLeft' ? -step : e.key === 'ArrowRight' ? step : 0,
+            e.key === 'ArrowUp' ? -step : e.key === 'ArrowDown' ? step : 0,
+          );
+          return;
+        }
         const dx = e.key === 'ArrowLeft' ? -step : e.key === 'ArrowRight' ? step : 0;
         const dy = e.key === 'ArrowUp' ? -step : e.key === 'ArrowDown' ? step : 0;
         nudgeSelection(dx, dy);
@@ -197,23 +260,30 @@ export function CanvasStage(): JSX.Element {
     const up = (e: KeyboardEvent): void => {
       if (e.code === 'Space') spaceRef.current = false;
     };
+
+    const blur = (): void => {
+      spaceRef.current = false;
+      cancelActiveSession();
+    };
     window.addEventListener('keydown', down);
     window.addEventListener('keyup', up);
+    window.addEventListener('blur', blur);
     return () => {
       window.removeEventListener('keydown', down);
       window.removeEventListener('keyup', up);
+      window.removeEventListener('blur', blur);
     };
-  }, []);
+  }, [cancelActiveSession]);
 
-  /* ---------- 滚轮:ctrl=缩放(以指针为中心),否则平移(非 passive) ---------- */
+  /* ---------- 滚轮:ctrl=缩放;普通=纵移;shift=横移;始终保留一部分屏幕可见 ---------- */
   useEffect(() => {
     const el = stageRef.current;
     if (!el) return;
     const onWheel = (e: WheelEvent): void => {
       e.preventDefault();
       const ed = useEditorStore.getState();
+      const rect = el.getBoundingClientRect();
       if (e.ctrlKey || e.metaKey) {
-        const rect = el.getBoundingClientRect();
         const px = e.clientX - rect.left;
         const py = e.clientY - rect.top;
         const oldZoom = ed.zoom;
@@ -222,15 +292,50 @@ export function CanvasStage(): JSX.Element {
         // 保持指针下的逻辑点不动
         const lx = (px - ed.pan.x) / oldZoom;
         const ly = (py - ed.pan.y) / oldZoom;
+        const nextPan = constrainCanvasPan(
+          { x: px - lx * newZoom, y: py - ly * newZoom },
+          { width: rect.width, height: rect.height },
+          display,
+          newZoom,
+        );
         ed.setZoom(newZoom);
-        ed.setPan({ x: px - lx * newZoom, y: py - ly * newZoom });
+        ed.setPan(nextPan);
       } else {
-        ed.setPan({ x: ed.pan.x - e.deltaX, y: ed.pan.y - e.deltaY });
+        const horizontalDelta = e.shiftKey
+          ? (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY)
+          : e.deltaX;
+        const verticalDelta = e.shiftKey ? 0 : e.deltaY;
+        ed.setPan(constrainCanvasPan(
+          { x: ed.pan.x - horizontalDelta, y: ed.pan.y - verticalDelta },
+          { width: rect.width, height: rect.height },
+          display,
+          ed.zoom,
+        ));
       }
     };
     el.addEventListener('wheel', onWheel, { passive: false });
     return () => el.removeEventListener('wheel', onWheel);
-  }, []);
+  }, [display.height, display.width]);
+
+  /* 面板或窗口尺寸变化时只收紧边界，不改变用户当前缩放和位置。 */
+  useEffect(() => {
+    const el = stageRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver((entries) => {
+      const size = entries[0]?.contentRect;
+      if (!size) return;
+      const ed = useEditorStore.getState();
+      const nextPan = constrainCanvasPan(
+        ed.pan,
+        { width: size.width, height: size.height },
+        display,
+        ed.zoom,
+      );
+      if (nextPan.x !== ed.pan.x || nextPan.y !== ed.pan.y) ed.setPan(nextPan);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [display.height, display.width]);
 
   /* ---------- 指针状态机(设计态) ---------- */
 
@@ -239,7 +344,9 @@ export function CanvasStage(): JSX.Element {
     if (ed.mode === 'play') return;
     const stage = stageRef.current;
     if (!stage) return;
+    stage.focus({ preventScroll: true });
     stage.setPointerCapture(e.pointerId);
+    activePointerIdRef.current = e.pointerId;
 
     if (spaceRef.current || e.button === 1) {
       sessionRef.current = { kind: 'pan', startClient: { x: e.clientX, y: e.clientY }, origPan: { ...ed.pan } };
@@ -302,10 +409,18 @@ export function CanvasStage(): JSX.Element {
     }
 
     if (s.kind === 'pan') {
-      ed.setPan({
-        x: s.origPan.x + (e.clientX - s.startClient.x),
-        y: s.origPan.y + (e.clientY - s.startClient.y),
-      });
+      const stage = stageRef.current;
+      if (!stage) return;
+      const rect = stage.getBoundingClientRect();
+      ed.setPan(constrainCanvasPan(
+        {
+          x: s.origPan.x + (e.clientX - s.startClient.x),
+          y: s.origPan.y + (e.clientY - s.startClient.y),
+        },
+        { width: rect.width, height: rect.height },
+        display,
+        ed.zoom,
+      ));
       return;
     }
     if (!l || !pipeline) return;
@@ -323,20 +438,24 @@ export function CanvasStage(): JSX.Element {
       const dist = Math.hypot(l.x - s.startL.x, l.y - s.startL.y);
       if (dist <= 3 / ed.zoom) return;
       // 升级为拖动:采集(全部选中控件的)起始 rect / 父 rect / 兄弟 rects
-      const rect = pipeline.rectOf(s.id);
-      if (!rect) return;
       const project = useProjectStore.getState().project;
-      const hit = findNodeById(project, s.id);
+      const moving = ed.selectedIds.includes(s.id)
+        ? topLevelMovableIds(project, ed.selectedIds)
+        : [s.id];
+      const primaryId = moving.includes(s.id) ? s.id : moving[0];
+      if (!primaryId) return;
+      const rect = pipeline.rectOf(primaryId);
+      if (!rect) return;
+      const hit = findNodeById(project, primaryId);
       if (!hit) return;
-      const parentRect = parentRectOf(s.id) ?? { x: 0, y: 0, w: display.width, h: display.height };
-      const siblings = (hit.parent?.children ?? []).filter((c) => c.id !== s.id).map((c) => c.id);
+      const parentRect = parentRectOf(primaryId) ?? { x: 0, y: 0, w: display.width, h: display.height };
+      const siblings = (hit.parent?.children ?? []).filter((c) => c.id !== primaryId).map((c) => c.id);
       const siblingRects = [...pipeline.rectsOf(siblings).values()];
 
-      // 多选:除主控件外,把其余选中控件也纳入随动,各自记 origRel/startRect
-      const moving = ed.selectedIds.includes(s.id) ? ed.selectedIds : [s.id];
+      // 多选只移动顶层选中项，避免已选父容器和其子节点被重复位移。
       const items: DragItem[] = [];
       for (const mid of moving) {
-        const mrect = mid === s.id ? rect : pipeline.rectOf(mid);
+        const mrect = mid === primaryId ? rect : pipeline.rectOf(mid);
         if (!mrect) continue;
         const mparent = parentRectOf(mid) ?? { x: 0, y: 0, w: display.width, h: display.height };
         items.push({ id: mid, startRect: mrect, origRel: { x: mrect.x - mparent.x, y: mrect.y - mparent.y } });
@@ -344,7 +463,7 @@ export function CanvasStage(): JSX.Element {
       const label = items.length > 1 ? `移动 ${items.length} 个对象` : `移动 ${hit.node.name ?? hit.node.type}`;
       useProjectStore.getState().beginInteraction(label, `drag:${s.id}`);
       sessionRef.current = {
-        kind: 'drag', id: s.id, startL: s.startL,
+        kind: 'drag', id: primaryId, startL: s.startL,
         origRel: { x: rect.x - parentRect.x, y: rect.y - parentRect.y },
         startRect: rect, siblingRects, items,
       };
@@ -400,8 +519,11 @@ export function CanvasStage(): JSX.Element {
 
   const onPointerUp = (e: React.PointerEvent): void => {
     const s = sessionRef.current;
+    const marqueeBox = s?.kind === 'marquee' ? useEditorStore.getState().marquee : null;
     sessionRef.current = null;
-    stageRef.current?.releasePointerCapture(e.pointerId);
+    activePointerIdRef.current = null;
+    const stage = stageRef.current;
+    if (stage?.hasPointerCapture(e.pointerId)) stage.releasePointerCapture(e.pointerId);
     if (!s) return;
     const ed = useEditorStore.getState();
     if (s.kind === 'drag' || s.kind === 'resize') {
@@ -412,15 +534,14 @@ export function CanvasStage(): JSX.Element {
       return;
     }
     if (s.kind === 'marquee') {
-      const box = ed.marquee;
       ed.setMarquee(null);
       const pipeline = getPipeline();
       // 拖出了选框(有实际面积)→ 矩形相交测试;否则视为单击空白 → 取消选择
-      if (box && (box.w > 1 || box.h > 1) && pipeline) {
+      if (marqueeBox && (marqueeBox.w > 1 || marqueeBox.h > 1) && pipeline) {
         const rects = pipeline.activeScreenNodeRects();
         const hitIds: string[] = [];
         for (const [id, r] of rects) {
-          if (rectsIntersect(box, r)) hitIds.push(id);
+          if (rectsIntersect(marqueeBox, r)) hitIds.push(id);
         }
         if (s.additive) {
           const set = new Set(s.baseIds);
@@ -447,11 +568,97 @@ export function CanvasStage(): JSX.Element {
     <div
       ref={stageRef}
       className={`stage ${isPlay ? 'stage-play' : ''}`}
+      role="region"
+      tabIndex={0}
+      aria-label={isPlay ? 'LVGL 运行画布' : 'LVGL 设计画布'}
+      aria-describedby="canvas-keyboard-help"
+      onFocus={() => useEditorStore.getState().setHover(null)}
       onPointerDown={isPlay ? undefined : onPointerDown}
       onPointerMove={isPlay ? undefined : onPointerMove}
       onPointerUp={isPlay ? undefined : onPointerUp}
+      onPointerCancel={isPlay ? undefined : cancelActiveSession}
+      onLostPointerCapture={isPlay ? undefined : cancelActiveSession}
       onPointerLeave={() => useEditorStore.getState().setHover(null)}
     >
+      <span id="canvas-keyboard-help" className="sr-only">
+        {isPlay
+          ? '运行模式。画布事件会发送到 LVGL。'
+          : '设计模式。方向键移动选中对象，Shift 加方向键移动十像素，Ctrl 或 Command 加方向键调整宽高。'}
+      </span>
+      <span className="sr-only" aria-live="polite">
+        {selectedIds.length === 0 ? '未选中对象' : `已选中 ${selectedIds.length} 个对象`}
+      </span>
+      <div
+        className="canvas-view-tools"
+        role="toolbar"
+        aria-label="画布视图工具"
+        onPointerDown={(event) => event.stopPropagation()}
+      >
+        <button
+          type="button"
+          className="canvas-tool-btn"
+          disabled={!canUndo || mode !== 'design'}
+          title="撤销 (Ctrl+Z)"
+          aria-label="撤销"
+          onClick={() => useProjectStore.getState().undo()}
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M9 7 4 12l5 5" />
+            <path d="M5 12h8a6 6 0 0 1 6 6" />
+          </svg>
+        </button>
+        <button
+          type="button"
+          className="canvas-tool-btn"
+          disabled={!canRedo || mode !== 'design'}
+          title="重做 (Ctrl+Y)"
+          aria-label="重做"
+          onClick={() => useProjectStore.getState().redo()}
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m15 7 5 5-5 5" />
+            <path d="M19 12h-8a6 6 0 0 0-6 6" />
+          </svg>
+        </button>
+        <span className="canvas-zoom-label" title="Ctrl+滚轮缩放，空格拖动平移">
+          {Math.round(zoom * 100)}%
+        </span>
+        <button
+          type="button"
+          className="canvas-tool-btn"
+          title="适应窗口 (Shift+1)"
+          aria-label="适应窗口"
+          onClick={() => {
+            const currentDisplay = useProjectStore.getState().project.display;
+            useEditorStore.getState().fitToScreen({
+              width: currentDisplay.width,
+              height: currentDisplay.height,
+            });
+          }}
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 3H3v5M16 3h5v5M21 16v5h-5M8 21H3v-5" />
+          </svg>
+        </button>
+        <button
+          type="button"
+          className="canvas-tool-btn"
+          title="重置视图（100% 居中）"
+          aria-label="重置视图"
+          onClick={() => {
+            const currentDisplay = useProjectStore.getState().project.display;
+            useEditorStore.getState().resetView({
+              width: currentDisplay.width,
+              height: currentDisplay.height,
+            });
+          }}
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M12 3v4M12 17v4M3 12h4M17 12h4" />
+          </svg>
+        </button>
+      </div>
       <div
         className="world"
         style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }}
@@ -461,6 +668,7 @@ export function CanvasStage(): JSX.Element {
           id="lvgl-canvas"
           width={display.width}
           height={display.height}
+          aria-hidden="true"
           style={{ imageRendering: zoom >= 2 ? 'pixelated' : 'auto' }}
         />
         <Overlay />
@@ -476,10 +684,10 @@ export function CanvasStage(): JSX.Element {
  */
 function nudgeSelection(dx: number, dy: number): void {
   const ed = useEditorStore.getState();
-  const ids = ed.selectedIds;
+  const project = useProjectStore.getState().project;
+  const ids = topLevelMovableIds(project, ed.selectedIds);
   if (ids.length === 0) return;
   const pipeline = getPipeline();
-  const project = useProjectStore.getState().project;
   const display = project.display;
   const entries: { id: string; x: number; y: number }[] = [];
   for (const id of ids) {
@@ -501,7 +709,49 @@ function nudgeSelection(dx: number, dy: number): void {
   }
   if (entries.length === 0) return;
   const label = entries.length > 1 ? `微移 ${entries.length} 个对象` : '微移';
-  setNodesXy(label, entries, { coalesceKey: 'nudge' });
+  setNodesXy(label, entries, { coalesceKey: `nudge:${ids.slice().sort().join(',')}` });
+}
+
+/** Ctrl/Command + 方向键：为鼠标缩放手柄提供键盘等价操作。 */
+function resizeSelection(dw: number, dh: number): void {
+  const ids = useEditorStore.getState().selectedIds;
+  if (ids.length !== 1) return;
+  const id = ids[0]!;
+  const project = useProjectStore.getState().uiProject;
+  const hit = findNodeByIdV2(project, id);
+  if (!hit || hit.node === hit.screen.root) return;
+  const rect = getPipeline()?.rectOf(id);
+  const currentWidth = rect?.w
+    ?? (typeof hit.node.props['width'] === 'number' ? hit.node.props['width'] : 1);
+  const currentHeight = rect?.h
+    ?? (typeof hit.node.props['height'] === 'number' ? hit.node.props['height'] : 1);
+  useProjectStore.getState().mutateV2(
+    '键盘调整大小',
+    (draft) => {
+      const current = findNodeByIdV2(draft, id)?.node;
+      if (!current) return;
+      if (dw !== 0) current.props['width'] = Math.max(1, Math.round(currentWidth + dw));
+      if (dh !== 0) current.props['height'] = Math.max(1, Math.round(currentHeight + dh));
+    },
+    { coalesceKey: `keyboard-resize:${id}` },
+  );
+}
+
+/**
+ * 多选移动只保留没有已选祖先的节点。否则父容器移动后，其已选子节点又会被写入一次
+ * x/y，造成视觉上的双倍位移。返回顺序与工程树一致，且屏根始终不可移动。
+ */
+export function topLevelMovableIds(project: LvProject, ids: string[]): string[] {
+  const selected = new Set(ids);
+  const result: string[] = [];
+  const walk = (node: WidgetNode, hasSelectedAncestor: boolean, isRoot: boolean): void => {
+    const isMovableSelection = selected.has(node.id) && !isRoot;
+    if (isMovableSelection && !hasSelectedAncestor) result.push(node.id);
+    const blocksDescendants = hasSelectedAncestor || isMovableSelection;
+    for (const child of node.children) walk(child, blocksDescendants, false);
+  };
+  for (const screen of project.screens) walk(screen.root, false, true);
+  return result;
 }
 
 /** 矩形相交测试(边接触不算相交;框选用) */

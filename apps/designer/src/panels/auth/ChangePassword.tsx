@@ -5,6 +5,7 @@
  */
 import { useState } from 'react';
 import { apiUrl } from '../../stores/authStore';
+import { useDialogFocus } from '../useDialogFocus';
 
 type Submit =
   | { kind: 'idle' }
@@ -13,6 +14,7 @@ type Submit =
   | { kind: 'fail'; message: string };
 
 export function ChangePassword({ onClose }: { onClose: () => void }): JSX.Element {
+  const dialogRef = useDialogFocus<HTMLDivElement>(onClose);
   const [oldPassword, setOld] = useState('');
   const [newPassword, setNew] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -56,7 +58,15 @@ export function ChangePassword({ onClose }: { onClose: () => void }): JSX.Elemen
 
   return (
     <div className="auth-mask" onClick={onClose}>
-      <div className="auth-modal" onClick={(e) => e.stopPropagation()}>
+      <div
+        ref={dialogRef}
+        className="auth-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label="修改密码"
+        tabIndex={-1}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="auth-modal-head">
           <span>修改密码</span>
           <button className="icon-btn" title="关闭" onClick={onClose}>✕</button>
@@ -67,6 +77,7 @@ export function ChangePassword({ onClose }: { onClose: () => void }): JSX.Elemen
             <input
               className="ed-text"
               type="password"
+              aria-label="旧密码"
               autoComplete="current-password"
               value={oldPassword}
               onChange={(e) => setOld(e.target.value)}
@@ -77,6 +88,7 @@ export function ChangePassword({ onClose }: { onClose: () => void }): JSX.Elemen
             <input
               className="ed-text"
               type="password"
+              aria-label="新密码"
               autoComplete="new-password"
               value={newPassword}
               onChange={(e) => setNew(e.target.value)}
@@ -87,6 +99,7 @@ export function ChangePassword({ onClose }: { onClose: () => void }): JSX.Elemen
             <input
               className="ed-text"
               type="password"
+              aria-label="确认新密码"
               autoComplete="new-password"
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}

@@ -88,4 +88,65 @@ describe('projectStore native UiProject edits', () => {
     expect(useBuildTargetStore.getState().actionRegistry['custom.wifi_scan']?.id)
       .toBe('custom.wifi_scan');
   });
+
+  it('restores the previous dirty state when an interaction is cancelled', () => {
+    const rootId = useProjectStore.getState().uiProject.screens[0]!.root.id;
+    const store = useProjectStore.getState();
+    expect(store.dirty).toBe(false);
+
+    store.beginInteraction('drag', `drag:${rootId}`);
+    store.mutateV2('drag', (draft) => {
+      const hit = findNodeByIdV2(draft, rootId);
+      if (hit) hit.node.props.x = 42;
+    }, { transient: true });
+    expect(useProjectStore.getState().dirty).toBe(true);
+
+    useProjectStore.getState().abortInteraction();
+    const after = useProjectStore.getState();
+    expect(after.uiProject.screens[0]!.root.props.x).toBeUndefined();
+    expect(after.dirty).toBe(false);
+    expect(after.undoStack).toHaveLength(0);
+  });
+
+  it('commits an active interaction before redo and invalidates stale redo history', () => {
+    const rootId = useProjectStore.getState().uiProject.screens[0]!.root.id;
+    useProjectStore.getState().mutateV2('first edit', (draft) => {
+      const hit = findNodeByIdV2(draft, rootId);
+      if (hit) hit.node.props.x = 10;
+    });
+    useProjectStore.getState().undo();
+    expect(useProjectStore.getState().redoStack).toHaveLength(1);
+
+    useProjectStore.getState().beginInteraction('drag', `drag:${rootId}`);
+    useProjectStore.getState().mutateV2('drag', (draft) => {
+      const hit = findNodeByIdV2(draft, rootId);
+      if (hit) hit.node.props.y = 20;
+    }, { transient: true });
+    useProjectStore.getState().redo();
+
+    const after = useProjectStore.getState();
+    expect(after.uiProject.screens[0]!.root.props.x).toBeUndefined();
+    expect(after.uiProject.screens[0]!.root.props.y).toBe(20);
+    expect(after.undoStack.at(-1)?.label).toBe('drag');
+    expect(after.redoStack).toHaveLength(0);
+  });
+
+  it('does not clear dirty when an older async save finishes after a newer edit', () => {
+    const rootId = useProjectStore.getState().uiProject.screens[0]!.root.id;
+    useProjectStore.getState().mutateV2('first edit', (draft) => {
+      const hit = findNodeByIdV2(draft, rootId);
+      if (hit) hit.node.props.x = 10;
+    });
+    const savingRevision = useProjectStore.getState().revision;
+    useProjectStore.getState().mutateV2('newer edit', (draft) => {
+      const hit = findNodeByIdV2(draft, rootId);
+      if (hit) hit.node.props.y = 20;
+    });
+
+    useProjectStore.getState().markSaved(savingRevision);
+    expect(useProjectStore.getState().dirty).toBe(true);
+
+    useProjectStore.getState().markSaved(useProjectStore.getState().revision);
+    expect(useProjectStore.getState().dirty).toBe(false);
+  });
 });

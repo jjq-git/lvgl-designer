@@ -322,7 +322,8 @@ BuildTarget.lvglVersion 是发布构建所用 LVGL 版本的唯一权威
 
 条屏可使用非全屏 `visibleRect`；它表示从逻辑 framebuffer 中显示哪一块区域。Validator 必须保证它位于 `logicalSize` 内。
 
-真实屏型以本仓库的 `docs/screen-inventory.md` 为准。两个已知需要特殊字段的例子：
+发布设备型号与设计器一键预设以 `ui.podsc.com/site/frames/manifest.json` 为准；
+`docs/screen-inventory.md` 仅保留固件硬件调研背景。两个已知需要特殊字段的例子：
 
 - **TXW620002B0**：逻辑分辨率 480×960，但物理可视仅 360 列（左右各插黑 60）。只有 `logicalSize` 无法表达，产品预览会画错开孔——对应 `visibleRect: { x: 60, y: 0, width: 360, height: 960 }`。
 - **MX039/ST7102 圆屏**：显示 480×480，而触摸坐标系为 480×854 经 `touch_map` 映射。这属于硬件输入校准，进 `InputProfile`（§4.4），不进 `DisplayProfile`。
@@ -702,7 +703,7 @@ UiProject
 
 交付：
 
-1. 确认产品目标为 LVGL `9.5.0`，并选定一个真实目标板作为首个闭环对象（屏型参数以本仓库的 `docs/screen-inventory.md` 为准，勿凭印象填写）。
+1. 确认产品目标为 LVGL `9.5.0`，并选定一个真实目标板作为首个闭环对象（发布屏型参数以 `ui.podsc.com/site/frames/manifest.json` 为准，勿凭印象填写）。
 2. 产出 9.4 → 9.5 的 API、XML、Widget、Style 和 `lv_conf.h` 差异清单。**其中必须包含 13 个自研 parser 的逐个静态影响判定（§2.6）**；完成 Spike 后再按证据估算它与 emitter 的相对工作量。
 3. 验证 9.5 runtime 能构建、启动并渲染 P0 中至少 Button/Label/Slider。
 4. 验证单 runtime 切换 RGB565/32-bit 格式是否可行。
@@ -898,6 +899,6 @@ packages/codegen/src/emitters/c95/
 >
 > 本阶段不要实现完整客户分享、SSO、多租户 API、RAG 或大规模 UI 重构。
 >
-> 屏型参数一律以本仓库的 `docs/screen-inventory.md` 为准，不要凭印象填写分辨率与色彩格式。
+> 发布屏型参数一律以 `ui.podsc.com/site/frames/manifest.json` 为准；未登记分辨率时使用自定义逻辑尺寸，不要凭印象补值。
 >
 > 第一阶段完成后先提交 Schema 与架构评审。评审通过，再实现 LVGL 9.5 emitter、产品外壳预览、客户发布和平台集成。

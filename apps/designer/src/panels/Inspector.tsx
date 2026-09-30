@@ -186,6 +186,7 @@ function ComponentApiSection({ node, api }: { node: WidgetNodeV2; api: Component
           <div key={prop.name} className={`prop-row ${value === undefined ? 'unset' : ''}`}>
             <label title={`${prop.name} · ${COMPONENT_API_TYPE_LABELS[prop.type]}`}>{prop.name}</label>
             <ValueEditor
+              ariaLabel={prop.name}
               node={node}
               propKey={prop.name}
               type={prop.type}
@@ -247,6 +248,7 @@ function ButtonTextRow({ node }: { node: WidgetNodeV2 }): JSX.Element {
       <label title="内部自动创建或更新居中的 Label">按钮文字</label>
       <input
         className="ed-text"
+        aria-label="按钮文字"
         value={value}
         placeholder="输入文字（自动创建标签）"
         onChange={(event) => setText(event.target.value)}
@@ -291,6 +293,7 @@ function NameRow({ node }: { node: WidgetNodeV2 }): JSX.Element {
       <label>名称</label>
       <input
         className="ed-text"
+        aria-label="名称"
         placeholder="(匿名)"
         value={val ?? node.codeName ?? ''}
         onChange={(e) => setVal(e.target.value)}
@@ -317,6 +320,7 @@ function PropRowEditor({ node, spec }: { node: WidgetNodeV2; spec: PropSpec }): 
           )}
         </label>
         <ValueEditor
+          ariaLabel={spec.ui.label}
           node={node}
           propKey={spec.key}
           type={spec.type}
@@ -357,6 +361,7 @@ function CompanionRow(props: { node: WidgetNodeV2; parent: PropSpec; companion: 
     <div className={`prop-row companion-row ${isSet ? '' : 'unset'}`}>
       <label title={companion.xmlAttr}>{label}</label>
       <ValueEditor
+        ariaLabel={label}
         node={node}
         propKey={companion.key}
         type={companion.type}
@@ -399,9 +404,14 @@ function FlagsSection(props: {
 
   return (
     <section className="insp-group">
-      <div className="panel-subtitle clickable" onClick={() => setOpen(!open)}>
+      <button
+        type="button"
+        className="panel-subtitle clickable"
+        aria-expanded={open}
+        onClick={() => setOpen(!open)}
+      >
         {open ? '▾' : '▸'} {title}{setCount > 0 ? `(已设 ${setCount})` : ''}
-      </div>
+      </button>
       {open && (
         <div className="flags-grid">
           {keys.map((k) => {
@@ -536,9 +546,9 @@ function ChildItem(props: {
   return (
     <div className="child-item" data-child-type={child.type}>
       <div className="child-head">
-        <span className="clickable" onClick={() => setOpen(!open)}>
+        <button type="button" className="clickable" aria-expanded={open} onClick={() => setOpen(!open)}>
           {open ? '▾' : '▸'} {childLabel(child.type)} #{idx + 1}
-        </span>
+        </button>
         {child.type === 'tabview-tab' && (
           <button
             className={`icon-btn ${parent.props['active'] === parent.children.filter((c) => c.type === 'tabview-tab').indexOf(child) ? 'active' : ''}`}
@@ -627,6 +637,7 @@ function TableCellInput(props: { r: number; c: number; value: string; onCommit: 
   };
   return (
     <input
+      aria-label={`表格第 ${props.r + 1} 行第 ${props.c + 1} 列`}
       className="ed-text table-cell-input"
       data-cell={`${props.r}-${props.c}`}
       placeholder={`${props.r},${props.c}`}
@@ -801,9 +812,9 @@ function ActionRegistrySection(): JSX.Element {
   return (
     <section className="insp-group" data-section="action-registry">
       <div className="panel-subtitle interaction-title">
-        <span className="clickable" onClick={() => setOpen(!open)}>
+        <button type="button" className="clickable" aria-expanded={open} onClick={() => setOpen(!open)}>
           {open ? '▾' : '▸'} 设备业务动作{customActions.length > 0 ? ` (${customActions.length})` : ''}
-        </span>
+        </button>
       </div>
       {open && (
         <>
@@ -812,6 +823,7 @@ function ActionRegistrySection(): JSX.Element {
           </div>
           <div className="action-create-row">
             <input
+              aria-label="业务动作代码名"
               className="ed-text"
               value={codeName}
               placeholder="代码名，例如 wifi_scan"
@@ -819,6 +831,7 @@ function ActionRegistrySection(): JSX.Element {
               onKeyDown={(event) => event.key === 'Enter' && addAction()}
             />
             <input
+              aria-label="业务动作显示名称"
               className="ed-text"
               value={displayName}
               placeholder="显示名称（可选）"
@@ -901,9 +914,9 @@ function SubjectSection(): JSX.Element {
   return (
     <section className="insp-group">
       <div className="panel-subtitle interaction-title">
-        <span className="clickable" onClick={() => setOpen(!open)}>
+        <button type="button" className="clickable" aria-expanded={open} onClick={() => setOpen(!open)}>
           {open ? '▾' : '▸'} 工程数据源{subjects.length > 0 ? ` (${subjects.length})` : ''}
-        </span>
+        </button>
         <button className="btn btn-sm" onClick={addSubject}>+ 新建</button>
       </div>
       {open && (
@@ -991,14 +1004,14 @@ function SubjectItem({ subject }: { subject: SubjectDefV2 }): JSX.Element {
         </div>
         <div className="prop-row">
           <label>显示名称</label>
-          <TextCommitEditor value={subject.displayName ?? ''} placeholder={subject.codeName} onCommit={(value) => update('改数据源显示名称', (current) => {
+          <TextCommitEditor ariaLabel="显示名称" value={subject.displayName ?? ''} placeholder={subject.codeName} onCommit={(value) => update('改数据源显示名称', (current) => {
             if (value.trim() === '') delete current.displayName;
             else current.displayName = value.trim();
           })} />
         </div>
         <div className="prop-row">
           <label>类型</label>
-          <select className="ed-select" value={subject.type} onChange={(event) => changeType(event.target.value as SubjectDefV2['type'])}>
+          <select aria-label="类型" className="ed-select" value={subject.type} onChange={(event) => changeType(event.target.value as SubjectDefV2['type'])}>
             <option value="int">整数</option>
             <option value="float">小数</option>
             <option value="string">文本</option>
@@ -1008,17 +1021,17 @@ function SubjectItem({ subject }: { subject: SubjectDefV2 }): JSX.Element {
         <div className="prop-row">
           <label>初始值</label>
           {subject.type === 'string' && (
-            <TextCommitEditor value={subject.initial} onCommit={(value) => update('改数据源初始值', (current) => {
+            <TextCommitEditor ariaLabel="初始值" value={subject.initial} onCommit={(value) => update('改数据源初始值', (current) => {
               if (current.type === 'string') current.initial = value;
             })} />
           )}
           {subject.type === 'color' && (
-            <ValueEditor type="color" value={subject.initial} onChange={(value) => update('改数据源初始值', (current) => {
+            <ValueEditor ariaLabel="初始值" type="color" value={subject.initial} onChange={(value) => update('改数据源初始值', (current) => {
               if (current.type === 'color' && typeof value === 'string') current.initial = value;
             })} />
           )}
           {(subject.type === 'int' || subject.type === 'float') && (
-            <input className="ed-num" type="number" value={subject.initial} onChange={(event) => {
+            <input className="ed-num" aria-label="初始值" type="number" value={subject.initial} onChange={(event) => {
               const value = Number(event.target.value);
               if (Number.isFinite(value)) update('改数据源初始值', (current) => {
                 if (current.type === 'int' || current.type === 'float') current.initial = value;
@@ -1030,7 +1043,7 @@ function SubjectItem({ subject }: { subject: SubjectDefV2 }): JSX.Element {
           <>
             <div className="prop-row unset">
               <label>最小值</label>
-              <input className="ed-num" type="number" value={subject.min ?? ''} placeholder="不限制" onChange={(event) => {
+              <input aria-label="最小值" className="ed-num" type="number" value={subject.min ?? ''} placeholder="不限制" onChange={(event) => {
                 const raw = event.target.value;
                 update('改数据源最小值', (current) => {
                   if (current.type !== 'int' && current.type !== 'float') return;
@@ -1041,7 +1054,7 @@ function SubjectItem({ subject }: { subject: SubjectDefV2 }): JSX.Element {
             </div>
             <div className="prop-row unset">
               <label>最大值</label>
-              <input className="ed-num" type="number" value={subject.max ?? ''} placeholder="不限制" onChange={(event) => {
+              <input aria-label="最大值" className="ed-num" type="number" value={subject.max ?? ''} placeholder="不限制" onChange={(event) => {
                 const raw = event.target.value;
                 update('改数据源最大值', (current) => {
                   if (current.type !== 'int' && current.type !== 'float') return;
@@ -1121,7 +1134,7 @@ function EventSection({ node, triggers }: { node: WidgetNodeV2; triggers: readon
             <div className="child-body">
               <div className="prop-row">
                 <label>触发时机</label>
-                <select className="ed-select" value={event.on} onChange={(e) => update(index, { ...event, on: e.target.value })}>
+                <select aria-label="触发时机" className="ed-select" value={event.on} onChange={(e) => update(index, { ...event, on: e.target.value })}>
                   {triggers.map((token) => (
                     <option key={token} value={token}>{EVENT_LABELS[token] ? `${EVENT_LABELS[token]} (${token})` : token}</option>
                   ))}
@@ -1129,7 +1142,7 @@ function EventSection({ node, triggers }: { node: WidgetNodeV2; triggers: readon
               </div>
               <div className="prop-row">
                 <label>执行动作</label>
-                <select className="ed-select" value={event.action} onChange={(e) => {
+                <select aria-label="执行动作" className="ed-select" value={event.action} onChange={(e) => {
                   const nextSpec = actions[e.target.value];
                   if (nextSpec) update(index, { on: event.on, action: nextSpec.id, args: defaultActionArgs(nextSpec) });
                 }}>
@@ -1174,43 +1187,44 @@ function ActionArgRow(props: {
 }): JSX.Element {
   const { param, value, onChange } = props;
   const project = useProjectStore((state) => state.uiProject);
+  const ariaLabel = ACTION_PARAM_LABELS[param.name] ?? param.name;
   let editor: JSX.Element;
   if (param.enum) {
     editor = (
-      <select className="ed-select" value={typeof value === 'string' ? value : ''} onChange={(e) => onChange(e.target.value || undefined)}>
+      <select aria-label={ariaLabel} className="ed-select" value={typeof value === 'string' ? value : ''} onChange={(e) => onChange(e.target.value || undefined)}>
         <option value="">(未设置)</option>
         {param.enum.map((item) => <option key={item} value={item}>{item}</option>)}
       </select>
     );
   } else if (param.type === 'screenRef') {
     editor = (
-      <select className="ed-select" value={typeof value === 'string' ? value : ''} onChange={(e) => onChange(e.target.value || undefined)}>
+      <select aria-label={ariaLabel} className="ed-select" value={typeof value === 'string' ? value : ''} onChange={(e) => onChange(e.target.value || undefined)}>
         <option value="">(请选择)</option>
         {project.screens.map((screen) => <option key={screen.id} value={screen.id}>{screen.displayName || screen.codeName}</option>)}
       </select>
     );
   } else if (param.type === 'subjectRef') {
     editor = (
-      <select className="ed-select" value={typeof value === 'string' ? value : ''} onChange={(e) => onChange(e.target.value || undefined)}>
+      <select aria-label={ariaLabel} className="ed-select" value={typeof value === 'string' ? value : ''} onChange={(e) => onChange(e.target.value || undefined)}>
         <option value="">{project.subjects.length === 0 ? '(请先新建数据源)' : '(请选择)'}</option>
         {project.subjects.map((subject) => <option key={subject.id} value={subject.id}>{subject.displayName || subject.codeName}</option>)}
       </select>
     );
   } else if (param.type === 'bool') {
-    editor = <input type="checkbox" checked={value === true} onChange={(e) => onChange(e.target.checked)} />;
+    editor = <input aria-label={ariaLabel} type="checkbox" checked={value === true} onChange={(e) => onChange(e.target.checked)} />;
   } else if (param.type === 'int' || param.type === 'float') {
     editor = (
-      <input className="ed-num" type="number" min={param.min} max={param.max} value={typeof value === 'number' ? value : ''}
+      <input aria-label={ariaLabel} className="ed-num" type="number" min={param.min} max={param.max} value={typeof value === 'number' ? value : ''}
         onChange={(e) => onChange(e.target.value === '' ? undefined : Number(e.target.value))} />
     );
   } else if (param.type === 'color') {
-    editor = <ValueEditor type="color" value={value as PropValueV2 | undefined} onChange={(next) => onChange(next as ActionArgValue | undefined)} />;
+    editor = <ValueEditor ariaLabel={ariaLabel} type="color" value={value as PropValueV2 | undefined} onChange={(next) => onChange(next as ActionArgValue | undefined)} />;
   } else {
-    editor = <TextCommitEditor value={typeof value === 'string' ? value : ''} onCommit={(next) => onChange(next || undefined)} />;
+    editor = <TextCommitEditor ariaLabel={ariaLabel} value={typeof value === 'string' ? value : ''} onCommit={(next) => onChange(next || undefined)} />;
   }
   return (
     <div className={`prop-row ${value === undefined ? 'unset' : ''}`}>
-      <label title={param.name}>{ACTION_PARAM_LABELS[param.name] ?? param.name}{param.required ? ' *' : ''}</label>
+      <label title={param.name}>{ariaLabel}{param.required ? ' *' : ''}</label>
       {editor}
       {value !== undefined && !param.required && <button className="icon-btn" title="清除" onClick={() => onChange(undefined)}>↺</button>}
     </div>
@@ -1271,7 +1285,7 @@ function BindingSection({ node }: { node: WidgetNodeV2 }): JSX.Element {
     <section className="insp-group">
       <div className="panel-subtitle">数据绑定 ({node.bindings.length})</div>
       <div className="binding-add-row">
-        <select className="ed-select" defaultValue="" disabled={project.subjects.length === 0} onChange={(e) => {
+        <select aria-label="新增数据绑定" className="ed-select" defaultValue="" disabled={project.subjects.length === 0} onChange={(e) => {
           add(e.target.value);
           e.target.value = '';
         }}>
@@ -1357,7 +1371,7 @@ function BindingItem(props: {
       <div className="child-body">
         <div className="prop-row">
           <label>数据源</label>
-          <select className="ed-select" value={binding.subject} onChange={(e) => onChange({ ...binding, subject: e.target.value })}>
+          <select aria-label="数据源" className="ed-select" value={binding.subject} onChange={(e) => onChange({ ...binding, subject: e.target.value })}>
             {missing && <option value={binding.subject}>{binding.subject}（已失效）</option>}
             {subjects.map((subject) => {
               const compatible = subjectMatchesDescriptor(subject, binding.kind, binding.kind === 'prop' ? binding.prop : '');
@@ -1370,27 +1384,27 @@ function BindingItem(props: {
           <>
             <div className="prop-row">
               <label>条件</label>
-              <select className="ed-select" value={binding.op} onChange={(e) => onChange({ ...binding, op: e.target.value as CmpOp })}>
+              <select aria-label="条件" className="ed-select" value={binding.op} onChange={(e) => onChange({ ...binding, op: e.target.value as CmpOp })}>
                 {(Object.keys(CMP_OP_LABELS) as CmpOp[]).map((op) => <option key={op} value={op}>{CMP_OP_LABELS[op]}</option>)}
               </select>
             </div>
             <div className="prop-row">
               <label>比较值</label>
-              <input className="ed-num" type="number" value={binding.refValue} onChange={(e) => onChange({ ...binding, refValue: Number(e.target.value) })} />
+              <input aria-label="比较值" className="ed-num" type="number" value={binding.refValue} onChange={(e) => onChange({ ...binding, refValue: Number(e.target.value) })} />
             </div>
           </>
         )}
         {binding.kind === 'prop' && binding.prop === 'text' && (
           <div className="prop-row">
             <label>格式</label>
-            <TextCommitEditor value={binding.fmt ?? ''} placeholder="%s" onCommit={(fmt) => onChange({ ...binding, fmt: fmt || undefined })} />
+            <TextCommitEditor ariaLabel="格式" value={binding.fmt ?? ''} placeholder="%s" onCommit={(fmt) => onChange({ ...binding, fmt: fmt || undefined })} />
           </div>
         )}
         {binding.kind === 'style' && (
           <>
             <div className="prop-row">
               <label>应用部件</label>
-              <select className="ed-select" value={binding.selector?.part ?? 'main'} onChange={(e) => onChange({
+              <select aria-label="应用部件" className="ed-select" value={binding.selector?.part ?? 'main'} onChange={(e) => onChange({
                 ...binding,
                 selector: normSelector(binding.selector?.states?.[0] ?? 'default', e.target.value),
               })}>
@@ -1399,7 +1413,7 @@ function BindingItem(props: {
             </div>
             <div className="prop-row">
               <label>组件状态</label>
-              <select className="ed-select" value={binding.selector?.states?.[0] ?? 'default'} onChange={(e) => onChange({
+              <select aria-label="组件状态" className="ed-select" value={binding.selector?.states?.[0] ?? 'default'} onChange={(e) => onChange({
                 ...binding,
                 selector: normSelector(e.target.value as StateToken, binding.selector?.part ?? 'main'),
               })}>
@@ -1448,6 +1462,7 @@ function namedStyleUseCount(styleId: string): number {
 
 function StyleTab({ node }: { node: WidgetNodeV2 }): JSX.Element {
   const uiProject = useProjectStore((state) => state.uiProject);
+  const isScreenRoot = uiProject.screens.some((screen) => screen.root.id === node.id);
   const component = componentForNode(uiProject, node);
   const effectiveType = component?.root.type ?? node.type;
   const spec = REGISTRY.get(effectiveType);
@@ -1472,6 +1487,9 @@ function StyleTab({ node }: { node: WidgetNodeV2 }): JSX.Element {
     ? undefined
     : namedStyles.find((style) => style.id === styleTarget);
   const styleValues = namedTarget?.props ?? group?.props;
+  const screenBackgroundValues = isScreenRoot
+    ? node.styles.find((item) => sameSelector(item.selector, undefined))?.props
+    : undefined;
   const appliedAtSelector = (styleId: string): boolean => node.styleRefs.some(
     (usage) => usage.styleId === styleId && sameSelector(usage.selector, selector),
   );
@@ -1510,6 +1528,31 @@ function StyleTab({ node }: { node: WidgetNodeV2 }): JSX.Element {
           ? `named-style:${namedTarget.id}:${key}`
           : `style:${node.id}:${state}:${part}:${key}`,
       },
+    );
+  };
+
+  const setScreenBackgroundProp = (key: 'bg_color' | 'bg_opa', v: PropValueV2 | undefined): void => {
+    useProjectStore.getState().mutateV2(
+      `改屏幕背景 ${key}`,
+      (draft) => {
+        const hit = findNodeByIdV2(draft, node.id);
+        if (!hit) return;
+        let base = hit.node.styles.find((item) => sameSelector(item.selector, undefined));
+        if (v === undefined) {
+          if (!base) return;
+          delete base.props[key];
+          if (Object.keys(base.props).length === 0) {
+            hit.node.styles = hit.node.styles.filter((item) => item !== base);
+          }
+          return;
+        }
+        if (!base) {
+          base = { props: {} };
+          hit.node.styles.push(base);
+        }
+        base.props[key] = v;
+      },
+      v === undefined ? {} : { coalesceKey: `screen-background:${node.id}:${key}` },
     );
   };
 
@@ -1576,15 +1619,37 @@ function StyleTab({ node }: { node: WidgetNodeV2 }): JSX.Element {
           关联组件：{component.displayName ?? component.codeName}。此处修改的是当前实例覆盖值。
         </div>
       )}
+      {isScreenRoot && (
+        <section className="insp-group">
+          <div className="panel-subtitle">屏幕背景</div>
+          <div className="insp-note">
+            属于实际显示内容并参与导出；编辑器灰色区域和设备外壳仅用于预览。
+          </div>
+          <StyleRow
+            spec={STYLE_PROPS.bg_color!}
+            label="背景颜色"
+            fontTokens={fontTokens}
+            value={screenBackgroundValues?.bg_color}
+            onChange={(v) => setScreenBackgroundProp('bg_color', v)}
+          />
+          <StyleRow
+            spec={STYLE_PROPS.bg_opa!}
+            label="背景透明度"
+            fontTokens={fontTokens}
+            value={screenBackgroundValues?.bg_opa}
+            onChange={(v) => setScreenBackgroundProp('bg_opa', v)}
+          />
+        </section>
+      )}
       <div className="prop-row">
         <label>状态</label>
-        <select className="ed-select" value={state} onChange={(e) => setState(e.target.value as StateToken)}>
+        <select aria-label="状态" className="ed-select" value={state} onChange={(e) => setState(e.target.value as StateToken)}>
           {STATE_TOKENS.map((s) => <option key={s} value={s}>{s}</option>)}
         </select>
       </div>
       <div className="prop-row">
         <label>部件</label>
-        <select className="ed-select" value={part} onChange={(e) => setPart(e.target.value)}>
+        <select aria-label="部件" className="ed-select" value={part} onChange={(e) => setPart(e.target.value)}>
           {parts.map((p) => <option key={p} value={p}>{p}</option>)}
         </select>
       </div>
@@ -1592,7 +1657,7 @@ function StyleTab({ node }: { node: WidgetNodeV2 }): JSX.Element {
         <div className="panel-subtitle">复用样式</div>
         <div className="prop-row">
           <label>编辑目标</label>
-          <select className="ed-select" value={namedTarget?.id ?? 'local'} onChange={(e) => setStyleTarget(e.target.value)}>
+          <select aria-label="编辑目标" className="ed-select" value={namedTarget?.id ?? 'local'} onChange={(e) => setStyleTarget(e.target.value)}>
             <option value="local">当前组件局部样式</option>
             {namedStyles.map((style) => (
               <option key={style.id} value={style.id}>{style.displayName || style.codeName || style.id}</option>
@@ -1620,7 +1685,9 @@ function StyleTab({ node }: { node: WidgetNodeV2 }): JSX.Element {
         {namedStyles.length === 0 && <div className="insp-note">先设置局部样式，再点击“提取当前样式”即可复用和动态绑定。</div>}
       </section>
       <div className="panel-subtitle">{namedTarget ? `命名样式 · ${namedTarget.displayName || namedTarget.codeName || namedTarget.id}` : '局部样式(style_*)'}</div>
-      {M1_INSPECTOR_STYLE_KEYS.map((key) => {
+      {M1_INSPECTOR_STYLE_KEYS.filter(
+        (key) => !isScreenRoot || (key !== 'bg_color' && key !== 'bg_opa'),
+      ).map((key) => {
         const sp = STYLE_PROPS[key];
         if (!sp) return null;
         return (
@@ -1639,16 +1706,18 @@ function StyleTab({ node }: { node: WidgetNodeV2 }): JSX.Element {
 
 function StyleRow(props: {
   spec: StylePropSpec;
+  label?: string;
   fontTokens: readonly string[];
   value: PropValueV2 | undefined;
   onChange: (v: PropValueV2 | undefined) => void;
 }): JSX.Element {
-  const { spec, fontTokens, value, onChange } = props;
+  const { spec, label, fontTokens, value, onChange } = props;
   const isSet = value !== undefined && value !== null;
   return (
     <div className={`prop-row ${isSet ? '' : 'unset'}`}>
-      <label title={`style_${spec.key}`}>{spec.key}</label>
+      <label title={`style_${spec.key}`}>{label ?? spec.key}</label>
       <ValueEditor
+        ariaLabel={label ?? spec.key}
         type={spec.type === 'fontRef' ? 'fontRef' : spec.type}
         tokens={spec.type === 'fontRef' ? fontTokens : spec.enum?.tokens}
         value={value}
@@ -1723,6 +1792,7 @@ function textToStrList(t: string): string[] | undefined {
 /* ================= 通用值编辑器 ================= */
 
 function ValueEditor(props: {
+  ariaLabel?: string;
   type: string;
   tokens?: readonly string[];
   min?: number;
@@ -1734,7 +1804,7 @@ function ValueEditor(props: {
   node?: WidgetNodeV2;
   propKey?: string;
 }): JSX.Element {
-  const { type, tokens, min, max, value, defaultValue, onChange, node, propKey } = props;
+  const { ariaLabel, type, tokens, min, max, value, defaultValue, onChange, node, propKey } = props;
   const ph = defaultValue !== undefined ? String(defaultValue) : '';
   const uiProject = useProjectStore((state) => state.uiProject);
   const themes = uiProject.themes;
@@ -1752,6 +1822,7 @@ function ValueEditor(props: {
     return (
       <span className="ed-size" title={`Theme Token: ${value.$token}`}>
         <select
+          aria-label={ariaLabel}
           className="ed-select"
           value={value.$token}
           onChange={(event) => onChange({ $token: event.target.value })}
@@ -1771,10 +1842,11 @@ function ValueEditor(props: {
 
   switch (type) {
     case 'size':
-      return <SizeEditor value={value} placeholder={ph} onChange={onChange} />;
+      return <SizeEditor ariaLabel={ariaLabel} value={value} placeholder={ph} onChange={onChange} />;
     case 'int':
       return (
         <input
+          aria-label={ariaLabel}
           className="ed-num"
           type="number"
           min={min}
@@ -1787,6 +1859,7 @@ function ValueEditor(props: {
     case 'opa':
       return (
         <input
+          aria-label={ariaLabel}
           className="ed-num"
           type="number"
           min={0}
@@ -1799,6 +1872,7 @@ function ValueEditor(props: {
     case 'bool':
       return (
         <input
+          aria-label={ariaLabel}
           type="checkbox"
           checked={value === true}
           onChange={(e) => onChange(e.target.checked)}
@@ -1808,6 +1882,7 @@ function ValueEditor(props: {
     case 'fontRef':
       return (
         <select
+          aria-label={ariaLabel}
           className="ed-select"
           value={typeof value === 'string' ? value : ''}
           onChange={(e) => onChange(e.target.value === '' ? undefined : e.target.value)}
@@ -1819,6 +1894,7 @@ function ValueEditor(props: {
     case 'imageRef':
       return (
         <AssetPicker
+          ariaLabel={ariaLabel}
           value={typeof value === 'string' ? value : undefined}
           accept={node?.type === 'lottie' && propKey === 'src' ? 'lottie' : 'image'}
           onChange={onChange}
@@ -1827,6 +1903,7 @@ function ValueEditor(props: {
     case 'float':
       return (
         <input
+          aria-label={ariaLabel}
           className="ed-num"
           type="number"
           step="any"
@@ -1841,6 +1918,7 @@ function ValueEditor(props: {
       const current = typeof value === 'string' ? value : '';
       return (
         <select
+          aria-label={ariaLabel}
           className="ed-select"
           value={current}
           onChange={(event) => onChange(event.target.value === '' ? undefined : event.target.value)}
@@ -1865,6 +1943,7 @@ function ValueEditor(props: {
         .filter((style, index, list) => list.findIndex((item) => item.id === style.id) === index);
       return (
         <select
+          aria-label={ariaLabel}
           className="ed-select"
           value={current}
           onChange={(event) => onChange(event.target.value === '' ? undefined : event.target.value)}
@@ -1893,6 +1972,7 @@ function ValueEditor(props: {
       }
       return (
         <TextCommitEditor
+          ariaLabel={ariaLabel}
           value={strListToText(value)}
           placeholder="a b c"
           onCommit={(t) => onChange(textToStrList(t))}
@@ -1901,6 +1981,7 @@ function ValueEditor(props: {
     case 'intList':
       return (
         <TextCommitEditor
+          ariaLabel={ariaLabel}
           value={intListToText(value)}
           placeholder="10 20 30"
           onCommit={(t) => onChange(textToIntList(t))}
@@ -1909,6 +1990,7 @@ function ValueEditor(props: {
     case 'pointList':
       return (
         <TextCommitEditor
+          ariaLabel={ariaLabel}
           value={pointListToText(value)}
           placeholder="0,80 60,10 120,60"
           onCommit={(t) => onChange(textToPointList(t))}
@@ -1917,6 +1999,7 @@ function ValueEditor(props: {
     case 'stringQuotedList':
       return (
         <TextAreaCommitEditor
+          ariaLabel={ariaLabel}
           value={mapToText(value)}
           placeholder={'按钮1 | 按钮2\n按钮3(换行=新一排)'}
           onCommit={(t) => onChange(textToMap(t))}
@@ -1925,6 +2008,7 @@ function ValueEditor(props: {
     case 'orFlags':
       return (
         <TextCommitEditor
+          ariaLabel={ariaLabel}
           value={strListToText(value)}
           placeholder="width_2|checked none …(每按钮一组,'|' 位或)"
           onCommit={(t) => onChange(textToStrList(t))}
@@ -1935,11 +2019,13 @@ function ValueEditor(props: {
       return (
         <span className="ed-color">
           <input
+            aria-label={ariaLabel ? `${ariaLabel}颜色` : '颜色'}
             type="color"
             value={hex}
             onChange={(e) => onChange(e.target.value)}
           />
           <input
+            aria-label={ariaLabel}
             className="ed-text"
             placeholder={ph || '#RRGGBB'}
             value={typeof value === 'string' ? value : ''}
@@ -1956,6 +2042,7 @@ function ValueEditor(props: {
       // string / subject / styleRef / 其它 → 文本
       return (
         <TextCommitEditor
+          ariaLabel={ariaLabel}
           value={typeof value === 'string' ? value : value !== undefined ? String(value) : ''}
           placeholder={ph}
           onCommit={(v) => onChange(v === '' ? undefined : v)}
@@ -1966,6 +2053,7 @@ function ValueEditor(props: {
 
 /** 文本:失焦/回车提交(避免每键触发重载抖动) */
 function TextCommitEditor(props: {
+  ariaLabel?: string;
   value: string;
   placeholder?: string;
   onCommit: (v: string) => void;
@@ -1978,6 +2066,7 @@ function TextCommitEditor(props: {
   };
   return (
     <input
+      aria-label={props.ariaLabel}
       className="ed-text"
       placeholder={props.placeholder}
       value={draft ?? props.value}
@@ -1990,6 +2079,7 @@ function TextCommitEditor(props: {
 
 /** 多行文本:失焦/Ctrl+Enter 提交(buttonmatrix map 等) */
 function TextAreaCommitEditor(props: {
+  ariaLabel?: string;
   value: string;
   placeholder?: string;
   onCommit: (v: string) => void;
@@ -2002,6 +2092,7 @@ function TextAreaCommitEditor(props: {
   };
   return (
     <textarea
+      aria-label={props.ariaLabel}
       className="ed-textarea"
       rows={3}
       placeholder={props.placeholder}
@@ -2015,6 +2106,7 @@ function TextAreaCommitEditor(props: {
 
 /** size:px / % / content 三态(lv_xml_to_size 语义) */
 function SizeEditor(props: {
+  ariaLabel?: string;
   value: PropValueV2 | undefined;
   placeholder?: string;
   onChange: (v: PropValueV2 | undefined) => void;
@@ -2042,6 +2134,7 @@ function SizeEditor(props: {
     <span className="ed-size">
       {mode !== 'content' && (
         <input
+          aria-label={props.ariaLabel}
           className="ed-num"
           type="number"
           placeholder={props.placeholder}
@@ -2056,7 +2149,12 @@ function SizeEditor(props: {
           }}
         />
       )}
-      <select className="ed-select ed-size-mode" value={mode} onChange={(e) => setMode(e.target.value)}>
+      <select
+        className="ed-select ed-size-mode"
+        aria-label={props.ariaLabel ? `${props.ariaLabel}单位` : '尺寸单位'}
+        value={mode}
+        onChange={(e) => setMode(e.target.value)}
+      >
         <option value="unset">—</option>
         <option value="px">px</option>
         <option value="%">%</option>

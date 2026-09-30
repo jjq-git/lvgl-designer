@@ -285,7 +285,7 @@ try {
     });
   }, { nodeId, props: props ?? null, style: style ?? null });
   const newProject = async () => {
-    await page.locator('.toolbar button', { hasText: '新建' }).click();
+    await page.getByRole('button', { name: '新建项目' }).click();
     await page.waitForTimeout(600);
     await page.evaluate(() => {
       window.__lvd.projectStore.getState().mutateDisplay('e2e 480 方屏', (display) => {
@@ -604,11 +604,11 @@ try {
 
   /* ================= P4 导出 zip → gcc 双配置编译 ================= */
   step('P4 导出 C 代码 zip + host gcc 双配置编译');
-  await page.selectOption('[aria-label="目标颜色格式"]', 'RGB565');
+  await page.evaluate(() => window.__lvd.buildTargetStore.getState().confirmColorFormat('RGB565'));
   await page.selectOption('[aria-label="目标控制器"]', 'screen-only');
   const [download] = await Promise.all([
     page.waitForEvent('download', { timeout: 60000 }),
-    page.locator('.toolbar button', { hasText: '导出 C 代码' }).click(),
+    page.getByRole('button', { name: '导出 C 代码' }).click(),
   ]);
   const zipPath = join(artDir, 'ui-all.zip');
   await download.saveAs(zipPath);

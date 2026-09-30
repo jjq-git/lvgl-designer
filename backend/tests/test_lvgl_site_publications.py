@@ -112,11 +112,49 @@ def test_semantic_merge_preserves_order_and_unknown_fields():
     assert listing["future"] == {"keep": True}
 
 
+def test_existing_demo_can_supply_a_canvas_without_inventing_hardware_resolution(tmp_path):
+    ui_dir = tmp_path / "site" / "uis"
+    ui_dir.mkdir(parents=True)
+    document = {
+        "displayProfile": {
+            "logicalSize": {"width": 480, "height": 480},
+            "shape": "rect",
+        },
+    }
+    (ui_dir / "WF2D-8630-1.json").write_text(json.dumps(document), encoding="utf-8")
+    listing = {
+        "items": [
+            {"frameId": "WF2D-8630", "documentUrl": "uis/WF2D-8630-1.json"},
+            {"frameId": "WF2D-8630", "documentUrl": "uis/WF2D-8630-1.json"},
+            {"frameId": "WF2D-8630", "documentUrl": "../outside.json"},
+        ],
+    }
+
+    assert git_target._demo_logical_sizes(tmp_path, listing) == {
+        "WF2D-8630": [{"width": 480, "height": 480, "shape": "rect"}],
+    }
+
+
 def test_frame_gate_requires_registered_resolution_and_shape():
     document = {"displayProfile": {"logicalSize": {"width": 480, "height": 480}, "shape": "rect"}}
     frame = {"id": "WF2D-8620", "resolution": {"width": 240, "height": 240}, "match": {"shape": "round"}}
     codes = {item["code"] for item in git_target.validate_frame(document, frame)}
     assert codes == {"E_FRAME_SHAPE_MISMATCH", "E_FRAME_RESOLUTION_MISMATCH"}
+
+
+def test_frame_gate_enforces_manifest_aspect_ratio_without_inventing_resolution():
+    frame = {
+        "id": "WF2D-8630",
+        "match": {"shape": "rect", "aspectRatio": "1:1", "aspectRatioTolerance": 0.005},
+    }
+    square = {"displayProfile": {"logicalSize": {"width": 480, "height": 480}, "shape": "rect"}}
+    wide = {"displayProfile": {"logicalSize": {"width": 1024, "height": 600}, "shape": "rect"}}
+
+    square_codes = {item["code"] for item in git_target.validate_frame(square, frame)}
+    wide_codes = {item["code"] for item in git_target.validate_frame(wide, frame)}
+
+    assert square_codes == {"W_FRAME_RESOLUTION_UNREGISTERED"}
+    assert wide_codes == {"W_FRAME_RESOLUTION_UNREGISTERED", "E_FRAME_ASPECT_RATIO_MISMATCH"}
 
 
 def test_publish_is_idempotent_at_database_boundary(isolated_publications, monkeypatch):
@@ -236,6 +274,33 @@ def test_prepare_request_id_is_idempotent(isolated_publications, monkeypatch):
     assert len(db.list_for_project(7, project["id"])) == 1
 
 
+def test_failed_prepare_retry_preserves_original_error(isolated_publications, monkeypatch):
+    install_fakes(monkeypatch)
+    project = project_db.create_project(7, "Panel", snapshot())
+    request_id = str(uuid.uuid4())
+    monkeypatch.setattr(
+        git_target,
+        "prepare",
+        lambda *_args: (_ for _ in ()).throw(
+            git_target.TargetError("frame-incompatible", "frame mismatch", [{"code": "bad-frame"}]),
+        ),
+    )
+
+    for _attempt in range(2):
+        with pytest.raises(service.PublicationError) as error:
+            service.prepare(
+                7, 7, project_id=project["id"], frame_id="WF2D-8620", name="New",
+                description="", is_public=False, demo_id=None, request_id=request_id,
+            )
+        assert error.value.code == "frame-incompatible"
+        assert error.value.status_code == 422
+        assert error.value.detail == [{"code": "bad-frame"}]
+
+    records = db.list_for_project(7, project["id"])
+    assert len(records) == 1
+    assert records[0]["status"] == "failed"
+
+
 def test_publish_recovers_after_push_succeeded_before_receipt_was_saved(isolated_publications, monkeypatch):
     install_fakes(monkeypatch)
     project = project_db.create_project(7, "Panel", snapshot())
@@ -269,6 +334,33 @@ def test_publish_recovers_after_push_succeeded_before_receipt_was_saved(isolated
     assert recovered["status"] == "git_committed"
     assert recovered["commitSha"] == "c" * 40
     assert len(calls) == 2
+
+
+def test_publish_can_retry_after_target_failure(isolated_publications, monkeypatch):
+    install_fakes(monkeypatch)
+    project = project_db.create_project(7, "Panel", snapshot())
+    prepared = service.prepare(
+        7, 9, project_id=project["id"], frame_id="WF2D-8620", name="Retry",
+        description="", is_public=False, demo_id=None, request_id=str(uuid.uuid4()),
+    )
+    attempts = []
+
+    def publish_once_credentials_exist(*_args):
+        attempts.append(1)
+        if len(attempts) == 1:
+            raise git_target.TargetError("target-command-failed", "credentials unavailable")
+        return {"commitSha": "c" * 40, "changedPaths": [], "idempotent": False}
+
+    monkeypatch.setattr(git_target, "publish", publish_once_credentials_exist)
+    with pytest.raises(service.PublicationError) as error:
+        service.publish(7, 9, prepared["id"])
+    assert error.value.status_code == 502
+    assert db.get(7, prepared["id"])["status"] == "failed"
+
+    retried = service.publish(7, 9, prepared["id"])
+    assert retried["status"] == "git_committed"
+    assert retried["commitSha"] == "c" * 40
+    assert len(attempts) == 2
 
 
 def test_blank_thumbnail_is_rejected(tmp_path):

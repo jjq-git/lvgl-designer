@@ -12,8 +12,14 @@ import {
   type PlatformBuild,
 } from '../../services/catalog';
 import { hasPermission, useAuthStore } from '../../stores/authStore';
-import { useBuildTargetStore } from '../../stores/buildTargetStore';
+import {
+  compatiblePreviewFormats,
+  useBuildTargetStore,
+  type PreviewColorFormat,
+} from '../../stores/buildTargetStore';
 import { useEditorStore } from '../../stores/editorStore';
+import { getPipeline } from '../../canvas/reloadPipeline';
+import { useDialogFocus } from '../useDialogFocus';
 import './catalog.css';
 
 type EditorKind = CatalogDocument['kind'];
@@ -78,10 +84,14 @@ function formatTime(value: string): string {
 }
 
 export function CatalogPanel({ onClose }: { onClose: () => void }): JSX.Element {
+  const dialogRef = useDialogFocus<HTMLDivElement>(onClose);
   const me = useAuthStore((state) => state.me);
   const canManage = hasPermission(me, 'tool.lvgl.profile.manage');
   const canBuild = hasPermission(me, 'tool.lvgl.build');
   const canPublish = hasPermission(me, 'tool.lvgl.publish');
+  const targetFormat = useBuildTargetStore((state) => state.displayProfile.colorFormat);
+  const colorFormatConfirmed = useBuildTargetStore((state) => state.colorFormatConfirmed);
+  const colorDepth = useBuildTargetStore((state) => state.sourceProject.display.colorDepth);
   const [kind, setKind] = useState<EditorKind>('display-profile');
   const [draft, setDraft] = useState(() => formatJson(currentDraft('display-profile')));
   const [records, setRecords] = useState<CatalogRecord[]>([]);
@@ -106,14 +116,6 @@ export function CatalogPanel({ onClose }: { onClose: () => void }): JSX.Element 
   };
 
   useEffect(() => { void refresh(); }, []);
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent): void => {
-      if (event.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
-
   const grouped = useMemo(() => {
     const groups = new Map<string, CatalogRecord[]>();
     for (const record of records) {
@@ -198,9 +200,31 @@ export function CatalogPanel({ onClose }: { onClose: () => void }): JSX.Element 
     }
   };
 
+  const applyDeviceColorFormat = (value: string): void => {
+    const target = useBuildTargetStore.getState();
+    if (value === 'unconfirmed') target.clearColorFormatConfirmation();
+    else if (!target.confirmColorFormat(value as PreviewColorFormat)) {
+      setMessage({ ok: false, text: `${value} 与当前 ${colorDepth}bpp 工程不兼容` });
+      return;
+    }
+    getPipeline()?.refreshTarget();
+    setMessage({
+      ok: true,
+      text: value === 'unconfirmed' ? '设备构建颜色格式已清除' : `设备 C 构建颜色格式已设为 ${value}`,
+    });
+  };
+
   return (
     <div className="catalog-mask" onClick={onClose}>
-      <div className="catalog-modal" role="dialog" aria-label="目标与构建管理" onClick={(event) => event.stopPropagation()}>
+      <div
+        ref={dialogRef}
+        className="catalog-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label="目标与构建管理"
+        tabIndex={-1}
+        onClick={(event) => event.stopPropagation()}
+      >
         <div className="catalog-head">
           <div>
             <strong>目标与构建管理</strong>
@@ -233,7 +257,7 @@ export function CatalogPanel({ onClose }: { onClose: () => void }): JSX.Element 
 
           <section className="catalog-section catalog-editor">
             <div className="catalog-editor-toolbar">
-              <select className="ed-select" value={kind} onChange={(event) => resetDraft(event.target.value as EditorKind)}>
+              <select aria-label="配置类型" className="ed-select" value={kind} onChange={(event) => resetDraft(event.target.value as EditorKind)}>
                 {Object.entries(KIND_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
               </select>
               <button className="btn" onClick={() => resetDraft()}>载入当前草稿</button>
@@ -241,12 +265,30 @@ export function CatalogPanel({ onClose }: { onClose: () => void }): JSX.Element 
                 发布新 revision
               </button>
             </div>
-            <textarea className="catalog-json" spellCheck={false} value={draft} onChange={(event) => setDraft(event.target.value)} />
+            <textarea aria-label="配置 JSON" className="catalog-json" spellCheck={false} value={draft} onChange={(event) => setDraft(event.target.value)} />
             {!canManage && <div className="catalog-hint">缺少 tool.lvgl.profile.manage，仅可查看。</div>}
           </section>
 
           <section className="catalog-section">
             <div className="catalog-section-title">BuildTarget</div>
+            <div className="catalog-device-format">
+              <label htmlFor="device-build-color-format">设备 C 构建颜色格式</label>
+              <select
+                id="device-build-color-format"
+                aria-label="设备构建颜色格式"
+                className="ed-select"
+                value={colorFormatConfirmed ? targetFormat : 'unconfirmed'}
+                onChange={(event) => applyDeviceColorFormat(event.target.value)}
+              >
+                <option value="unconfirmed">待选择</option>
+                {compatiblePreviewFormats(colorDepth).map((format) => (
+                  <option key={format} value={format}>{format}</option>
+                ))}
+              </select>
+              <div className="catalog-hint">
+                仅影响设备 C 代码和硬件 BuildTarget；网页 UI 导出与 ui.podsc.com 发布固定使用 RGB565。
+              </div>
+            </div>
             {targets.length === 0 && <div className="catalog-empty">暂无 BuildTarget</div>}
             {targets.map((record) => (
               <div className="catalog-target" key={`${record.id}@${record.revision}`}>

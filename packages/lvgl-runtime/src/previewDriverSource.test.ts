@@ -116,6 +116,18 @@ describe('preview_driver.c 协议边界', () => {
     expect(source).toContain('lv_spangroup_set_span_style(');
     expect(source).toContain('lv_spangroup_bind_span_text(');
     expect(source).toContain('lv_checkbox_set_text(');
+    expect(source).toContain('lv_obj_set_flex_flow(');
+    expect(source).toContain('lv_obj_set_scroll_snap_x(');
+    expect(source).toContain('lv_obj_set_scroll_snap_y(');
+    expect(source).toContain('lv_obj_set_scrollbar_mode(');
+    expect(source).toContain('lv_obj_set_style_line_color(');
+    expect(source).toContain('lv_obj_set_style_line_width(');
+    expect(source).toContain('lv_style_set_line_color(');
+    expect(source).toContain('lv_style_set_line_width(');
+    expect(source).toContain('lv_obj_set_style_arc_color(');
+    expect(source).toContain('lv_obj_set_style_arc_width(');
+    expect(source).toContain('lv_style_set_arc_color(');
+    expect(source).toContain('lv_style_set_arc_width(');
     expect(source).toContain('lv_dropdown_get_list(');
     expect(source).toContain('lv_dropdown_set_options(');
     expect(source).toContain('lv_dropdown_bind_value(');

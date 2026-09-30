@@ -43,7 +43,7 @@ export interface ProjectMeta {
 
 export interface DisplayConfig {
   width: number;
-  height: number;                       // 主力 240x240 圆 / 480x480(圆:MX039-ST7102;方:YDP395等)
+  height: number;                       // 逻辑分辨率；设备型号以 site/frames/manifest.json 为准
   shape: 'rect' | 'round';              // round → 画布圆形遮罩(designer 侧,不进 XML)
   colorDepth: 16 | 24 | 32;
   dpi?: number;                         // 默认 130

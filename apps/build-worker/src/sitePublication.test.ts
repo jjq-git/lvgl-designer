@@ -15,10 +15,16 @@ function snapshot(): ProjectSnapshotV2 {
 
 describe('podsc-static publication worker', () => {
   it('creates a canonical asset-free WebUiDocumentV1', async () => {
-    const result = await executeSitePublication({ protocolVersion: 1, command: 'project-podsc-static', snapshot: snapshot() });
+    const input = snapshot();
+    input.displayProfile.id = 'display:480x480-rgb565-swapped';
+    input.displayProfile.colorFormat = 'RGB565_SWAPPED';
+    input.uiProject.designDisplayRef = 'display:480x480-rgb565-swapped@1';
+    const result = await executeSitePublication({ protocolVersion: 1, command: 'project-podsc-static', snapshot: input });
     expect(result.diagnostics).toEqual([]);
     expect(result.document?.kind).toBe('wf2-web-ui');
     expect(result.document?.assetManifest).toEqual([]);
+    expect(result.document?.displayProfile.colorFormat).toBe('RGB565');
+    expect(result.document?.uiProject.designDisplayRef).toBe('display:240x240-rgb565@1');
     expect(result.sha256).toMatch(/^[0-9a-f]{64}$/);
   });
 

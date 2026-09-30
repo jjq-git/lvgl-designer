@@ -40,7 +40,7 @@ export function buildRegistryDoc(): string {
     ...buildWidgetLines(),
     '',
     `全部 widget 通用属性(props 里直接写):${objProps}`,
-    "类型说明:size=整数px|'content'|'50%';opa=0-255|'n%';color='#RRGGBB';bool=true/false",
+    "类型说明:size=整数px|'content'|'50%';opa=0-255|'n%';color='#RRGGBB';bool=true/false;pointList=[x1,y1,x2,y2,…]",
     `通用 flags(布尔,写在 flags 里):${OBJ_BASE.flags.join('|')}`,
     `通用 states(布尔,写在 states 里):${OBJ_BASE.states.join('|')}`,
     '',

@@ -4,7 +4,7 @@
  */
 import { openDB, type IDBPDatabase } from 'idb';
 import type { LvProject } from '@lvd/schema';
-import { useProjectStore } from '../stores/projectStore';
+import { isProjectInteractionActive, useProjectStore } from '../stores/projectStore';
 import {
   cloneStoredProjectDocument,
   createStoredProjectDocument,
@@ -33,10 +33,10 @@ export function db(): Promise<IDBPDatabase> {
   return dbPromise;
 }
 
-export async function saveNow(project: LvProject): Promise<void> {
+export async function saveNow(project: LvProject, expectedRevision?: number): Promise<void> {
   const d = await db();
   await d.put(STORE, cloneStoredProjectDocument(createStoredProjectDocument(project)), KEY);
-  useProjectStore.getState().markSaved();
+  useProjectStore.getState().markSaved(expectedRevision);
 }
 
 /** 启动恢复:v2 快照主路径；v1 经兼容迁移读取。 */
@@ -60,8 +60,12 @@ export function startAutoSave(): () => void {
       clearTimeout(timer);
       timer = null;
     }
+    if (isProjectInteractionActive()) {
+      timer = window.setTimeout(flush, DEBOUNCE_MS);
+      return;
+    }
     const s = useProjectStore.getState();
-    if (s.dirty) void saveNow(s.project);
+    if (s.dirty) void saveNow(s.project, s.revision);
   };
   const unsub = useProjectStore.subscribe((s, prev) => {
     if (!s.dirty || s.revision === prev.revision) return;

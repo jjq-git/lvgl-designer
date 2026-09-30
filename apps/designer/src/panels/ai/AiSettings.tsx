@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { useAiStore } from '../../stores/aiStore';
 // 任务 B 契约(集成阶段就位;类型对不上集成阶段修)
 import { chatComplete } from '../../services/ai/deepseekClient';
+import { useDialogFocus } from '../useDialogFocus';
 
 type TestState =
   | { kind: 'idle' }
@@ -30,6 +31,7 @@ function AiSettingsDialog(): JSX.Element {
   const [test, setTest] = useState<TestState>({ kind: 'idle' });
 
   const close = (): void => useAiStore.getState().setSettingsOpen(false);
+  const dialogRef = useDialogFocus<HTMLDivElement>(close, test.kind !== 'testing');
 
   const saveKey = (): void => {
     const k = keyDraft.trim();
@@ -48,10 +50,6 @@ function AiSettingsDialog(): JSX.Element {
   const runTest = async (): Promise<void> => {
     // 输入框有未保存的新 Key → 先落 localStorage 再测(测试即保存)
     if (keyDraft.trim() !== '') saveKey();
-    if (!useAiStore.getState().getKey()) {
-      setTest({ kind: 'fail', message: '请先填入 API Key' });
-      return;
-    }
     setTest({ kind: 'testing' });
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 15000);
@@ -76,8 +74,16 @@ function AiSettingsDialog(): JSX.Element {
   };
 
   return (
-    <div className="ai-modal-mask" onClick={close}>
-      <div className="ai-modal" onClick={(e) => e.stopPropagation()}>
+    <div className="ai-modal-mask" onClick={test.kind !== 'testing' ? close : undefined} role="presentation">
+      <div
+        ref={dialogRef}
+        className="ai-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label="AI 设置"
+        tabIndex={-1}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="ai-modal-head">
           <span>AI 设置</span>
           <button className="icon-btn" title="关闭" onClick={close}>
@@ -89,9 +95,14 @@ function AiSettingsDialog(): JSX.Element {
           <div className="ai-form-row">
             <label>API Key</label>
             <input
+              aria-label="DeepSeek API Key"
               className="ed-text"
               type="password"
-              autoComplete="off"
+              name="deepseek-api-key"
+              autoComplete="new-password"
+              spellCheck={false}
+              data-lpignore="true"
+              data-1p-ignore="true"
               placeholder={hasKey ? '已保存(输入新 Key 可替换)' : 'sk-…'}
               value={keyDraft}
               onChange={(e) => setKeyDraft(e.target.value)}
@@ -107,13 +118,14 @@ function AiSettingsDialog(): JSX.Element {
             )}
           </div>
           <div className="ai-note">
-            Key 仅存本机浏览器(localStorage),不上传服务器、不进工程文件;
-            请求经本地代理转发到 DeepSeek。没有 Key?去 platform.deepseek.com 创建。
+            个人 Key 仅存本机浏览器(localStorage),不进工程文件；未填写时使用服务器预置 Key。
+            请求统一经服务器代理转发到 DeepSeek。
           </div>
 
           <div className="ai-form-row">
             <label>温度</label>
             <input
+              aria-label="温度"
               type="range"
               min={0}
               max={2}
@@ -133,7 +145,9 @@ function AiSettingsDialog(): JSX.Element {
             {test.kind === 'ok' && <span className="ai-test-ok">✓ 连接正常</span>}
             {test.kind === 'fail' && <span className="ai-test-fail">✗ {test.message}</span>}
           </div>
-          <div className="ai-note">当前对话模型:{model}(测试固定用 deepseek-chat,最省最快)</div>
+          <div className="ai-note">
+            当前对话模型:{model}(测试固定用 deepseek-chat；优先测试个人 Key，否则测试服务器 Key)
+          </div>
         </div>
       </div>
     </div>

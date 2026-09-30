@@ -8,7 +8,7 @@ import {
   convertFontToLvglC,
   findMissingFontCodePoints,
 } from '@lvd/asset-pipeline';
-import { createWebUiExport, WebUiDocumentError } from '@lvd/schema/v2';
+import { createPodscStaticWebUiExport, WebUiDocumentError } from '@lvd/schema/v2';
 import { emitC95 } from './codegen/adapter';
 import { getAssetBytes, resyncAssets } from './assets';
 import { useProjectStore } from '../stores/projectStore';
@@ -137,13 +137,7 @@ export function saveProjectFile(project: LvProject): void {
 export async function exportWebUiJson(project: LvProject): Promise<boolean> {
   const ed = useEditorStore.getState();
   try {
-    const result = await createWebUiExport(
-      createStoredProjectDocument(project),
-      async (asset) => {
-        const record = await getAssetBytes(asset.sha256);
-        return record === null ? null : new Uint8Array(record.bytes);
-      },
-    );
+    const result = await createPodscStaticWebUiExport(createStoredProjectDocument(project));
     download(result.fileName, new Blob([result.json], { type: 'application/json;charset=utf-8' }));
     ed.setBanner(`网页 UI JSON 已导出；SHA-256: ${result.sha256}`);
     return true;

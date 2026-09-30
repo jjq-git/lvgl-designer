@@ -84,17 +84,20 @@ try {
       draft.screens[0].root.styles = [{ props: { bg_color: '#123456', bg_opa: 255 } }];
     });
   });
-  if (await page.locator('[aria-label="目标颜色格式"]').count() === 0) {
+  if (!await page.evaluate(() => Boolean(window.__lvd?.buildTargetStore))) {
     throw new Error(`toolbar disappeared after v2 edit: ${errors.join(' | ') || 'no captured page error'}`);
   }
-  await page.selectOption('[aria-label="目标颜色格式"]', 'RGB565_SWAPPED');
+  await page.evaluate(() => {
+    window.__lvd.buildTargetStore.getState().confirmColorFormat('RGB565_SWAPPED');
+    window.__lvd.getPipeline().refreshTarget();
+  });
   await page.selectOption('[aria-label="目标控制器"]', 'screen-only');
   await page.waitForTimeout(100);
   const targetPreview = await page.evaluate(() => {
     window.__lvd.getPipeline().runtime.tick();
     const canvas = document.querySelector('#lvgl-canvas');
     return {
-      selection: document.querySelector('[aria-label="目标颜色格式"]')?.value,
+      selection: window.__lvd.buildTargetStore.getState().displayProfile.colorFormat,
       controller: document.querySelector('[aria-label="目标控制器"]')?.value,
       badge: document.querySelector('.rt-badge')?.textContent ?? '',
       pixel: [...canvas.getContext('2d').getImageData(10, 10, 1, 1).data],
@@ -264,8 +267,8 @@ try {
     throw new Error('PreviewProgram reload did not create an LVGL button');
   }
   if (targetPreview.selection !== 'RGB565_SWAPPED'
-    || !targetPreview.badge.includes('RGB565_SWAPPED')) {
-    throw new Error(`DisplayProfile selection did not reach Toolbar/runtime: ${JSON.stringify(targetPreview)}`);
+    || targetPreview.badge !== 'LVGL 9.5 · WASM 编辑预览') {
+    throw new Error(`DisplayProfile selection or preview badge is incorrect: ${JSON.stringify(targetPreview)}`);
   }
   if (targetPreview.controller !== 'screen-only') {
     throw new Error(`ControllerProfile selection did not reach target sidecar: ${JSON.stringify(targetPreview)}`);

@@ -3,7 +3,7 @@
  * 入口:工具条「?」按钮 / F1 / Shift+? 切换;Esc 或点遮罩关闭。
  * 复用现有 CSS 变量(--bg-panel / --hairline / --shadow-menu 等),不引外部依赖。
  */
-import { useEffect } from 'react';
+import { useDialogFocus } from './useDialogFocus';
 
 interface Row {
   keys: string[];
@@ -21,6 +21,16 @@ const SECTIONS: { title: string; rows: Row[] }[] = [
       { keys: ['Ctrl', 'D'], desc: '就地复刻选中控件' },
       { keys: ['Del'], desc: '删除选中控件' },
       { keys: ['方向键'], desc: '微移选中控件' },
+      { keys: ['Shift', '方向键'], desc: '移动选中控件 10 像素' },
+      { keys: ['Ctrl/⌘', '方向键'], desc: '调整单个选中控件的宽高' },
+    ],
+  },
+  {
+    title: '对象树',
+    rows: [
+      { keys: ['←/→'], desc: '收起 / 展开节点' },
+      { keys: ['Alt', '↑/↓'], desc: '同级重排节点' },
+      { keys: ['Shift', 'F10'], desc: '打开节点操作菜单' },
     ],
   },
   {
@@ -42,23 +52,17 @@ const SECTIONS: { title: string; rows: Row[] }[] = [
 ];
 
 export function ShortcutsHelp({ onClose }: { onClose: () => void }): JSX.Element {
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent): void => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        onClose();
-      }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  const dialogRef = useDialogFocus<HTMLDivElement>(onClose);
 
   return (
     <div className="help-mask" onClick={onClose} role="presentation">
       <div
+        ref={dialogRef}
         className="help-modal"
         role="dialog"
+        aria-modal="true"
         aria-label="快捷键帮助"
+        tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="help-head">

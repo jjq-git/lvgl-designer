@@ -21,6 +21,22 @@
 .sync-badge:hover:not(:disabled) { background: var(--bg-hover); }
 .sync-badge:disabled { cursor: default; opacity: 0.7; }
 .sync-badge .sync-dot { font-size: 9px; line-height: 1; }
+.sync-icon-badge {
+  justify-content: center;
+  width: 30px;
+  min-width: 30px;
+  min-height: 28px;
+  padding: 0;
+}
+.sync-icon-badge svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 
 .sync-badge.synced { color: #1a7f37; border-color: rgba(26, 127, 55, 0.28); background: rgba(52, 199, 89, 0.08); }
 .sync-badge.saving { color: var(--accent); border-color: rgba(0, 113, 227, 0.3); background: var(--accent-tint); }
@@ -32,7 +48,7 @@
 .cloud-mask {
   position: fixed;
   inset: 0;
-  z-index: 200;
+  z-index: 9400;
   background: rgba(0, 0, 0, 0.28);
   -webkit-backdrop-filter: blur(2px);
   backdrop-filter: blur(2px);
@@ -159,7 +175,7 @@
   top: 0;
   right: 0;
   bottom: 0;
-  z-index: 190;
+  z-index: 9401;
   width: min(380px, 92vw);
   background: var(--bg-panel);
   box-shadow: var(--shadow-menu);
@@ -171,7 +187,7 @@
 .hist-drawer-mask {
   position: fixed;
   inset: 0;
-  z-index: 189;
+  z-index: 9400;
   background: rgba(0, 0, 0, 0.14);
 }
 .hist-head {

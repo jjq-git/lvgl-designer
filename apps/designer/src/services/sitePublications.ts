@@ -5,8 +5,43 @@ export interface SiteFrame {
   model: string;
   nameCn?: string;
   nameEn?: string;
+  screenSizeInches?: number;
+  physicalSize?: { width: number; height: number; unit: 'mm' };
+  screenPhysicalSize?: { width: number; height: number; unit: 'mm' };
   resolution: { width: number; height: number } | null;
+  /** Existing UI coordinate systems for this frame; they are not hardware specifications. */
+  demoLogicalSizes?: Array<{ width: number; height: number; shape: 'round' | 'rect' }>;
   shape?: 'round' | 'rect';
+  aspectRatio?: string;
+  aspectRatioTolerance?: number;
+}
+
+/** 与目标站 galleryFilterInfo 使用相同字段和排列，不从 UI 文档补推硬件规格。 */
+export function siteFrameSpecsLabel(frame: SiteFrame, language: 'cn' | 'en' = 'cn'): string {
+  const name = language === 'cn'
+    ? frame.nameCn ?? frame.nameEn
+    : frame.nameEn ?? frame.nameCn;
+  const physical = frame.physicalSize?.unit === 'mm'
+    && frame.physicalSize.width > 0 && frame.physicalSize.height > 0
+    ? `${frame.physicalSize.width} x ${frame.physicalSize.height}mm`
+    : '';
+  return [
+    frame.model || frame.id,
+    Number.isFinite(frame.screenSizeInches) && frame.screenSizeInches! > 0
+      ? `${frame.screenSizeInches}"`
+      : '',
+    frame.resolution
+      ? `${frame.resolution.width} x ${frame.resolution.height}px`
+      : '',
+    physical,
+    name,
+  ].filter(Boolean).join(' ');
+}
+
+export function siteFrameDemoSizeLabel(frame: SiteFrame): string {
+  return (frame.demoLogicalSizes ?? [])
+    .map((size) => `${size.width}×${size.height}`)
+    .join('、');
 }
 
 export interface SiteDemo {
@@ -22,6 +57,38 @@ export interface SiteTargetState {
   branch: string;
   frames: SiteFrame[];
   demos: SiteDemo[];
+}
+
+export interface SiteDisplay {
+  width: number;
+  height: number;
+  shape: 'round' | 'rect';
+}
+
+export function siteFrameCompatibility(frame: SiteFrame, display: SiteDisplay): string | null {
+  if (frame.shape && frame.shape !== display.shape) {
+    return `当前画布为${display.shape === 'round' ? '圆形' : '方形'}，该型号要求${frame.shape === 'round' ? '圆形' : '方形'}`;
+  }
+  if (frame.resolution
+    && (frame.resolution.width !== display.width || frame.resolution.height !== display.height)) {
+    return `当前画布为 ${display.width}×${display.height}，该型号要求 ${frame.resolution.width}×${frame.resolution.height}`;
+  }
+  if (frame.aspectRatio) {
+    const [ratioWidth, ratioHeight] = frame.aspectRatio.split(':').map(Number);
+    if (Number.isFinite(ratioWidth) && Number.isFinite(ratioHeight) && ratioWidth! > 0 && ratioHeight! > 0) {
+      const expected = ratioWidth! / ratioHeight!;
+      const actual = display.width / display.height;
+      const tolerance = frame.aspectRatioTolerance ?? 0;
+      if (Math.abs(actual - expected) > tolerance) {
+        return `当前画布比例为 ${display.width}:${display.height}，该型号要求 ${frame.aspectRatio}`;
+      }
+    }
+  }
+  return null;
+}
+
+export function matchingSiteFrameId(frames: SiteFrame[], display: SiteDisplay): string {
+  return frames.find((frame) => siteFrameCompatibility(frame, display) === null)?.id ?? '';
 }
 
 export interface SitePublication {

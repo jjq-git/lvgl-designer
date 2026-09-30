@@ -61,7 +61,7 @@ export function Overlay(): JSX.Element | null {
   if (mode === 'play') {
     // 运行态:overlay 隐藏,仅保留圆屏遮罩
     return (
-      <svg className="overlay" viewBox={`0 0 ${w} ${h}`} width={w} height={h}>
+      <svg className="overlay" aria-hidden="true" viewBox={`0 0 ${w} ${h}`} width={w} height={h}>
         {round && <path d={maskPath} fillRule="evenodd" fill="rgba(10,10,12,0.75)" />}
       </svg>
     );
@@ -78,7 +78,7 @@ export function Overlay(): JSX.Element | null {
   const hs = 8 / zoom; // 手柄边长反补偿
 
   return (
-    <svg className="overlay" viewBox={`0 0 ${w} ${h}`} width={w} height={h}>
+    <svg className="overlay" aria-hidden="true" viewBox={`0 0 ${w} ${h}`} width={w} height={h}>
       {/* 对齐参考线 */}
       {guides?.v.map((x) => (
         <line key={`v${x}`} x1={x} y1={0} x2={x} y2={h} stroke="#ff5cf4" strokeWidth={1 / zoom} />

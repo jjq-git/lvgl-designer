@@ -54,6 +54,24 @@ describe('projectsStore switching and preview safety', () => {
     resetStores();
   });
 
+  it('initializes cloud state with a single project-list request', async () => {
+    const updatedAt = new Date().toISOString();
+    cloudMock.listProjects.mockResolvedValue({
+      ok: true,
+      data: [{ id: 'cloud-id', name: 'cloud', version: 1, updated_at: updatedAt }],
+    });
+
+    await useProjectsStore.getState().init();
+
+    expect(cloudMock.listProjects).toHaveBeenCalledTimes(1);
+    expect(cloudMock.probeCloudEnabled).not.toHaveBeenCalled();
+    expect(useProjectsStore.getState()).toMatchObject({
+      cloudEnabled: true,
+      listLoading: false,
+      list: [{ id: 'cloud-id', name: 'cloud', version: 1, updated_at: updatedAt }],
+    });
+  });
+
   it('saves the dirty current project before loading another cloud project', async () => {
     useProjectStore.getState().mutateV2('edit old', (draft) => {
       draft.meta.name = 'old edited';

@@ -3,7 +3,12 @@
  * 左 = 组件面板/对象树/屏幕列表,中 = 工具条 + CanvasStage,右 = 检查器。
  * 深色主题,中文 UI(design/04 §4.1)。
  */
-import { useEffect, useState } from 'react';
+import {
+  useEffect,
+  useState,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type PointerEvent as ReactPointerEvent,
+} from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { Toolbar } from './Toolbar';
 import { CanvasStage } from './canvas/CanvasStage';
@@ -26,25 +31,142 @@ import { copySelection, pasteClipboard, duplicateSelection } from './services/cl
 import { ShortcutsHelp } from './panels/ShortcutsHelp';
 import { CatalogPanel } from './panels/catalog/CatalogPanel';
 import { SitePublicationModal } from './panels/SitePublicationModal';
+import { AppDialogHost } from './panels/AppDialogHost';
+import { useBuildTargetStore } from './stores/buildTargetStore';
 
 let bootstrapped = false;
+const TREE_HEIGHT_STORAGE_KEY = 'lvd:left-tree-height';
+const TREE_COLLAPSED_STORAGE_KEY = 'lvd:left-tree-collapsed';
+const DEFAULT_TREE_HEIGHT = 180;
+const MIN_TREE_HEIGHT = 96;
+const MAX_TREE_HEIGHT = 520;
+const MAX_TREE_HEIGHT_RATIO = 0.45;
+
+function clampTreeHeight(value: number, panelHeight?: number): number {
+  const responsiveMax = panelHeight === undefined
+    ? MAX_TREE_HEIGHT
+    : Math.min(MAX_TREE_HEIGHT, Math.floor(panelHeight * MAX_TREE_HEIGHT_RATIO));
+  return Math.max(MIN_TREE_HEIGHT, Math.min(Math.round(value), responsiveMax));
+}
+
+function loadTreeHeight(): number {
+  if (typeof window === 'undefined') return DEFAULT_TREE_HEIGHT;
+  try {
+    const value = Number(window.localStorage.getItem(TREE_HEIGHT_STORAGE_KEY));
+    return Number.isFinite(value) && value > 0 ? clampTreeHeight(value) : DEFAULT_TREE_HEIGHT;
+  } catch {
+    return DEFAULT_TREE_HEIGHT;
+  }
+}
+
+function saveTreeHeight(value: number): void {
+  try {
+    window.localStorage.setItem(TREE_HEIGHT_STORAGE_KEY, String(value));
+  } catch {
+    // localStorage may be unavailable in privacy-restricted browsers.
+  }
+}
+
+function loadTreeCollapsed(): boolean {
+  if (typeof window === 'undefined') return true;
+  try {
+    const value = window.localStorage.getItem(TREE_COLLAPSED_STORAGE_KEY);
+    return value === null ? true : value === '1';
+  } catch {
+    return true;
+  }
+}
+
+function saveTreeCollapsed(value: boolean): void {
+  try {
+    window.localStorage.setItem(TREE_COLLAPSED_STORAGE_KEY, value ? '1' : '0');
+  } catch {
+    // localStorage may be unavailable in privacy-restricted browsers.
+  }
+}
 
 export function App(): JSX.Element {
+  const compactLayout = typeof window !== 'undefined' && window.innerWidth <= 1200;
   const banner = useEditorStore((s) => s.banner);
   const [leftTab, setLeftTab] = useState<'widgets' | 'assets'>('widgets');
   const [helpOpen, setHelpOpen] = useState(false);
   const [catalogOpen, setCatalogOpen] = useState(false);
   const [sitePublicationOpen, setSitePublicationOpen] = useState(false);
+  const [treeHeight, setTreeHeight] = useState(loadTreeHeight);
+  const [treeCollapsed, setTreeCollapsed] = useState(loadTreeCollapsed);
+  const [treeResizing, setTreeResizing] = useState(false);
+
+  const toggleTreeCollapsed = (): void => {
+    setTreeCollapsed((current) => {
+      const next = !current;
+      saveTreeCollapsed(next);
+      return next;
+    });
+  };
+
+  const startTreeResize = (event: ReactPointerEvent<HTMLDivElement>): void => {
+    if (event.button !== 0) return;
+    event.preventDefault();
+    const panel = event.currentTarget.parentElement;
+    if (!panel) return;
+    const startY = event.clientY;
+    const startHeight = treeHeight;
+    const panelHeight = panel.getBoundingClientRect().height;
+    let finalHeight = startHeight;
+
+    setTreeResizing(true);
+    document.body.classList.add('tree-resizing');
+    const onMove = (moveEvent: PointerEvent): void => {
+      finalHeight = clampTreeHeight(startHeight - (moveEvent.clientY - startY), panelHeight);
+      setTreeHeight(finalHeight);
+    };
+    const onEnd = (): void => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onEnd);
+      window.removeEventListener('pointercancel', onEnd);
+      window.removeEventListener('blur', onEnd);
+      document.body.classList.remove('tree-resizing');
+      setTreeResizing(false);
+      saveTreeHeight(finalHeight);
+    };
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onEnd);
+    window.addEventListener('pointercancel', onEnd);
+    window.addEventListener('blur', onEnd);
+  };
+
+  const resetTreeHeight = (): void => {
+    setTreeHeight(DEFAULT_TREE_HEIGHT);
+    saveTreeHeight(DEFAULT_TREE_HEIGHT);
+  };
+
+  const resizeTreeWithKeyboard = (event: ReactKeyboardEvent<HTMLDivElement>): void => {
+    if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown' && event.key !== 'Home') return;
+    event.preventDefault();
+    if (event.key === 'Home') {
+      resetTreeHeight();
+      return;
+    }
+    const panelHeight = event.currentTarget.parentElement?.getBoundingClientRect().height;
+    setTreeHeight((current) => {
+      const delta = event.key === 'ArrowUp' ? 16 : -16;
+      const next = clampTreeHeight(current + delta, panelHeight);
+      saveTreeHeight(next);
+      return next;
+    });
+  };
 
   /* 启动:恢复最近工程 + 自动保存 + 全局快捷键 */
   useEffect(() => {
     if (bootstrapped) return;
     bootstrapped = true;
     // 启动拉取当前用户(拿角色);401/后端未接时容错为 me=null,不白屏
-    void useAuthStore.getState().fetchMe();
     void (async () => {
       // 1) 探测云存储是否启用(503 → 纯本地);启用则拉工程列表
-      await useProjectsStore.getState().init();
+      await Promise.all([
+        useAuthStore.getState().fetchMe(),
+        useProjectsStore.getState().init(),
+      ]);
       const ps = useProjectsStore.getState();
 
       // 有云工程:打开最近更新的一个
@@ -58,7 +180,7 @@ export function App(): JSX.Element {
       }
 
       // 2) 云启用但无工程 → 引导新建
-      if (ps.cloudEnabled) {
+      if (ps.cloudEnabled && useAuthStore.getState().me) {
         useEditorStore.getState().setBanner('还没有云端工程,点工具条「我的工程」新建你的第一个工程');
       }
 
@@ -76,11 +198,19 @@ export function App(): JSX.Element {
     const stopCloudSync = startCloudSync();
 
     const onKey = (e: KeyboardEvent): void => {
+      if (e.defaultPrevented) return;
       const t = e.target as HTMLElement;
-      const typing = t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement || t.isContentEditable;
+      const typing = t instanceof HTMLInputElement
+        || t instanceof HTMLTextAreaElement
+        || t instanceof HTMLSelectElement
+        || t.isContentEditable;
+      const commandControl = t instanceof HTMLButtonElement
+        || t instanceof HTMLAnchorElement
+        || !!t.closest('[role="button"], [role="menuitem"], [role="tab"]');
+      const interactive = typing || commandControl;
       const isDesignMode = useEditorStore.getState().mode === 'design';
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !e.shiftKey) {
-        if (typing || !isDesignMode) return;
+        if (interactive || !isDesignMode) return;
         e.preventDefault();
         useProjectStore.getState().undo();
         return;
@@ -89,26 +219,26 @@ export function App(): JSX.Element {
         (e.ctrlKey || e.metaKey) &&
         (e.key.toLowerCase() === 'y' || (e.key.toLowerCase() === 'z' && e.shiftKey))
       ) {
-        if (typing || !isDesignMode) return;
+        if (interactive || !isDesignMode) return;
         e.preventDefault();
         useProjectStore.getState().redo();
         return;
       }
       // 复制 / 粘贴 / 复刻(仅设计态;typing 守卫)
       if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'c') {
-        if (typing || !isDesignMode) return;
+        if (interactive || !isDesignMode) return;
         e.preventDefault();
         copySelection();
         return;
       }
       if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'v') {
-        if (typing || !isDesignMode) return;
+        if (interactive || !isDesignMode) return;
         e.preventDefault();
         pasteClipboard();
         return;
       }
       if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'd') {
-        if (typing || !isDesignMode) return;
+        if (interactive || !isDesignMode) return;
         e.preventDefault();
         duplicateSelection();
         return;
@@ -119,7 +249,7 @@ export function App(): JSX.Element {
         setHelpOpen((v) => !v);
         return;
       }
-      if ((e.key === 'Delete' || e.key === 'Backspace') && !typing) {
+      if ((e.key === 'Delete' || e.key === 'Backspace') && !interactive) {
         const ed = useEditorStore.getState();
         if (ed.mode !== 'design' || ed.selectedIds.length === 0) return;
         e.preventDefault();
@@ -148,6 +278,7 @@ export function App(): JSX.Element {
     (window as unknown as Record<string, unknown>)['__lvd'] = {
       projectStore: useProjectStore,
       editorStore: useEditorStore,
+      buildTargetStore: useBuildTargetStore,
       getPipeline,
     };
   }, []);
@@ -177,7 +308,12 @@ export function App(): JSX.Element {
       )}
       <Toolbar />
       <PanelGroup direction="horizontal" className="main">
-        <Panel defaultSize={18} minSize={12} className="side">
+        <Panel
+          defaultSize={compactLayout ? 20 : 14}
+          minSize={compactLayout ? 18 : 12}
+          maxSize={compactLayout ? 25 : 22}
+          className="side side-left"
+        >
           <div className="panel-title left-tabs">
             <button
               className={`left-tab ${leftTab === 'widgets' ? 'active' : ''}`}
@@ -191,17 +327,61 @@ export function App(): JSX.Element {
           <div className="side-section palette-section">
             {leftTab === 'widgets' ? <WidgetPalette /> : <AssetPanel />}
           </div>
-          <div className="panel-title">对象树</div>
-          <div className="side-section tree-section"><ObjectTree /></div>
-          <div className="panel-title">屏幕</div>
-          <div className="side-section screens-section"><ScreenList /></div>
+          <div className="screens-section"><ScreenList /></div>
+          {!treeCollapsed && (
+            <div
+              className={`tree-resize-handle ${treeResizing ? 'active' : ''}`}
+              role="separator"
+              aria-label="调整对象树高度"
+              aria-orientation="horizontal"
+              aria-valuemin={MIN_TREE_HEIGHT}
+              aria-valuemax={MAX_TREE_HEIGHT}
+              aria-valuenow={treeHeight}
+              tabIndex={0}
+              title="拖动调整对象树高度；双击恢复默认"
+              onPointerDown={startTreeResize}
+              onDoubleClick={resetTreeHeight}
+              onKeyDown={resizeTreeWithKeyboard}
+            >
+              <span className="tree-resize-grip" aria-hidden="true" />
+            </div>
+          )}
+          <div className="tree-panel-header">
+            <button
+              className="tree-panel-toggle"
+              type="button"
+              aria-expanded={!treeCollapsed}
+              aria-controls="object-tree-section"
+              title={treeCollapsed ? '展开对象树' : '收起对象树'}
+              onClick={toggleTreeCollapsed}
+            >
+              <span className="tree-panel-label">对象树</span>
+              <span className="tree-toggle-caret" aria-hidden="true">
+                {treeCollapsed ? '▾' : '▴'}
+              </span>
+            </button>
+          </div>
+          {!treeCollapsed && (
+            <div
+              id="object-tree-section"
+              className="side-section tree-section"
+              style={{ height: treeHeight, flexBasis: treeHeight }}
+            >
+              <ObjectTree />
+            </div>
+          )}
         </Panel>
-        <PanelResizeHandle className="resize-handle" />
-        <Panel minSize={30}>
+        <PanelResizeHandle className="resize-handle" aria-label="调整左侧面板宽度" />
+        <Panel defaultSize={compactLayout ? 55 : 68} minSize={compactLayout ? 40 : 38} className="canvas-panel">
           <CanvasStage />
         </Panel>
-        <PanelResizeHandle className="resize-handle" />
-        <Panel defaultSize={22} minSize={15} className="side">
+        <PanelResizeHandle className="resize-handle" aria-label="调整右侧面板宽度" />
+        <Panel
+          defaultSize={compactLayout ? 25 : 18}
+          minSize={compactLayout ? 22 : 16}
+          maxSize={compactLayout ? 32 : 28}
+          className="side side-right"
+        >
           <Inspector />
         </Panel>
       </PanelGroup>
@@ -211,6 +391,7 @@ export function App(): JSX.Element {
       {helpOpen && <ShortcutsHelp onClose={() => setHelpOpen(false)} />}
       {catalogOpen && <CatalogPanel onClose={() => setCatalogOpen(false)} />}
       {sitePublicationOpen && <SitePublicationModal onClose={() => setSitePublicationOpen(false)} />}
+      <AppDialogHost />
     </div>
   );
 }

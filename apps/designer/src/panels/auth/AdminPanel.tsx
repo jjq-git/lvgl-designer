@@ -16,6 +16,8 @@
 import { useEffect, useState } from 'react';
 import { apiUrl, useAuthStore, type UserRole } from '../../stores/authStore';
 import { readError } from './ChangePassword';
+import { useDialogFocus } from '../useDialogFocus';
+import { requestConfirmation, requestText } from '../../services/appDialogs';
 
 interface AdminUser {
   id: string | number;
@@ -33,6 +35,7 @@ type ListState =
 const ROLE_LABEL: Record<UserRole, string> = { admin: '管理员', normal: '普通' };
 
 export function AdminPanel({ onClose }: { onClose: () => void }): JSX.Element {
+  const dialogRef = useDialogFocus<HTMLDivElement>(onClose);
   const me = useAuthStore((s) => s.me);
   const [list, setList] = useState<ListState>({ kind: 'loading' });
   /** 顶部条:某行操作的错误/成功提示 */
@@ -98,9 +101,14 @@ export function AdminPanel({ onClose }: { onClose: () => void }): JSX.Element {
     }
   };
 
-  const onDelete = (u: AdminUser): void => {
-    if (!window.confirm(`确认删除用户「${u.username}」?此操作不可撤销。`)) return;
-    void run(
+  const onDelete = async (u: AdminUser): Promise<void> => {
+    if (!await requestConfirmation({
+      title: `删除用户「${u.username}」`,
+      message: '此操作不可撤销。',
+      confirmLabel: '删除用户',
+      danger: true,
+    })) return;
+    await run(
       u.id,
       () =>
         fetch(apiUrl(`api/admin/users/${encodeURIComponent(String(u.id))}`), {
@@ -112,14 +120,20 @@ export function AdminPanel({ onClose }: { onClose: () => void }): JSX.Element {
     );
   };
 
-  const onResetPassword = (u: AdminUser): void => {
-    const pwd = window.prompt(`为「${u.username}」设置新密码:`);
+  const onResetPassword = async (u: AdminUser): Promise<void> => {
+    const pwd = await requestText({
+      title: `重置「${u.username}」的密码`,
+      label: '新密码',
+      inputType: 'password',
+      confirmLabel: '重置密码',
+      danger: true,
+    });
     if (pwd == null) return; // 取消
     if (pwd.trim() === '') {
       flash('fail', '密码不能为空');
       return;
     }
-    void run(
+    await run(
       u.id,
       () =>
         fetch(apiUrl(`api/admin/users/${encodeURIComponent(String(u.id))}/password`), {
@@ -160,7 +174,15 @@ export function AdminPanel({ onClose }: { onClose: () => void }): JSX.Element {
 
   return (
     <div className="auth-mask" onClick={onClose}>
-      <div className="auth-modal wide" onClick={(e) => e.stopPropagation()}>
+      <div
+        ref={dialogRef}
+        className="auth-modal wide"
+        role="dialog"
+        aria-modal="true"
+        aria-label="用户管理"
+        tabIndex={-1}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="auth-modal-head">
           <span>用户管理</span>
           <button className="icon-btn" title="关闭" onClick={onClose}>✕</button>

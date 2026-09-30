@@ -39,7 +39,7 @@ exports[`buildWidgetLines / buildRegistryDoc > registry 文档快照(schema 变�
 - lottie(Lottie 动画) src:imageRef
 
 全部 widget 通用属性(props 里直接写):x:size y:size width:size height:size align∈(top_left|top_mid|top_right|bottom_left|bottom_mid|bottom_right|right_mid|left_mid|center) flex_flow∈(column|column_reverse|column_wrap|column_wrap_reverse|row|row_reverse|row_wrap|row_wrap_reverse) flex_grow:int ext_click_area:int scroll_snap_x∈(none|start|center|end) scroll_snap_y∈(none|start|center|end) scrollbar_mode∈(off|on|active|auto)
-类型说明:size=整数px|'content'|'50%';opa=0-255|'n%';color='#RRGGBB';bool=true/false
+类型说明:size=整数px|'content'|'50%';opa=0-255|'n%';color='#RRGGBB';bool=true/false;pointList=[x1,y1,x2,y2,…]
 通用 flags(布尔,写在 flags 里):hidden|clickable|click_focusable|checkable|scrollable|scroll_elastic|scroll_momentum|scroll_one|scroll_chain_hor|scroll_chain_ver|scroll_chain|scroll_on_focus|scroll_with_arrow|snappable|press_lock|event_bubble|event_trickle|state_trickle|gesture_bubble|adv_hittest|ignore_layout|floating|send_draw_task_events|overflow_visible|flex_in_new_track
 通用 states(布尔,写在 states 里):checked|focused|focus_key|edited|hovered|pressed|scrolled|disabled
 

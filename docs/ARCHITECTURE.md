@@ -17,7 +17,7 @@
 | [design/05](design/05-交叉评审.md) | 全部裁决的依据与源码引用 | 本文的裁决来源 |
 | [M1-REPORT.md](M1-REPORT.md) | M1 验收(E1~E7)+ ESP-IDF 真编译 | 交付存档 |
 | [ALL-WIDGETS-REPORT.md](ALL-WIDGETS-REPORT.md) | 35 控件全量扩容:来源/属性/子元素/已知限制 | 交付存档 |
-| [screen-inventory.md](screen-inventory.md) | 全仓屏幕盘点(预设依据;含 MX039=480×480 更正) | 有效 |
+| [screen-inventory.md](screen-inventory.md) | 全仓历史屏幕盘点（预设权威来源已迁移到 site frame manifest） | 参考 |
 | [DEPLOY.md](DEPLOY.md) | 部署运维手册(本机 systemd + 腾讯云 docker/caddy) | 有效 |
 | [m0/REPORT.md](../m0/REPORT.md) | M0 技术验证 8/8 | 交付存档 |
 

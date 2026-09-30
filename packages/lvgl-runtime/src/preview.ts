@@ -33,7 +33,11 @@ const STRUCTURAL_TYPES = new Map<string, { kind: PreviewNode['kind']; parent: st
   ['chart-axis', { kind: 'virtual', parent: 'chart' }],
 ]);
 const COMMON_I32_PROPS = new Set(['x', 'y', 'width', 'height', 'flex_grow', 'ext_click_area']);
-const COMMON_STRING_PROPS = new Set(['x', 'y', 'width', 'height', 'align']);
+const COMMON_SIZE_STRING_PROPS = new Set(['x', 'y', 'width', 'height']);
+const COMMON_STRING_PROPS = new Set([
+  ...COMMON_SIZE_STRING_PROPS,
+  'align', 'flex_flow', 'scroll_snap_x', 'scroll_snap_y', 'scrollbar_mode',
+]);
 const TYPE_I32_PROPS: Record<string, ReadonlySet<string>> = {
   obj: new Set(), label: new Set(), button: new Set(), switch: new Set(), checkbox: new Set(),
   image: new Set(['rotation', 'scale_x', 'scale_y', 'pivot_x', 'pivot_y']),
@@ -82,7 +86,7 @@ const TYPE_STRING_PROPS: Record<string, ReadonlySet<string>> = {
     'src_released_left', 'src_released_mid', 'src_released_right',
     'src_pressed_left', 'src_pressed_mid', 'src_pressed_right', 'state',
   ]),
-  line: new Set(),
+  line: new Set(['points']),
   arclabel: new Set([
     'text', 'dir', 'text_vertical_align', 'text_horizontal_align',
   ]),
@@ -148,9 +152,12 @@ const STYLE_I32 = new Set([
   'radius', 'pad_hor', 'pad_ver', 'pad_all', 'bg_opa',
   'border_width', 'border_opa', 'outline_width', 'outline_opa', 'outline_pad',
   'shadow_width', 'shadow_offset_x', 'shadow_offset_y', 'shadow_spread', 'shadow_opa',
-  'text_opa', 'opa',
+  'text_opa', 'line_width', 'arc_width', 'opa',
 ]);
-const STYLE_COLOR = new Set(['bg_color', 'border_color', 'outline_color', 'shadow_color', 'text_color']);
+const STYLE_COLOR = new Set([
+  'bg_color', 'border_color', 'outline_color', 'shadow_color', 'text_color',
+  'line_color', 'arc_color',
+]);
 const STYLE_ENUM = new Set(['align', 'text_align']);
 const STYLE_FONT = new Set(['text_font']);
 const STYLE_STRING = new Set([...STYLE_COLOR, ...STYLE_ENUM, ...STYLE_FONT]);
@@ -162,6 +169,12 @@ const STYLE_ENUM_VALUES: Record<string, ReadonlySet<string>> = {
   ]),
   text_align: new Set(['left', 'right', 'center', 'auto']),
 };
+const FLEX_FLOWS = new Set([
+  'column', 'column_reverse', 'column_wrap', 'column_wrap_reverse',
+  'row', 'row_reverse', 'row_wrap', 'row_wrap_reverse',
+]);
+const SCROLL_SNAPS = new Set(['none', 'start', 'center', 'end']);
+const SCROLLBAR_MODES = new Set(['off', 'on', 'active', 'auto']);
 const BIND_OPS = new Set(['eq', 'not_eq', 'gt', 'ge', 'lt', 'le']);
 const VALUE_BIND_WIDGETS = new Set(['slider', 'bar', 'arc', 'dropdown', 'roller', 'spinbox']);
 const CHECKED_BIND_WIDGETS = new Set(['obj', 'button', 'switch', 'imagebutton', 'checkbox']);
@@ -324,6 +337,20 @@ function isRuntimeSizeString(value: string): boolean {
   return value === 'content' || (percent !== undefined && Math.abs(percent) <= 1000);
 }
 
+function normalizePointListText(value: string): string | undefined {
+  const text = value.trim();
+  if (text.length === 0) return undefined;
+  const coordinates = text.split(/[\s,]+/).map(Number);
+  if (coordinates.length === 0 || coordinates.length % 2 !== 0 || coordinates.length > 8192
+    || coordinates.some((coordinate) => !Number.isFinite(coordinate)
+      || !Number.isFinite(Math.fround(coordinate)))) return undefined;
+  const pairs: string[] = [];
+  for (let index = 0; index < coordinates.length; index += 2) {
+    pairs.push(`${coordinates[index]},${coordinates[index + 1]}`);
+  }
+  return pairs.join(' ');
+}
+
 function parseConstValue(def: PreviewConst): ResolvedConst | undefined {
   switch (def.type) {
     case 'int':
@@ -418,7 +445,8 @@ function styleConstTypes(key: string): readonly ConstType[] | undefined {
 }
 
 function propConstTypes(type: string, key: string): readonly ConstType[] | undefined {
-  if (COMMON_STRING_PROPS.has(key)) return ['int', 'px', 'percent'];
+  if (COMMON_SIZE_STRING_PROPS.has(key)) return ['int', 'px', 'percent'];
+  if (COMMON_STRING_PROPS.has(key)) return ['string'];
   if (key === 'ext_click_area') return ['int', 'px'];
   if (key === 'flex_grow' || TYPE_I32_PROPS[type]?.has(key)) return ['int'];
   if (TYPE_STRING_PROPS[type]?.has(key)) return ['string'];
@@ -972,7 +1000,12 @@ function validateNode(
           `${node.type}.${key} must be 1..2048`);
       }
     } else if (typeof value === 'string') {
-      if (!COMMON_STRING_PROPS.has(key) && !TYPE_STRING_PROPS[node.type]?.has(key)) {
+      if (node.type === 'line' && key === 'points') {
+        if (normalizePointListText(value) === undefined) {
+          issue(out, 'E_PREVIEW_POINT_LIST_INVALID', valuePath,
+            'pointList 必须包含 1..4096 对有限坐标');
+        }
+      } else if (!COMMON_STRING_PROPS.has(key) && !TYPE_STRING_PROPS[node.type]?.has(key)) {
         issue(out, 'E_PREVIEW_PROP_UNSUPPORTED', valuePath, `v1 driver 不支持 ${node.type}.${key}`);
       } else if ((node.type === 'canvas' || node.type === 'lottie')
         && (key === 'width' || key === 'height')) {
@@ -980,7 +1013,13 @@ function validateNode(
           `${node.type}.${key} only supports px integers`);
       } else if (key === 'align' && !STYLE_ENUM_VALUES.align!.has(value)) {
         issue(out, 'E_PREVIEW_PROP_ENUM_INVALID', valuePath, `align 非法:${value}`);
-      } else if (COMMON_STRING_PROPS.has(key) && !isRuntimeSizeString(value) && key !== 'align') {
+      } else if (key === 'flex_flow' && !FLEX_FLOWS.has(value)) {
+        issue(out, 'E_PREVIEW_PROP_ENUM_INVALID', valuePath, `flex_flow invalid:${value}`);
+      } else if ((key === 'scroll_snap_x' || key === 'scroll_snap_y') && !SCROLL_SNAPS.has(value)) {
+        issue(out, 'E_PREVIEW_PROP_ENUM_INVALID', valuePath, `${key} invalid:${value}`);
+      } else if (key === 'scrollbar_mode' && !SCROLLBAR_MODES.has(value)) {
+        issue(out, 'E_PREVIEW_PROP_ENUM_INVALID', valuePath, `scrollbar_mode invalid:${value}`);
+      } else if (COMMON_SIZE_STRING_PROPS.has(key) && !isRuntimeSizeString(value)) {
         issue(out, 'E_PREVIEW_SIZE_UNSUPPORTED', valuePath, `不支持的 size:${value}`);
       } else if (node.type === 'qrcode' && (key === 'dark_color' || key === 'light_color')
         && !/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(value)) {
@@ -1398,7 +1437,19 @@ function applyNode(
     if (node.type === 'spangroup-span' && (key === 'bind_text' || key === 'bind_text_fmt')) continue;
     const value = resolveValue(sourceValue, consts, `${node.runtimeName}.${key}`);
     if (value === UNRESOLVED) throw new Error(`preview unresolved const:${node.runtimeName}.${key}`);
-    if (typeof value === 'string') {
+    if (node.type === 'line' && key === 'points') {
+      const serialized = typeof value === 'string'
+        ? normalizePointListText(value)
+        : Array.isArray(value)
+          ? value.reduce<string[]>((pairs, coordinate, index) => {
+              if (index % 2 === 0) pairs.push(`${coordinate},${value[index + 1]}`);
+              return pairs;
+            }, []).join(' ')
+          : undefined;
+      if (serialized === undefined) throw new Error(`preview invalid point list:${node.runtimeName}.${key}`);
+      check(bridge.setPointList(node.runtimeName, key, serialized),
+        `preview.setPointList(${node.runtimeName}.${key})`);
+    } else if (typeof value === 'string') {
       // align 是所有 lv_obj 的通用属性；现有 WASM bridge 已通过 style string
       // 完整支持它，复用该稳定通道可避免普通属性路径无故拒绝 AI/检查器产物。
       if (key === 'align') {
@@ -1410,13 +1461,6 @@ function applyNode(
     } else if (typeof value === 'number' || typeof value === 'boolean') {
       check(bridge.setI32(node.runtimeName, key, typeof value === 'boolean' ? Number(value) : value),
         `preview.setI32(${node.runtimeName}.${key})`);
-    } else if (Array.isArray(value) && node.type === 'line' && key === 'points') {
-      const serialized = value.reduce<string[]>((pairs, coordinate, index) => {
-        if (index % 2 === 0) pairs.push(`${coordinate},${value[index + 1]}`);
-        return pairs;
-      }, []).join(' ');
-      check(bridge.setPointList(node.runtimeName, key, serialized),
-        `preview.setPointList(${node.runtimeName}.${key})`);
     } else if (Array.isArray(value) && TYPE_STRING_LIST_PROPS[node.type]?.has(key)) {
       check(bridge.setStringList(node.runtimeName, key, value.join('\u001f')),
         `preview.setStringList(${node.runtimeName}.${key})`);

@@ -18,8 +18,8 @@
  * undo/redo 归 projectStore,与本 store 正交,互不干扰。
  */
 import { create } from 'zustand';
-import { createEmptyProject, type LvProject } from '@lvd/schema';
-import { useProjectStore } from './projectStore';
+import { type LvProject } from '@lvd/schema';
+import { isProjectInteractionActive, useProjectStore } from './projectStore';
 import { useEditorStore } from './editorStore';
 import {
   cacheCloudProject,
@@ -37,6 +37,7 @@ import {
   type StoredProjectDocument,
 } from '../services/projectPersistence';
 import { syncProjectAssetsToCloud } from '../services/assets';
+import { createDesignerProject } from '../services/projectDefaults';
 
 export type SyncState = 'synced' | 'saving' | 'offline' | 'conflict';
 
@@ -100,7 +101,7 @@ function loadIntoEditor(rawDoc: StoredProjectDocument): void {
     doc = loadProjectDocument(rawDoc).project;
   } catch {
     // 校验失败(格式过旧/损坏)→ 兜底空工程,别白屏
-    doc = createEmptyProject();
+    doc = createDesignerProject();
     loadProjectDocument(doc);
   }
   useProjectStore.getState().loadProject(doc);
@@ -130,9 +131,18 @@ export const useProjectsStore = create<ProjectsStoreState>()((set, get) => ({
   openPanel: (panel) => set({ panel }),
 
   init: async () => {
-    const enabled = await cloud.probeCloudEnabled();
-    set({ cloudEnabled: enabled });
-    if (enabled) await get().refreshList();
+    set({ listLoading: true, listError: null });
+    const result = await cloud.listProjects();
+    if (result.ok) {
+      set({ cloudEnabled: true, list: result.data, listLoading: false });
+      return;
+    }
+    if (result.kind === 'unauthorized') {
+      set({ cloudEnabled: true, listLoading: false, listError: result.message });
+      return;
+    }
+    // Keep the local-first fallback for disabled/offline/error responses.
+    set({ cloudEnabled: false, listLoading: false });
   },
 
   refreshList: async () => {
@@ -214,7 +224,7 @@ export const useProjectsStore = create<ProjectsStoreState>()((set, get) => ({
     }
     if (useProjectStore.getState().dirty) await get().saveCurrent();
 
-    const doc = createEmptyProject(name);
+    const doc = createDesignerProject(name);
     doc.meta.name = name;
     const stored = createNewStoredProjectDocument(doc);
     if (!get().cloudEnabled) {
@@ -261,6 +271,10 @@ export const useProjectsStore = create<ProjectsStoreState>()((set, get) => ({
     if (saveTimer !== null) clearTimeout(saveTimer);
     saveTimer = window.setTimeout(() => {
       saveTimer = null;
+      if (isProjectInteractionActive()) {
+        get().scheduleSave();
+        return;
+      }
       void get().saveCurrent();
     }, SAVE_DEBOUNCE_MS);
   },
@@ -268,7 +282,9 @@ export const useProjectsStore = create<ProjectsStoreState>()((set, get) => ({
   saveCurrent: async (force = false) => {
     if (get().cloudSyncPaused) return;
     const { currentId, currentVersion, currentName, cloudEnabled } = get();
-    const doc = useProjectStore.getState().project;
+    const projectState = useProjectStore.getState();
+    const doc = projectState.project;
+    const savedRevision = projectState.revision;
     const stored = createStoredProjectDocument(doc);
 
     // 1) 本地永远先写(真相);无云 id(纯本地/离线新建)只能本地
@@ -282,7 +298,7 @@ export const useProjectsStore = create<ProjectsStoreState>()((set, get) => ({
         pendingSync: true,
       });
     }
-    useProjectStore.getState().markSaved();
+    useProjectStore.getState().markSaved(savedRevision);
 
     if (!cloudEnabled || !currentId) return; // 纯本地 / 未上云:到此为止
 
@@ -348,7 +364,7 @@ export const useProjectsStore = create<ProjectsStoreState>()((set, get) => ({
     set((s) => ({ list: s.list.filter((p) => p.id !== id) }));
     // 删的是当前工程 → 清空当前指针(App 层可引导新建/打开其它)
     if (get().currentId === id) {
-      const blank = createEmptyProject();
+      const blank = createDesignerProject();
       loadIntoEditor(createNewStoredProjectDocument(blank));
       set({ currentId: null, currentName: blank.meta.name, currentVersion: 0, syncState: 'synced' });
       banner('当前工程已删除，已切换到新的本地空工程');

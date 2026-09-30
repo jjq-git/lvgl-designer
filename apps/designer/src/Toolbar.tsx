@@ -1,111 +1,80 @@
 /**
  * 工具条:undo/redo、缩放、设计/运行、圆屏开关、屏幕尺寸预设、新建/打开/保存/导出。
  */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useProjectStore } from './stores/projectStore';
 import { useEditorStore } from './stores/editorStore';
 import { exportUiZip, exportWebUiJson, openProjectFile, saveProjectFile } from './services/exportZip';
 import { UserMenu } from './panels/auth/UserMenu';
 import { useProjectsStore } from './stores/projectsStore';
+import { requestText } from './services/appDialogs';
 import { SyncBadge } from './panels/cloud/SyncBadge';
-import {
-  compatiblePreviewFormats,
-  runtimeColorFormat,
-  useBuildTargetStore,
-  type PreviewColorFormat,
-} from './stores/buildTargetStore';
-import { getPipeline } from './canvas/reloadPipeline';
+import { useBuildTargetStore } from './stores/buildTargetStore';
 import { hasPermission, useAuthStore } from './stores/authStore';
-
-// 预设来自本机仓库实际在用的屏(2026-07-02 全仓盘点,详见 docs/screen-inventory.md)
-const SIZE_PRESETS = [
-  { label: '240×240 圆 · GC9A01 (WF2P-0050)', w: 240, h: 240, shape: 'round' as const },
-  { label: '480×480 圆 · MX039/ST7102', w: 480, h: 480, shape: 'round' as const },
-  { label: '480×480 方 · YDP395/D395/HD400', w: 480, h: 480, shape: 'rect' as const },
-  { label: '128×64 方 · SSD1306 OLED', w: 128, h: 64, shape: 'rect' as const },
-  { label: '128×160 方 · ST7735S 1.77″', w: 128, h: 160, shape: 'rect' as const },
-  { label: '480×960 条 · TXW6.2″/ST7701SN', w: 480, h: 960, shape: 'rect' as const },
-  { label: '480×1920 条 · 8.8″/OTA7290B', w: 480, h: 1920, shape: 'rect' as const },
-  { label: '1024×600 方 · 7″ EK79007', w: 1024, h: 600, shape: 'rect' as const },
-  { label: '720×1280 方 · P4-6B/ILI9881C', w: 720, h: 1280, shape: 'rect' as const },
-  { label: '720×1440 方 · P4-6A/HX8394', w: 720, h: 1440, shape: 'rect' as const },
-  { label: '320×240 矩形(通用)', w: 320, h: 240, shape: 'rect' as const },
-];
-
-const SIZE_MIN = 16;
-const SIZE_MAX = 2048;
+import { getSiteTargetState } from './services/sitePublications';
+import {
+  displayPresetLabel,
+  displayPresetsFromFrames,
+  FALLBACK_DISPLAY_PRESETS,
+  SITE_FRAME_MANIFEST_URL,
+  unresolvedDisplayPresetLabel,
+} from './services/displayPresets';
 
 export function Toolbar(): JSX.Element {
-  const canUndo = useProjectStore((s) => s.undoStack.length > 0);
-  const canRedo = useProjectStore((s) => s.redoStack.length > 0);
   const dirty = useProjectStore((s) => s.dirty);
   const display = useProjectStore((s) => s.project.display);
-  const zoom = useEditorStore((s) => s.zoom);
   const mode = useEditorStore((s) => s.mode);
   const runtimeKind = useEditorStore((s) => s.runtimeKind);
-  const targetFormat = useBuildTargetStore((s) => s.displayProfile.colorFormat);
-  const colorFormatConfirmed = useBuildTargetStore((s) => s.colorFormatConfirmed);
   const controllerPreset = useBuildTargetStore((s) => s.controllerPreset);
   const catalogTargetRef = useBuildTargetStore((s) => s.catalogTargetRef);
   const canPublishSite = useAuthStore((state) => hasPermission(state.me, 'tool.lvgl.publish'));
   const cloudProjectId = useProjectsStore((state) => state.currentId);
 
-  const [customOpen, setCustomOpen] = useState(false);
   const [creatingProject, setCreatingProject] = useState(false);
-  const [customW, setCustomW] = useState(String(display.width));
-  const [customH, setCustomH] = useState(String(display.height));
+  const [displayPresets, setDisplayPresets] = useState(FALLBACK_DISPLAY_PRESETS);
 
-  const presetValue = `${display.width}x${display.height}:${display.shape}`;
-  const previewFormat = runtimeColorFormat();
+  const matchingPreset = displayPresets.fixed.find((preset) =>
+    preset.width === display.width
+    && preset.height === display.height
+    && preset.shape === display.shape);
+  const customPresetValue = `custom:${display.width}x${display.height}:${display.shape}`;
+  const presetValue = matchingPreset?.frameId ?? customPresetValue;
 
-  const applyColorFormat = (value: string): void => {
-    const target = useBuildTargetStore.getState();
-    if (value === 'unconfirmed') target.clearColorFormatConfirmation();
-    else if (!target.confirmColorFormat(value as PreviewColorFormat)) {
-      useEditorStore.getState().setBanner(`${value} 与当前 ${display.colorDepth}bpp 工程不兼容`);
-      return;
-    }
-    getPipeline()?.refreshTarget();
-  };
+  useEffect(() => {
+    if (!canPublishSite) return;
+    let cancelled = false;
+    void getSiteTargetState()
+      .then((target) => {
+        if (!cancelled) setDisplayPresets(displayPresetsFromFrames(target.frames));
+      })
+      .catch(() => {
+        // 离线或无目标仓库时继续使用 manifest 快照，屏幕选择不应被发布服务阻断。
+      });
+    return () => { cancelled = true; };
+  }, [canPublishSite]);
 
   const applyController = (value: string): void => {
     useBuildTargetStore.getState().selectController(value === 'screen-only' ? 'screen-only' : null);
   };
 
   const applyPreset = (v: string): void => {
-    if (v === 'custom') {
-      setCustomW(String(display.width));
-      setCustomH(String(display.height));
-      setCustomOpen(true);
-      return;
-    }
-    setCustomOpen(false);
-    const p = SIZE_PRESETS.find((x) => `${x.w}x${x.h}:${x.shape}` === v);
+    const p = displayPresets.fixed.find((preset) => preset.frameId === v);
     if (!p) return;
     useProjectStore.getState().mutateDisplay('改屏幕预设', (display) => {
-      display.width = p.w;
-      display.height = p.h;
+      display.width = p.width;
+      display.height = p.height;
       display.shape = p.shape;
     });
   };
 
-  const applyCustom = (): void => {
-    const w = Math.round(Number(customW));
-    const h = Math.round(Number(customH));
-    if (!Number.isFinite(w) || !Number.isFinite(h)) return;
-    const cw = Math.min(SIZE_MAX, Math.max(SIZE_MIN, w));
-    const ch = Math.min(SIZE_MAX, Math.max(SIZE_MIN, h));
-    setCustomW(String(cw));
-    setCustomH(String(ch));
-    useProjectStore.getState().mutateDisplay('自定义分辨率', (display) => {
-      display.width = cw;
-      display.height = ch;
-    });
-    setCustomOpen(false);
-  };
-
   const newProject = async (): Promise<void> => {
-    const input = window.prompt('新建独立工程名称（不会覆盖当前工程）:', '未命名工程');
+    const input = await requestText({
+      title: '新建独立工程',
+      message: '新工程不会覆盖当前工程。',
+      label: '工程名称',
+      defaultValue: '未命名工程',
+      confirmLabel: '新建',
+    });
     if (input == null) return;
     const name = input.trim();
     if (name === '') {
@@ -122,119 +91,109 @@ export function Toolbar(): JSX.Element {
 
   return (
     <div className="toolbar">
-      <button className="btn" disabled={creatingProject} onClick={() => void newProject()}>
-        {creatingProject ? '新建中…' : '新建'}
+      <div className="toolbar-row toolbar-main-row">
+      <div className="toolbar-group toolbar-project-group">
+      <button
+        type="button"
+        className="btn toolbar-icon-btn"
+        disabled={creatingProject}
+        aria-label={creatingProject ? '新建中' : '新建项目'}
+        aria-busy={creatingProject}
+        title={creatingProject ? '新建中…' : '新建项目'}
+        onClick={() => void newProject()}
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9Z" />
+          <path d="M14 3v6h6M12 13v6M9 16h6" />
+        </svg>
       </button>
-      <button className="btn" onClick={openProjectFile}>打开</button>
-      <button className="btn" onClick={() => saveProjectFile(useProjectStore.getState().project)}>
-        保存{dirty ? ' •' : ''}
+      <button
+        type="button"
+        className="btn toolbar-icon-btn"
+        aria-label="打开项目"
+        title="打开项目"
+        onClick={openProjectFile}
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v2H7l-4 8Z" />
+          <path d="M7 11h14l-4 8H3" />
+        </svg>
+      </button>
+      <button
+        type="button"
+        className={`btn toolbar-icon-btn ${dirty ? 'is-dirty' : ''}`}
+        aria-label={dirty ? '保存项目（有未保存更改）' : '保存项目'}
+        title={dirty ? '保存项目（有未保存更改）' : '保存项目'}
+        onClick={() => saveProjectFile(useProjectStore.getState().project)}
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 4h14l2 2v14H4Z" />
+          <path d="M8 4v6h8V4M8 20v-6h8v6" />
+        </svg>
       </button>
       <SyncBadge />
       <span className="sep" />
-      <button className="btn" onClick={() => useProjectsStore.getState().openPanel('projects')}>我的工程</button>
-      <button className="btn" onClick={() => useProjectsStore.getState().openPanel('history')}>历史</button>
       <button
-        className="btn"
+        type="button"
+        className="btn toolbar-icon-btn"
+        aria-label="我的工程"
+        title="我的工程"
+        onClick={() => useProjectsStore.getState().openPanel('projects')}
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 7h16v13H4Z" />
+          <path d="M8 7V4h8v3M9 12h6" />
+        </svg>
+      </button>
+      <button
+        type="button"
+        className="btn toolbar-icon-btn"
+        aria-label="版本历史"
+        title="版本历史"
+        onClick={() => useProjectsStore.getState().openPanel('history')}
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="8" />
+          <path d="M12 8v5l3 2M5 5v4h4" />
+        </svg>
+      </button>
+      <button
+        type="button"
+        className="btn toolbar-icon-btn"
+        aria-label="目标与构建"
         title="管理不可变 Profile、Theme、BuildTarget revision 及构建发布状态"
         onClick={() => window.dispatchEvent(new Event('lvd:open-catalog'))}
       >
-        目标与构建
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 7h10M18 7h2M4 17h2M10 17h10M14 4v6M6 14v6" />
+        </svg>
       </button>
-      <span className="sep" />
-      <button className="btn" disabled={!canUndo || mode !== 'design'} title="Ctrl+Z" onClick={() => useProjectStore.getState().undo()}>
-        ↶ 撤销
-      </button>
-      <button className="btn" disabled={!canRedo || mode !== 'design'} title="Ctrl+Y" onClick={() => useProjectStore.getState().redo()}>
-        ↷ 重做
-      </button>
-      <span className="sep" />
-      <span className="zoom-label" title="Ctrl+滚轮缩放,空格拖动平移">{Math.round(zoom * 100)}%</span>
-      <button
-        className="btn"
-        title="适应窗口(Shift+1):内容居中并缩放到刚好塞进画布"
-        onClick={() => {
-          const disp = useProjectStore.getState().project.display;
-          useEditorStore.getState().fitToScreen({ width: disp.width, height: disp.height });
-        }}
-      >
-        适应窗口
-      </button>
-      <button
-        className="btn"
-        title="重置视图:100% 缩放,回到左上角"
-        onClick={() => useEditorStore.getState().resetView()}
-      >
-        重置视图
-      </button>
+      </div>
+      <div className="toolbar-group toolbar-target-group">
       <span className="sep" />
       <select
-        className="ed-select"
-        value={customOpen ? 'custom' : presetValue}
+        className="ed-select toolbar-display-select"
+        aria-label="屏幕分辨率预设"
+        title={`设备清单来源：${SITE_FRAME_MANIFEST_URL}`}
+        value={presetValue}
         onChange={(e) => applyPreset(e.target.value)}
       >
-        {SIZE_PRESETS.map((p) => (
-          <option key={p.label} value={`${p.w}x${p.h}:${p.shape}`}>{p.label}</option>
+        {displayPresets.fixed.map((preset) => (
+          <option key={preset.frameId} value={preset.frameId}>{displayPresetLabel(preset)}</option>
         ))}
-        {!customOpen && !SIZE_PRESETS.some((p) => `${p.w}x${p.h}:${p.shape}` === presetValue) && (
-          <option value={presetValue}>{display.width}×{display.height} {display.shape === 'round' ? '圆' : '方'}(自定义)</option>
-        )}
-        <option value="custom">自定义分辨率…</option>
-      </select>
-      {customOpen && (
-        <span className="custom-size">
-          <input
-            className="ed-num"
-            type="number"
-            min={SIZE_MIN}
-            max={SIZE_MAX}
-            value={customW}
-            onChange={(e) => setCustomW(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && applyCustom()}
-            aria-label="宽"
-          />
-          ×
-          <input
-            className="ed-num"
-            type="number"
-            min={SIZE_MIN}
-            max={SIZE_MAX}
-            value={customH}
-            onChange={(e) => setCustomH(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && applyCustom()}
-            aria-label="高"
-          />
-          <button className="btn" onClick={applyCustom}>✓ 应用</button>
-          <button className="btn" onClick={() => setCustomOpen(false)}>取消</button>
-        </span>
-      )}
-      <label className="chk">
-        <input
-          type="checkbox"
-          checked={display.shape === 'round'}
-          onChange={(e) =>
-            useProjectStore.getState().mutateDisplay('切换圆屏', (display) => {
-              display.shape = e.target.checked ? 'round' : 'rect';
-            })
-          }
-        />
-        圆屏
-      </label>
-      <select
-        className="ed-select"
-        aria-label="目标颜色格式"
-        title="来自 Schema v2 DisplayProfile；16bpp 必须确认 RGB565 字节序"
-        value={colorFormatConfirmed ? targetFormat : 'unconfirmed'}
-        onChange={(e) => applyColorFormat(e.target.value)}
-      >
-        {!colorFormatConfirmed && (
-          <option value="unconfirmed">目标格式待确认（编辑预览 XRGB8888）</option>
-        )}
-        {compatiblePreviewFormats(display.colorDepth).map((format) => (
-          <option key={format} value={format}>{format}</option>
+        {displayPresets.unresolved.map((preset) => (
+          <option key={preset.frameId} value={preset.frameId} disabled>
+            {unresolvedDisplayPresetLabel(preset)}
+          </option>
         ))}
+        {!matchingPreset && (
+          <option value={customPresetValue} disabled>
+            当前：{display.width}×{display.height} {display.shape === 'round' ? '圆' : '方'}（自定义工程，仅兼容）
+          </option>
+        )}
       </select>
       <select
-        className="ed-select"
+        className="ed-select toolbar-controller-select"
         aria-label="目标控制器"
         title="Schema v2 ControllerProfile；发布目标必须锁定一个 Controller revision"
         value={catalogTargetRef ? 'catalog' : controllerPreset ?? 'unconfirmed'}
@@ -246,49 +205,78 @@ export function Toolbar(): JSX.Element {
       </select>
       <span className="sep" />
       <button
-        className={`btn ${mode === 'play' ? 'primary' : ''}`}
+        type="button"
+        className={`btn toolbar-icon-btn ${mode === 'play' ? 'primary' : ''}`}
+        aria-label={mode === 'design' ? '运行' : '停止'}
+        title={mode === 'design' ? '运行预览' : '停止预览'}
         onClick={() => useEditorStore.getState().setMode(mode === 'design' ? 'play' : 'design')}
       >
-        {mode === 'design' ? '▶ 运行' : '■ 停止'}
+        {mode === 'design' ? (
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 9 6-9 6Z" /></svg>
+        ) : (
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="1" /></svg>
+        )}
       </button>
-      <span className="spacer" />
+      </div>
+      <span className="toolbar-spacer" />
+      <div className="toolbar-group toolbar-output-group">
       <span className={`rt-badge rt-${runtimeKind}`}>
         {runtimeKind === 'wasm'
-          ? `LVGL 9.5 · ${previewFormat}${colorFormatConfirmed ? '' : '（目标待确认）'}`
+          ? 'LVGL 9.5 · WASM 编辑预览'
           : runtimeKind === 'mock' ? '打桩模式' : '加载中…'}
       </span>
+      <span className="sep" />
       <button
-        className="btn primary"
+        type="button"
+        className="btn primary toolbar-icon-btn"
+        aria-label="导出 C 代码"
         title="导出精确钉死 LVGL 9.5.0 的 C 代码与构建 manifest"
         onClick={() => { void exportUiZip(useProjectStore.getState().project); }}
       >
-        导出 C 代码
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="m8 7-5 5 5 5M16 7l5 5-5 5M13 4l-2 16" />
+        </svg>
       </button>
       <button
-        className="btn"
+        type="button"
+        className="btn toolbar-icon-btn"
+        aria-label="导出网页 UI JSON"
         title="导出冻结的 WebUiDocumentV1 JSON；不包含 Build URL、编辑状态或后端主键"
         onClick={() => { void exportWebUiJson(useProjectStore.getState().project); }}
       >
-        导出网页 UI JSON
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M8 4H6a2 2 0 0 0-2 2v3a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5a2 2 0 0 0 2 2h2M16 4h2a2 2 0 0 1 2 2v3a2 2 0 0 0 2 2 2 2 0 0 0-2 2v5a2 2 0 0 1-2 2h-2" />
+        </svg>
       </button>
       <button
-        className="btn"
+        type="button"
+        className="btn toolbar-icon-btn"
         disabled={!canPublishSite || cloudProjectId === null}
+        aria-label="发布网页"
         title={!canPublishSite ? '需要 tool.lvgl.publish 权限' : cloudProjectId === null ? '请先保存为云端工程' : '准备并发布到 ui.podsc.com；不会修改设备外框'}
         onClick={() => window.dispatchEvent(new Event('lvd:open-site-publication'))}
       >
-        发布到 ui.podsc.com
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 18a4 4 0 0 1-.5-8A6.5 6.5 0 0 1 18 9a4.5 4.5 0 0 1 0 9" />
+          <path d="m9 13 3-3 3 3M12 10v9" />
+        </svg>
       </button>
       <span className="sep" />
       <button
-        className="btn"
+        type="button"
+        className="btn toolbar-icon-btn"
         title="快捷键帮助(F1)"
         aria-label="快捷键帮助"
         onClick={() => window.dispatchEvent(new Event('lvd:open-help'))}
       >
-        ?
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M9.8 9a2.4 2.4 0 1 1 3.5 2.1c-.8.4-1.3 1-1.3 1.9M12 17h.01" />
+        </svg>
       </button>
       <UserMenu />
+      </div>
+      </div>
     </div>
   );
 }

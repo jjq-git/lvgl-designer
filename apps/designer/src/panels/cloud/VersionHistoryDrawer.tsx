@@ -20,6 +20,8 @@ import {
   type StoredProjectDocument,
 } from '../../services/projectPersistence';
 import { formatTime } from './ProjectListModal';
+import { useDialogFocus } from '../useDialogFocus';
+import { requestConfirmation } from '../../services/appDialogs';
 import './cloud.css';
 
 type ListState =
@@ -35,6 +37,7 @@ const KIND_LABEL: Record<VersionMeta['kind'], string> = {
 };
 
 export function VersionHistoryDrawer({ onClose }: { onClose: () => void }): JSX.Element {
+  const dialogRef = useDialogFocus<HTMLDivElement>(onClose);
   const currentId = useProjectsStore((s) => s.currentId);
   const cloudEnabled = useProjectsStore((s) => s.cloudEnabled);
   const [list, setList] = useState<ListState>({ kind: 'loading' });
@@ -79,17 +82,6 @@ export function VersionHistoryDrawer({ onClose }: { onClose: () => void }): JSX.
   }, [currentId, cloudEnabled]);
 
   /* Esc 关闭抽屉(与 UserMenu 一致风格) */
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent): void => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        onClose();
-      }
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
-
   const exitPreview = (): void => {
     if (snapshotRef.current) {
       const doc = loadProjectDocument(snapshotRef.current).project;
@@ -137,7 +129,12 @@ export function VersionHistoryDrawer({ onClose }: { onClose: () => void }): JSX.
 
   const onRollback = async (seq: number): Promise<void> => {
     if (!currentId) return;
-    if (!window.confirm(`确认回滚到版本 #${seq}?当前内容会被该版本覆盖(回滚本身也会记为一条历史)。`)) return;
+    if (!await requestConfirmation({
+      title: `回滚到版本 #${seq}`,
+      message: '当前内容会被该版本覆盖；回滚本身也会记录为一条历史。',
+      confirmLabel: '确认回滚',
+      danger: true,
+    })) return;
     exitPreview();
     setBusy(true);
     const r = await cloud.restoreVersion(currentId, seq);
@@ -171,7 +168,12 @@ export function VersionHistoryDrawer({ onClose }: { onClose: () => void }): JSX.
 
   const onDeleteVersion = async (seq: number): Promise<void> => {
     if (!currentId) return;
-    if (!window.confirm(`删除版本 #${seq}?此操作不可撤销。`)) return;
+    if (!await requestConfirmation({
+      title: `删除版本 #${seq}`,
+      message: '此操作不可撤销。',
+      confirmLabel: '删除版本',
+      danger: true,
+    })) return;
     if (previewSeq === seq) onExitPreview();
     setBusy(true);
     const r = await cloud.deleteVersion(currentId, seq);
@@ -187,7 +189,14 @@ export function VersionHistoryDrawer({ onClose }: { onClose: () => void }): JSX.
   return (
     <>
       <div className="hist-drawer-mask" onClick={onClose} />
-      <div className="hist-drawer" role="dialog" aria-label="版本历史">
+      <div
+        ref={dialogRef}
+        className="hist-drawer"
+        role="dialog"
+        aria-modal="true"
+        aria-label="版本历史"
+        tabIndex={-1}
+      >
         <div className="hist-head">
           <span>版本历史</span>
           <button className="icon-btn" title="关闭" onClick={onClose}>✕</button>

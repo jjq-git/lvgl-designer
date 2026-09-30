@@ -130,6 +130,13 @@ def prepare(
                 raise PublicationError(
                     "idempotency-key-conflict", "同一 requestId 不能用于不同的发布参数", status_code=409,
                 )
+            if previous_request["status"] == "failed":
+                error = previous_request.get("error") or {}
+                raise PublicationError(
+                    error.get("code", "prepare-failed"),
+                    error.get("message", "publication preparation failed"),
+                    error.get("detail"),
+                )
             return _decorate(previous_request)
     try:
         target = git_target.read_state()
@@ -196,7 +203,10 @@ def publish(owner_user_id: int, actor_user_id: int, publication_id: str) -> dict
         raise PublicationError("publication-not-found", "publication not found", status_code=404)
     if record["status"] == "git_committed":
         return _decorate(record)
-    if record["status"] not in {"prepared", "publishing", "conflict"}:
+    retryable_failed = record["status"] == "failed" and (
+        db.artifact_dir(publication_id) / "plan.json"
+    ).is_file()
+    if record["status"] not in {"prepared", "publishing", "conflict"} and not retryable_failed:
         raise PublicationError("publication-state-conflict", f"cannot publish from {record['status']}", status_code=409)
     current_project = project_db.get_project(owner_user_id, record["projectId"])
     if current_project is None or current_project["version"] != record["sourceProjectVersion"]:

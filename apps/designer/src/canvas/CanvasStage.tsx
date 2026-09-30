@@ -69,6 +69,18 @@ export function constrainCanvasPan(
   };
 }
 
+/**
+ * Selection outlines live in an SVG that can overflow beyond the display.
+ * Runtime hit-testing only covers display pixels, so an already-selected node
+ * outside the display must carry its id on the outline itself to remain
+ * draggable back into view.
+ */
+export function selectedIdFromPointerTarget(target: EventTarget | null): string | null {
+  const candidate = target as { getAttribute?: (name: string) => string | null } | null;
+  if (typeof candidate?.getAttribute !== 'function') return null;
+  return candidate.getAttribute('data-selected-id') || null;
+}
+
 function setNodeProps(id: string, label: string, props: Record<string, number>): void {
   useProjectStore.getState().mutateV2(
     label,
@@ -375,7 +387,8 @@ export function CanvasStage(): JSX.Element {
 
     const project = useProjectStore.getState().project;
     const screen = project.screens.find((s) => s.id === ed.activeScreenId) ?? project.screens[0];
-    const hitId = pipeline.nodeIdAt(Math.round(l.x), Math.round(l.y));
+    const hitId = selectedIdFromPointerTarget(e.target)
+      ?? pipeline.nodeIdAt(Math.round(l.x), Math.round(l.y));
     if (!hitId || hitId === screen?.root.id) {
       // 空白处按下:进入框选会话(拖出选框才生效;若只是单击则 up 时取消选择)
       sessionRef.current = {

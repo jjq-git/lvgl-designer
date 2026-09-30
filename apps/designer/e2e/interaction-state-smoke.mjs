@@ -68,6 +68,7 @@ try {
     const parentId = crypto.randomUUID();
     const childId = crypto.randomUUID();
     const siblingId = crypto.randomUUID();
+    const offscreenId = crypto.randomUUID();
     projectStore.mutateV2('interaction smoke fixture', (draft) => {
       draft.screens[0].root.children.push(
         {
@@ -102,11 +103,22 @@ try {
           bindings: [],
           children: [],
         },
+        {
+          id: offscreenId,
+          type: 'obj',
+          codeName: 'smoke_offscreen',
+          props: { x: 260, y: -60, width: 80, height: 40 },
+          styleRefs: [],
+          styles: [],
+          events: [],
+          bindings: [],
+          children: [],
+        },
       );
     });
     editorStore.setActiveScreen(screen.id);
     projectStore.markSaved(projectStore.revision);
-    window.__interactionSmoke = { parentId, childId, siblingId };
+    window.__interactionSmoke = { parentId, childId, siblingId, offscreenId };
   });
   await page.waitForTimeout(250);
 
@@ -187,6 +199,28 @@ try {
   assert(state.dirty === false, 'Escape restores the pre-drag dirty state');
   assert(state.undoCount === undoCountBeforeDrag, 'cancelled drag does not create undo history');
   assert(state.guides === null && state.marquee === null, 'cancelled interaction clears overlays');
+
+  await page.evaluate(({ offscreenId }) => {
+    window.__lvd.editorStore.getState().select([offscreenId]);
+  }, ids);
+  const overflowOutline = page.locator(`[data-selected-id="${ids.offscreenId}"]`);
+  await overflowOutline.waitFor();
+  const overflowBox = await overflowOutline.boundingBox();
+  if (!overflowBox) throw new Error('Offscreen selection outline is unavailable');
+  const overflowCenter = {
+    x: overflowBox.x + overflowBox.width / 2,
+    y: overflowBox.y + overflowBox.height / 2,
+  };
+  await page.mouse.move(overflowCenter.x, overflowCenter.y);
+  await page.mouse.down();
+  await page.mouse.move(overflowCenter.x, overflowCenter.y + 100, { steps: 8 });
+  await page.mouse.up();
+  const recoveredY = await page.evaluate(({ offscreenId }) => {
+    const root = window.__lvd.projectStore.getState().uiProject.screens[0].root;
+    const find = (node, id) => node.id === id ? node : node.children.map((child) => find(child, id)).find(Boolean);
+    return find(root, offscreenId).props.y;
+  }, ids);
+  assert(recoveredY > -60, 'an offscreen selected widget can be dragged back toward the display');
   assert(errors.length === 0, `page errors: ${errors.join(' | ')}`);
 
   console.log(JSON.stringify({
@@ -194,6 +228,7 @@ try {
     parentChildMove: 'passed',
     selectionScopedUndo: 'passed',
     escapeCancellation: 'passed',
+    offscreenDragRecovery: 'passed',
     pageErrors: errors,
   }, null, 2));
 } finally {

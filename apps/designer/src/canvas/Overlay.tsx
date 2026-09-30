@@ -104,8 +104,10 @@ export function Overlay(): JSX.Element | null {
       {selRects.map(({ id, rect }) => (
         <g key={id}>
           <rect
+            data-selected-id={id}
             x={rect.x} y={rect.y} width={rect.w} height={rect.h}
-            fill="none" stroke="#4aa8ff" strokeWidth={1.5 / zoom}
+            fill="transparent" stroke="#4aa8ff" strokeWidth={1.5 / zoom}
+            style={{ cursor: 'move', pointerEvents: 'all' }}
           />
           {selRects.length === 1 &&
             HANDLES.map((dir) => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createEmptyProject, createNode } from '@lvd/schema';
-import { constrainCanvasPan, topLevelMovableIds } from './CanvasStage';
+import { constrainCanvasPan, selectedIdFromPointerTarget, topLevelMovableIds } from './CanvasStage';
 
 describe('constrainCanvasPan', () => {
   it('keeps at least 64px of a large screen visible on every edge', () => {
@@ -37,5 +37,17 @@ describe('topLevelMovableIds', () => {
       .toEqual([parent.id, sibling.id]);
     expect(topLevelMovableIds(project, [child.id, sibling.id]))
       .toEqual([child.id, sibling.id]);
+  });
+});
+
+describe('selectedIdFromPointerTarget', () => {
+  it('recovers the selected node id from an overflow selection outline', () => {
+    const target = {
+      getAttribute: (name: string) => name === 'data-selected-id' ? 'offscreen-widget' : null,
+    };
+
+    expect(selectedIdFromPointerTarget(target as unknown as EventTarget)).toBe('offscreen-widget');
+    expect(selectedIdFromPointerTarget(null)).toBeNull();
+    expect(selectedIdFromPointerTarget({} as EventTarget)).toBeNull();
   });
 });

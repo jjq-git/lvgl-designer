@@ -173,7 +173,7 @@
               "type": "label",
               "codeName": "home_brand",
               "props": {
-                "text": "QUIET POD",
+                "text": "BRAND A",
                 "x": 22,
                 "y": 20,
                 "width": 220,
@@ -199,10 +199,10 @@
               "type": "label",
               "codeName": "home_title",
               "props": {
-                "text": "HOME",
-                "x": 250,
-                "y": 23,
-                "width": 208,
+                "text": "  HOME",
+                "x": 230,
+                "y": 22,
+                "width": 228,
                 "height": "content"
               },
               "styleRefs": [],
@@ -210,7 +210,7 @@
                 {
                   "props": {
                     "text_color": "#8FA7BD",
-                    "text_font": "montserrat_14",
+                    "text_font": "montserrat_16",
                     "text_align": "right",
                     "text_opa": 255
                   }
@@ -411,7 +411,7 @@
                       "type": "label",
                       "codeName": "home_end_text",
                       "props": {
-                        "text": "END SESSION",
+                        "text": "  END SESSION",
                         "align": "center",
                         "width": "100%",
                         "height": "content"
@@ -483,7 +483,7 @@
                     {
                       "props": {
                         "text_color": "#8FA7BD",
-                        "text_font": "montserrat_14",
+                        "text_font": "montserrat_16",
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -535,7 +535,7 @@
                     {
                       "props": {
                         "text_color": "#8FA7BD",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_16",
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -596,7 +596,7 @@
                     {
                       "props": {
                         "text_color": "#8FA7BD",
-                        "text_font": "montserrat_14",
+                        "text_font": "montserrat_16",
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -648,7 +648,7 @@
                     {
                       "props": {
                         "text_color": "#8FA7BD",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_16",
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -709,7 +709,7 @@
                     {
                       "props": {
                         "text_color": "#8FA7BD",
-                        "text_font": "montserrat_14",
+                        "text_font": "montserrat_16",
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -761,7 +761,7 @@
                     {
                       "props": {
                         "text_color": "#8FA7BD",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_16",
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -831,7 +831,7 @@
                   "type": "label",
                   "codeName": "home_nav_home_text",
                   "props": {
-                    "text": "H",
+                    "text": " HOME",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -841,7 +841,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "center"
                       }
                     }
@@ -910,7 +910,7 @@
                   "type": "label",
                   "codeName": "home_nav_air_text",
                   "props": {
-                    "text": "AIR",
+                    "text": " AIR",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -920,7 +920,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "center"
                       }
                     }
@@ -989,7 +989,7 @@
                   "type": "label",
                   "codeName": "home_nav_light_text",
                   "props": {
-                    "text": "LUX",
+                    "text": " LIGHT",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -999,7 +999,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "center"
                       }
                     }
@@ -1068,7 +1068,7 @@
                   "type": "label",
                   "codeName": "home_nav_focus_text",
                   "props": {
-                    "text": "FOC",
+                    "text": " FOCUS",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -1078,7 +1078,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "center"
                       }
                     }
@@ -1147,7 +1147,7 @@
                   "type": "label",
                   "codeName": "home_nav_settings_text",
                   "props": {
-                    "text": "SET",
+                    "text": " SET",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -1157,7 +1157,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "center"
                       }
                     }
@@ -1204,7 +1204,7 @@
               "type": "label",
               "codeName": "air_brand",
               "props": {
-                "text": "QUIET POD",
+                "text": "BRAND A",
                 "x": 22,
                 "y": 20,
                 "width": 220,
@@ -1230,10 +1230,10 @@
               "type": "label",
               "codeName": "air_title",
               "props": {
-                "text": "AIR",
-                "x": 250,
-                "y": 23,
-                "width": 208,
+                "text": "  AIR",
+                "x": 230,
+                "y": 22,
+                "width": 228,
                 "height": "content"
               },
               "styleRefs": [],
@@ -1241,7 +1241,7 @@
                 {
                   "props": {
                     "text_color": "#8FA7BD",
-                    "text_font": "montserrat_14",
+                    "text_font": "montserrat_16",
                     "text_align": "right",
                     "text_opa": 255
                   }
@@ -1374,7 +1374,7 @@
                   "type": "label",
                   "codeName": "air_ppm",
                   "props": {
-                    "text": "ppm / GOOD",
+                    "text": "ppm  ",
                     "x": 45,
                     "y": 130,
                     "width": 120,
@@ -1385,7 +1385,7 @@
                     {
                       "props": {
                         "text_color": "#51D88A",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "center",
                         "text_opa": 255
                       }
@@ -1483,7 +1483,7 @@
                   "type": "label",
                   "codeName": "air_fan_title",
                   "props": {
-                    "text": "FRESH AIR",
+                    "text": "  FRESH AIR",
                     "x": 22,
                     "y": 22,
                     "width": 120,
@@ -1796,7 +1796,7 @@
                       "type": "label",
                       "codeName": "air_boost_text",
                       "props": {
-                        "text": "BOOST 10 MIN",
+                        "text": "  BOOST 10 MIN",
                         "align": "center",
                         "width": "100%",
                         "height": "content"
@@ -1806,7 +1806,7 @@
                         {
                           "props": {
                             "text_color": "#06101E",
-                            "text_font": "montserrat_12",
+                            "text_font": "montserrat_14",
                             "text_align": "center"
                           }
                         }
@@ -1877,7 +1877,7 @@
                   "type": "label",
                   "codeName": "air_nav_home_text",
                   "props": {
-                    "text": "H",
+                    "text": " HOME",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -1887,7 +1887,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "center"
                       }
                     }
@@ -1956,7 +1956,7 @@
                   "type": "label",
                   "codeName": "air_nav_air_text",
                   "props": {
-                    "text": "AIR",
+                    "text": " AIR",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -1966,7 +1966,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "center"
                       }
                     }
@@ -2035,7 +2035,7 @@
                   "type": "label",
                   "codeName": "air_nav_light_text",
                   "props": {
-                    "text": "LUX",
+                    "text": " LIGHT",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -2045,7 +2045,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "center"
                       }
                     }
@@ -2114,7 +2114,7 @@
                   "type": "label",
                   "codeName": "air_nav_focus_text",
                   "props": {
-                    "text": "FOC",
+                    "text": " FOCUS",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -2124,7 +2124,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "center"
                       }
                     }
@@ -2193,7 +2193,7 @@
                   "type": "label",
                   "codeName": "air_nav_settings_text",
                   "props": {
-                    "text": "SET",
+                    "text": " SET",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -2203,7 +2203,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "center"
                       }
                     }
@@ -2250,7 +2250,7 @@
               "type": "label",
               "codeName": "light_brand",
               "props": {
-                "text": "QUIET POD",
+                "text": "BRAND A",
                 "x": 22,
                 "y": 20,
                 "width": 220,
@@ -2276,10 +2276,10 @@
               "type": "label",
               "codeName": "light_title",
               "props": {
-                "text": "LIGHT",
-                "x": 250,
-                "y": 23,
-                "width": 208,
+                "text": "  LIGHT",
+                "x": 230,
+                "y": 22,
+                "width": 228,
                 "height": "content"
               },
               "styleRefs": [],
@@ -2287,7 +2287,7 @@
                 {
                   "props": {
                     "text_color": "#8FA7BD",
-                    "text_font": "montserrat_14",
+                    "text_font": "montserrat_16",
                     "text_align": "right",
                     "text_opa": 255
                   }
@@ -2335,7 +2335,7 @@
                   "type": "label",
                   "codeName": "light_main_title",
                   "props": {
-                    "text": "CABIN LIGHT",
+                    "text": "  CABIN LIGHT",
                     "x": 28,
                     "y": 24,
                     "width": 260,
@@ -2649,7 +2649,7 @@
                       "type": "label",
                       "codeName": "light_work_text",
                       "props": {
-                        "text": "WORK",
+                        "text": "  WORK",
                         "align": "center",
                         "width": "100%",
                         "height": "content"
@@ -2659,7 +2659,7 @@
                         {
                           "props": {
                             "text_color": "#F4F8FC",
-                            "text_font": "montserrat_12",
+                            "text_font": "montserrat_14",
                             "text_align": "center"
                           }
                         }
@@ -2717,7 +2717,7 @@
                       "type": "label",
                       "codeName": "light_call_text",
                       "props": {
-                        "text": "CALL",
+                        "text": "  CALL",
                         "align": "center",
                         "width": "100%",
                         "height": "content"
@@ -2727,7 +2727,7 @@
                         {
                           "props": {
                             "text_color": "#F4F8FC",
-                            "text_font": "montserrat_12",
+                            "text_font": "montserrat_14",
                             "text_align": "center"
                           }
                         }
@@ -2785,7 +2785,7 @@
                       "type": "label",
                       "codeName": "light_relax_text",
                       "props": {
-                        "text": "RELAX",
+                        "text": "  RELAX",
                         "align": "center",
                         "width": "100%",
                         "height": "content"
@@ -2795,7 +2795,7 @@
                         {
                           "props": {
                             "text_color": "#F4F8FC",
-                            "text_font": "montserrat_12",
+                            "text_font": "montserrat_14",
                             "text_align": "center"
                           }
                         }
@@ -2866,7 +2866,7 @@
                   "type": "label",
                   "codeName": "light_nav_home_text",
                   "props": {
-                    "text": "H",
+                    "text": " HOME",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -2876,7 +2876,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "center"
                       }
                     }
@@ -2945,7 +2945,7 @@
                   "type": "label",
                   "codeName": "light_nav_air_text",
                   "props": {
-                    "text": "AIR",
+                    "text": " AIR",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -2955,7 +2955,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "center"
                       }
                     }
@@ -3024,7 +3024,7 @@
                   "type": "label",
                   "codeName": "light_nav_light_text",
                   "props": {
-                    "text": "LUX",
+                    "text": " LIGHT",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -3034,7 +3034,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "center"
                       }
                     }
@@ -3103,7 +3103,7 @@
                   "type": "label",
                   "codeName": "light_nav_focus_text",
                   "props": {
-                    "text": "FOC",
+                    "text": " FOCUS",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -3113,7 +3113,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "center"
                       }
                     }
@@ -3182,7 +3182,7 @@
                   "type": "label",
                   "codeName": "light_nav_settings_text",
                   "props": {
-                    "text": "SET",
+                    "text": " SET",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -3192,7 +3192,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "center"
                       }
                     }
@@ -3239,7 +3239,7 @@
               "type": "label",
               "codeName": "focus_brand",
               "props": {
-                "text": "QUIET POD",
+                "text": "BRAND A",
                 "x": 22,
                 "y": 20,
                 "width": 220,
@@ -3265,10 +3265,10 @@
               "type": "label",
               "codeName": "focus_title",
               "props": {
-                "text": "FOCUS",
-                "x": 250,
-                "y": 23,
-                "width": 208,
+                "text": "  FOCUS",
+                "x": 230,
+                "y": 22,
+                "width": 228,
                 "height": "content"
               },
               "styleRefs": [],
@@ -3276,7 +3276,7 @@
                 {
                   "props": {
                     "text_color": "#8FA7BD",
-                    "text_font": "montserrat_14",
+                    "text_font": "montserrat_16",
                     "text_align": "right",
                     "text_opa": 255
                   }
@@ -3302,7 +3302,7 @@
                 {
                   "props": {
                     "text_color": "#8FA7BD",
-                    "text_font": "montserrat_14",
+                    "text_font": "montserrat_16",
                     "text_align": "left",
                     "text_opa": 255
                   }
@@ -3449,7 +3449,7 @@
                       "type": "label",
                       "codeName": "focus_mode_0_start_text",
                       "props": {
-                        "text": "START",
+                        "text": "  START",
                         "align": "center",
                         "width": "100%",
                         "height": "content"
@@ -3459,7 +3459,7 @@
                         {
                           "props": {
                             "text_color": "#F4F8FC",
-                            "text_font": "montserrat_12",
+                            "text_font": "montserrat_14",
                             "text_align": "center"
                           }
                         }
@@ -3609,7 +3609,7 @@
                       "type": "label",
                       "codeName": "focus_mode_1_start_text",
                       "props": {
-                        "text": "START",
+                        "text": "  START",
                         "align": "center",
                         "width": "100%",
                         "height": "content"
@@ -3619,7 +3619,7 @@
                         {
                           "props": {
                             "text_color": "#F4F8FC",
-                            "text_font": "montserrat_12",
+                            "text_font": "montserrat_14",
                             "text_align": "center"
                           }
                         }
@@ -3769,7 +3769,7 @@
                       "type": "label",
                       "codeName": "focus_mode_2_start_text",
                       "props": {
-                        "text": "START",
+                        "text": "  START",
                         "align": "center",
                         "width": "100%",
                         "height": "content"
@@ -3779,7 +3779,7 @@
                         {
                           "props": {
                             "text_color": "#F4F8FC",
-                            "text_font": "montserrat_12",
+                            "text_font": "montserrat_14",
                             "text_align": "center"
                           }
                         }
@@ -3929,7 +3929,7 @@
                       "type": "label",
                       "codeName": "focus_mode_3_start_text",
                       "props": {
-                        "text": "START",
+                        "text": "  START",
                         "align": "center",
                         "width": "100%",
                         "height": "content"
@@ -3939,7 +3939,7 @@
                         {
                           "props": {
                             "text_color": "#F4F8FC",
-                            "text_font": "montserrat_12",
+                            "text_font": "montserrat_14",
                             "text_align": "center"
                           }
                         }
@@ -4010,7 +4010,7 @@
                   "type": "label",
                   "codeName": "focus_nav_home_text",
                   "props": {
-                    "text": "H",
+                    "text": " HOME",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -4020,7 +4020,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "center"
                       }
                     }
@@ -4089,7 +4089,7 @@
                   "type": "label",
                   "codeName": "focus_nav_air_text",
                   "props": {
-                    "text": "AIR",
+                    "text": " AIR",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -4099,7 +4099,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "center"
                       }
                     }
@@ -4168,7 +4168,7 @@
                   "type": "label",
                   "codeName": "focus_nav_light_text",
                   "props": {
-                    "text": "LUX",
+                    "text": " LIGHT",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -4178,7 +4178,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "center"
                       }
                     }
@@ -4247,7 +4247,7 @@
                   "type": "label",
                   "codeName": "focus_nav_focus_text",
                   "props": {
-                    "text": "FOC",
+                    "text": " FOCUS",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -4257,7 +4257,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "center"
                       }
                     }
@@ -4326,7 +4326,7 @@
                   "type": "label",
                   "codeName": "focus_nav_settings_text",
                   "props": {
-                    "text": "SET",
+                    "text": " SET",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -4336,7 +4336,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "center"
                       }
                     }
@@ -4383,7 +4383,7 @@
               "type": "label",
               "codeName": "settings_brand",
               "props": {
-                "text": "QUIET POD",
+                "text": "BRAND A",
                 "x": 22,
                 "y": 20,
                 "width": 220,
@@ -4409,10 +4409,10 @@
               "type": "label",
               "codeName": "settings_title",
               "props": {
-                "text": "SETTINGS",
-                "x": 250,
-                "y": 23,
-                "width": 208,
+                "text": "  SETTINGS",
+                "x": 230,
+                "y": 22,
+                "width": 228,
                 "height": "content"
               },
               "styleRefs": [],
@@ -4420,7 +4420,7 @@
                 {
                   "props": {
                     "text_color": "#8FA7BD",
-                    "text_font": "montserrat_14",
+                    "text_font": "montserrat_16",
                     "text_align": "right",
                     "text_opa": 255
                   }
@@ -4464,9 +4464,9 @@
                   "type": "label",
                   "codeName": "settings_dnd_title",
                   "props": {
-                    "text": "DO NOT DISTURB",
+                    "text": "  DO NOT DISTURB",
                     "x": 22,
-                    "y": 16,
+                    "y": 14,
                     "width": 270,
                     "height": "content"
                   },
@@ -4492,7 +4492,7 @@
                   "props": {
                     "text": "Mute occupied alerts",
                     "x": 22,
-                    "y": 44,
+                    "y": 43,
                     "width": 270,
                     "height": "content"
                   },
@@ -4501,7 +4501,7 @@
                     {
                       "props": {
                         "text_color": "#8FA7BD",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -4611,9 +4611,9 @@
                   "type": "label",
                   "codeName": "settings_auto_light_title",
                   "props": {
-                    "text": "AUTO LIGHT",
+                    "text": "  AUTO LIGHT",
                     "x": 22,
-                    "y": 16,
+                    "y": 14,
                     "width": 270,
                     "height": "content"
                   },
@@ -4639,7 +4639,7 @@
                   "props": {
                     "text": "Presence controlled",
                     "x": 22,
-                    "y": 44,
+                    "y": 43,
                     "width": 270,
                     "height": "content"
                   },
@@ -4648,7 +4648,7 @@
                     {
                       "props": {
                         "text_color": "#8FA7BD",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -4758,9 +4758,9 @@
                   "type": "label",
                   "codeName": "settings_auto_vent_title",
                   "props": {
-                    "text": "AUTO VENT",
+                    "text": "  AUTO VENT",
                     "x": 22,
-                    "y": 16,
+                    "y": 14,
                     "width": 270,
                     "height": "content"
                   },
@@ -4786,7 +4786,7 @@
                   "props": {
                     "text": "30 min schedule",
                     "x": 22,
-                    "y": 44,
+                    "y": 43,
                     "width": 270,
                     "height": "content"
                   },
@@ -4795,7 +4795,7 @@
                     {
                       "props": {
                         "text_color": "#8FA7BD",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -4907,7 +4907,7 @@
                   "props": {
                     "text": "WF2D-8630  /  480 x 480 DEMO",
                     "x": 18,
-                    "y": 15,
+                    "y": 14,
                     "width": 400,
                     "height": "content"
                   },
@@ -4916,7 +4916,7 @@
                     {
                       "props": {
                         "text_color": "#32D6C6",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "center",
                         "text_opa": 255
                       }
@@ -4986,7 +4986,7 @@
                   "type": "label",
                   "codeName": "settings_nav_home_text",
                   "props": {
-                    "text": "H",
+                    "text": " HOME",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -4996,7 +4996,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "center"
                       }
                     }
@@ -5065,7 +5065,7 @@
                   "type": "label",
                   "codeName": "settings_nav_air_text",
                   "props": {
-                    "text": "AIR",
+                    "text": " AIR",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -5075,7 +5075,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "center"
                       }
                     }
@@ -5144,7 +5144,7 @@
                   "type": "label",
                   "codeName": "settings_nav_light_text",
                   "props": {
-                    "text": "LUX",
+                    "text": " LIGHT",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -5154,7 +5154,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "center"
                       }
                     }
@@ -5223,7 +5223,7 @@
                   "type": "label",
                   "codeName": "settings_nav_focus_text",
                   "props": {
-                    "text": "FOC",
+                    "text": " FOCUS",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -5233,7 +5233,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "center"
                       }
                     }
@@ -5302,7 +5302,7 @@
                   "type": "label",
                   "codeName": "settings_nav_settings_text",
                   "props": {
-                    "text": "SET",
+                    "text": " SET",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -5312,7 +5312,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "center"
                       }
                     }

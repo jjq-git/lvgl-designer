@@ -174,9 +174,9 @@
               "codeName": "home_page_title",
               "props": {
                 "text": "HOME",
-                "x": 60,
+                "x": 80,
                 "y": 18,
-                "width": 120,
+                "width": 80,
                 "height": "content"
               },
               "styleRefs": [],
@@ -184,7 +184,7 @@
                 {
                   "props": {
                     "text_color": "#8FA7BD",
-                    "text_font": "montserrat_14",
+                    "text_font": "montserrat_16",
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -252,7 +252,7 @@
                   "type": "label",
                   "codeName": "home_next_text",
                   "props": {
-                    "text": ">",
+                    "text": "",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -389,10 +389,10 @@
               "type": "label",
               "codeName": "home_air",
               "props": {
-                "text": "AIR  GOOD",
-                "x": 70,
+                "text": "  AIR GOOD",
+                "x": 60,
                 "y": 151,
-                "width": 100,
+                "width": 120,
                 "height": "content"
               },
               "styleRefs": [],
@@ -415,10 +415,10 @@
               "type": "button",
               "codeName": "home_start",
               "props": {
-                "x": 80,
-                "y": 182,
-                "width": 80,
-                "height": 32
+                "x": 76,
+                "y": 180,
+                "width": 88,
+                "height": 36
               },
               "flags": {
                 "scrollable": false
@@ -431,7 +431,7 @@
                     "bg_opa": 255,
                     "border_width": 0,
                     "border_color": "#203852",
-                    "radius": 16,
+                    "radius": 18,
                     "shadow_width": 10,
                     "shadow_color": "#3B82F6",
                     "shadow_opa": 55,
@@ -466,7 +466,7 @@
                   "type": "label",
                   "codeName": "home_start_text",
                   "props": {
-                    "text": "START",
+                    "text": "  START",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -476,7 +476,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_font": "montserrat_12",
                         "text_align": "center"
                       }
                     }
@@ -524,9 +524,9 @@
               "codeName": "air_page_title",
               "props": {
                 "text": "AIR",
-                "x": 60,
+                "x": 80,
                 "y": 18,
-                "width": 120,
+                "width": 80,
                 "height": "content"
               },
               "styleRefs": [],
@@ -534,7 +534,7 @@
                 {
                   "props": {
                     "text_color": "#8FA7BD",
-                    "text_font": "montserrat_14",
+                    "text_font": "montserrat_16",
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -602,7 +602,7 @@
                   "type": "label",
                   "codeName": "air_back_text",
                   "props": {
-                    "text": "<",
+                    "text": "",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -681,7 +681,7 @@
                   "type": "label",
                   "codeName": "air_next_text",
                   "props": {
-                    "text": ">",
+                    "text": "",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -792,10 +792,10 @@
               "type": "label",
               "codeName": "air_ppm",
               "props": {
-                "text": "ppm",
-                "x": 70,
+                "text": "ppm   GOOD",
+                "x": 55,
                 "y": 123,
-                "width": 100,
+                "width": 130,
                 "height": "content"
               },
               "styleRefs": [],
@@ -818,10 +818,10 @@
               "type": "label",
               "codeName": "air_fan",
               "props": {
-                "text": "FAN 36%",
-                "x": 52,
+                "text": " FAN 36%",
+                "x": 48,
                 "y": 158,
-                "width": 136,
+                "width": 144,
                 "height": "content"
               },
               "styleRefs": [],
@@ -841,7 +841,7 @@
                   "kind": "prop",
                   "prop": "text",
                   "subject": "subject:fan_speed",
-                  "fmt": "FAN %d%%"
+                  "fmt": " FAN %d%%"
                 }
               ],
               "children": []
@@ -941,9 +941,9 @@
               "codeName": "light_page_title",
               "props": {
                 "text": "LIGHT",
-                "x": 60,
+                "x": 80,
                 "y": 18,
-                "width": 120,
+                "width": 80,
                 "height": "content"
               },
               "styleRefs": [],
@@ -951,7 +951,7 @@
                 {
                   "props": {
                     "text_color": "#8FA7BD",
-                    "text_font": "montserrat_14",
+                    "text_font": "montserrat_16",
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -1019,7 +1019,7 @@
                   "type": "label",
                   "codeName": "light_back_text",
                   "props": {
-                    "text": "<",
+                    "text": "",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -1098,7 +1098,7 @@
                   "type": "label",
                   "codeName": "light_next_text",
                   "props": {
-                    "text": ">",
+                    "text": "",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -1345,9 +1345,9 @@
               "codeName": "focus_page_title",
               "props": {
                 "text": "FOCUS",
-                "x": 60,
+                "x": 80,
                 "y": 18,
-                "width": 120,
+                "width": 80,
                 "height": "content"
               },
               "styleRefs": [],
@@ -1355,7 +1355,7 @@
                 {
                   "props": {
                     "text_color": "#8FA7BD",
-                    "text_font": "montserrat_14",
+                    "text_font": "montserrat_16",
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -1423,7 +1423,7 @@
                   "type": "label",
                   "codeName": "focus_back_text",
                   "props": {
-                    "text": "<",
+                    "text": "",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -1502,7 +1502,7 @@
                   "type": "label",
                   "codeName": "focus_next_text",
                   "props": {
-                    "text": ">",
+                    "text": "",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -1529,17 +1529,17 @@
               "codeName": "focus_prompt",
               "props": {
                 "text": "SELECT MODE",
-                "x": 55,
-                "y": 66,
-                "width": 130,
+                "x": 60,
+                "y": 65,
+                "width": 120,
                 "height": "content"
               },
               "styleRefs": [],
               "styles": [
                 {
                   "props": {
-                    "text_color": "#F4F8FC",
-                    "text_font": "montserrat_14",
+                    "text_color": "#8FA7BD",
+                    "text_font": "montserrat_12",
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -1615,7 +1615,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_font": "montserrat_12",
                         "text_align": "center"
                       }
                     }
@@ -1692,7 +1692,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_font": "montserrat_12",
                         "text_align": "center"
                       }
                     }
@@ -1769,7 +1769,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_font": "montserrat_12",
                         "text_align": "center"
                       }
                     }
@@ -1846,7 +1846,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_font": "montserrat_12",
                         "text_align": "center"
                       }
                     }
@@ -1920,9 +1920,9 @@
               "codeName": "settings_page_title",
               "props": {
                 "text": "SET",
-                "x": 60,
+                "x": 80,
                 "y": 18,
-                "width": 120,
+                "width": 80,
                 "height": "content"
               },
               "styleRefs": [],
@@ -1930,7 +1930,7 @@
                 {
                   "props": {
                     "text_color": "#8FA7BD",
-                    "text_font": "montserrat_14",
+                    "text_font": "montserrat_16",
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -1998,7 +1998,7 @@
                   "type": "label",
                   "codeName": "settings_back_text",
                   "props": {
-                    "text": "<",
+                    "text": "",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -2077,7 +2077,7 @@
                   "type": "label",
                   "codeName": "settings_home_text",
                   "props": {
-                    "text": "H",
+                    "text": "",
                     "align": "center",
                     "width": "100%",
                     "height": "content"
@@ -2087,7 +2087,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_16",
                         "text_align": "center"
                       }
                     }
@@ -2103,10 +2103,10 @@
               "type": "label",
               "codeName": "settings_dnd_label",
               "props": {
-                "text": "DND",
-                "x": 54,
-                "y": 78,
-                "width": 80,
+                "text": "  DND",
+                "x": 42,
+                "y": 77,
+                "width": 92,
                 "height": "content"
               },
               "styleRefs": [],
@@ -2129,9 +2129,9 @@
               "type": "switch",
               "codeName": "settings_dnd",
               "props": {
-                "x": 130,
+                "x": 138,
                 "y": 72,
-                "width": 52,
+                "width": 48,
                 "height": 26
               },
               "styleRefs": [],
@@ -2193,10 +2193,10 @@
               "type": "label",
               "codeName": "settings_vent_label",
               "props": {
-                "text": "AUTO AIR",
-                "x": 54,
-                "y": 120,
-                "width": 80,
+                "text": "  VENT",
+                "x": 42,
+                "y": 119,
+                "width": 92,
                 "height": "content"
               },
               "styleRefs": [],
@@ -2219,9 +2219,9 @@
               "type": "switch",
               "codeName": "settings_vent",
               "props": {
-                "x": 130,
+                "x": 138,
                 "y": 114,
-                "width": 52,
+                "width": 48,
                 "height": 26
               },
               "styleRefs": [],
@@ -2283,10 +2283,10 @@
               "type": "label",
               "codeName": "settings_light_label",
               "props": {
-                "text": "AUTO LUX",
-                "x": 54,
-                "y": 162,
-                "width": 80,
+                "text": "  LIGHT",
+                "x": 42,
+                "y": 161,
+                "width": 92,
                 "height": "content"
               },
               "styleRefs": [],
@@ -2309,9 +2309,9 @@
               "type": "switch",
               "codeName": "settings_light",
               "props": {
-                "x": 130,
+                "x": 138,
                 "y": 156,
-                "width": 52,
+                "width": 48,
                 "height": 26
               },
               "styleRefs": [],
@@ -2374,9 +2374,9 @@
               "codeName": "settings_version",
               "props": {
                 "text": "WF2D-8620  v1.4",
-                "x": 64,
+                "x": 55,
                 "y": 205,
-                "width": 112,
+                "width": 130,
                 "height": "content"
               },
               "styleRefs": [],
@@ -2384,7 +2384,7 @@
                 {
                   "props": {
                     "text_color": "#8FA7BD",
-                    "text_font": "montserrat_10",
+                    "text_font": "montserrat_12",
                     "text_align": "center",
                     "text_opa": 255
                   }

@@ -56,6 +56,7 @@ import {
 import { useEditorStore } from '../stores/editorStore';
 import { useBuildTargetStore } from '../stores/buildTargetStore';
 import { AssetMultiPicker, AssetPicker } from './AssetPicker';
+import { IconTextEditor } from './IconTextEditor';
 
 const GROUP_ORDER: { key: PropSpec['ui']['group']; label: string }[] = [
   { key: 'geometry', label: '布局' },
@@ -246,12 +247,11 @@ function ButtonTextRow({ node }: { node: WidgetNodeV2 }): JSX.Element {
   return (
     <div className="prop-row">
       <label title="内部自动创建或更新居中的 Label">按钮文字</label>
-      <input
-        className="ed-text"
-        aria-label="按钮文字"
+      <IconTextEditor
+        ariaLabel="按钮文字"
         value={value}
         placeholder="输入文字（自动创建标签）"
-        onChange={(event) => setText(event.target.value)}
+        onCommit={setText}
       />
     </div>
   );
@@ -2040,6 +2040,16 @@ function ValueEditor(props: {
     }
     default:
       // string / subject / styleRef / 其它 → 文本
+      if (propKey === 'text') {
+        return (
+          <IconTextEditor
+            ariaLabel={ariaLabel}
+            value={typeof value === 'string' ? value : value !== undefined ? String(value) : ''}
+            placeholder={ph}
+            onCommit={(v) => onChange(v === '' ? undefined : v)}
+          />
+        );
+      }
       return (
         <TextCommitEditor
           ariaLabel={ariaLabel}

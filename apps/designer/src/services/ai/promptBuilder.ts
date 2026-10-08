@@ -103,6 +103,7 @@ function screenSection(project: LvProject, screen: ScreenDef): string {
 
 function rulesSection(project: LvProject): string {
   const d = project.display;
+  const minimumTextSize = d.width <= 240 ? 12 : d.width <= 480 ? 14 : 16;
   const rules = [
     `1. 编辑当前屏时坐标/尺寸不得越界:${d.width}x${d.height};create_screen 带 displayPreset 时必须改用该预设标注的宽高布局；x/y 配合 align 使用,内容留边距`,
     '2. 文字用 label(中文直接写在 text 里;中文不要设 text_font,内置 montserrat 只有英文数字字形)',
@@ -112,9 +113,11 @@ function rulesSection(project: LvProject): string {
     '6. 用户明确说“新建/创建/新增一个屏幕或页面”时必须用 create_screen，不得用 replace_screen；create_screen 的 root 内直接给出完整 UI',
     `7. 屏幕尺寸和形状是项目级 Display Profile，所有屏幕共用当前 ${d.width}x${d.height} ${d.shape === 'round' ? '圆形' : '矩形'}规格；create_screen 可通过 displayPreset 切换整个项目规格，未提供时不得声称已切换规格`,
     '8. 用户指定圆形屏/圆屏时，create_screen 必须填写一个 shape=round 的 displayPreset；指定型号时必须选择该型号，不能仅靠根节点 radius 模拟',
+    '9. 图标只用于高辨识度的导航或动作（如主页、返回、下一页、播放）；页面标题、状态、模式名称、数值单位和危险操作必须保留文字，有歧义的操作使用“图标 + 短文字”，不得把整套界面的文字全部替换成图标',
+    `10. 可读性下限：当前 ${d.width}x${d.height} 屏幕的普通文字和按钮图标不得小于 montserrat_${minimumTextSize}，页面标题、核心数值和主要操作应更大；不得为了塞入更多内容使用过小字号`,
   ];
   if (d.shape === 'round') {
-    rules.push(`9. 圆屏:四角被裁掉,重要内容放内切圆内(中心 ${d.width / 2},${d.height / 2},半径 ${Math.min(d.width, d.height) / 2}),避免贴边贴角`);
+    rules.push(`11. 圆屏:四角被裁掉,重要内容放内切圆内(中心 ${d.width / 2},${d.height / 2},半径 ${Math.min(d.width, d.height) / 2}),避免贴边贴角`);
   }
   return ['硬性规则:', ...rules].join('\n');
 }

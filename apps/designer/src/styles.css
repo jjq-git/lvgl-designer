@@ -1106,6 +1106,116 @@ input::placeholder { color: var(--fg-hint); }
 .ed-size { display: flex; gap: 4px; flex: 1; }
 .ed-size-mode { flex: 0 0 76px; }
 
+/* ---------- LVGL 符号文本编辑器 ---------- */
+.icon-text-editor {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.icon-text-editor .ed-text { width: 0; }
+.icon-text-picker-btn {
+  flex: 0 0 auto;
+  min-width: 42px;
+  height: 28px;
+  padding: 0 7px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 7px;
+  background: var(--bg-panel);
+  color: var(--fg);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.icon-text-picker-btn:hover,
+.icon-text-picker-btn[aria-expanded='true'] {
+  border-color: var(--accent);
+  background: var(--accent-tint);
+}
+.lvgl-symbol-pop {
+  position: fixed;
+  z-index: 12000;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  background: var(--bg-panel);
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  box-shadow: var(--shadow-menu);
+}
+.lvgl-symbol-head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.lvgl-symbol-head strong { font-size: 13px; color: var(--fg); }
+.lvgl-symbol-head span { font-size: 10px; color: var(--fg-hint); }
+.lvgl-symbol-search { width: 100%; min-height: 30px; flex: 0 0 auto; }
+.lvgl-symbol-mode {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px;
+  padding: 3px;
+  border-radius: 8px;
+  background: var(--bg-inset);
+}
+.lvgl-symbol-mode button {
+  min-height: 27px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--fg-secondary);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+.lvgl-symbol-mode button.active {
+  background: var(--bg-panel);
+  color: var(--accent);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+.lvgl-symbol-grid {
+  overflow: auto;
+  overscroll-behavior: contain;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 5px;
+  min-height: 0;
+}
+.lvgl-symbol-grid button {
+  display: flex;
+  min-width: 0;
+  min-height: 58px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 3px;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  background: var(--bg-inset);
+  color: var(--fg-secondary);
+  font: inherit;
+  font-size: 10px;
+  cursor: pointer;
+}
+.lvgl-symbol-grid button:hover {
+  border-color: var(--accent);
+  background: var(--accent-tint);
+  color: var(--fg);
+}
+.lvgl-symbol-glyph { color: var(--fg); font-size: 22px; line-height: 1; }
+.lvgl-symbol-empty {
+  grid-column: 1 / -1;
+  padding: 20px;
+  text-align: center;
+  color: var(--fg-hint);
+  font-size: 11px;
+}
+
 .flags-grid { display: flex; flex-direction: column; gap: 2px; }
 .flag-item {
   display: flex;

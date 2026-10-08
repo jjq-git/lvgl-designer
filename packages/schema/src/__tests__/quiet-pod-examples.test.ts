@@ -48,6 +48,23 @@ function expectInsideCanvas(
   });
 }
 
+function collectText(node: WidgetNodeV2): string[] {
+  const own = typeof node.props.text === 'string' ? [node.props.text] : [];
+  return [...own, ...node.children.flatMap(collectText)];
+}
+
+function collectTextFontSizes(node: WidgetNodeV2): Array<{ name: string; text: string; size: number }> {
+  const text = typeof node.props.text === 'string' ? node.props.text : null;
+  const font = node.styles
+    .map((entry) => entry.props.text_font)
+    .find((value): value is string => typeof value === 'string');
+  const match = font ? /^montserrat_(\d+)$/.exec(font) : null;
+  const own = text !== null && match
+    ? [{ name: node.codeName ?? node.type, text, size: Number(match[1]) }]
+    : [];
+  return [...own, ...node.children.flatMap(collectTextFontSizes)];
+}
+
 describe('quiet pod example projects', () => {
   for (const preset of PRESETS) {
     it(`${preset.model} is a valid five-screen project for its exact display`, () => {
@@ -87,6 +104,40 @@ describe('quiet pod example projects', () => {
           );
         });
       });
+
+      const minimumTextSize = preset.width <= 240 ? 12 : preset.width <= 480 ? 14 : 16;
+      const textNodes = snapshot.uiProject.screens.flatMap((screen) => collectTextFontSizes(screen.root));
+      expect(textNodes.length).toBeGreaterThan(0);
+      expect(
+        textNodes.filter((item) => item.size < minimumTextSize),
+        `${preset.model} contains text smaller than ${minimumTextSize}px`,
+      ).toEqual([]);
+
+      const allText = snapshot.uiProject.screens.flatMap((screen) => collectText(screen.root));
+      expect(allText).not.toContain('QUIET POD');
+      expect(allText).not.toContain('QUIET\nPOD');
+      if (preset.shape !== 'round') {
+        expect(allText.filter((value) => value === 'BRAND A')).toHaveLength(5);
+      }
     });
   }
+
+  it('balances real LVGL action icons with readable labels on the round UI', () => {
+    const { snapshot } = loadExample('WF2D-8620');
+    const text = snapshot.uiProject.screens.flatMap((screen) => collectText(screen.root));
+
+    expect(text).toEqual(expect.arrayContaining([
+      '\uf054',
+      '\uf015',
+      '\uf00c  AIR GOOD',
+      '\uf04b  START',
+      'HOME',
+      'SELECT MODE',
+      'DEEP',
+      '\uf026  DND',
+    ]));
+    for (const placeholder of ['>', '<', 'H']) {
+      expect(text).not.toContain(placeholder);
+    }
+  });
 });

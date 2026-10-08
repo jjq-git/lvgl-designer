@@ -57,6 +57,9 @@ describe('buildSystemPrompt', () => {
     expect(prompt).toContain('圆屏:四角被裁掉');
     expect(prompt).toContain('必须用 create_screen');
     expect(prompt).toContain('不能仅靠根节点 radius 模拟');
+    expect(prompt).toContain('有歧义的操作使用“图标 + 短文字”');
+    expect(prompt).toContain('不得把整套界面的文字全部替换成图标');
+    expect(prompt).toContain('普通文字和按钮图标不得小于 montserrat_12');
     expect(prompt).toContain('"type":"obj"');   // 当前屏精简 JSON
   });
 

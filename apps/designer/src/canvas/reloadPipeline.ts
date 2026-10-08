@@ -217,13 +217,17 @@ export class ReloadPipeline {
 
   /** 启动:全量 reloadAll + 订阅 projectStore(ARCHITECTURE §3.4 G5 管线) */
   start(): void {
-    this.reloadAllNow();
     let prevRevision = useProjectStore.getState().revision;
     this.unsub = useProjectStore.subscribe((s) => {
       if (s.revision === prevRevision) return;
       prevRevision = s.revision;
       this.onChange(s.lastPatches, s.lastChangeKind === 'load', s.project);
     });
+    // Subscribe before the initial reload. A stale cached project can fail
+    // preview compilation during startup; keeping the subscription alive lets
+    // a later cloud/project reload recover the canvas instead of leaving it
+    // permanently blank until the whole page is refreshed.
+    this.onChange([], true, useProjectStore.getState().project);
   }
 
   dispose(): void {

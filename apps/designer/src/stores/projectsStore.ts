@@ -162,7 +162,9 @@ export const useProjectsStore = create<ProjectsStoreState>()((set, get) => ({
   },
 
   openProject: async (id) => {
-    if (id === get().currentId) return;
+    // 允许重新打开当前工程。云端可能已由另一会话、导入脚本或管理员更新；
+    // 若在这里直接 return，项目列表里的“当前”项永远无法主动拉取新版本，
+    // 编辑器会继续显示 IndexedDB/内存中的旧文档。
     // 切换工程前结清当前工程的待保存内容。否则旧 debounce 可能在新工程
     // 载入后执行，导致旧改动丢失，甚至把新文档写到错误的工程 id。
     if (saveTimer !== null) {

@@ -751,6 +751,15 @@ function validateStyleProps(
         issue(out, 'E_PREVIEW_STYLE_OPA_INVALID', valuePath, `非法透明度:${value}`);
       } else if (STYLE_FONT.has(key) && value.length === 0) {
         issue(out, 'E_PREVIEW_STYLE_FONT_INVALID', valuePath, '字体引用不得为空');
+      } else if (STYLE_FONT.has(key)) {
+        const builtIn = /^montserrat_(\d+)$/.exec(value);
+        if (builtIn) {
+          const size = Number(builtIn[1]);
+          if (size < 8 || size > 48 || size % 2 !== 0) {
+            issue(out, 'E_PREVIEW_STYLE_FONT_INVALID', valuePath,
+              `WASM 预览仅内置 montserrat_8..48 的偶数字号:${value}`);
+          }
+        }
       }
     } else if (typeof value === 'boolean') {
       issue(out, 'E_PREVIEW_STYLE_VALUE_UNSUPPORTED', valuePath, `v1 driver 尚未开放 bool style:${key}`);

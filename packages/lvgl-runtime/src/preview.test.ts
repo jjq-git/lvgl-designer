@@ -155,6 +155,18 @@ describe('PreviewProgram runtime executor', () => {
     expect(calls).toContain('style-str:main:bg_opa:50%:main:pressed');
   });
 
+  it('rejects built-in font sizes that are absent from the WASM runtime', () => {
+    const p = program();
+    const label = p.screens[0]!.root.children[0]!.children[0]!;
+    label.inlineStyles.push({ props: { text_font: 'montserrat_13' } });
+
+    expect(validatePreviewProgramSupport(p).map((entry) => entry.code))
+      .toContain('E_PREVIEW_STYLE_FONT_INVALID');
+
+    label.inlineStyles[0]!.props.text_font = 'montserrat_14';
+    expect(validatePreviewProgramSupport(p)).toEqual([]);
+  });
+
   it('命名 style 保持独立生命周期并以 selector 挂载', () => {
     const p = program();
     p.globals.styles.push({

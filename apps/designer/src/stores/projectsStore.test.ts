@@ -91,6 +91,30 @@ describe('projectsStore switching and preview safety', () => {
     expect(useProjectsStore.getState().currentId).toBe('next-id');
   });
 
+  it('reopens the current project to fetch a newer cloud version', async () => {
+    const updated = createNewStoredProjectDocument(createEmptyProject('updated current'));
+    cloudMock.getProject.mockResolvedValue({
+      ok: true,
+      data: {
+        id: 'old-id',
+        name: 'updated current',
+        doc: updated,
+        version: 4,
+        updated_at: new Date().toISOString(),
+      },
+    });
+
+    await useProjectsStore.getState().openProject('old-id');
+
+    expect(cloudMock.getProject).toHaveBeenCalledWith('old-id');
+    expect(useProjectsStore.getState()).toMatchObject({
+      currentId: 'old-id',
+      currentName: 'updated current',
+      currentVersion: 4,
+    });
+    expect(useProjectStore.getState().project.meta.name).toBe('updated current');
+  });
+
   it('blocks manual cloud saves while a history version is being previewed', async () => {
     useProjectStore.getState().mutateV2('preview-only edit', (draft) => {
       draft.meta.name = 'must not sync';

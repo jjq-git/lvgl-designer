@@ -14,7 +14,8 @@
     "test:deploy": "corepack pnpm --dir deploy --ignore-workspace test",
     "test:backend": "python -m pytest backend/tests -q",
     "typecheck": "corepack pnpm -r typecheck",
-    "audit:lvgl-diff": "node scripts/audit-lvgl-version-diff.mjs"
+    "audit:lvgl-diff": "node scripts/audit-lvgl-version-diff.mjs",
+    "generate:quiet-pod-demos": "node scripts/generate-quiet-pod-projects.mjs"
   },
   "devDependencies": {
     "playwright": "^1.61.1",

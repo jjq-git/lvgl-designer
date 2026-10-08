@@ -119,7 +119,8 @@ select.ed-select:focus-visible,
 .app-dialog-mask {
   position: fixed;
   inset: 0;
-  z-index: 1200;
+  /* Global confirmations/prompts must stay above cloud, AI, auth, and catalog modals. */
+  z-index: 11000;
   display: grid;
   place-items: center;
   padding: 20px;

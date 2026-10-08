@@ -1,0 +1,5522 @@
+{
+  "kind": "lvgl-project-snapshot",
+  "snapshotVersion": 1,
+  "uiProject": {
+    "schemaVersion": 2,
+    "kind": "lvgl-ui-project",
+    "meta": {
+      "id": "ui:wf2d-8630-quiet-pod",
+      "revision": 1,
+      "name": "WF2D-8630 静音仓操作界面",
+      "appVersion": "1.0.0",
+      "createdAt": "2026-10-08T00:00:00.000Z",
+      "modifiedAt": "2026-10-08T00:00:00.000Z"
+    },
+    "designDisplayRef": "display:wf2d-8630-480x480-rgb565@1",
+    "themes": [
+      {
+        "id": "default",
+        "displayName": "默认",
+        "tokens": []
+      }
+    ],
+    "subjects": [
+      {
+        "id": "subject:pod_mode",
+        "codeName": "pod_mode",
+        "displayName": "pod mode",
+        "type": "int",
+        "initial": 0,
+        "min": 0,
+        "max": 3
+      },
+      {
+        "id": "subject:pod_occupied",
+        "codeName": "pod_occupied",
+        "displayName": "pod occupied",
+        "type": "int",
+        "initial": 1,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "id": "subject:light_enabled",
+        "codeName": "light_enabled",
+        "displayName": "light enabled",
+        "type": "int",
+        "initial": 1,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "id": "subject:light_brightness",
+        "codeName": "light_brightness",
+        "displayName": "light brightness",
+        "type": "int",
+        "initial": 68,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "id": "subject:light_cct",
+        "codeName": "light_cct",
+        "displayName": "light cct",
+        "type": "int",
+        "initial": 4200,
+        "min": 2700,
+        "max": 6500
+      },
+      {
+        "id": "subject:fan_enabled",
+        "codeName": "fan_enabled",
+        "displayName": "fan enabled",
+        "type": "int",
+        "initial": 1,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "id": "subject:fan_speed",
+        "codeName": "fan_speed",
+        "displayName": "fan speed",
+        "type": "int",
+        "initial": 36,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "id": "subject:vent_enabled",
+        "codeName": "vent_enabled",
+        "displayName": "vent enabled",
+        "type": "int",
+        "initial": 1,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "id": "subject:dnd_enabled",
+        "codeName": "dnd_enabled",
+        "displayName": "dnd enabled",
+        "type": "int",
+        "initial": 1,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "id": "subject:co2_level",
+        "codeName": "co2_level",
+        "displayName": "co2 level",
+        "type": "int",
+        "initial": 586,
+        "min": 350,
+        "max": 2000
+      },
+      {
+        "id": "subject:noise_level",
+        "codeName": "noise_level",
+        "displayName": "noise level",
+        "type": "int",
+        "initial": 32,
+        "min": 20,
+        "max": 90
+      },
+      {
+        "id": "subject:temperature",
+        "codeName": "temperature",
+        "displayName": "temperature",
+        "type": "int",
+        "initial": 24,
+        "min": 10,
+        "max": 40
+      },
+      {
+        "id": "subject:humidity",
+        "codeName": "humidity",
+        "displayName": "humidity",
+        "type": "int",
+        "initial": 46,
+        "min": 0,
+        "max": 100
+      }
+    ],
+    "screens": [
+      {
+        "id": "00000000-0000-4000-8000-000000000001",
+        "codeName": "home",
+        "displayName": "总览",
+        "isHome": true,
+        "styles": [],
+        "consts": [],
+        "root": {
+          "id": "00000000-0000-4000-8000-000000000148",
+          "type": "obj",
+          "props": {},
+          "flags": {
+            "scrollable": false
+          },
+          "styleRefs": [],
+          "styles": [
+            {
+              "props": {
+                "bg_color": "#06101E",
+                "bg_opa": 255,
+                "border_width": 0,
+                "pad_all": 0
+              }
+            }
+          ],
+          "events": [],
+          "bindings": [],
+          "children": [
+            {
+              "id": "00000000-0000-4000-8000-000000000006",
+              "type": "label",
+              "codeName": "home_brand",
+              "props": {
+                "text": "QUIET POD",
+                "x": 22,
+                "y": 20,
+                "width": 220,
+                "height": "content"
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": "#32D6C6",
+                    "text_font": "montserrat_20",
+                    "text_align": "left",
+                    "text_opa": 255
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000007",
+              "type": "label",
+              "codeName": "home_title",
+              "props": {
+                "text": "HOME",
+                "x": 250,
+                "y": 23,
+                "width": 208,
+                "height": "content"
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": "#8FA7BD",
+                    "text_font": "montserrat_14",
+                    "text_align": "right",
+                    "text_opa": 255
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000013",
+              "type": "obj",
+              "codeName": "home_hero",
+              "props": {
+                "x": 22,
+                "y": 64,
+                "width": 274,
+                "height": 338
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#102238",
+                    "bg_opa": 255,
+                    "border_color": "#203852",
+                    "border_width": 1,
+                    "radius": 18,
+                    "pad_all": 0,
+                    "shadow_color": "#000000",
+                    "shadow_width": 18,
+                    "shadow_opa": 90,
+                    "shadow_offset_y": 6
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000008",
+                  "type": "arc",
+                  "codeName": "home_quiet_arc",
+                  "props": {
+                    "x": 47,
+                    "y": 30,
+                    "width": 180,
+                    "height": 180,
+                    "min_value": 0,
+                    "max_value": 100,
+                    "value": 36,
+                    "bg_start_angle": 135,
+                    "bg_end_angle": 45,
+                    "start_angle": 135,
+                    "end_angle": 45,
+                    "knob_offset": -3
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "selector": {
+                        "part": "main"
+                      },
+                      "props": {
+                        "arc_color": "#263C52",
+                        "arc_width": 15
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "indicator"
+                      },
+                      "props": {
+                        "arc_color": "#32D6C6",
+                        "arc_width": 15
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "knob"
+                      },
+                      "props": {
+                        "bg_color": "#32D6C6",
+                        "bg_opa": 255,
+                        "radius": 12
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [
+                    {
+                      "kind": "prop",
+                      "prop": "value",
+                      "subject": "subject:fan_speed"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000009",
+                  "type": "label",
+                  "codeName": "home_quiet",
+                  "props": {
+                    "text": "QUIET",
+                    "x": 57,
+                    "y": 92,
+                    "width": 160,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_32",
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000010",
+                  "type": "label",
+                  "codeName": "home_noise",
+                  "props": {
+                    "text": "32 dB",
+                    "x": 77,
+                    "y": 136,
+                    "width": 120,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#32D6C6",
+                        "text_font": "montserrat_18",
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000012",
+                  "type": "button",
+                  "codeName": "home_end",
+                  "props": {
+                    "x": 42,
+                    "y": 262,
+                    "width": 190,
+                    "height": 50
+                  },
+                  "flags": {
+                    "scrollable": false
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "bg_color": "#FF6B6B",
+                        "bg_opa": 255,
+                        "border_width": 0,
+                        "border_color": "#203852",
+                        "radius": 18,
+                        "shadow_width": 10,
+                        "shadow_color": "#FF6B6B",
+                        "shadow_opa": 55,
+                        "pad_all": 0
+                      }
+                    },
+                    {
+                      "selector": {
+                        "states": [
+                          "pressed"
+                        ]
+                      },
+                      "props": {
+                        "bg_color": "#32D6C6"
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": [
+                    {
+                      "id": "00000000-0000-4000-8000-000000000011",
+                      "type": "label",
+                      "codeName": "home_end_text",
+                      "props": {
+                        "text": "END SESSION",
+                        "align": "center",
+                        "width": "100%",
+                        "height": "content"
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "text_color": "#F4F8FC",
+                            "text_font": "montserrat_14",
+                            "text_align": "center"
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000017",
+              "type": "obj",
+              "codeName": "home_co2",
+              "props": {
+                "x": 314,
+                "y": 64,
+                "width": 144,
+                "height": 102
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#102238",
+                    "bg_opa": 255,
+                    "border_color": "#203852",
+                    "border_width": 1,
+                    "radius": 18,
+                    "pad_all": 0,
+                    "shadow_color": "#000000",
+                    "shadow_width": 18,
+                    "shadow_opa": 90,
+                    "shadow_offset_y": 6
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000014",
+                  "type": "label",
+                  "codeName": "home_co2_title",
+                  "props": {
+                    "text": "CO2",
+                    "x": 22,
+                    "y": 18,
+                    "width": 100,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#8FA7BD",
+                        "text_font": "montserrat_14",
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000015",
+                  "type": "label",
+                  "codeName": "home_co2_value",
+                  "props": {
+                    "text": "586",
+                    "x": 22,
+                    "y": 43,
+                    "width": 100,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#51D88A",
+                        "text_font": "montserrat_30",
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000016",
+                  "type": "label",
+                  "codeName": "home_co2_unit",
+                  "props": {
+                    "text": "ppm",
+                    "x": 22,
+                    "y": 68,
+                    "width": 100,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#8FA7BD",
+                        "text_font": "montserrat_12",
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000021",
+              "type": "obj",
+              "codeName": "home_temp",
+              "props": {
+                "x": 314,
+                "y": 182,
+                "width": 144,
+                "height": 102
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#102238",
+                    "bg_opa": 255,
+                    "border_color": "#203852",
+                    "border_width": 1,
+                    "radius": 18,
+                    "pad_all": 0,
+                    "shadow_color": "#000000",
+                    "shadow_width": 18,
+                    "shadow_opa": 90,
+                    "shadow_offset_y": 6
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000018",
+                  "type": "label",
+                  "codeName": "home_temp_title",
+                  "props": {
+                    "text": "TEMP",
+                    "x": 22,
+                    "y": 18,
+                    "width": 100,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#8FA7BD",
+                        "text_font": "montserrat_14",
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000019",
+                  "type": "label",
+                  "codeName": "home_temp_value",
+                  "props": {
+                    "text": "24.2",
+                    "x": 22,
+                    "y": 43,
+                    "width": 100,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F5B942",
+                        "text_font": "montserrat_30",
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000020",
+                  "type": "label",
+                  "codeName": "home_temp_unit",
+                  "props": {
+                    "text": "deg C",
+                    "x": 22,
+                    "y": 68,
+                    "width": 100,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#8FA7BD",
+                        "text_font": "montserrat_12",
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000025",
+              "type": "obj",
+              "codeName": "home_humidity",
+              "props": {
+                "x": 314,
+                "y": 300,
+                "width": 144,
+                "height": 102
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#102238",
+                    "bg_opa": 255,
+                    "border_color": "#203852",
+                    "border_width": 1,
+                    "radius": 18,
+                    "pad_all": 0,
+                    "shadow_color": "#000000",
+                    "shadow_width": 18,
+                    "shadow_opa": 90,
+                    "shadow_offset_y": 6
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000022",
+                  "type": "label",
+                  "codeName": "home_humidity_title",
+                  "props": {
+                    "text": "HUM",
+                    "x": 22,
+                    "y": 18,
+                    "width": 100,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#8FA7BD",
+                        "text_font": "montserrat_14",
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000023",
+                  "type": "label",
+                  "codeName": "home_humidity_value",
+                  "props": {
+                    "text": "46",
+                    "x": 22,
+                    "y": 43,
+                    "width": 100,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#3B82F6",
+                        "text_font": "montserrat_30",
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000024",
+                  "type": "label",
+                  "codeName": "home_humidity_unit",
+                  "props": {
+                    "text": "percent",
+                    "x": 22,
+                    "y": 68,
+                    "width": 100,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#8FA7BD",
+                        "text_font": "montserrat_12",
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000027",
+              "type": "button",
+              "codeName": "home_nav_home",
+              "props": {
+                "x": 14,
+                "y": 426,
+                "width": 82,
+                "height": 40
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#3B82F6",
+                    "bg_opa": 255,
+                    "border_width": 0,
+                    "border_color": "#203852",
+                    "radius": 18,
+                    "shadow_width": 0,
+                    "shadow_color": "#3B82F6",
+                    "shadow_opa": 0,
+                    "pad_all": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": "#32D6C6"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "00000000-0000-4000-8000-000000000001",
+                    "anim": "fade_on",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000026",
+                  "type": "label",
+                  "codeName": "home_nav_home_text",
+                  "props": {
+                    "text": "H",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_12",
+                        "text_align": "center"
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000029",
+              "type": "button",
+              "codeName": "home_nav_air",
+              "props": {
+                "x": 106,
+                "y": 426,
+                "width": 82,
+                "height": 40
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#0C1B2E",
+                    "bg_opa": 255,
+                    "border_width": 1,
+                    "border_color": "#203852",
+                    "radius": 18,
+                    "shadow_width": 0,
+                    "shadow_color": "#0C1B2E",
+                    "shadow_opa": 0,
+                    "pad_all": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": "#32D6C6"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "00000000-0000-4000-8000-000000000002",
+                    "anim": "fade_on",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000028",
+                  "type": "label",
+                  "codeName": "home_nav_air_text",
+                  "props": {
+                    "text": "AIR",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_12",
+                        "text_align": "center"
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000031",
+              "type": "button",
+              "codeName": "home_nav_light",
+              "props": {
+                "x": 198,
+                "y": 426,
+                "width": 82,
+                "height": 40
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#0C1B2E",
+                    "bg_opa": 255,
+                    "border_width": 1,
+                    "border_color": "#203852",
+                    "radius": 18,
+                    "shadow_width": 0,
+                    "shadow_color": "#0C1B2E",
+                    "shadow_opa": 0,
+                    "pad_all": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": "#32D6C6"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "00000000-0000-4000-8000-000000000003",
+                    "anim": "fade_on",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000030",
+                  "type": "label",
+                  "codeName": "home_nav_light_text",
+                  "props": {
+                    "text": "LUX",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_12",
+                        "text_align": "center"
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000033",
+              "type": "button",
+              "codeName": "home_nav_focus",
+              "props": {
+                "x": 290,
+                "y": 426,
+                "width": 82,
+                "height": 40
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#0C1B2E",
+                    "bg_opa": 255,
+                    "border_width": 1,
+                    "border_color": "#203852",
+                    "radius": 18,
+                    "shadow_width": 0,
+                    "shadow_color": "#0C1B2E",
+                    "shadow_opa": 0,
+                    "pad_all": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": "#32D6C6"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "00000000-0000-4000-8000-000000000004",
+                    "anim": "fade_on",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000032",
+                  "type": "label",
+                  "codeName": "home_nav_focus_text",
+                  "props": {
+                    "text": "FOC",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_12",
+                        "text_align": "center"
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000035",
+              "type": "button",
+              "codeName": "home_nav_settings",
+              "props": {
+                "x": 382,
+                "y": 426,
+                "width": 82,
+                "height": 40
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#0C1B2E",
+                    "bg_opa": 255,
+                    "border_width": 1,
+                    "border_color": "#203852",
+                    "radius": 18,
+                    "shadow_width": 0,
+                    "shadow_color": "#0C1B2E",
+                    "shadow_opa": 0,
+                    "pad_all": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": "#32D6C6"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "00000000-0000-4000-8000-000000000005",
+                    "anim": "fade_on",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000034",
+                  "type": "label",
+                  "codeName": "home_nav_settings_text",
+                  "props": {
+                    "text": "SET",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_12",
+                        "text_align": "center"
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000002",
+        "codeName": "air",
+        "displayName": "空气与通风",
+        "isHome": false,
+        "styles": [],
+        "consts": [],
+        "root": {
+          "id": "00000000-0000-4000-8000-000000000150",
+          "type": "obj",
+          "props": {},
+          "flags": {
+            "scrollable": false
+          },
+          "styleRefs": [],
+          "styles": [
+            {
+              "props": {
+                "bg_color": "#06101E",
+                "bg_opa": 255,
+                "border_width": 0,
+                "pad_all": 0
+              }
+            }
+          ],
+          "events": [],
+          "bindings": [],
+          "children": [
+            {
+              "id": "00000000-0000-4000-8000-000000000036",
+              "type": "label",
+              "codeName": "air_brand",
+              "props": {
+                "text": "QUIET POD",
+                "x": 22,
+                "y": 20,
+                "width": 220,
+                "height": "content"
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": "#32D6C6",
+                    "text_font": "montserrat_20",
+                    "text_align": "left",
+                    "text_opa": 255
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000037",
+              "type": "label",
+              "codeName": "air_title",
+              "props": {
+                "text": "AIR",
+                "x": 250,
+                "y": 23,
+                "width": 208,
+                "height": "content"
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": "#8FA7BD",
+                    "text_font": "montserrat_14",
+                    "text_align": "right",
+                    "text_opa": 255
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000043",
+              "type": "obj",
+              "codeName": "air_quality",
+              "props": {
+                "x": 22,
+                "y": 64,
+                "width": 210,
+                "height": 338
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#102238",
+                    "bg_opa": 255,
+                    "border_color": "#203852",
+                    "border_width": 1,
+                    "radius": 18,
+                    "pad_all": 0,
+                    "shadow_color": "#000000",
+                    "shadow_width": 18,
+                    "shadow_opa": 90,
+                    "shadow_offset_y": 6
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000038",
+                  "type": "arc",
+                  "codeName": "air_co2_arc",
+                  "props": {
+                    "x": 30,
+                    "y": 34,
+                    "width": 150,
+                    "height": 150,
+                    "min_value": 350,
+                    "max_value": 2000,
+                    "value": 586,
+                    "bg_start_angle": 135,
+                    "bg_end_angle": 45,
+                    "start_angle": 135,
+                    "end_angle": 45,
+                    "knob_offset": -3
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "selector": {
+                        "part": "main"
+                      },
+                      "props": {
+                        "arc_color": "#263C52",
+                        "arc_width": 13
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "indicator"
+                      },
+                      "props": {
+                        "arc_color": "#51D88A",
+                        "arc_width": 13
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "knob"
+                      },
+                      "props": {
+                        "bg_color": "#51D88A",
+                        "bg_opa": 255,
+                        "radius": 12
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [
+                    {
+                      "kind": "prop",
+                      "prop": "value",
+                      "subject": "subject:co2_level"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000039",
+                  "type": "label",
+                  "codeName": "air_co2",
+                  "props": {
+                    "text": "586",
+                    "x": 45,
+                    "y": 90,
+                    "width": 120,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_30",
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000040",
+                  "type": "label",
+                  "codeName": "air_ppm",
+                  "props": {
+                    "text": "ppm / GOOD",
+                    "x": 45,
+                    "y": 130,
+                    "width": 120,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#51D88A",
+                        "text_font": "montserrat_12",
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000041",
+                  "type": "label",
+                  "codeName": "air_temp",
+                  "props": {
+                    "text": "24.2 C",
+                    "x": 26,
+                    "y": 236,
+                    "width": 158,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F5B942",
+                        "text_font": "montserrat_18",
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000042",
+                  "type": "label",
+                  "codeName": "air_hum",
+                  "props": {
+                    "text": "46% RH",
+                    "x": 26,
+                    "y": 276,
+                    "width": 158,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#3B82F6",
+                        "text_font": "montserrat_18",
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000052",
+              "type": "obj",
+              "codeName": "air_control",
+              "props": {
+                "x": 250,
+                "y": 64,
+                "width": 208,
+                "height": 338
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#102238",
+                    "bg_opa": 255,
+                    "border_color": "#203852",
+                    "border_width": 1,
+                    "radius": 18,
+                    "pad_all": 0
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000044",
+                  "type": "label",
+                  "codeName": "air_fan_title",
+                  "props": {
+                    "text": "FRESH AIR",
+                    "x": 22,
+                    "y": 22,
+                    "width": 120,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_18",
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000045",
+                  "type": "switch",
+                  "codeName": "air_fan",
+                  "props": {
+                    "x": 130,
+                    "y": 16,
+                    "width": 54,
+                    "height": 28
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "selector": {
+                        "part": "main"
+                      },
+                      "props": {
+                        "bg_color": "#32465A",
+                        "bg_opa": 255,
+                        "radius": 20
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "indicator",
+                        "states": [
+                          "checked"
+                        ]
+                      },
+                      "props": {
+                        "bg_color": "#32D6C6",
+                        "bg_opa": 255,
+                        "radius": 20
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "knob"
+                      },
+                      "props": {
+                        "bg_color": "#FFFFFF",
+                        "bg_opa": 255,
+                        "radius": 20
+                      }
+                    }
+                  ],
+                  "events": [
+                    {
+                      "on": "value_changed",
+                      "action": "subject.toggle",
+                      "args": {
+                        "subject": "subject:fan_enabled"
+                      }
+                    }
+                  ],
+                  "bindings": [
+                    {
+                      "kind": "prop",
+                      "prop": "checked",
+                      "subject": "subject:fan_enabled"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000046",
+                  "type": "label",
+                  "codeName": "air_speed_value",
+                  "props": {
+                    "text": "36%",
+                    "x": 22,
+                    "y": 82,
+                    "width": 164,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#32D6C6",
+                        "text_font": "montserrat_28",
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [
+                    {
+                      "kind": "prop",
+                      "prop": "text",
+                      "subject": "subject:fan_speed",
+                      "fmt": "%d%%"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000047",
+                  "type": "slider",
+                  "codeName": "air_speed",
+                  "props": {
+                    "x": 22,
+                    "y": 132,
+                    "width": 164,
+                    "height": 14,
+                    "min_value": 0,
+                    "max_value": 100,
+                    "value": 36
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "selector": {
+                        "part": "main"
+                      },
+                      "props": {
+                        "bg_color": "#29425A",
+                        "bg_opa": 255,
+                        "radius": 10
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "indicator"
+                      },
+                      "props": {
+                        "bg_color": "#32D6C6",
+                        "bg_opa": 255,
+                        "radius": 10
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "knob"
+                      },
+                      "props": {
+                        "bg_color": "#FFFFFF",
+                        "bg_opa": 255,
+                        "radius": 12,
+                        "shadow_width": 8,
+                        "shadow_opa": 70
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [
+                    {
+                      "kind": "prop",
+                      "prop": "value",
+                      "subject": "subject:fan_speed"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000048",
+                  "type": "label",
+                  "codeName": "air_auto",
+                  "props": {
+                    "text": "AUTO VENT",
+                    "x": 22,
+                    "y": 192,
+                    "width": 100,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_14",
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000049",
+                  "type": "switch",
+                  "codeName": "air_vent",
+                  "props": {
+                    "x": 130,
+                    "y": 184,
+                    "width": 54,
+                    "height": 28
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "selector": {
+                        "part": "main"
+                      },
+                      "props": {
+                        "bg_color": "#32465A",
+                        "bg_opa": 255,
+                        "radius": 20
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "indicator",
+                        "states": [
+                          "checked"
+                        ]
+                      },
+                      "props": {
+                        "bg_color": "#32D6C6",
+                        "bg_opa": 255,
+                        "radius": 20
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "knob"
+                      },
+                      "props": {
+                        "bg_color": "#FFFFFF",
+                        "bg_opa": 255,
+                        "radius": 20
+                      }
+                    }
+                  ],
+                  "events": [
+                    {
+                      "on": "value_changed",
+                      "action": "subject.toggle",
+                      "args": {
+                        "subject": "subject:vent_enabled"
+                      }
+                    }
+                  ],
+                  "bindings": [
+                    {
+                      "kind": "prop",
+                      "prop": "checked",
+                      "subject": "subject:vent_enabled"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000051",
+                  "type": "button",
+                  "codeName": "air_boost",
+                  "props": {
+                    "x": 22,
+                    "y": 260,
+                    "width": 164,
+                    "height": 48
+                  },
+                  "flags": {
+                    "scrollable": false
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "bg_color": "#32D6C6",
+                        "bg_opa": 255,
+                        "border_width": 0,
+                        "border_color": "#203852",
+                        "radius": 18,
+                        "shadow_width": 10,
+                        "shadow_color": "#32D6C6",
+                        "shadow_opa": 55,
+                        "pad_all": 0
+                      }
+                    },
+                    {
+                      "selector": {
+                        "states": [
+                          "pressed"
+                        ]
+                      },
+                      "props": {
+                        "bg_color": "#32D6C6"
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": [
+                    {
+                      "id": "00000000-0000-4000-8000-000000000050",
+                      "type": "label",
+                      "codeName": "air_boost_text",
+                      "props": {
+                        "text": "BOOST 10 MIN",
+                        "align": "center",
+                        "width": "100%",
+                        "height": "content"
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "text_color": "#06101E",
+                            "text_font": "montserrat_12",
+                            "text_align": "center"
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000054",
+              "type": "button",
+              "codeName": "air_nav_home",
+              "props": {
+                "x": 14,
+                "y": 426,
+                "width": 82,
+                "height": 40
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#0C1B2E",
+                    "bg_opa": 255,
+                    "border_width": 1,
+                    "border_color": "#203852",
+                    "radius": 18,
+                    "shadow_width": 0,
+                    "shadow_color": "#0C1B2E",
+                    "shadow_opa": 0,
+                    "pad_all": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": "#32D6C6"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "00000000-0000-4000-8000-000000000001",
+                    "anim": "fade_on",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000053",
+                  "type": "label",
+                  "codeName": "air_nav_home_text",
+                  "props": {
+                    "text": "H",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_12",
+                        "text_align": "center"
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000056",
+              "type": "button",
+              "codeName": "air_nav_air",
+              "props": {
+                "x": 106,
+                "y": 426,
+                "width": 82,
+                "height": 40
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#3B82F6",
+                    "bg_opa": 255,
+                    "border_width": 0,
+                    "border_color": "#203852",
+                    "radius": 18,
+                    "shadow_width": 0,
+                    "shadow_color": "#3B82F6",
+                    "shadow_opa": 0,
+                    "pad_all": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": "#32D6C6"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "00000000-0000-4000-8000-000000000002",
+                    "anim": "fade_on",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000055",
+                  "type": "label",
+                  "codeName": "air_nav_air_text",
+                  "props": {
+                    "text": "AIR",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_12",
+                        "text_align": "center"
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000058",
+              "type": "button",
+              "codeName": "air_nav_light",
+              "props": {
+                "x": 198,
+                "y": 426,
+                "width": 82,
+                "height": 40
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#0C1B2E",
+                    "bg_opa": 255,
+                    "border_width": 1,
+                    "border_color": "#203852",
+                    "radius": 18,
+                    "shadow_width": 0,
+                    "shadow_color": "#0C1B2E",
+                    "shadow_opa": 0,
+                    "pad_all": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": "#32D6C6"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "00000000-0000-4000-8000-000000000003",
+                    "anim": "fade_on",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000057",
+                  "type": "label",
+                  "codeName": "air_nav_light_text",
+                  "props": {
+                    "text": "LUX",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_12",
+                        "text_align": "center"
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000060",
+              "type": "button",
+              "codeName": "air_nav_focus",
+              "props": {
+                "x": 290,
+                "y": 426,
+                "width": 82,
+                "height": 40
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#0C1B2E",
+                    "bg_opa": 255,
+                    "border_width": 1,
+                    "border_color": "#203852",
+                    "radius": 18,
+                    "shadow_width": 0,
+                    "shadow_color": "#0C1B2E",
+                    "shadow_opa": 0,
+                    "pad_all": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": "#32D6C6"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "00000000-0000-4000-8000-000000000004",
+                    "anim": "fade_on",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000059",
+                  "type": "label",
+                  "codeName": "air_nav_focus_text",
+                  "props": {
+                    "text": "FOC",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_12",
+                        "text_align": "center"
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000062",
+              "type": "button",
+              "codeName": "air_nav_settings",
+              "props": {
+                "x": 382,
+                "y": 426,
+                "width": 82,
+                "height": 40
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#0C1B2E",
+                    "bg_opa": 255,
+                    "border_width": 1,
+                    "border_color": "#203852",
+                    "radius": 18,
+                    "shadow_width": 0,
+                    "shadow_color": "#0C1B2E",
+                    "shadow_opa": 0,
+                    "pad_all": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": "#32D6C6"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "00000000-0000-4000-8000-000000000005",
+                    "anim": "fade_on",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000061",
+                  "type": "label",
+                  "codeName": "air_nav_settings_text",
+                  "props": {
+                    "text": "SET",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_12",
+                        "text_align": "center"
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000003",
+        "codeName": "light",
+        "displayName": "灯光",
+        "isHome": false,
+        "styles": [],
+        "consts": [],
+        "root": {
+          "id": "00000000-0000-4000-8000-000000000152",
+          "type": "obj",
+          "props": {},
+          "flags": {
+            "scrollable": false
+          },
+          "styleRefs": [],
+          "styles": [
+            {
+              "props": {
+                "bg_color": "#06101E",
+                "bg_opa": 255,
+                "border_width": 0,
+                "pad_all": 0
+              }
+            }
+          ],
+          "events": [],
+          "bindings": [],
+          "children": [
+            {
+              "id": "00000000-0000-4000-8000-000000000063",
+              "type": "label",
+              "codeName": "light_brand",
+              "props": {
+                "text": "QUIET POD",
+                "x": 22,
+                "y": 20,
+                "width": 220,
+                "height": "content"
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": "#32D6C6",
+                    "text_font": "montserrat_20",
+                    "text_align": "left",
+                    "text_opa": 255
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000064",
+              "type": "label",
+              "codeName": "light_title",
+              "props": {
+                "text": "LIGHT",
+                "x": 250,
+                "y": 23,
+                "width": 208,
+                "height": "content"
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": "#8FA7BD",
+                    "text_font": "montserrat_14",
+                    "text_align": "right",
+                    "text_opa": 255
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000077",
+              "type": "obj",
+              "codeName": "light_main",
+              "props": {
+                "x": 22,
+                "y": 64,
+                "width": 436,
+                "height": 338
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#102238",
+                    "bg_opa": 255,
+                    "border_color": "#203852",
+                    "border_width": 1,
+                    "radius": 18,
+                    "pad_all": 0,
+                    "shadow_color": "#000000",
+                    "shadow_width": 18,
+                    "shadow_opa": 90,
+                    "shadow_offset_y": 6
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000065",
+                  "type": "label",
+                  "codeName": "light_main_title",
+                  "props": {
+                    "text": "CABIN LIGHT",
+                    "x": 28,
+                    "y": 24,
+                    "width": 260,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_20",
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000066",
+                  "type": "switch",
+                  "codeName": "light_master",
+                  "props": {
+                    "x": 350,
+                    "y": 18,
+                    "width": 58,
+                    "height": 30
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "selector": {
+                        "part": "main"
+                      },
+                      "props": {
+                        "bg_color": "#32465A",
+                        "bg_opa": 255,
+                        "radius": 20
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "indicator",
+                        "states": [
+                          "checked"
+                        ]
+                      },
+                      "props": {
+                        "bg_color": "#32D6C6",
+                        "bg_opa": 255,
+                        "radius": 20
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "knob"
+                      },
+                      "props": {
+                        "bg_color": "#FFFFFF",
+                        "bg_opa": 255,
+                        "radius": 20
+                      }
+                    }
+                  ],
+                  "events": [
+                    {
+                      "on": "value_changed",
+                      "action": "subject.toggle",
+                      "args": {
+                        "subject": "subject:light_enabled"
+                      }
+                    }
+                  ],
+                  "bindings": [
+                    {
+                      "kind": "prop",
+                      "prop": "checked",
+                      "subject": "subject:light_enabled"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000067",
+                  "type": "label",
+                  "codeName": "light_brightness_value",
+                  "props": {
+                    "text": "68%",
+                    "x": 28,
+                    "y": 82,
+                    "width": 180,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F5B942",
+                        "text_font": "montserrat_38",
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [
+                    {
+                      "kind": "prop",
+                      "prop": "text",
+                      "subject": "subject:light_brightness",
+                      "fmt": "%d%%"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000068",
+                  "type": "slider",
+                  "codeName": "light_brightness_slider",
+                  "props": {
+                    "x": 28,
+                    "y": 144,
+                    "width": 380,
+                    "height": 15,
+                    "min_value": 0,
+                    "max_value": 100,
+                    "value": 68
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "selector": {
+                        "part": "main"
+                      },
+                      "props": {
+                        "bg_color": "#29425A",
+                        "bg_opa": 255,
+                        "radius": 10
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "indicator"
+                      },
+                      "props": {
+                        "bg_color": "#F5B942",
+                        "bg_opa": 255,
+                        "radius": 10
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "knob"
+                      },
+                      "props": {
+                        "bg_color": "#FFFFFF",
+                        "bg_opa": 255,
+                        "radius": 12,
+                        "shadow_width": 8,
+                        "shadow_opa": 70
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [
+                    {
+                      "kind": "prop",
+                      "prop": "value",
+                      "subject": "subject:light_brightness"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000069",
+                  "type": "label",
+                  "codeName": "light_cct_value",
+                  "props": {
+                    "text": "4200 K",
+                    "x": 28,
+                    "y": 194,
+                    "width": 180,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#32D6C6",
+                        "text_font": "montserrat_24",
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [
+                    {
+                      "kind": "prop",
+                      "prop": "text",
+                      "subject": "subject:light_cct",
+                      "fmt": "%d K"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000070",
+                  "type": "slider",
+                  "codeName": "light_cct_slider",
+                  "props": {
+                    "x": 28,
+                    "y": 240,
+                    "width": 380,
+                    "height": 15,
+                    "min_value": 2700,
+                    "max_value": 6500,
+                    "value": 4200
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "selector": {
+                        "part": "main"
+                      },
+                      "props": {
+                        "bg_color": "#29425A",
+                        "bg_opa": 255,
+                        "radius": 10
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "indicator"
+                      },
+                      "props": {
+                        "bg_color": "#32D6C6",
+                        "bg_opa": 255,
+                        "radius": 10
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "knob"
+                      },
+                      "props": {
+                        "bg_color": "#FFFFFF",
+                        "bg_opa": 255,
+                        "radius": 12,
+                        "shadow_width": 8,
+                        "shadow_opa": 70
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [
+                    {
+                      "kind": "prop",
+                      "prop": "value",
+                      "subject": "subject:light_cct"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000072",
+                  "type": "button",
+                  "codeName": "light_work",
+                  "props": {
+                    "x": 28,
+                    "y": 278,
+                    "width": 112,
+                    "height": 42
+                  },
+                  "flags": {
+                    "scrollable": false
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "bg_color": "#3B82F6",
+                        "bg_opa": 255,
+                        "border_width": 0,
+                        "border_color": "#203852",
+                        "radius": 18,
+                        "shadow_width": 10,
+                        "shadow_color": "#3B82F6",
+                        "shadow_opa": 55,
+                        "pad_all": 0
+                      }
+                    },
+                    {
+                      "selector": {
+                        "states": [
+                          "pressed"
+                        ]
+                      },
+                      "props": {
+                        "bg_color": "#32D6C6"
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": [
+                    {
+                      "id": "00000000-0000-4000-8000-000000000071",
+                      "type": "label",
+                      "codeName": "light_work_text",
+                      "props": {
+                        "text": "WORK",
+                        "align": "center",
+                        "width": "100%",
+                        "height": "content"
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "text_color": "#F4F8FC",
+                            "text_font": "montserrat_12",
+                            "text_align": "center"
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000074",
+                  "type": "button",
+                  "codeName": "light_call",
+                  "props": {
+                    "x": 162,
+                    "y": 278,
+                    "width": 112,
+                    "height": 42
+                  },
+                  "flags": {
+                    "scrollable": false
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "bg_color": "#0C1B2E",
+                        "bg_opa": 255,
+                        "border_width": 1,
+                        "border_color": "#203852",
+                        "radius": 18,
+                        "shadow_width": 0,
+                        "shadow_color": "#0C1B2E",
+                        "shadow_opa": 0,
+                        "pad_all": 0
+                      }
+                    },
+                    {
+                      "selector": {
+                        "states": [
+                          "pressed"
+                        ]
+                      },
+                      "props": {
+                        "bg_color": "#32D6C6"
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": [
+                    {
+                      "id": "00000000-0000-4000-8000-000000000073",
+                      "type": "label",
+                      "codeName": "light_call_text",
+                      "props": {
+                        "text": "CALL",
+                        "align": "center",
+                        "width": "100%",
+                        "height": "content"
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "text_color": "#F4F8FC",
+                            "text_font": "montserrat_12",
+                            "text_align": "center"
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000076",
+                  "type": "button",
+                  "codeName": "light_relax",
+                  "props": {
+                    "x": 296,
+                    "y": 278,
+                    "width": 112,
+                    "height": 42
+                  },
+                  "flags": {
+                    "scrollable": false
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "bg_color": "#0C1B2E",
+                        "bg_opa": 255,
+                        "border_width": 1,
+                        "border_color": "#203852",
+                        "radius": 18,
+                        "shadow_width": 0,
+                        "shadow_color": "#0C1B2E",
+                        "shadow_opa": 0,
+                        "pad_all": 0
+                      }
+                    },
+                    {
+                      "selector": {
+                        "states": [
+                          "pressed"
+                        ]
+                      },
+                      "props": {
+                        "bg_color": "#32D6C6"
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": [
+                    {
+                      "id": "00000000-0000-4000-8000-000000000075",
+                      "type": "label",
+                      "codeName": "light_relax_text",
+                      "props": {
+                        "text": "RELAX",
+                        "align": "center",
+                        "width": "100%",
+                        "height": "content"
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "text_color": "#F4F8FC",
+                            "text_font": "montserrat_12",
+                            "text_align": "center"
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000079",
+              "type": "button",
+              "codeName": "light_nav_home",
+              "props": {
+                "x": 14,
+                "y": 426,
+                "width": 82,
+                "height": 40
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#0C1B2E",
+                    "bg_opa": 255,
+                    "border_width": 1,
+                    "border_color": "#203852",
+                    "radius": 18,
+                    "shadow_width": 0,
+                    "shadow_color": "#0C1B2E",
+                    "shadow_opa": 0,
+                    "pad_all": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": "#32D6C6"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "00000000-0000-4000-8000-000000000001",
+                    "anim": "fade_on",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000078",
+                  "type": "label",
+                  "codeName": "light_nav_home_text",
+                  "props": {
+                    "text": "H",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_12",
+                        "text_align": "center"
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000081",
+              "type": "button",
+              "codeName": "light_nav_air",
+              "props": {
+                "x": 106,
+                "y": 426,
+                "width": 82,
+                "height": 40
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#0C1B2E",
+                    "bg_opa": 255,
+                    "border_width": 1,
+                    "border_color": "#203852",
+                    "radius": 18,
+                    "shadow_width": 0,
+                    "shadow_color": "#0C1B2E",
+                    "shadow_opa": 0,
+                    "pad_all": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": "#32D6C6"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "00000000-0000-4000-8000-000000000002",
+                    "anim": "fade_on",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000080",
+                  "type": "label",
+                  "codeName": "light_nav_air_text",
+                  "props": {
+                    "text": "AIR",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_12",
+                        "text_align": "center"
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000083",
+              "type": "button",
+              "codeName": "light_nav_light",
+              "props": {
+                "x": 198,
+                "y": 426,
+                "width": 82,
+                "height": 40
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#3B82F6",
+                    "bg_opa": 255,
+                    "border_width": 0,
+                    "border_color": "#203852",
+                    "radius": 18,
+                    "shadow_width": 0,
+                    "shadow_color": "#3B82F6",
+                    "shadow_opa": 0,
+                    "pad_all": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": "#32D6C6"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "00000000-0000-4000-8000-000000000003",
+                    "anim": "fade_on",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000082",
+                  "type": "label",
+                  "codeName": "light_nav_light_text",
+                  "props": {
+                    "text": "LUX",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_12",
+                        "text_align": "center"
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000085",
+              "type": "button",
+              "codeName": "light_nav_focus",
+              "props": {
+                "x": 290,
+                "y": 426,
+                "width": 82,
+                "height": 40
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#0C1B2E",
+                    "bg_opa": 255,
+                    "border_width": 1,
+                    "border_color": "#203852",
+                    "radius": 18,
+                    "shadow_width": 0,
+                    "shadow_color": "#0C1B2E",
+                    "shadow_opa": 0,
+                    "pad_all": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": "#32D6C6"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "00000000-0000-4000-8000-000000000004",
+                    "anim": "fade_on",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000084",
+                  "type": "label",
+                  "codeName": "light_nav_focus_text",
+                  "props": {
+                    "text": "FOC",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_12",
+                        "text_align": "center"
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000087",
+              "type": "button",
+              "codeName": "light_nav_settings",
+              "props": {
+                "x": 382,
+                "y": 426,
+                "width": 82,
+                "height": 40
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#0C1B2E",
+                    "bg_opa": 255,
+                    "border_width": 1,
+                    "border_color": "#203852",
+                    "radius": 18,
+                    "shadow_width": 0,
+                    "shadow_color": "#0C1B2E",
+                    "shadow_opa": 0,
+                    "pad_all": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": "#32D6C6"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "00000000-0000-4000-8000-000000000005",
+                    "anim": "fade_on",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000086",
+                  "type": "label",
+                  "codeName": "light_nav_settings_text",
+                  "props": {
+                    "text": "SET",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_12",
+                        "text_align": "center"
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000004",
+        "codeName": "focus",
+        "displayName": "专注模式",
+        "isHome": false,
+        "styles": [],
+        "consts": [],
+        "root": {
+          "id": "00000000-0000-4000-8000-000000000154",
+          "type": "obj",
+          "props": {},
+          "flags": {
+            "scrollable": false
+          },
+          "styleRefs": [],
+          "styles": [
+            {
+              "props": {
+                "bg_color": "#06101E",
+                "bg_opa": 255,
+                "border_width": 0,
+                "pad_all": 0
+              }
+            }
+          ],
+          "events": [],
+          "bindings": [],
+          "children": [
+            {
+              "id": "00000000-0000-4000-8000-000000000088",
+              "type": "label",
+              "codeName": "focus_brand",
+              "props": {
+                "text": "QUIET POD",
+                "x": 22,
+                "y": 20,
+                "width": 220,
+                "height": "content"
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": "#32D6C6",
+                    "text_font": "montserrat_20",
+                    "text_align": "left",
+                    "text_opa": 255
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000089",
+              "type": "label",
+              "codeName": "focus_title",
+              "props": {
+                "text": "FOCUS",
+                "x": 250,
+                "y": 23,
+                "width": 208,
+                "height": "content"
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": "#8FA7BD",
+                    "text_font": "montserrat_14",
+                    "text_align": "right",
+                    "text_opa": 255
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000090",
+              "type": "label",
+              "codeName": "focus_prompt",
+              "props": {
+                "text": "CHOOSE A SESSION",
+                "x": 22,
+                "y": 70,
+                "width": 436,
+                "height": "content"
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": "#8FA7BD",
+                    "text_font": "montserrat_14",
+                    "text_align": "left",
+                    "text_opa": 255
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000095",
+              "type": "obj",
+              "codeName": "focus_mode_0",
+              "props": {
+                "x": 22,
+                "y": 108,
+                "width": 200,
+                "height": 128
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#13305A",
+                    "bg_opa": 255,
+                    "border_color": "#3B82F6",
+                    "border_width": 1,
+                    "radius": 18,
+                    "pad_all": 0
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000091",
+                  "type": "label",
+                  "codeName": "focus_mode_0_title",
+                  "props": {
+                    "text": "DEEP WORK",
+                    "x": 18,
+                    "y": 18,
+                    "width": 164,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_16",
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000092",
+                  "type": "label",
+                  "codeName": "focus_mode_0_time",
+                  "props": {
+                    "text": "50 MIN",
+                    "x": 18,
+                    "y": 50,
+                    "width": 164,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#3B82F6",
+                        "text_font": "montserrat_14",
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000094",
+                  "type": "button",
+                  "codeName": "focus_mode_0_start",
+                  "props": {
+                    "x": 18,
+                    "y": 82,
+                    "width": 164,
+                    "height": 34
+                  },
+                  "flags": {
+                    "scrollable": false
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "bg_color": "#3B82F6",
+                        "bg_opa": 255,
+                        "border_width": 0,
+                        "border_color": "#203852",
+                        "radius": 17,
+                        "shadow_width": 10,
+                        "shadow_color": "#3B82F6",
+                        "shadow_opa": 55,
+                        "pad_all": 0
+                      }
+                    },
+                    {
+                      "selector": {
+                        "states": [
+                          "pressed"
+                        ]
+                      },
+                      "props": {
+                        "bg_color": "#32D6C6"
+                      }
+                    }
+                  ],
+                  "events": [
+                    {
+                      "on": "clicked",
+                      "action": "subject.set",
+                      "args": {
+                        "subject": "subject:pod_mode",
+                        "value": "0"
+                      }
+                    }
+                  ],
+                  "bindings": [],
+                  "children": [
+                    {
+                      "id": "00000000-0000-4000-8000-000000000093",
+                      "type": "label",
+                      "codeName": "focus_mode_0_start_text",
+                      "props": {
+                        "text": "START",
+                        "align": "center",
+                        "width": "100%",
+                        "height": "content"
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "text_color": "#F4F8FC",
+                            "text_font": "montserrat_12",
+                            "text_align": "center"
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000100",
+              "type": "obj",
+              "codeName": "focus_mode_1",
+              "props": {
+                "x": 240,
+                "y": 108,
+                "width": 200,
+                "height": 128
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#102238",
+                    "bg_opa": 255,
+                    "border_color": "#32D6C6",
+                    "border_width": 1,
+                    "radius": 18,
+                    "pad_all": 0
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000096",
+                  "type": "label",
+                  "codeName": "focus_mode_1_title",
+                  "props": {
+                    "text": "MEETING",
+                    "x": 18,
+                    "y": 18,
+                    "width": 164,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_16",
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000097",
+                  "type": "label",
+                  "codeName": "focus_mode_1_time",
+                  "props": {
+                    "text": "45 MIN",
+                    "x": 18,
+                    "y": 50,
+                    "width": 164,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#32D6C6",
+                        "text_font": "montserrat_14",
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000099",
+                  "type": "button",
+                  "codeName": "focus_mode_1_start",
+                  "props": {
+                    "x": 18,
+                    "y": 82,
+                    "width": 164,
+                    "height": 34
+                  },
+                  "flags": {
+                    "scrollable": false
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "bg_color": "#32D6C6",
+                        "bg_opa": 255,
+                        "border_width": 0,
+                        "border_color": "#203852",
+                        "radius": 17,
+                        "shadow_width": 10,
+                        "shadow_color": "#32D6C6",
+                        "shadow_opa": 55,
+                        "pad_all": 0
+                      }
+                    },
+                    {
+                      "selector": {
+                        "states": [
+                          "pressed"
+                        ]
+                      },
+                      "props": {
+                        "bg_color": "#32D6C6"
+                      }
+                    }
+                  ],
+                  "events": [
+                    {
+                      "on": "clicked",
+                      "action": "subject.set",
+                      "args": {
+                        "subject": "subject:pod_mode",
+                        "value": "1"
+                      }
+                    }
+                  ],
+                  "bindings": [],
+                  "children": [
+                    {
+                      "id": "00000000-0000-4000-8000-000000000098",
+                      "type": "label",
+                      "codeName": "focus_mode_1_start_text",
+                      "props": {
+                        "text": "START",
+                        "align": "center",
+                        "width": "100%",
+                        "height": "content"
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "text_color": "#F4F8FC",
+                            "text_font": "montserrat_12",
+                            "text_align": "center"
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000105",
+              "type": "obj",
+              "codeName": "focus_mode_2",
+              "props": {
+                "x": 22,
+                "y": 256,
+                "width": 200,
+                "height": 128
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#102238",
+                    "bg_opa": 255,
+                    "border_color": "#F5B942",
+                    "border_width": 1,
+                    "radius": 18,
+                    "pad_all": 0
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000101",
+                  "type": "label",
+                  "codeName": "focus_mode_2_title",
+                  "props": {
+                    "text": "PHONE",
+                    "x": 18,
+                    "y": 18,
+                    "width": 164,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_16",
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000102",
+                  "type": "label",
+                  "codeName": "focus_mode_2_time",
+                  "props": {
+                    "text": "30 MIN",
+                    "x": 18,
+                    "y": 50,
+                    "width": 164,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F5B942",
+                        "text_font": "montserrat_14",
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000104",
+                  "type": "button",
+                  "codeName": "focus_mode_2_start",
+                  "props": {
+                    "x": 18,
+                    "y": 82,
+                    "width": 164,
+                    "height": 34
+                  },
+                  "flags": {
+                    "scrollable": false
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "bg_color": "#F5B942",
+                        "bg_opa": 255,
+                        "border_width": 0,
+                        "border_color": "#203852",
+                        "radius": 17,
+                        "shadow_width": 10,
+                        "shadow_color": "#F5B942",
+                        "shadow_opa": 55,
+                        "pad_all": 0
+                      }
+                    },
+                    {
+                      "selector": {
+                        "states": [
+                          "pressed"
+                        ]
+                      },
+                      "props": {
+                        "bg_color": "#32D6C6"
+                      }
+                    }
+                  ],
+                  "events": [
+                    {
+                      "on": "clicked",
+                      "action": "subject.set",
+                      "args": {
+                        "subject": "subject:pod_mode",
+                        "value": "2"
+                      }
+                    }
+                  ],
+                  "bindings": [],
+                  "children": [
+                    {
+                      "id": "00000000-0000-4000-8000-000000000103",
+                      "type": "label",
+                      "codeName": "focus_mode_2_start_text",
+                      "props": {
+                        "text": "START",
+                        "align": "center",
+                        "width": "100%",
+                        "height": "content"
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "text_color": "#F4F8FC",
+                            "text_font": "montserrat_12",
+                            "text_align": "center"
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000110",
+              "type": "obj",
+              "codeName": "focus_mode_3",
+              "props": {
+                "x": 240,
+                "y": 256,
+                "width": 200,
+                "height": 128
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#102238",
+                    "bg_opa": 255,
+                    "border_color": "#51D88A",
+                    "border_width": 1,
+                    "radius": 18,
+                    "pad_all": 0
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000106",
+                  "type": "label",
+                  "codeName": "focus_mode_3_title",
+                  "props": {
+                    "text": "RESET",
+                    "x": 18,
+                    "y": 18,
+                    "width": 164,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_16",
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000107",
+                  "type": "label",
+                  "codeName": "focus_mode_3_time",
+                  "props": {
+                    "text": "15 MIN",
+                    "x": 18,
+                    "y": 50,
+                    "width": 164,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#51D88A",
+                        "text_font": "montserrat_14",
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000109",
+                  "type": "button",
+                  "codeName": "focus_mode_3_start",
+                  "props": {
+                    "x": 18,
+                    "y": 82,
+                    "width": 164,
+                    "height": 34
+                  },
+                  "flags": {
+                    "scrollable": false
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "bg_color": "#51D88A",
+                        "bg_opa": 255,
+                        "border_width": 0,
+                        "border_color": "#203852",
+                        "radius": 17,
+                        "shadow_width": 10,
+                        "shadow_color": "#51D88A",
+                        "shadow_opa": 55,
+                        "pad_all": 0
+                      }
+                    },
+                    {
+                      "selector": {
+                        "states": [
+                          "pressed"
+                        ]
+                      },
+                      "props": {
+                        "bg_color": "#32D6C6"
+                      }
+                    }
+                  ],
+                  "events": [
+                    {
+                      "on": "clicked",
+                      "action": "subject.set",
+                      "args": {
+                        "subject": "subject:pod_mode",
+                        "value": "3"
+                      }
+                    }
+                  ],
+                  "bindings": [],
+                  "children": [
+                    {
+                      "id": "00000000-0000-4000-8000-000000000108",
+                      "type": "label",
+                      "codeName": "focus_mode_3_start_text",
+                      "props": {
+                        "text": "START",
+                        "align": "center",
+                        "width": "100%",
+                        "height": "content"
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "text_color": "#F4F8FC",
+                            "text_font": "montserrat_12",
+                            "text_align": "center"
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000112",
+              "type": "button",
+              "codeName": "focus_nav_home",
+              "props": {
+                "x": 14,
+                "y": 426,
+                "width": 82,
+                "height": 40
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#0C1B2E",
+                    "bg_opa": 255,
+                    "border_width": 1,
+                    "border_color": "#203852",
+                    "radius": 18,
+                    "shadow_width": 0,
+                    "shadow_color": "#0C1B2E",
+                    "shadow_opa": 0,
+                    "pad_all": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": "#32D6C6"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "00000000-0000-4000-8000-000000000001",
+                    "anim": "fade_on",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000111",
+                  "type": "label",
+                  "codeName": "focus_nav_home_text",
+                  "props": {
+                    "text": "H",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_12",
+                        "text_align": "center"
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000114",
+              "type": "button",
+              "codeName": "focus_nav_air",
+              "props": {
+                "x": 106,
+                "y": 426,
+                "width": 82,
+                "height": 40
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#0C1B2E",
+                    "bg_opa": 255,
+                    "border_width": 1,
+                    "border_color": "#203852",
+                    "radius": 18,
+                    "shadow_width": 0,
+                    "shadow_color": "#0C1B2E",
+                    "shadow_opa": 0,
+                    "pad_all": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": "#32D6C6"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "00000000-0000-4000-8000-000000000002",
+                    "anim": "fade_on",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000113",
+                  "type": "label",
+                  "codeName": "focus_nav_air_text",
+                  "props": {
+                    "text": "AIR",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_12",
+                        "text_align": "center"
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000116",
+              "type": "button",
+              "codeName": "focus_nav_light",
+              "props": {
+                "x": 198,
+                "y": 426,
+                "width": 82,
+                "height": 40
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#0C1B2E",
+                    "bg_opa": 255,
+                    "border_width": 1,
+                    "border_color": "#203852",
+                    "radius": 18,
+                    "shadow_width": 0,
+                    "shadow_color": "#0C1B2E",
+                    "shadow_opa": 0,
+                    "pad_all": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": "#32D6C6"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "00000000-0000-4000-8000-000000000003",
+                    "anim": "fade_on",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000115",
+                  "type": "label",
+                  "codeName": "focus_nav_light_text",
+                  "props": {
+                    "text": "LUX",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_12",
+                        "text_align": "center"
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000118",
+              "type": "button",
+              "codeName": "focus_nav_focus",
+              "props": {
+                "x": 290,
+                "y": 426,
+                "width": 82,
+                "height": 40
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#3B82F6",
+                    "bg_opa": 255,
+                    "border_width": 0,
+                    "border_color": "#203852",
+                    "radius": 18,
+                    "shadow_width": 0,
+                    "shadow_color": "#3B82F6",
+                    "shadow_opa": 0,
+                    "pad_all": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": "#32D6C6"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "00000000-0000-4000-8000-000000000004",
+                    "anim": "fade_on",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000117",
+                  "type": "label",
+                  "codeName": "focus_nav_focus_text",
+                  "props": {
+                    "text": "FOC",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_12",
+                        "text_align": "center"
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000120",
+              "type": "button",
+              "codeName": "focus_nav_settings",
+              "props": {
+                "x": 382,
+                "y": 426,
+                "width": 82,
+                "height": 40
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#0C1B2E",
+                    "bg_opa": 255,
+                    "border_width": 1,
+                    "border_color": "#203852",
+                    "radius": 18,
+                    "shadow_width": 0,
+                    "shadow_color": "#0C1B2E",
+                    "shadow_opa": 0,
+                    "pad_all": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": "#32D6C6"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "00000000-0000-4000-8000-000000000005",
+                    "anim": "fade_on",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000119",
+                  "type": "label",
+                  "codeName": "focus_nav_settings_text",
+                  "props": {
+                    "text": "SET",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_12",
+                        "text_align": "center"
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000005",
+        "codeName": "settings",
+        "displayName": "设置",
+        "isHome": false,
+        "styles": [],
+        "consts": [],
+        "root": {
+          "id": "00000000-0000-4000-8000-000000000156",
+          "type": "obj",
+          "props": {},
+          "flags": {
+            "scrollable": false
+          },
+          "styleRefs": [],
+          "styles": [
+            {
+              "props": {
+                "bg_color": "#06101E",
+                "bg_opa": 255,
+                "border_width": 0,
+                "pad_all": 0
+              }
+            }
+          ],
+          "events": [],
+          "bindings": [],
+          "children": [
+            {
+              "id": "00000000-0000-4000-8000-000000000121",
+              "type": "label",
+              "codeName": "settings_brand",
+              "props": {
+                "text": "QUIET POD",
+                "x": 22,
+                "y": 20,
+                "width": 220,
+                "height": "content"
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": "#32D6C6",
+                    "text_font": "montserrat_20",
+                    "text_align": "left",
+                    "text_opa": 255
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000122",
+              "type": "label",
+              "codeName": "settings_title",
+              "props": {
+                "text": "SETTINGS",
+                "x": 250,
+                "y": 23,
+                "width": 208,
+                "height": "content"
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": "#8FA7BD",
+                    "text_font": "montserrat_14",
+                    "text_align": "right",
+                    "text_opa": 255
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000126",
+              "type": "obj",
+              "codeName": "settings_dnd",
+              "props": {
+                "x": 22,
+                "y": 66,
+                "width": 436,
+                "height": 80
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#102238",
+                    "bg_opa": 255,
+                    "border_color": "#203852",
+                    "border_width": 1,
+                    "radius": 18,
+                    "pad_all": 0
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000123",
+                  "type": "label",
+                  "codeName": "settings_dnd_title",
+                  "props": {
+                    "text": "DO NOT DISTURB",
+                    "x": 22,
+                    "y": 16,
+                    "width": 270,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_16",
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000124",
+                  "type": "label",
+                  "codeName": "settings_dnd_note",
+                  "props": {
+                    "text": "Mute occupied alerts",
+                    "x": 22,
+                    "y": 44,
+                    "width": 270,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#8FA7BD",
+                        "text_font": "montserrat_12",
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000125",
+                  "type": "switch",
+                  "codeName": "settings_dnd_toggle",
+                  "props": {
+                    "x": 350,
+                    "y": 24,
+                    "width": 58,
+                    "height": 30
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "selector": {
+                        "part": "main"
+                      },
+                      "props": {
+                        "bg_color": "#32465A",
+                        "bg_opa": 255,
+                        "radius": 20
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "indicator",
+                        "states": [
+                          "checked"
+                        ]
+                      },
+                      "props": {
+                        "bg_color": "#32D6C6",
+                        "bg_opa": 255,
+                        "radius": 20
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "knob"
+                      },
+                      "props": {
+                        "bg_color": "#FFFFFF",
+                        "bg_opa": 255,
+                        "radius": 20
+                      }
+                    }
+                  ],
+                  "events": [
+                    {
+                      "on": "value_changed",
+                      "action": "subject.toggle",
+                      "args": {
+                        "subject": "subject:dnd_enabled"
+                      }
+                    }
+                  ],
+                  "bindings": [
+                    {
+                      "kind": "prop",
+                      "prop": "checked",
+                      "subject": "subject:dnd_enabled"
+                    }
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000130",
+              "type": "obj",
+              "codeName": "settings_auto_light",
+              "props": {
+                "x": 22,
+                "y": 162,
+                "width": 436,
+                "height": 80
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#102238",
+                    "bg_opa": 255,
+                    "border_color": "#203852",
+                    "border_width": 1,
+                    "radius": 18,
+                    "pad_all": 0
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000127",
+                  "type": "label",
+                  "codeName": "settings_auto_light_title",
+                  "props": {
+                    "text": "AUTO LIGHT",
+                    "x": 22,
+                    "y": 16,
+                    "width": 270,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_16",
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000128",
+                  "type": "label",
+                  "codeName": "settings_auto_light_note",
+                  "props": {
+                    "text": "Presence controlled",
+                    "x": 22,
+                    "y": 44,
+                    "width": 270,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#8FA7BD",
+                        "text_font": "montserrat_12",
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000129",
+                  "type": "switch",
+                  "codeName": "settings_auto_light_toggle",
+                  "props": {
+                    "x": 350,
+                    "y": 24,
+                    "width": 58,
+                    "height": 30
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "selector": {
+                        "part": "main"
+                      },
+                      "props": {
+                        "bg_color": "#32465A",
+                        "bg_opa": 255,
+                        "radius": 20
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "indicator",
+                        "states": [
+                          "checked"
+                        ]
+                      },
+                      "props": {
+                        "bg_color": "#32D6C6",
+                        "bg_opa": 255,
+                        "radius": 20
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "knob"
+                      },
+                      "props": {
+                        "bg_color": "#FFFFFF",
+                        "bg_opa": 255,
+                        "radius": 20
+                      }
+                    }
+                  ],
+                  "events": [
+                    {
+                      "on": "value_changed",
+                      "action": "subject.toggle",
+                      "args": {
+                        "subject": "subject:light_enabled"
+                      }
+                    }
+                  ],
+                  "bindings": [
+                    {
+                      "kind": "prop",
+                      "prop": "checked",
+                      "subject": "subject:light_enabled"
+                    }
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000134",
+              "type": "obj",
+              "codeName": "settings_auto_vent",
+              "props": {
+                "x": 22,
+                "y": 258,
+                "width": 436,
+                "height": 80
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#102238",
+                    "bg_opa": 255,
+                    "border_color": "#203852",
+                    "border_width": 1,
+                    "radius": 18,
+                    "pad_all": 0
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000131",
+                  "type": "label",
+                  "codeName": "settings_auto_vent_title",
+                  "props": {
+                    "text": "AUTO VENT",
+                    "x": 22,
+                    "y": 16,
+                    "width": 270,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_16",
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000132",
+                  "type": "label",
+                  "codeName": "settings_auto_vent_note",
+                  "props": {
+                    "text": "30 min schedule",
+                    "x": 22,
+                    "y": 44,
+                    "width": 270,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#8FA7BD",
+                        "text_font": "montserrat_12",
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000000133",
+                  "type": "switch",
+                  "codeName": "settings_auto_vent_toggle",
+                  "props": {
+                    "x": 350,
+                    "y": 24,
+                    "width": 58,
+                    "height": 30
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "selector": {
+                        "part": "main"
+                      },
+                      "props": {
+                        "bg_color": "#32465A",
+                        "bg_opa": 255,
+                        "radius": 20
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "indicator",
+                        "states": [
+                          "checked"
+                        ]
+                      },
+                      "props": {
+                        "bg_color": "#32D6C6",
+                        "bg_opa": 255,
+                        "radius": 20
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "knob"
+                      },
+                      "props": {
+                        "bg_color": "#FFFFFF",
+                        "bg_opa": 255,
+                        "radius": 20
+                      }
+                    }
+                  ],
+                  "events": [
+                    {
+                      "on": "value_changed",
+                      "action": "subject.toggle",
+                      "args": {
+                        "subject": "subject:vent_enabled"
+                      }
+                    }
+                  ],
+                  "bindings": [
+                    {
+                      "kind": "prop",
+                      "prop": "checked",
+                      "subject": "subject:vent_enabled"
+                    }
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000136",
+              "type": "obj",
+              "codeName": "settings_device",
+              "props": {
+                "x": 22,
+                "y": 354,
+                "width": 436,
+                "height": 48
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#0C1B2E",
+                    "bg_opa": 255,
+                    "border_color": "#203852",
+                    "border_width": 1,
+                    "radius": 18,
+                    "pad_all": 0
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000135",
+                  "type": "label",
+                  "codeName": "settings_device_name",
+                  "props": {
+                    "text": "WF2D-8630  /  480 x 480 DEMO",
+                    "x": 18,
+                    "y": 15,
+                    "width": 400,
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#32D6C6",
+                        "text_font": "montserrat_12",
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000138",
+              "type": "button",
+              "codeName": "settings_nav_home",
+              "props": {
+                "x": 14,
+                "y": 426,
+                "width": 82,
+                "height": 40
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#0C1B2E",
+                    "bg_opa": 255,
+                    "border_width": 1,
+                    "border_color": "#203852",
+                    "radius": 18,
+                    "shadow_width": 0,
+                    "shadow_color": "#0C1B2E",
+                    "shadow_opa": 0,
+                    "pad_all": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": "#32D6C6"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "00000000-0000-4000-8000-000000000001",
+                    "anim": "fade_on",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000137",
+                  "type": "label",
+                  "codeName": "settings_nav_home_text",
+                  "props": {
+                    "text": "H",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_12",
+                        "text_align": "center"
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000140",
+              "type": "button",
+              "codeName": "settings_nav_air",
+              "props": {
+                "x": 106,
+                "y": 426,
+                "width": 82,
+                "height": 40
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#0C1B2E",
+                    "bg_opa": 255,
+                    "border_width": 1,
+                    "border_color": "#203852",
+                    "radius": 18,
+                    "shadow_width": 0,
+                    "shadow_color": "#0C1B2E",
+                    "shadow_opa": 0,
+                    "pad_all": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": "#32D6C6"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "00000000-0000-4000-8000-000000000002",
+                    "anim": "fade_on",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000139",
+                  "type": "label",
+                  "codeName": "settings_nav_air_text",
+                  "props": {
+                    "text": "AIR",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_12",
+                        "text_align": "center"
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000142",
+              "type": "button",
+              "codeName": "settings_nav_light",
+              "props": {
+                "x": 198,
+                "y": 426,
+                "width": 82,
+                "height": 40
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#0C1B2E",
+                    "bg_opa": 255,
+                    "border_width": 1,
+                    "border_color": "#203852",
+                    "radius": 18,
+                    "shadow_width": 0,
+                    "shadow_color": "#0C1B2E",
+                    "shadow_opa": 0,
+                    "pad_all": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": "#32D6C6"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "00000000-0000-4000-8000-000000000003",
+                    "anim": "fade_on",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000141",
+                  "type": "label",
+                  "codeName": "settings_nav_light_text",
+                  "props": {
+                    "text": "LUX",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_12",
+                        "text_align": "center"
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000144",
+              "type": "button",
+              "codeName": "settings_nav_focus",
+              "props": {
+                "x": 290,
+                "y": 426,
+                "width": 82,
+                "height": 40
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#0C1B2E",
+                    "bg_opa": 255,
+                    "border_width": 1,
+                    "border_color": "#203852",
+                    "radius": 18,
+                    "shadow_width": 0,
+                    "shadow_color": "#0C1B2E",
+                    "shadow_opa": 0,
+                    "pad_all": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": "#32D6C6"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "00000000-0000-4000-8000-000000000004",
+                    "anim": "fade_on",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000143",
+                  "type": "label",
+                  "codeName": "settings_nav_focus_text",
+                  "props": {
+                    "text": "FOC",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_12",
+                        "text_align": "center"
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000146",
+              "type": "button",
+              "codeName": "settings_nav_settings",
+              "props": {
+                "x": 382,
+                "y": 426,
+                "width": 82,
+                "height": 40
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": "#3B82F6",
+                    "bg_opa": 255,
+                    "border_width": 0,
+                    "border_color": "#203852",
+                    "radius": 18,
+                    "shadow_width": 0,
+                    "shadow_color": "#3B82F6",
+                    "shadow_opa": 0,
+                    "pad_all": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": "#32D6C6"
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "00000000-0000-4000-8000-000000000005",
+                    "anim": "fade_on",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000145",
+                  "type": "label",
+                  "codeName": "settings_nav_settings_text",
+                  "props": {
+                    "text": "SET",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": "#F4F8FC",
+                        "text_font": "montserrat_12",
+                        "text_align": "center"
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "components": [],
+    "styles": [],
+    "consts": [],
+    "assets": {
+      "fonts": [],
+      "images": [],
+      "icons": []
+    },
+    "translations": null,
+    "editor": {
+      "deviceModel": "WF2D-8630",
+      "deviceTitle": "3.95 inch square demo",
+      "example": "quiet-pod-control-suite"
+    }
+  },
+  "displayProfile": {
+    "schemaVersion": 1,
+    "kind": "display-profile",
+    "id": "display:wf2d-8630-480x480-rgb565",
+    "revision": 1,
+    "displayName": "WF2D-8630 480×480 矩形屏 RGB565",
+    "logicalSize": {
+      "width": 480,
+      "height": 480
+    },
+    "shape": "rect",
+    "colorFormat": "RGB565",
+    "dpi": 130
+  },
+  "controllerProfile": {
+    "schemaVersion": 1,
+    "kind": "controller-profile",
+    "id": "controller:wf2d-8630",
+    "revision": 1,
+    "model": "WF2D-8630",
+    "displayName": "WF2D-8630 设备外壳",
+    "displayRef": "display:wf2d-8630-480x480-rgb565@1",
+    "frame": {
+      "assetRef": "asset:controller/wf2d-8630.svg@sha256:9df6a6386ab20ef085b2bde7c119b5825188e9cff866923325857a32f6b97346",
+      "viewBox": {
+        "x": 0,
+        "y": 0,
+        "width": 86,
+        "height": 86
+      },
+      "screenViewport": {
+        "x": 7.445321,
+        "y": 7.445321,
+        "width": 71.109358,
+        "height": 71.109358,
+        "rotation": 0,
+        "clip": {
+          "type": "roundedRect",
+          "radius": 0.75
+        }
+      }
+    }
+  },
+  "buildTarget": {
+    "schemaVersion": 1,
+    "kind": "lvgl-build-target",
+    "id": "target:wf2d-8630-quiet-pod",
+    "revision": 1,
+    "displayName": "WF2D-8630 静音仓目标",
+    "uiProjectRef": "ui:wf2d-8630-quiet-pod@1",
+    "controllerProfileRef": "controller:wf2d-8630@1",
+    "themeRef": "ui:wf2d-8630-quiet-pod@1#theme:default",
+    "lvglVersion": "9.5.0"
+  },
+  "actionRegistry": {
+    "screen.open": {
+      "id": "screen.open",
+      "displayName": "打开屏幕",
+      "params": [
+        {
+          "name": "screen",
+          "type": "screenRef",
+          "required": true
+        },
+        {
+          "name": "anim",
+          "type": "string"
+        },
+        {
+          "name": "duration",
+          "type": "int"
+        },
+        {
+          "name": "delay",
+          "type": "int"
+        }
+      ]
+    },
+    "screen.create": {
+      "id": "screen.create",
+      "displayName": "创建并打开屏幕",
+      "description": "目标屏未创建时先创建再加载",
+      "params": [
+        {
+          "name": "screen",
+          "type": "screenRef",
+          "required": true
+        },
+        {
+          "name": "anim",
+          "type": "string"
+        },
+        {
+          "name": "duration",
+          "type": "int"
+        },
+        {
+          "name": "delay",
+          "type": "int"
+        }
+      ]
+    },
+    "screen.back": {
+      "id": "screen.back",
+      "displayName": "返回上一屏",
+      "params": []
+    },
+    "subject.set": {
+      "id": "subject.set",
+      "displayName": "设置 Subject",
+      "params": [
+        {
+          "name": "subject",
+          "type": "subjectRef",
+          "required": true
+        },
+        {
+          "name": "value",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    "subject.toggle": {
+      "id": "subject.toggle",
+      "displayName": "翻转 Subject",
+      "params": [
+        {
+          "name": "subject",
+          "type": "subjectRef",
+          "required": true
+        }
+      ]
+    },
+    "subject.increment": {
+      "id": "subject.increment",
+      "displayName": "递增 Subject",
+      "params": [
+        {
+          "name": "subject",
+          "type": "subjectRef",
+          "required": true
+        },
+        {
+          "name": "step",
+          "type": "int"
+        },
+        {
+          "name": "min",
+          "type": "int"
+        },
+        {
+          "name": "max",
+          "type": "int"
+        },
+        {
+          "name": "rollover",
+          "type": "bool"
+        }
+      ]
+    }
+  },
+  "migrationNotes": [
+    {
+      "severity": "info",
+      "code": "color-format-confirmed",
+      "path": "display.colorFormat",
+      "message": "WF2D-8630 示例已确认使用 RGB565。"
+    },
+    {
+      "severity": "info",
+      "code": "controller-profile-selected",
+      "path": "buildTarget.controllerProfileRef",
+      "message": "已绑定 WF2D-8630 设备外壳。"
+    }
+  ],
+  "colorFormatConfirmed": true
+}

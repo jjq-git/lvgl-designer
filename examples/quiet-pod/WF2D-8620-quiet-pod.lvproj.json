@@ -148,7 +148,7 @@
         "styles": [],
         "consts": [],
         "root": {
-          "id": "00000000-0000-4000-8000-000000000062",
+          "id": "00000000-0000-4000-8000-000000000064",
           "type": "obj",
           "props": {},
           "flags": {
@@ -174,9 +174,9 @@
               "codeName": "home_page_title",
               "props": {
                 "text": "HOME",
-                "x": 80,
-                "y": 18,
-                "width": 80,
+                "x": 84,
+                "y": 24,
+                "width": 72,
                 "height": "content"
               },
               "styleRefs": [],
@@ -184,7 +184,7 @@
                 {
                   "props": {
                     "text_color": "#8FA7BD",
-                    "text_font": "montserrat_16",
+                    "text_font": "montserrat_18",
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -199,10 +199,10 @@
               "type": "button",
               "codeName": "home_next",
               "props": {
-                "x": 162,
-                "y": 27,
-                "width": 34,
-                "height": 34
+                "x": 156,
+                "y": 26,
+                "width": 38,
+                "height": 38
               },
               "flags": {
                 "scrollable": false
@@ -215,7 +215,7 @@
                     "bg_opa": 255,
                     "border_width": 1,
                     "border_color": "#203852",
-                    "radius": 17,
+                    "radius": 18,
                     "shadow_width": 0,
                     "shadow_color": "#102238",
                     "shadow_opa": 0,
@@ -262,7 +262,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_font": "montserrat_18",
                         "text_align": "center"
                       }
                     }
@@ -278,10 +278,10 @@
               "type": "arc",
               "codeName": "home_quiet_arc",
               "props": {
-                "x": 48,
-                "y": 46,
-                "width": 144,
-                "height": 144,
+                "x": 56,
+                "y": 68,
+                "width": 128,
+                "height": 128,
                 "min_value": 0,
                 "max_value": 100,
                 "value": 36,
@@ -299,7 +299,7 @@
                   },
                   "props": {
                     "arc_color": "#263C52",
-                    "arc_width": 13
+                    "arc_width": 12
                   }
                 },
                 {
@@ -308,7 +308,7 @@
                   },
                   "props": {
                     "arc_color": "#32D6C6",
-                    "arc_width": 13
+                    "arc_width": 12
                   }
                 },
                 {
@@ -338,9 +338,9 @@
               "codeName": "home_quiet",
               "props": {
                 "text": "QUIET",
-                "x": 55,
-                "y": 90,
-                "width": 130,
+                "x": 60,
+                "y": 99,
+                "width": 120,
                 "height": "content"
               },
               "styleRefs": [],
@@ -348,7 +348,7 @@
                 {
                   "props": {
                     "text_color": "#F4F8FC",
-                    "text_font": "montserrat_26",
+                    "text_font": "montserrat_28",
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -365,7 +365,7 @@
               "props": {
                 "text": "32 dB",
                 "x": 70,
-                "y": 124,
+                "y": 134,
                 "width": 100,
                 "height": "content"
               },
@@ -374,7 +374,7 @@
                 {
                   "props": {
                     "text_color": "#32D6C6",
-                    "text_font": "montserrat_16",
+                    "text_font": "montserrat_18",
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -390,9 +390,9 @@
               "codeName": "home_air",
               "props": {
                 "text": "  AIR GOOD",
-                "x": 60,
-                "y": 151,
-                "width": 120,
+                "x": 64,
+                "y": 160,
+                "width": 112,
                 "height": "content"
               },
               "styleRefs": [],
@@ -400,7 +400,7 @@
                 {
                   "props": {
                     "text_color": "#51D88A",
-                    "text_font": "montserrat_12",
+                    "text_font": "montserrat_14",
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -415,10 +415,10 @@
               "type": "button",
               "codeName": "home_start",
               "props": {
-                "x": 76,
-                "y": 180,
-                "width": 88,
-                "height": 36
+                "x": 72,
+                "y": 185,
+                "width": 96,
+                "height": 40
               },
               "flags": {
                 "scrollable": false
@@ -476,7 +476,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "center"
                       }
                     }
@@ -498,7 +498,7 @@
         "styles": [],
         "consts": [],
         "root": {
-          "id": "00000000-0000-4000-8000-000000000064",
+          "id": "00000000-0000-4000-8000-000000000066",
           "type": "obj",
           "props": {},
           "flags": {
@@ -524,9 +524,9 @@
               "codeName": "air_page_title",
               "props": {
                 "text": "AIR",
-                "x": 80,
-                "y": 18,
-                "width": 80,
+                "x": 84,
+                "y": 24,
+                "width": 72,
                 "height": "content"
               },
               "styleRefs": [],
@@ -534,7 +534,7 @@
                 {
                   "props": {
                     "text_color": "#8FA7BD",
-                    "text_font": "montserrat_16",
+                    "text_font": "montserrat_18",
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -549,10 +549,10 @@
               "type": "button",
               "codeName": "air_back",
               "props": {
-                "x": 44,
-                "y": 27,
-                "width": 34,
-                "height": 34
+                "x": 46,
+                "y": 26,
+                "width": 38,
+                "height": 38
               },
               "flags": {
                 "scrollable": false
@@ -565,7 +565,7 @@
                     "bg_opa": 255,
                     "border_width": 1,
                     "border_color": "#203852",
-                    "radius": 17,
+                    "radius": 18,
                     "shadow_width": 0,
                     "shadow_color": "#102238",
                     "shadow_opa": 0,
@@ -612,7 +612,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_font": "montserrat_18",
                         "text_align": "center"
                       }
                     }
@@ -628,10 +628,10 @@
               "type": "button",
               "codeName": "air_next",
               "props": {
-                "x": 162,
-                "y": 27,
-                "width": 34,
-                "height": 34
+                "x": 156,
+                "y": 26,
+                "width": 38,
+                "height": 38
               },
               "flags": {
                 "scrollable": false
@@ -644,7 +644,7 @@
                     "bg_opa": 255,
                     "border_width": 1,
                     "border_color": "#203852",
-                    "radius": 17,
+                    "radius": 18,
                     "shadow_width": 0,
                     "shadow_color": "#102238",
                     "shadow_opa": 0,
@@ -691,7 +691,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_font": "montserrat_18",
                         "text_align": "center"
                       }
                     }
@@ -707,10 +707,10 @@
               "type": "arc",
               "codeName": "air_co2_arc",
               "props": {
-                "x": 62,
-                "y": 54,
-                "width": 116,
-                "height": 116,
+                "x": 60,
+                "y": 68,
+                "width": 120,
+                "height": 120,
                 "min_value": 350,
                 "max_value": 2000,
                 "value": 586,
@@ -767,9 +767,9 @@
               "codeName": "air_co2",
               "props": {
                 "text": "586",
-                "x": 70,
-                "y": 92,
-                "width": 100,
+                "x": 68,
+                "y": 100,
+                "width": 104,
                 "height": "content"
               },
               "styleRefs": [],
@@ -777,7 +777,7 @@
                 {
                   "props": {
                     "text_color": "#F4F8FC",
-                    "text_font": "montserrat_26",
+                    "text_font": "montserrat_30",
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -792,18 +792,18 @@
               "type": "label",
               "codeName": "air_ppm",
               "props": {
-                "text": "ppm   GOOD",
-                "x": 55,
-                "y": 123,
-                "width": 130,
+                "text": "ppm",
+                "x": 79,
+                "y": 137,
+                "width": 48,
                 "height": "content"
               },
               "styleRefs": [],
               "styles": [
                 {
                   "props": {
-                    "text_color": "#51D88A",
-                    "text_font": "montserrat_12",
+                    "text_color": "#32D6C6",
+                    "text_font": "montserrat_14",
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -816,11 +816,37 @@
             {
               "id": "00000000-0000-4000-8000-000000000023",
               "type": "label",
+              "codeName": "air_quality",
+              "props": {
+                "text": " GOOD",
+                "x": 124,
+                "y": 137,
+                "width": 68,
+                "height": "content"
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": "#51D88A",
+                    "text_font": "montserrat_14",
+                    "text_align": "left",
+                    "text_opa": 255
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000024",
+              "type": "label",
               "codeName": "air_fan",
               "props": {
-                "text": " FAN 36%",
+                "text": "  FAN 36%",
                 "x": 48,
-                "y": 158,
+                "y": 169,
                 "width": 144,
                 "height": "content"
               },
@@ -829,7 +855,7 @@
                 {
                   "props": {
                     "text_color": "#8FA7BD",
-                    "text_font": "montserrat_12",
+                    "text_font": "montserrat_14",
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -841,20 +867,20 @@
                   "kind": "prop",
                   "prop": "text",
                   "subject": "subject:fan_speed",
-                  "fmt": " FAN %d%%"
+                  "fmt": "  FAN %d%%"
                 }
               ],
               "children": []
             },
             {
-              "id": "00000000-0000-4000-8000-000000000024",
+              "id": "00000000-0000-4000-8000-000000000025",
               "type": "slider",
               "codeName": "air_speed",
               "props": {
-                "x": 64,
-                "y": 181,
-                "width": 112,
-                "height": 10,
+                "x": 54,
+                "y": 200,
+                "width": 132,
+                "height": 12,
                 "min_value": 0,
                 "max_value": 100,
                 "value": 36
@@ -915,7 +941,7 @@
         "styles": [],
         "consts": [],
         "root": {
-          "id": "00000000-0000-4000-8000-000000000066",
+          "id": "00000000-0000-4000-8000-000000000068",
           "type": "obj",
           "props": {},
           "flags": {
@@ -936,14 +962,14 @@
           "bindings": [],
           "children": [
             {
-              "id": "00000000-0000-4000-8000-000000000025",
+              "id": "00000000-0000-4000-8000-000000000026",
               "type": "label",
               "codeName": "light_page_title",
               "props": {
                 "text": "LIGHT",
-                "x": 80,
-                "y": 18,
-                "width": 80,
+                "x": 84,
+                "y": 24,
+                "width": 72,
                 "height": "content"
               },
               "styleRefs": [],
@@ -951,7 +977,7 @@
                 {
                   "props": {
                     "text_color": "#8FA7BD",
-                    "text_font": "montserrat_16",
+                    "text_font": "montserrat_18",
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -962,14 +988,14 @@
               "children": []
             },
             {
-              "id": "00000000-0000-4000-8000-000000000027",
+              "id": "00000000-0000-4000-8000-000000000028",
               "type": "button",
               "codeName": "light_back",
               "props": {
-                "x": 44,
-                "y": 27,
-                "width": 34,
-                "height": 34
+                "x": 46,
+                "y": 26,
+                "width": 38,
+                "height": 38
               },
               "flags": {
                 "scrollable": false
@@ -982,7 +1008,7 @@
                     "bg_opa": 255,
                     "border_width": 1,
                     "border_color": "#203852",
-                    "radius": 17,
+                    "radius": 18,
                     "shadow_width": 0,
                     "shadow_color": "#102238",
                     "shadow_opa": 0,
@@ -1015,7 +1041,7 @@
               "bindings": [],
               "children": [
                 {
-                  "id": "00000000-0000-4000-8000-000000000026",
+                  "id": "00000000-0000-4000-8000-000000000027",
                   "type": "label",
                   "codeName": "light_back_text",
                   "props": {
@@ -1029,7 +1055,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_font": "montserrat_18",
                         "text_align": "center"
                       }
                     }
@@ -1041,14 +1067,14 @@
               ]
             },
             {
-              "id": "00000000-0000-4000-8000-000000000029",
+              "id": "00000000-0000-4000-8000-000000000030",
               "type": "button",
               "codeName": "light_next",
               "props": {
-                "x": 162,
-                "y": 27,
-                "width": 34,
-                "height": 34
+                "x": 156,
+                "y": 26,
+                "width": 38,
+                "height": 38
               },
               "flags": {
                 "scrollable": false
@@ -1061,7 +1087,7 @@
                     "bg_opa": 255,
                     "border_width": 1,
                     "border_color": "#203852",
-                    "radius": 17,
+                    "radius": 18,
                     "shadow_width": 0,
                     "shadow_color": "#102238",
                     "shadow_opa": 0,
@@ -1094,7 +1120,7 @@
               "bindings": [],
               "children": [
                 {
-                  "id": "00000000-0000-4000-8000-000000000028",
+                  "id": "00000000-0000-4000-8000-000000000029",
                   "type": "label",
                   "codeName": "light_next_text",
                   "props": {
@@ -1108,7 +1134,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_font": "montserrat_18",
                         "text_align": "center"
                       }
                     }
@@ -1120,14 +1146,14 @@
               ]
             },
             {
-              "id": "00000000-0000-4000-8000-000000000030",
+              "id": "00000000-0000-4000-8000-000000000031",
               "type": "arc",
               "codeName": "light_brightness_arc",
               "props": {
-                "x": 54,
-                "y": 50,
-                "width": 132,
-                "height": 132,
+                "x": 58,
+                "y": 68,
+                "width": 124,
+                "height": 124,
                 "min_value": 0,
                 "max_value": 100,
                 "value": 68,
@@ -1145,7 +1171,7 @@
                   },
                   "props": {
                     "arc_color": "#263C52",
-                    "arc_width": 12
+                    "arc_width": 11
                   }
                 },
                 {
@@ -1154,7 +1180,7 @@
                   },
                   "props": {
                     "arc_color": "#F5B942",
-                    "arc_width": 12
+                    "arc_width": 11
                   }
                 },
                 {
@@ -1179,13 +1205,13 @@
               "children": []
             },
             {
-              "id": "00000000-0000-4000-8000-000000000031",
+              "id": "00000000-0000-4000-8000-000000000032",
               "type": "label",
               "codeName": "light_value",
               "props": {
                 "text": "68%",
                 "x": 65,
-                "y": 94,
+                "y": 102,
                 "width": 110,
                 "height": "content"
               },
@@ -1194,7 +1220,7 @@
                 {
                   "props": {
                     "text_color": "#F5B942",
-                    "text_font": "montserrat_26",
+                    "text_font": "montserrat_30",
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -1212,13 +1238,13 @@
               "children": []
             },
             {
-              "id": "00000000-0000-4000-8000-000000000032",
+              "id": "00000000-0000-4000-8000-000000000033",
               "type": "label",
               "codeName": "light_cct_value",
               "props": {
                 "text": "4200 K",
                 "x": 65,
-                "y": 130,
+                "y": 140,
                 "width": 110,
                 "height": "content"
               },
@@ -1227,7 +1253,7 @@
                 {
                   "props": {
                     "text_color": "#32D6C6",
-                    "text_font": "montserrat_14",
+                    "text_font": "montserrat_16",
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -1245,14 +1271,40 @@
               "children": []
             },
             {
-              "id": "00000000-0000-4000-8000-000000000033",
+              "id": "00000000-0000-4000-8000-000000000034",
+              "type": "label",
+              "codeName": "light_master_label",
+              "props": {
+                "text": "MASTER",
+                "x": 74,
+                "y": 172,
+                "width": 92,
+                "height": "content"
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": "#8FA7BD",
+                    "text_font": "montserrat_14",
+                    "text_align": "center",
+                    "text_opa": 255
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000035",
               "type": "switch",
               "codeName": "light_master",
               "props": {
-                "x": 91,
-                "y": 174,
-                "width": 58,
-                "height": 28
+                "x": 88,
+                "y": 195,
+                "width": 64,
+                "height": 30
               },
               "styleRefs": [],
               "styles": [
@@ -1319,7 +1371,7 @@
         "styles": [],
         "consts": [],
         "root": {
-          "id": "00000000-0000-4000-8000-000000000068",
+          "id": "00000000-0000-4000-8000-000000000070",
           "type": "obj",
           "props": {},
           "flags": {
@@ -1340,14 +1392,14 @@
           "bindings": [],
           "children": [
             {
-              "id": "00000000-0000-4000-8000-000000000034",
+              "id": "00000000-0000-4000-8000-000000000036",
               "type": "label",
               "codeName": "focus_page_title",
               "props": {
                 "text": "FOCUS",
-                "x": 80,
-                "y": 18,
-                "width": 80,
+                "x": 84,
+                "y": 24,
+                "width": 72,
                 "height": "content"
               },
               "styleRefs": [],
@@ -1355,7 +1407,7 @@
                 {
                   "props": {
                     "text_color": "#8FA7BD",
-                    "text_font": "montserrat_16",
+                    "text_font": "montserrat_18",
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -1366,14 +1418,14 @@
               "children": []
             },
             {
-              "id": "00000000-0000-4000-8000-000000000036",
+              "id": "00000000-0000-4000-8000-000000000038",
               "type": "button",
               "codeName": "focus_back",
               "props": {
-                "x": 44,
-                "y": 27,
-                "width": 34,
-                "height": 34
+                "x": 46,
+                "y": 26,
+                "width": 38,
+                "height": 38
               },
               "flags": {
                 "scrollable": false
@@ -1386,7 +1438,7 @@
                     "bg_opa": 255,
                     "border_width": 1,
                     "border_color": "#203852",
-                    "radius": 17,
+                    "radius": 18,
                     "shadow_width": 0,
                     "shadow_color": "#102238",
                     "shadow_opa": 0,
@@ -1419,7 +1471,7 @@
               "bindings": [],
               "children": [
                 {
-                  "id": "00000000-0000-4000-8000-000000000035",
+                  "id": "00000000-0000-4000-8000-000000000037",
                   "type": "label",
                   "codeName": "focus_back_text",
                   "props": {
@@ -1433,7 +1485,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_font": "montserrat_18",
                         "text_align": "center"
                       }
                     }
@@ -1445,14 +1497,14 @@
               ]
             },
             {
-              "id": "00000000-0000-4000-8000-000000000038",
+              "id": "00000000-0000-4000-8000-000000000040",
               "type": "button",
               "codeName": "focus_next",
               "props": {
-                "x": 162,
-                "y": 27,
-                "width": 34,
-                "height": 34
+                "x": 156,
+                "y": 26,
+                "width": 38,
+                "height": 38
               },
               "flags": {
                 "scrollable": false
@@ -1465,7 +1517,7 @@
                     "bg_opa": 255,
                     "border_width": 1,
                     "border_color": "#203852",
-                    "radius": 17,
+                    "radius": 18,
                     "shadow_width": 0,
                     "shadow_color": "#102238",
                     "shadow_opa": 0,
@@ -1498,7 +1550,7 @@
               "bindings": [],
               "children": [
                 {
-                  "id": "00000000-0000-4000-8000-000000000037",
+                  "id": "00000000-0000-4000-8000-000000000039",
                   "type": "label",
                   "codeName": "focus_next_text",
                   "props": {
@@ -1512,7 +1564,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_font": "montserrat_18",
                         "text_align": "center"
                       }
                     }
@@ -1524,13 +1576,13 @@
               ]
             },
             {
-              "id": "00000000-0000-4000-8000-000000000039",
+              "id": "00000000-0000-4000-8000-000000000041",
               "type": "label",
               "codeName": "focus_prompt",
               "props": {
                 "text": "SELECT MODE",
                 "x": 60,
-                "y": 65,
+                "y": 72,
                 "width": 120,
                 "height": "content"
               },
@@ -1539,7 +1591,7 @@
                 {
                   "props": {
                     "text_color": "#8FA7BD",
-                    "text_font": "montserrat_12",
+                    "text_font": "montserrat_14",
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -1550,14 +1602,14 @@
               "children": []
             },
             {
-              "id": "00000000-0000-4000-8000-000000000041",
+              "id": "00000000-0000-4000-8000-000000000043",
               "type": "button",
               "codeName": "focus_deep",
               "props": {
-                "x": 48,
+                "x": 41,
                 "y": 98,
-                "width": 68,
-                "height": 40
+                "width": 76,
+                "height": 42
               },
               "flags": {
                 "scrollable": false
@@ -1601,7 +1653,7 @@
               "bindings": [],
               "children": [
                 {
-                  "id": "00000000-0000-4000-8000-000000000040",
+                  "id": "00000000-0000-4000-8000-000000000042",
                   "type": "label",
                   "codeName": "focus_deep_text",
                   "props": {
@@ -1615,7 +1667,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "center"
                       }
                     }
@@ -1627,14 +1679,14 @@
               ]
             },
             {
-              "id": "00000000-0000-4000-8000-000000000043",
+              "id": "00000000-0000-4000-8000-000000000045",
               "type": "button",
               "codeName": "focus_meet",
               "props": {
-                "x": 124,
+                "x": 123,
                 "y": 98,
-                "width": 68,
-                "height": 40
+                "width": 76,
+                "height": 42
               },
               "flags": {
                 "scrollable": false
@@ -1678,7 +1730,7 @@
               "bindings": [],
               "children": [
                 {
-                  "id": "00000000-0000-4000-8000-000000000042",
+                  "id": "00000000-0000-4000-8000-000000000044",
                   "type": "label",
                   "codeName": "focus_meet_text",
                   "props": {
@@ -1692,7 +1744,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "center"
                       }
                     }
@@ -1704,14 +1756,14 @@
               ]
             },
             {
-              "id": "00000000-0000-4000-8000-000000000045",
+              "id": "00000000-0000-4000-8000-000000000047",
               "type": "button",
               "codeName": "focus_call",
               "props": {
-                "x": 48,
-                "y": 146,
-                "width": 68,
-                "height": 40
+                "x": 41,
+                "y": 148,
+                "width": 76,
+                "height": 42
               },
               "flags": {
                 "scrollable": false
@@ -1755,7 +1807,7 @@
               "bindings": [],
               "children": [
                 {
-                  "id": "00000000-0000-4000-8000-000000000044",
+                  "id": "00000000-0000-4000-8000-000000000046",
                   "type": "label",
                   "codeName": "focus_call_text",
                   "props": {
@@ -1769,7 +1821,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "center"
                       }
                     }
@@ -1781,14 +1833,14 @@
               ]
             },
             {
-              "id": "00000000-0000-4000-8000-000000000047",
+              "id": "00000000-0000-4000-8000-000000000049",
               "type": "button",
               "codeName": "focus_reset",
               "props": {
-                "x": 124,
-                "y": 146,
-                "width": 68,
-                "height": 40
+                "x": 123,
+                "y": 148,
+                "width": 76,
+                "height": 42
               },
               "flags": {
                 "scrollable": false
@@ -1832,7 +1884,7 @@
               "bindings": [],
               "children": [
                 {
-                  "id": "00000000-0000-4000-8000-000000000046",
+                  "id": "00000000-0000-4000-8000-000000000048",
                   "type": "label",
                   "codeName": "focus_reset_text",
                   "props": {
@@ -1846,7 +1898,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_12",
+                        "text_font": "montserrat_14",
                         "text_align": "center"
                       }
                     }
@@ -1858,13 +1910,13 @@
               ]
             },
             {
-              "id": "00000000-0000-4000-8000-000000000048",
+              "id": "00000000-0000-4000-8000-000000000050",
               "type": "label",
               "codeName": "focus_time",
               "props": {
                 "text": "50 MIN",
                 "x": 70,
-                "y": 199,
+                "y": 205,
                 "width": 100,
                 "height": "content"
               },
@@ -1873,7 +1925,7 @@
                 {
                   "props": {
                     "text_color": "#32D6C6",
-                    "text_font": "montserrat_14",
+                    "text_font": "montserrat_16",
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -1894,7 +1946,7 @@
         "styles": [],
         "consts": [],
         "root": {
-          "id": "00000000-0000-4000-8000-000000000070",
+          "id": "00000000-0000-4000-8000-000000000072",
           "type": "obj",
           "props": {},
           "flags": {
@@ -1915,14 +1967,14 @@
           "bindings": [],
           "children": [
             {
-              "id": "00000000-0000-4000-8000-000000000049",
+              "id": "00000000-0000-4000-8000-000000000051",
               "type": "label",
               "codeName": "settings_page_title",
               "props": {
                 "text": "SET",
-                "x": 80,
-                "y": 18,
-                "width": 80,
+                "x": 84,
+                "y": 24,
+                "width": 72,
                 "height": "content"
               },
               "styleRefs": [],
@@ -1930,7 +1982,7 @@
                 {
                   "props": {
                     "text_color": "#8FA7BD",
-                    "text_font": "montserrat_16",
+                    "text_font": "montserrat_18",
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -1941,14 +1993,14 @@
               "children": []
             },
             {
-              "id": "00000000-0000-4000-8000-000000000051",
+              "id": "00000000-0000-4000-8000-000000000053",
               "type": "button",
               "codeName": "settings_back",
               "props": {
-                "x": 44,
-                "y": 27,
-                "width": 34,
-                "height": 34
+                "x": 46,
+                "y": 26,
+                "width": 38,
+                "height": 38
               },
               "flags": {
                 "scrollable": false
@@ -1961,7 +2013,7 @@
                     "bg_opa": 255,
                     "border_width": 1,
                     "border_color": "#203852",
-                    "radius": 17,
+                    "radius": 18,
                     "shadow_width": 0,
                     "shadow_color": "#102238",
                     "shadow_opa": 0,
@@ -1994,7 +2046,7 @@
               "bindings": [],
               "children": [
                 {
-                  "id": "00000000-0000-4000-8000-000000000050",
+                  "id": "00000000-0000-4000-8000-000000000052",
                   "type": "label",
                   "codeName": "settings_back_text",
                   "props": {
@@ -2008,7 +2060,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_font": "montserrat_18",
                         "text_align": "center"
                       }
                     }
@@ -2020,14 +2072,14 @@
               ]
             },
             {
-              "id": "00000000-0000-4000-8000-000000000053",
+              "id": "00000000-0000-4000-8000-000000000055",
               "type": "button",
               "codeName": "settings_home",
               "props": {
-                "x": 162,
-                "y": 27,
-                "width": 34,
-                "height": 34
+                "x": 156,
+                "y": 26,
+                "width": 38,
+                "height": 38
               },
               "flags": {
                 "scrollable": false
@@ -2040,7 +2092,7 @@
                     "bg_opa": 255,
                     "border_width": 1,
                     "border_color": "#203852",
-                    "radius": 17,
+                    "radius": 18,
                     "shadow_width": 0,
                     "shadow_color": "#102238",
                     "shadow_opa": 0,
@@ -2073,7 +2125,7 @@
               "bindings": [],
               "children": [
                 {
-                  "id": "00000000-0000-4000-8000-000000000052",
+                  "id": "00000000-0000-4000-8000-000000000054",
                   "type": "label",
                   "codeName": "settings_home_text",
                   "props": {
@@ -2087,7 +2139,7 @@
                     {
                       "props": {
                         "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_font": "montserrat_18",
                         "text_align": "center"
                       }
                     }
@@ -2099,14 +2151,14 @@
               ]
             },
             {
-              "id": "00000000-0000-4000-8000-000000000054",
+              "id": "00000000-0000-4000-8000-000000000056",
               "type": "label",
               "codeName": "settings_dnd_label",
               "props": {
                 "text": "  DND",
                 "x": 42,
-                "y": 77,
-                "width": 92,
+                "y": 82,
+                "width": 96,
                 "height": "content"
               },
               "styleRefs": [],
@@ -2114,7 +2166,7 @@
                 {
                   "props": {
                     "text_color": "#F4F8FC",
-                    "text_font": "montserrat_14",
+                    "text_font": "montserrat_16",
                     "text_align": "left",
                     "text_opa": 255
                   }
@@ -2125,14 +2177,14 @@
               "children": []
             },
             {
-              "id": "00000000-0000-4000-8000-000000000055",
+              "id": "00000000-0000-4000-8000-000000000057",
               "type": "switch",
               "codeName": "settings_dnd",
               "props": {
-                "x": 138,
-                "y": 72,
-                "width": 48,
-                "height": 26
+                "x": 142,
+                "y": 77,
+                "width": 54,
+                "height": 28
               },
               "styleRefs": [],
               "styles": [
@@ -2189,14 +2241,14 @@
               "children": []
             },
             {
-              "id": "00000000-0000-4000-8000-000000000056",
+              "id": "00000000-0000-4000-8000-000000000058",
               "type": "label",
               "codeName": "settings_vent_label",
               "props": {
                 "text": "  VENT",
                 "x": 42,
-                "y": 119,
-                "width": 92,
+                "y": 125,
+                "width": 96,
                 "height": "content"
               },
               "styleRefs": [],
@@ -2204,7 +2256,7 @@
                 {
                   "props": {
                     "text_color": "#F4F8FC",
-                    "text_font": "montserrat_14",
+                    "text_font": "montserrat_16",
                     "text_align": "left",
                     "text_opa": 255
                   }
@@ -2215,14 +2267,14 @@
               "children": []
             },
             {
-              "id": "00000000-0000-4000-8000-000000000057",
+              "id": "00000000-0000-4000-8000-000000000059",
               "type": "switch",
               "codeName": "settings_vent",
               "props": {
-                "x": 138,
-                "y": 114,
-                "width": 48,
-                "height": 26
+                "x": 142,
+                "y": 120,
+                "width": 54,
+                "height": 28
               },
               "styleRefs": [],
               "styles": [
@@ -2279,14 +2331,14 @@
               "children": []
             },
             {
-              "id": "00000000-0000-4000-8000-000000000058",
+              "id": "00000000-0000-4000-8000-000000000060",
               "type": "label",
               "codeName": "settings_light_label",
               "props": {
                 "text": "  LIGHT",
                 "x": 42,
-                "y": 161,
-                "width": 92,
+                "y": 168,
+                "width": 96,
                 "height": "content"
               },
               "styleRefs": [],
@@ -2294,7 +2346,7 @@
                 {
                   "props": {
                     "text_color": "#F4F8FC",
-                    "text_font": "montserrat_14",
+                    "text_font": "montserrat_16",
                     "text_align": "left",
                     "text_opa": 255
                   }
@@ -2305,14 +2357,14 @@
               "children": []
             },
             {
-              "id": "00000000-0000-4000-8000-000000000059",
+              "id": "00000000-0000-4000-8000-000000000061",
               "type": "switch",
               "codeName": "settings_light",
               "props": {
-                "x": 138,
-                "y": 156,
-                "width": 48,
-                "height": 26
+                "x": 142,
+                "y": 163,
+                "width": 54,
+                "height": 28
               },
               "styleRefs": [],
               "styles": [
@@ -2369,14 +2421,14 @@
               "children": []
             },
             {
-              "id": "00000000-0000-4000-8000-000000000060",
+              "id": "00000000-0000-4000-8000-000000000062",
               "type": "label",
               "codeName": "settings_version",
               "props": {
                 "text": "WF2D-8620  v1.4",
-                "x": 55,
-                "y": 205,
-                "width": 130,
+                "x": 50,
+                "y": 211,
+                "width": 140,
                 "height": "content"
               },
               "styleRefs": [],
@@ -2384,7 +2436,7 @@
                 {
                   "props": {
                     "text_color": "#8FA7BD",
-                    "text_font": "montserrat_12",
+                    "text_font": "montserrat_14",
                     "text_align": "center",
                     "text_opa": 255
                   }

@@ -524,9 +524,9 @@ function roundChrome(screen, index, screenIds) {
   return [
     // Page names carry product meaning, so keep them readable. Only the
     // universally understood previous/next actions remain icon-only.
-    label(screen, 'page_title', PAGE_LABELS[index], 80, 18, 80, { font: 'montserrat_16', color: COLORS.muted, align: 'center' }),
-    ...(index > 0 ? [button(screen, 'back', ICONS.left, 44, 27, 34, 34, { color: COLORS.card, borderWidth: 1, shadow: false, font: 'montserrat_16', events: navEvent(screenIds[index - 1], 'move_right') })] : []),
-    ...(index < 4 ? [button(screen, 'next', ICONS.right, 162, 27, 34, 34, { color: COLORS.card, borderWidth: 1, shadow: false, font: 'montserrat_16', events: navEvent(screenIds[index + 1], 'move_left') })] : []),
+    label(screen, 'page_title', PAGE_LABELS[index], 84, 24, 72, { font: 'montserrat_18', color: COLORS.muted, align: 'center' }),
+    ...(index > 0 ? [button(screen, 'back', ICONS.left, 46, 26, 38, 38, { color: COLORS.card, borderWidth: 1, shadow: false, font: 'montserrat_18', events: navEvent(screenIds[index - 1], 'move_right') })] : []),
+    ...(index < 4 ? [button(screen, 'next', ICONS.right, 156, 26, 38, 38, { color: COLORS.card, borderWidth: 1, shadow: false, font: 'montserrat_18', events: navEvent(screenIds[index + 1], 'move_left') })] : []),
   ];
 }
 
@@ -534,46 +534,48 @@ function buildRoundScreens(screenIds) {
   const layouts = [];
   layouts.push([
     ...roundChrome('home', 0, screenIds),
-    meterArc('home', 'quiet_arc', 'fan_speed', 48, 46, 144, 36, { color: COLORS.cyan, arcWidth: 13 }),
-    label('home', 'quiet', 'QUIET', 55, 90, 130, { font: 'montserrat_26', align: 'center' }),
-    label('home', 'noise', '32 dB', 70, 124, 100, { color: COLORS.cyan, font: 'montserrat_16', align: 'center' }),
-    label('home', 'air', `${ICONS.ok}  AIR GOOD`, 60, 151, 120, { color: COLORS.green, font: 'montserrat_12', align: 'center' }),
-    button('home', 'start', `${ICONS.play}  START`, 76, 180, 88, 36, { color: COLORS.blue, font: 'montserrat_12', events: [{ kind: 'subject_set', trigger: 'clicked', subject: 'pod_mode', subjectType: 'int', value: '0' }] }),
+    meterArc('home', 'quiet_arc', 'fan_speed', 56, 68, 128, 36, { color: COLORS.cyan, arcWidth: 12 }),
+    label('home', 'quiet', 'QUIET', 60, 99, 120, { font: 'montserrat_28', align: 'center' }),
+    label('home', 'noise', '32 dB', 70, 134, 100, { color: COLORS.cyan, font: 'montserrat_18', align: 'center' }),
+    label('home', 'air', `${ICONS.ok}  AIR GOOD`, 64, 160, 112, { color: COLORS.green, font: 'montserrat_14', align: 'center' }),
+    button('home', 'start', `${ICONS.play}  START`, 72, 185, 96, 40, { color: COLORS.blue, font: 'montserrat_14', events: [{ kind: 'subject_set', trigger: 'clicked', subject: 'pod_mode', subjectType: 'int', value: '0' }] }),
   ]);
   layouts.push([
     ...roundChrome('air', 1, screenIds),
-    meterArc('air', 'co2_arc', 'co2_level', 62, 54, 116, 586, { min: 350, max: 2000, color: COLORS.green, arcWidth: 11 }),
-    label('air', 'co2', '586', 70, 92, 100, { font: 'montserrat_26', align: 'center' }),
-    label('air', 'ppm', `ppm  ${ICONS.ok} GOOD`, 55, 123, 130, { color: COLORS.green, font: 'montserrat_12', align: 'center' }),
-    label('air', 'fan', `${ICONS.refresh} FAN 36%`, 48, 158, 144, { color: COLORS.muted, font: 'montserrat_12', align: 'center', binding: { subject: 'fan_speed', fmt: `${ICONS.refresh} FAN %d%%` } }),
-    slider('air', 'speed', 'fan_speed', 64, 181, 112, 36, { height: 10 }),
+    meterArc('air', 'co2_arc', 'co2_level', 60, 68, 120, 586, { min: 350, max: 2000, color: COLORS.green, arcWidth: 11 }),
+    label('air', 'co2', '586', 68, 100, 104, { font: 'montserrat_30', align: 'center' }),
+    label('air', 'ppm', 'ppm', 79, 137, 48, { color: COLORS.cyan, font: 'montserrat_14', align: 'center' }),
+    label('air', 'quality', `${ICONS.ok} GOOD`, 124, 137, 68, { color: COLORS.green, font: 'montserrat_14', align: 'left' }),
+    label('air', 'fan', `${ICONS.refresh}  FAN 36%`, 48, 169, 144, { color: COLORS.muted, font: 'montserrat_14', align: 'center', binding: { subject: 'fan_speed', fmt: `${ICONS.refresh}  FAN %d%%` } }),
+    slider('air', 'speed', 'fan_speed', 54, 200, 132, 36, { height: 12 }),
   ]);
   layouts.push([
     ...roundChrome('light', 2, screenIds),
-    meterArc('light', 'brightness_arc', 'light_brightness', 54, 50, 132, 68, { color: COLORS.amber, arcWidth: 12 }),
-    label('light', 'value', '68%', 65, 94, 110, { font: 'montserrat_26', color: COLORS.amber, align: 'center', binding: { subject: 'light_brightness', fmt: '%d%%' } }),
-    label('light', 'cct_value', '4200 K', 65, 130, 110, { font: 'montserrat_13', color: COLORS.cyan, align: 'center', binding: { subject: 'light_cct', fmt: '%d K' } }),
-    toggle('light', 'master', 'light_enabled', 91, 174, 58, 28),
+    meterArc('light', 'brightness_arc', 'light_brightness', 58, 68, 124, 68, { color: COLORS.amber, arcWidth: 11 }),
+    label('light', 'value', '68%', 65, 102, 110, { font: 'montserrat_30', color: COLORS.amber, align: 'center', binding: { subject: 'light_brightness', fmt: '%d%%' } }),
+    label('light', 'cct_value', '4200 K', 65, 140, 110, { font: 'montserrat_16', color: COLORS.cyan, align: 'center', binding: { subject: 'light_cct', fmt: '%d K' } }),
+    label('light', 'master_label', 'MASTER', 74, 172, 92, { font: 'montserrat_14', color: COLORS.muted, align: 'center' }),
+    toggle('light', 'master', 'light_enabled', 88, 195, 64, 30),
   ]);
   layouts.push([
     ...roundChrome('focus', 3, screenIds),
-    label('focus', 'prompt', 'SELECT MODE', 60, 65, 120, { color: COLORS.muted, font: 'montserrat_12', align: 'center' }),
-    button('focus', 'deep', 'DEEP', 48, 98, 68, 40, { color: COLORS.blue, font: 'montserrat_12', events: [{ kind: 'subject_set', trigger: 'clicked', subject: 'pod_mode', subjectType: 'int', value: '0' }] }),
-    button('focus', 'meet', 'MEET', 124, 98, 68, 40, { color: COLORS.card, borderWidth: 1, shadow: false, font: 'montserrat_12', events: [{ kind: 'subject_set', trigger: 'clicked', subject: 'pod_mode', subjectType: 'int', value: '1' }] }),
-    button('focus', 'call', 'CALL', 48, 146, 68, 40, { color: COLORS.card, borderWidth: 1, shadow: false, font: 'montserrat_12', events: [{ kind: 'subject_set', trigger: 'clicked', subject: 'pod_mode', subjectType: 'int', value: '2' }] }),
-    button('focus', 'reset', 'RESET', 124, 146, 68, 40, { color: COLORS.card, borderWidth: 1, shadow: false, font: 'montserrat_12', events: [{ kind: 'subject_set', trigger: 'clicked', subject: 'pod_mode', subjectType: 'int', value: '3' }] }),
-    label('focus', 'time', '50 MIN', 70, 199, 100, { color: COLORS.cyan, font: 'montserrat_14', align: 'center' }),
+    label('focus', 'prompt', 'SELECT MODE', 60, 72, 120, { color: COLORS.muted, font: 'montserrat_14', align: 'center' }),
+    button('focus', 'deep', 'DEEP', 41, 98, 76, 42, { color: COLORS.blue, font: 'montserrat_14', events: [{ kind: 'subject_set', trigger: 'clicked', subject: 'pod_mode', subjectType: 'int', value: '0' }] }),
+    button('focus', 'meet', 'MEET', 123, 98, 76, 42, { color: COLORS.card, borderWidth: 1, shadow: false, font: 'montserrat_14', events: [{ kind: 'subject_set', trigger: 'clicked', subject: 'pod_mode', subjectType: 'int', value: '1' }] }),
+    button('focus', 'call', 'CALL', 41, 148, 76, 42, { color: COLORS.card, borderWidth: 1, shadow: false, font: 'montserrat_14', events: [{ kind: 'subject_set', trigger: 'clicked', subject: 'pod_mode', subjectType: 'int', value: '2' }] }),
+    button('focus', 'reset', 'RESET', 123, 148, 76, 42, { color: COLORS.card, borderWidth: 1, shadow: false, font: 'montserrat_14', events: [{ kind: 'subject_set', trigger: 'clicked', subject: 'pod_mode', subjectType: 'int', value: '3' }] }),
+    label('focus', 'time', '50 MIN', 70, 205, 100, { color: COLORS.cyan, font: 'montserrat_16', align: 'center' }),
   ]);
   layouts.push([
     ...roundChrome('settings', 4, screenIds),
-    button('settings', 'home', ICONS.home, 162, 27, 34, 34, { color: COLORS.card, borderWidth: 1, shadow: false, font: 'montserrat_16', events: navEvent(screenIds[0], 'fade_on') }),
-    label('settings', 'dnd_label', `${ICONS.mute}  DND`, 42, 77, 92, { font: 'montserrat_14', align: 'left' }),
-    toggle('settings', 'dnd', 'dnd_enabled', 138, 72, 48, 26),
-    label('settings', 'vent_label', `${ICONS.refresh}  VENT`, 42, 119, 92, { font: 'montserrat_14', align: 'left' }),
-    toggle('settings', 'vent', 'vent_enabled', 138, 114, 48, 26),
-    label('settings', 'light_label', `${ICONS.charge}  LIGHT`, 42, 161, 92, { font: 'montserrat_14', align: 'left' }),
-    toggle('settings', 'light', 'light_enabled', 138, 156, 48, 26),
-    label('settings', 'version', 'WF2D-8620  v1.4', 55, 205, 130, { color: COLORS.muted, font: 'montserrat_12', align: 'center' }),
+    button('settings', 'home', ICONS.home, 156, 26, 38, 38, { color: COLORS.card, borderWidth: 1, shadow: false, font: 'montserrat_18', events: navEvent(screenIds[0], 'fade_on') }),
+    label('settings', 'dnd_label', `${ICONS.mute}  DND`, 42, 82, 96, { font: 'montserrat_16', align: 'left' }),
+    toggle('settings', 'dnd', 'dnd_enabled', 142, 77, 54, 28),
+    label('settings', 'vent_label', `${ICONS.refresh}  VENT`, 42, 125, 96, { font: 'montserrat_16', align: 'left' }),
+    toggle('settings', 'vent', 'vent_enabled', 142, 120, 54, 28),
+    label('settings', 'light_label', `${ICONS.charge}  LIGHT`, 42, 168, 96, { font: 'montserrat_16', align: 'left' }),
+    toggle('settings', 'light', 'light_enabled', 142, 163, 54, 28),
+    label('settings', 'version', 'WF2D-8620  v1.4', 50, 211, 140, { color: COLORS.muted, font: 'montserrat_14', align: 'center' }),
   ]);
   return layouts;
 }

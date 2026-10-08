@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { chromium } from 'playwright';
@@ -179,8 +179,23 @@ runE2e('quiet-pod browser preview', () => {
         expect(state.banner, `${model} state=${JSON.stringify(state)} console=${errors.join(' | ')}`).toBeNull();
         expect(state.rendered, `${model} screens`).toHaveLength(5);
         for (const screen of state.rendered) {
+          const sourceScreen = state.projectChildren.find((item) => item.name === screen.name);
           expect(screen.childCount, `${model}/${screen.name} runtime tree`).toBeGreaterThan(0);
+          expect(screen.childCount, `${model}/${screen.name} complete runtime tree`).toBe(sourceScreen?.children);
           expect(screen.nonWhite, `${model}/${screen.name} visible pixels`).toBeGreaterThan(100);
+        }
+        if (model === 'WF2D-8620' && process.env.LVD_QUIET_POD_ROUND_SCREENSHOTS_DIR) {
+          const outputDir = process.env.LVD_QUIET_POD_ROUND_SCREENSHOTS_DIR;
+          mkdirSync(outputDir, { recursive: true });
+          for (const screen of project.screens) {
+            await page.evaluate((screenId) => {
+              const lvd = (window as unknown as { __lvd: any }).__lvd;
+              lvd.editorStore.getState().setActiveScreen(screenId);
+            }, screen.id);
+            await page.waitForTimeout(150);
+            await page.evaluate(() => (window as unknown as { __lvd: any }).__lvd.getPipeline().runtime.tick());
+            await page.locator('#lvgl-canvas').screenshot({ path: join(outputDir, `${screen.name}.png`) });
+          }
         }
         if (model === 'WF2D-8630' && process.env.LVD_QUIET_POD_SQUARE_SCREENSHOT) {
           await page.locator('#lvgl-canvas').screenshot({ path: process.env.LVD_QUIET_POD_SQUARE_SCREENSHOT });

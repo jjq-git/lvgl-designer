@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { produce } from 'immer';
 import { createEmptyProject } from '@lvd/schema';
-import { migrateV1ToV2, type UiProject, type WidgetNodeV2 } from '@lvd/schema/v2';
+import {
+  migrateV1ToV2,
+  validateUiProjectV2,
+  type UiProject,
+  type WidgetNodeV2,
+} from '@lvd/schema/v2';
 import { applyAiOps } from '../applyOps.js';
 import type { AiOp } from '../opsSchema.js';
 
@@ -158,6 +163,111 @@ describe('applyAiOps — 名字处理', () => {
 });
 
 describe('applyAiOps — 正常批量应用', () => {
+  it('create_screen 真正新增独立屏幕并返回可切换的 ID', () => {
+    const p = proj();
+    const result = applyAiOps(p, [{
+      op: 'create_screen',
+      name: 'settings',
+      displayPreset: 'WF2D-8620',
+      root: {
+        type: 'obj',
+        inlineStyles: [{ props: { bg_color: '#101828', bg_opa: 255 } }],
+        children: [{ type: 'label', name: 'title', props: { text: '设置' } }],
+      },
+    }], screenId(p));
+    expect(result.errors).toEqual([]);
+    expect(result.createdScreenId).toMatch(/[0-9a-f-]{36}/);
+    expect(result.displayChange).toEqual({
+      presetId: 'WF2D-8620', width: 240, height: 240, shape: 'round',
+    });
+    const next = produce(p, result.recipe!);
+    expect(next.screens).toHaveLength(2);
+    const created = next.screens[1]!;
+    expect(created.id).toBe(result.createdScreenId);
+    expect(created.codeName).toBe('settings');
+    expect(byName(created.root, 'title')?.props['text']).toBe('设置');
+    expect(next.screens[0]!.root.children).toHaveLength(0);
+  });
+
+  it('create_screen 缺省名称自动命名，重名自动避让', () => {
+    const p = proj();
+    p.screens[0]!.codeName = 'settings';
+    const unnamed = applyAiOps(p, [{ op: 'create_screen', root: { type: 'obj' } }]);
+    const unnamedNext = produce(p, unnamed.recipe!);
+    expect(unnamedNext.screens[1]!.codeName).toBe('screen_1');
+
+    const duplicate = applyAiOps(p, [{ op: 'create_screen', name: 'settings', root: { type: 'obj' } }]);
+    const duplicateNext = produce(p, duplicate.recipe!);
+    expect(duplicateNext.screens[1]!.codeName).toBe('settings_2');
+    expect(duplicate.warnings).toContainEqual(expect.objectContaining({ code: 'name-conflict-renamed' }));
+  });
+
+  it('create_screen 对全项目控件 codeName 去重', () => {
+    const p = proj();
+    p.screens[0]!.root.children.push({
+      id: 'existing-title-id',
+      type: 'label',
+      codeName: 'settings_title',
+      props: { text: '旧标题' },
+      styleRefs: [],
+      styles: [],
+      events: [],
+      bindings: [],
+      children: [],
+    });
+    const result = applyAiOps(p, [{
+      op: 'create_screen',
+      name: 'settings',
+      root: {
+        type: 'obj',
+        children: [
+          { type: 'label', name: 'settings_title', props: { text: '设置' } },
+          { type: 'button', name: 'save_button' },
+        ],
+      },
+    }]);
+    const next = produce(p, result.recipe!);
+    expect(next.screens[1]!.root.children.map((node) => node.codeName))
+      .toEqual(['settings_title_2', 'save_button']);
+    expect(result.warnings).toContainEqual(expect.objectContaining({ code: 'name-conflict-renamed' }));
+    expect(validateUiProjectV2(next).errors).toEqual([]);
+  });
+
+  it('普通 add 也避让其他屏幕已使用的 codeName', () => {
+    const p = proj();
+    const created = applyAiOps(p, [{
+      op: 'create_screen',
+      name: 'other',
+      root: { type: 'obj', children: [{ type: 'label', name: 'shared_label' }] },
+    }]);
+    const withOther = produce(p, created.recipe!);
+    const added = applyAiOps(withOther, [{
+      op: 'add', parent: null, node: { type: 'label', name: 'shared_label' },
+    }], withOther.screens[0]!.id);
+    const next = produce(withOther, added.recipe!);
+    expect(next.screens[0]!.root.children[0]!.codeName).toBe('shared_label_2');
+    expect(validateUiProjectV2(next).errors).toEqual([]);
+  });
+
+  it('create_screen 必须独占一轮且根节点必须为 obj', () => {
+    const mixed = applyAiOps(proj(), [
+      { op: 'create_screen', root: { type: 'obj' } },
+      { op: 'add', parent: null, node: { type: 'label' } },
+    ]);
+    expect(mixed.errors[0]!.code).toBe('create-screen-must-be-only-op');
+
+    const badRoot = applyAiOps(proj(), [{ op: 'create_screen', root: { type: 'label' } }]);
+    expect(badRoot.errors[0]!.code).toBe('root-not-obj');
+  });
+
+  it('create_screen 拒绝未知设备预设', () => {
+    const result = applyAiOps(proj(), [{
+      op: 'create_screen', displayPreset: 'NOT-A-DISPLAY', root: { type: 'obj' },
+    }]);
+    expect(result.recipe).toBeUndefined();
+    expect(result.errors[0]).toMatchObject({ code: 'unknown-display-preset' });
+  });
+
   it('整批 ops 一个 recipe:add(嵌套)+update+remove 一次成型', () => {
     const p = proj();
     const ops: AiOp[] = [

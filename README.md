@@ -85,6 +85,13 @@ corepack pnpm --dir deploy install --frozen-lockfile --ignore-workspace
 corepack pnpm run test:deploy
 ```
 
+## 使用文档
+
+- [设备外壳使用指南](docs/设备外壳使用指南.md)
+- [AI 画 UI 使用指南](docs/AI画UI使用指南.md)
+- [工程 Schema 与 Profile 说明](docs/ui-schema.md)
+- [素材管线说明](docs/asset-pipeline.md)
+
 若要启用正式构建的主机编译门禁，将 `.env` 的 `LVGL_BUILD_COMPILE_GATE` 改为 `host`，并确保已安装 CMake、Ninja 和 C 编译器。仓库内带有固定版本的 `vendor/lvgl/` 源码。
 
 ## 发布到 ui.podsc.com

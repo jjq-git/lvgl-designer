@@ -10,7 +10,7 @@
  * - props 键不在 registry(widget 专有 ∪ OBJ_BASE ∪ 伴生键)→ 丢弃 + warning(非 fatal)
  * - 枚举值非法 / 值类型不符 → error
  * - update/remove 的 target 找不到 → error;禁止 remove 屏根
- * - replace_screen 的 root.type 必须为 'obj' → 否则 error
+ * - create_screen / replace_screen 的 root.type 必须为 'obj' → 否则 error
  * - name 非法自动净化 + warning;冲突自动 _2/_3… 后缀 + warning
  *
  * 实现:先在 structuredClone 的 screen 上完整跑一遍(收集 errors/warnings),
@@ -18,7 +18,7 @@
  */
 import {
   OBJ_BASE, PART_TOKENS, REGISTRY, STATE_TOKENS, STYLE_PROPS, findChildSpec,
-  checkCName, isColorHex, isConstRef, newUuid,
+  autoName, checkCName, isColorHex, isConstRef, newUuid,
   type EnumSpec, type PropSpec, type Selector,
 } from '@lvd/schema';
 import {
@@ -30,6 +30,7 @@ import {
   type WidgetNodeV2,
 } from '@lvd/schema/v2';
 import type { AiOp, NodeSpec } from './opsSchema.js';
+import { FALLBACK_DISPLAY_PRESETS } from '../displayPresets.js';
 
 /* ------------------------------------------------------------------ 类型 */
 
@@ -42,9 +43,20 @@ export interface AiOpIssue {
 export type AiOpError = AiOpIssue;
 export type AiOpWarning = AiOpIssue;
 
+export interface AiDisplayChange {
+  presetId: string;
+  width: number;
+  height: number;
+  shape: 'round' | 'rect';
+}
+
 export interface ApplyOpsResult {
   /** errors 为空时给出；由 projectStore.mutateV2 作为一条历史提交。 */
   recipe?: (draft: UiProject) => void;
+  /** create_screen 成功时返回；集成方应用 recipe 后应切换到该屏幕。 */
+  createdScreenId?: string;
+  /** create_screen 指定设备预设时返回；集成方应在应用 recipe 前切换 Display。 */
+  displayChange?: AiDisplayChange;
   errors: AiOpError[];
   warnings: AiOpWarning[];
 }
@@ -139,6 +151,14 @@ function findByName(
 function collectNames(node: WidgetNodeV2, into: Set<string>): void {
   if (node.codeName) into.add(node.codeName);
   for (const c of node.children) collectNames(c, into);
+}
+
+function collectProjectNodeNames(project: UiProject, exceptScreenId?: string): Set<string> {
+  const names = new Set<string>();
+  for (const screen of project.screens) {
+    if (screen.id !== exceptScreenId) collectNames(screen.root, names);
+  }
+  return names;
 }
 
 function acceptsWidgetChildren(node: WidgetNodeV2): boolean {
@@ -365,11 +385,60 @@ function materialize(
   return node;
 }
 
+function materializeScreen(
+  project: UiProject,
+  op: Extract<AiOp, { op: 'create_screen' }>,
+  opIndex: number,
+  errors: AiOpError[],
+  warnings: AiOpWarning[],
+): ScreenDefV2 | null {
+  const path = `ops[${opIndex}]`;
+  if (op.root.type !== 'obj') {
+    errors.push({
+      opIndex,
+      path: `${path}.root.type`,
+      code: 'root-not-obj',
+      message: "create_screen 的 root.type 必须为 'obj'",
+    });
+    return null;
+  }
+
+  const screenNames = new Set(project.screens.map((screen) => screen.codeName));
+  let codeName: string;
+  if (op.name === undefined) {
+    codeName = autoName('screen', screenNames);
+  } else {
+    const screenNameCtx: Ctx = { errors, warnings, used: screenNames };
+    codeName = resolveName(screenNameCtx, opIndex, `${path}.name`, op.name);
+  }
+
+  const nodeNames = collectProjectNodeNames(project);
+  nodeNames.add(codeName);
+  const nodeCtx: Ctx = { errors, warnings, used: nodeNames };
+  const root = materialize(nodeCtx, opIndex, `${path}.root`, op.root, { prefillDefaultSize: false });
+  if (!root || errors.length > 0) return null;
+
+  return {
+    id: newUuid(),
+    codeName,
+    styles: [],
+    consts: [],
+    root,
+  };
+}
+
 /* ------------------------------------------------------------ ops 执行 */
 
 /** 在给定 screen(克隆或 immer draft)上顺序执行 ops;确定性,两次跑结果一致 */
-function runOps(screen: ScreenDefV2, ops: AiOp[], errors: AiOpError[], warnings: AiOpWarning[]): void {
-  const used = new Set<string>([screen.codeName]);
+function runOps(
+  screen: ScreenDefV2,
+  ops: AiOp[],
+  errors: AiOpError[],
+  warnings: AiOpWarning[],
+  reservedNames: ReadonlySet<string> = new Set(),
+): void {
+  const used = new Set<string>(reservedNames);
+  used.add(screen.codeName);
   collectNames(screen.root, used);
   const ctx: Ctx = { errors, warnings, used };
 
@@ -382,6 +451,7 @@ function runOps(screen: ScreenDefV2, ops: AiOp[], errors: AiOpError[], warnings:
           return;
         }
         ctx.used.clear();
+        for (const name of reservedNames) ctx.used.add(name);
         ctx.used.add(screen.codeName);
         const root = materialize(ctx, i, `${p}.root`, op.root, { prefillDefaultSize: false });
         if (root) screen.root = root;
@@ -481,6 +551,55 @@ export function applyAiOps(
   const errors: AiOpError[] = [];
   const warnings: AiOpWarning[] = [];
 
+  if (ops.length === 0) {
+    return { errors, warnings };   // 纯聊天回合:无 recipe 亦无错误
+  }
+
+  const createScreenIndex = ops.findIndex((op) => op.op === 'create_screen');
+  if (createScreenIndex >= 0) {
+    if (ops.length !== 1) {
+      return {
+        errors: [{
+          opIndex: createScreenIndex,
+          path: `ops[${createScreenIndex}]`,
+          code: 'create-screen-must-be-only-op',
+          message: 'create_screen 必须是本轮唯一操作；请把完整界面放进 root.children',
+        }],
+        warnings,
+      };
+    }
+    const createOp = ops[0] as Extract<AiOp, { op: 'create_screen' }>;
+    let displayChange: AiDisplayChange | undefined;
+    if (createOp.displayPreset !== undefined) {
+      const preset = FALLBACK_DISPLAY_PRESETS.fixed.find((candidate) =>
+        candidate.frameId === createOp.displayPreset || candidate.model === createOp.displayPreset);
+      if (!preset) {
+        return {
+          errors: [{
+            opIndex: 0,
+            path: 'ops[0].displayPreset',
+            code: 'unknown-display-preset',
+            message: `未知设备预设 ${createOp.displayPreset}；可用:${FALLBACK_DISPLAY_PRESETS.fixed.map((item) => item.frameId).join('|')}`,
+          }],
+          warnings,
+        };
+      }
+      displayChange = {
+        presetId: preset.frameId,
+        width: preset.width,
+        height: preset.height,
+        shape: preset.shape,
+      };
+    }
+    const screen = materializeScreen(project, createOp, 0, errors, warnings);
+    if (!screen || errors.length > 0) return { errors, warnings };
+    const createdScreenId = screen.id;
+    const recipe = (draft: UiProject): void => {
+      draft.screens.push(structuredClone(screen));
+    };
+    return { recipe, createdScreenId, displayChange, errors, warnings };
+  }
+
   const screen = screenId !== undefined
     ? project.screens.find((s) => s.id === screenId)
     : project.screens[0];
@@ -490,13 +609,10 @@ export function applyAiOps(
       warnings,
     };
   }
-  if (ops.length === 0) {
-    return { errors, warnings };   // 纯聊天回合:无 recipe 亦无错误
-  }
-
   // 第一遍:克隆上模拟,收集全部问题
   const sim = structuredClone(screen);
-  runOps(sim, ops, errors, warnings);
+  const reservedNames = collectProjectNodeNames(project, screen.id);
+  runOps(sim, ops, errors, warnings, reservedNames);
   if (errors.length > 0) return { errors, warnings };
 
   // 全绿:recipe 在 draft 上重放同一确定性逻辑(整批 = 一条 undo 历史)
@@ -504,7 +620,7 @@ export function applyAiOps(
   const recipe = (draft: UiProject): void => {
     const s = draft.screens.find((x) => x.id === sid);
     if (!s) return;
-    runOps(s, ops, [], []);
+    runOps(s, ops, [], [], reservedNames);
   };
   return { recipe, errors, warnings };
 }

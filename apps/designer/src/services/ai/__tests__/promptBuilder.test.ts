@@ -50,9 +50,13 @@ describe('buildSystemPrompt', () => {
     expect(prompt).toContain('PreviewProgram/WASM');
     expect(prompt).toContain('不得生成 XML、cPatch 或任意 C');
     expect(prompt).not.toContain('WASM 仍是 9.4');
+    expect(prompt).toContain('"op":"create_screen"');
+    expect(prompt).toContain('WF2D-8620=240x240圆形');
     expect(prompt).toContain('"op":"replace_screen"');
     expect(prompt).toContain('当前屏幕:240x240 圆形屏');
     expect(prompt).toContain('圆屏:四角被裁掉');
+    expect(prompt).toContain('必须用 create_screen');
+    expect(prompt).toContain('不能仅靠根节点 radius 模拟');
     expect(prompt).toContain('"type":"obj"');   // 当前屏精简 JSON
   });
 

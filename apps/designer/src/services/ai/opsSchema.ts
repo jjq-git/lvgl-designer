@@ -3,7 +3,7 @@
  *
  * 模型输出契约(不得私改):
  *   { reply: string; ops: AiOp[] }
- *   AiOp = replace_screen | add | update | remove
+ *   AiOp = create_screen | replace_screen | add | update | remove
  *   NodeSpec = 简化版 WidgetNode(无 id,应用时生成 uuid)
  *
  * 注:zod 在 workspace 里只是 @lvd/schema 的依赖,@lvd/designer 未声明依赖、
@@ -26,6 +26,7 @@ export interface NodeSpec {
 }
 
 export type AiOp =
+  | { op: 'create_screen'; name?: string; displayPreset?: string; root: NodeSpec }
   | { op: 'replace_screen'; root: NodeSpec }
   | { op: 'add'; parent: string | null; node: NodeSpec }   // parent=控件name,null=屏根
   | {
@@ -185,7 +186,7 @@ function checkNodeSpec(v: unknown, path: string, errors: string[], depth = 0): N
   };
 }
 
-const OP_KINDS = ['replace_screen', 'add', 'update', 'remove'] as const;
+const OP_KINDS = ['create_screen', 'replace_screen', 'add', 'update', 'remove'] as const;
 
 function checkOp(v: unknown, path: string, errors: string[]): AiOp | undefined {
   if (!isRecord(v)) {
@@ -199,6 +200,25 @@ function checkOp(v: unknown, path: string, errors: string[]): AiOp | undefined {
   }
   const before = errors.length;
   switch (op) {
+    case 'create_screen': {
+      const name = v['name'];
+      if (name !== undefined && (typeof name !== 'string' || name.trim() === '')) {
+        errors.push(`${path}.name:如提供则应为非空屏幕 name`);
+      }
+      const displayPreset = v['displayPreset'];
+      if (displayPreset !== undefined
+        && (typeof displayPreset !== 'string' || displayPreset.trim() === '')) {
+        errors.push(`${path}.displayPreset:如提供则应为非空设备预设 ID`);
+      }
+      const root = checkNodeSpec(v['root'], `${path}.root`, errors);
+      if (errors.length > before || !root) return undefined;
+      return {
+        op: 'create_screen',
+        ...(name !== undefined ? { name: name as string } : {}),
+        ...(displayPreset !== undefined ? { displayPreset: displayPreset as string } : {}),
+        root,
+      };
+    }
     case 'replace_screen': {
       const root = checkNodeSpec(v['root'], `${path}.root`, errors);
       if (errors.length > before || !root) return undefined;

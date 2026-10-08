@@ -10,7 +10,12 @@ import type { LvProject, WidgetNode } from '@lvd/schema';
 import { migrateV1ToV2, type UiProject } from '@lvd/schema/v2';
 import { defaultAiClient, type AiClient, type DsMessage } from './deepseekClient.js';
 import { parseAiReply, type AiOp } from './opsSchema.js';
-import { applyAiOps, type AiOpError, type AiOpWarning } from './applyOps.js';
+import {
+  applyAiOps,
+  type AiDisplayChange,
+  type AiOpError,
+  type AiOpWarning,
+} from './applyOps.js';
 import { buildSystemPrompt } from './promptBuilder.js';
 
 export const DEFAULT_AI_MODEL = 'deepseek-chat';
@@ -45,6 +50,10 @@ export interface AiTurnResult {
   reply: string;
   /** 校验通过才有;undefined = 纯聊天或修复失败 */
   recipe?: (draft: UiProject) => void;
+  /** create_screen 成功时的新屏幕 ID；应用 recipe 后切换到它。 */
+  createdScreenId?: string;
+  /** create_screen 请求的项目级设备预设变更。 */
+  displayChange?: AiDisplayChange;
   /** 成功进入 recipe 的操作数(recipe 为空时 0) */
   opsApplied: number;
   /** 历史标签摘要(reply 截断),集成方可用作 mutate label */
@@ -123,6 +132,8 @@ export async function runAiTurn(args: RunAiTurnArgs): Promise<AiTurnResult> {
       return {
         reply: lastReply,
         recipe: applied.recipe,
+        createdScreenId: applied.createdScreenId,
+        displayChange: applied.displayChange,
         opsApplied: applied.recipe ? lastOps.length : 0,
         summary: lastReply.trim().slice(0, 24) || undefined,
         rawOps: lastOps,

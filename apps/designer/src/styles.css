@@ -854,8 +854,8 @@ select.ed-select:focus-visible,
 .screen-list-popover {
   position: absolute;
   z-index: 40;
-  top: auto;
-  bottom: calc(100% + 4px);
+  top: calc(100% + 4px);
+  bottom: auto;
   left: 8px;
   right: 8px;
   max-height: min(240px, 45vh);

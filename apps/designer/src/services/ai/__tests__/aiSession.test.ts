@@ -34,6 +34,31 @@ const BAD_ENUM = JSON.stringify({
 });
 
 describe('runAiTurn — 修复回路', () => {
+  it('create_screen 返回新屏幕 ID 并创建独立屏幕', async () => {
+    const p = proj();
+    const uiProject = migrateV1ToV2(p).uiProject;
+    const client = scriptedClient([JSON.stringify({
+      reply: '已新建状态屏幕',
+      ops: [{
+        op: 'create_screen',
+        name: 'status',
+        displayPreset: 'WF2D-8620',
+        root: { type: 'obj', children: [{ type: 'label', name: 'status_title', props: { text: '状态' } }] },
+      }],
+    })]);
+    const r = await runAiTurn({
+      project: p, uiProject, activeScreenId: p.screens[0]!.id, userText: '新建状态屏幕', client,
+    });
+    expect(r.errors).toEqual([]);
+    expect(r.createdScreenId).toMatch(/[0-9a-f-]{36}/);
+    expect(r.displayChange).toEqual({
+      presetId: 'WF2D-8620', width: 240, height: 240, shape: 'round',
+    });
+    const next = produce(uiProject, r.recipe!);
+    expect(next.screens).toHaveLength(2);
+    expect(next.screens[1]).toMatchObject({ id: r.createdScreenId, codeName: 'status' });
+  });
+
   it('一把过:attempts=1,recipe 可直接 mutate', async () => {
     const p = proj();
     const uiProject = migrateV1ToV2(p).uiProject;

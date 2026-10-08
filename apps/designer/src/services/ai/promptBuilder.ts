@@ -7,6 +7,7 @@ import {
   type LvProject, type PropSpec, type ScreenDef, type WidgetNode,
 } from '@lvd/schema';
 import type { NodeSpec } from './opsSchema.js';
+import { FALLBACK_DISPLAY_PRESETS } from '../displayPresets.js';
 
 /* ------------------------------------------------------------ registry 文档 */
 
@@ -55,7 +56,9 @@ export function buildRegistryDoc(): string {
 const OPS_PROTOCOL = [
   '你必须只输出一个 JSON 对象(不要 markdown 围栏、不要解释文字),格式:',
   '{"reply":"给用户的一句中文说明","ops":[…]}',
-  'ops 为编辑操作数组(纯聊天可为空数组),四种操作:',
+  'ops 为编辑操作数组(纯聊天可为空数组),五种操作:',
+  '{"op":"create_screen","name"?:"新屏幕英文名","displayPreset"?:"设备预设ID","root":NodeSpec} —— 真正新建独立屏幕；完整界面必须放入 root.children，且本轮只能有这一项操作',
+  `可用设备预设:${FALLBACK_DISPLAY_PRESETS.fixed.map((preset) => `${preset.frameId}=${preset.width}x${preset.height}${preset.shape === 'round' ? '圆形' : '矩形'}`).join(';')}`,
   '{"op":"replace_screen","root":NodeSpec} —— 整屏重画,root.type 必须是 "obj"',
   '{"op":"add","parent":"父控件name"|null,"node":NodeSpec} —— parent=null 表示加到屏根',
   '{"op":"update","target":"控件name","props"?:{…},"inlineStyles"?:[…],"flags"?:{…},"states"?:{…}}',
@@ -66,6 +69,8 @@ const OPS_PROTOCOL = [
   '{"reply":"已添加标题和亮度滑条","ops":[{"op":"add","parent":null,"node":{"type":"label","name":"title_label","props":{"text":"亮度","align":"top_mid","y":28}}},{"op":"add","parent":null,"node":{"type":"slider","name":"brightness_slider","props":{"width":160,"height":14,"align":"center","value":60},"inlineStyles":[{"selector":{"part":"knob"},"props":{"bg_color":"#3b82f6"}}]}}]}',
   '示例2(改值+删控件):',
   '{"reply":"滑条改为 80,删除了旧标签","ops":[{"op":"update","target":"brightness_slider","props":{"value":80}},{"op":"remove","target":"old_label"}]}',
+  '示例3(新建独立屏幕):',
+  '{"reply":"已新建 WF2D-8620 圆形设置屏幕；设备规格已切换为 240x240 圆形","ops":[{"op":"create_screen","name":"settings","displayPreset":"WF2D-8620","root":{"type":"obj","inlineStyles":[{"props":{"bg_color":"#101828","bg_opa":255}}],"children":[{"type":"label","name":"settings_title","props":{"text":"设置","align":"top_mid","y":24}}]}}]}',
 ].join('\n');
 
 /* ------------------------------------------------------------ 当前屏精简 */
@@ -99,14 +104,17 @@ function screenSection(project: LvProject, screen: ScreenDef): string {
 function rulesSection(project: LvProject): string {
   const d = project.display;
   const rules = [
-    `1. 坐标/尺寸不得越界:屏幕 ${d.width}x${d.height},x/y 配合 align 使用,内容留边距`,
+    `1. 编辑当前屏时坐标/尺寸不得越界:${d.width}x${d.height};create_screen 带 displayPreset 时必须改用该预设标注的宽高布局；x/y 配合 align 使用,内容留边距`,
     '2. 文字用 label(中文直接写在 text 里;中文不要设 text_font,内置 montserrat 只有英文数字字形)',
     '3. name 用蛇形小写英文(^[a-z][a-z0-9_]*$,不以 lv_/ui_ 开头),同屏不重名',
     '4. 改现有控件用 update/remove 引用其 name;只有用户要全新界面才 replace_screen',
     '5. 未列出的 widget 类型/属性/样式键一律不要用',
+    '6. 用户明确说“新建/创建/新增一个屏幕或页面”时必须用 create_screen，不得用 replace_screen；create_screen 的 root 内直接给出完整 UI',
+    `7. 屏幕尺寸和形状是项目级 Display Profile，所有屏幕共用当前 ${d.width}x${d.height} ${d.shape === 'round' ? '圆形' : '矩形'}规格；create_screen 可通过 displayPreset 切换整个项目规格，未提供时不得声称已切换规格`,
+    '8. 用户指定圆形屏/圆屏时，create_screen 必须填写一个 shape=round 的 displayPreset；指定型号时必须选择该型号，不能仅靠根节点 radius 模拟',
   ];
   if (d.shape === 'round') {
-    rules.push(`6. 圆屏:四角被裁掉,重要内容放内切圆内(中心 ${d.width / 2},${d.height / 2},半径 ${Math.min(d.width, d.height) / 2}),避免贴边贴角`);
+    rules.push(`9. 圆屏:四角被裁掉,重要内容放内切圆内(中心 ${d.width / 2},${d.height / 2},半径 ${Math.min(d.width, d.height) / 2}),避免贴边贴角`);
   }
   return ['硬性规则:', ...rules].join('\n');
 }

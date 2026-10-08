@@ -23,6 +23,10 @@ interface AiTurnResult {
   reply: string;
   /** 校验通过的编辑配方;null/undefined = 本轮纯问答不动画布 */
   recipe?: ((draft: UiProject) => void) | null;
+  /** create_screen 成功时的新屏幕 ID。 */
+  createdScreenId?: string;
+  /** create_screen 指定的项目级设备预设。 */
+  displayChange?: { presetId: string; width: number; height: number; shape: 'round' | 'rect' };
   /** 历史标签摘要,如 "新建圆屏时钟" */
   summary?: string;
   /** 成功进入 recipe 的操作数 */
@@ -135,7 +139,17 @@ function AiPanelBody(): JSX.Element {
       const opsApplied = res.opsApplied ?? 0;
       if (res.recipe && opsApplied > 0) {
         const label = `AI: ${res.summary?.trim() || text.slice(0, 24)}`;
+        if (res.displayChange) {
+          useProjectStore.getState().mutateDisplay(`${label}（${res.displayChange.presetId}）`, (display) => {
+            display.width = res.displayChange!.width;
+            display.height = res.displayChange!.height;
+            display.shape = res.displayChange!.shape;
+          });
+        }
         useProjectStore.getState().mutateV2(label, res.recipe);
+        if (res.createdScreenId) {
+          useEditorStore.getState().setActiveScreen(res.createdScreenId);
+        }
       }
       const errText = (res.errors ?? []).map((e) => e.message).join(';');
       useAiStore.getState().updateMessage(asstId, {

@@ -56,7 +56,38 @@ describe('parseAiReply', () => {
     const r = parseAiReply('{"reply":"","ops":[{"op":"teleport"}]}');
     expect(r.data).toBeUndefined();
     expect(r.errors[0]).toMatch(/ops\[0\]\.op/);
-    expect(r.errors[0]).toMatch(/replace_screen\|add\|update\|remove/);
+    expect(r.errors[0]).toMatch(/create_screen\|replace_screen\|add\|update\|remove/);
+  });
+
+  it('create_screen 解析独立屏幕名称和完整根节点', () => {
+    const r = parseAiReply(JSON.stringify({
+      reply: '已新建设置屏幕',
+      ops: [{
+        op: 'create_screen',
+        name: 'settings',
+        displayPreset: 'WF2D-8620',
+        root: { type: 'obj', children: [{ type: 'label', name: 'title' }] },
+      }],
+    }));
+    expect(r.errors).toEqual([]);
+    expect(r.data!.ops[0]).toMatchObject({
+      op: 'create_screen',
+      name: 'settings',
+      displayPreset: 'WF2D-8620',
+      root: { type: 'obj' },
+    });
+  });
+
+  it('create_screen 的空 name 非法，name 可缺省', () => {
+    const bad = parseAiReply('{"ops":[{"op":"create_screen","name":"","root":{"type":"obj"}}]}');
+    expect(bad.errors.join('\n')).toMatch(/name/);
+    const unnamed = parseAiReply('{"ops":[{"op":"create_screen","root":{"type":"obj"}}]}');
+    expect(unnamed.errors).toEqual([]);
+  });
+
+  it('create_screen 的 displayPreset 必须是非空字符串', () => {
+    const bad = parseAiReply('{"ops":[{"op":"create_screen","displayPreset":"","root":{"type":"obj"}}]}');
+    expect(bad.errors.join('\n')).toMatch(/displayPreset/);
   });
 
   it('update 缺 target / node 缺 type → errors', () => {

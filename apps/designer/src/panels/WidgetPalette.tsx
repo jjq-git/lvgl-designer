@@ -60,6 +60,18 @@ const allCollapsibleKeys = ['__recent', '__components', ...groups.map((group) =>
 const widgetCount = groups.reduce((total, group) => total + group.widgets.length, 0);
 const podscPublishRestrictedWidgets = new Set<string>(PODSC_STATIC_RESOURCE_WIDGET_TYPES);
 
+function PaletteChevron({ expanded }: { expanded: boolean }): JSX.Element {
+  return (
+    <svg
+      className={`palette-arrow${expanded ? ' is-expanded' : ''}`}
+      viewBox="0 0 20 20"
+      aria-hidden="true"
+    >
+      <path d="m7.5 4.75 5.25 5.25-5.25 5.25" />
+    </svg>
+  );
+}
+
 export function WidgetPalette(): JSX.Element {
   const project = useProjectStore((state) => state.uiProject);
   const [query, setQuery] = useState('');
@@ -168,7 +180,7 @@ export function WidgetPalette(): JSX.Element {
             aria-expanded={!collapsed.includes('__recent')}
             onClick={() => toggleCat('__recent')}
           >
-            <span className="palette-arrow">{collapsed.includes('__recent') ? '▶' : '▼'}</span>
+            <PaletteChevron expanded={!collapsed.includes('__recent')} />
             最近使用
           </button>
           {!collapsed.includes('__recent') && (
@@ -189,7 +201,7 @@ export function WidgetPalette(): JSX.Element {
             aria-expanded={!collapsed.includes('__components')}
             onClick={() => toggleCat('__components')}
           >
-            <span className="palette-arrow">{collapsed.includes('__components') ? '▶' : '▼'}</span>
+            <PaletteChevron expanded={!collapsed.includes('__components')} />
             可复用组件
             <span className="palette-count">{visibleComponents.length}</span>
           </button>
@@ -215,7 +227,7 @@ export function WidgetPalette(): JSX.Element {
               aria-expanded={!isCollapsed}
               onClick={() => toggleCat(category)}
             >
-              <span className="palette-arrow">{isCollapsed ? '▶' : '▼'}</span>
+              <PaletteChevron expanded={!isCollapsed} />
               {CATEGORY_LABELS[category] ?? category}
               <span className="palette-count">{visible.length}</span>
             </button>

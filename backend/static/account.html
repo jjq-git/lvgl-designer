@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <title>个人中心</title>
+  <style>
+    :root{color-scheme:light;--page:#f4f6f8;--panel:#fff;--text:#18212b;--muted:#66717d;--line:#dfe4e8;--accent:#087f8c;--danger:#b42318;--ok:#067647}
+    *{box-sizing:border-box}html,body{min-height:100%;margin:0}body{background:radial-gradient(circle at 10% 0,#dff3f1 0,transparent 32%),radial-gradient(circle at 95% 0,#e4edff 0,transparent 28%),var(--page);color:var(--text);font:14px -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
+    button,input{font:inherit}.shell{width:min(1240px,calc(100% - 32px));margin:auto;padding:24px 0 56px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{font-weight:750}.topnav{display:flex;align-items:center;gap:10px}.link,.quiet{border:1px solid var(--line);border-radius:999px;background:#ffffffbd;padding:8px 14px;color:var(--text);text-decoration:none;cursor:pointer}.link:hover,.quiet:hover{background:#fff;border-color:#aeb8c1}.hero{padding:14px 0 10px}.hero h1{margin:0 0 3px;font-size:clamp(26px,2.8vw,34px);letter-spacing:-.025em}.hero p{margin:0;color:var(--muted);font-size:14px}
+    .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,.85fr);gap:18px}.card{padding:26px;border:1px solid #fff;border-radius:22px;background:#ffffffd9;box-shadow:0 16px 50px #24344712;backdrop-filter:blur(18px)}.card h2{margin:0 0 22px;font-size:20px}.avatar{display:grid;width:68px;height:68px;place-items:center;border-radius:22px;background:#dff3f1;color:var(--accent);font-size:25px;font-weight:750}.identity{display:flex;align-items:center;gap:17px;margin-bottom:25px}.identity strong{display:block;font-size:21px}.identity span{color:var(--muted)}.facts{display:grid;gap:0;margin:0}.fact{display:flex;justify-content:space-between;gap:18px;padding:14px 0;border-top:1px solid var(--line)}.fact dt{color:var(--muted)}.fact dd{margin:0;text-align:right}.badge{display:inline-flex;border-radius:999px;background:#e4f5f3;padding:4px 9px;color:var(--accent);font-size:12px;font-weight:700}
+    label{display:block;margin:14px 0 6px;color:var(--muted)}input{width:100%;height:44px;padding:0 13px;border:1px solid #ccd4da;border-radius:11px;background:#fbfbfd;outline:none}input:focus{border-color:var(--accent);box-shadow:0 0 0 4px #087f8c20}.primary{width:100%;height:44px;margin-top:20px;border:0;border-radius:11px;background:var(--accent);color:#fff;cursor:pointer;font-weight:700}.primary:disabled{opacity:.55}.message{display:none;margin-top:14px;padding:11px 12px;border-radius:10px}.message.show{display:block}.message.error{background:#fef3f2;color:var(--danger)}.message.ok{background:#ecfdf3;color:var(--ok)}.note{margin:14px 0 0;color:var(--muted);font-size:12px;line-height:1.6}
+    @media(max-width:760px){.grid{grid-template-columns:1fr}.hero{padding-top:45px}.topnav .hide-mobile{display:none}.card{padding:21px}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">DENGTEC · ACCOUNT</div>
+      <nav class="topnav"><a class="link" href="/">应用导航</a><a class="link hide-mobile" id="admin-link" href="/admin/users" hidden>账号管理</a><button class="quiet" id="logout" type="button">退出登录</button></nav>
+    </header>
+    <section class="hero"><h1>个人中心</h1><p>查看当前账号信息并维护登录密码。</p></section>
+    <section class="grid">
+      <article class="card">
+        <h2>账号信息</h2>
+        <div class="identity"><div class="avatar" id="avatar">…</div><div><strong id="display-name">正在加载</strong><span id="username"></span></div></div>
+        <dl class="facts">
+          <div class="fact"><dt>账号角色</dt><dd><span class="badge" id="role">—</span></dd></div>
+          <div class="fact"><dt>账号状态</dt><dd id="state">—</dd></div>
+          <div class="fact"><dt>可访问应用</dt><dd id="apps">—</dd></div>
+          <div class="fact"><dt>权限数量</dt><dd id="permission-count">—</dd></div>
+        </dl>
+      </article>
+      <form class="card" id="password-form">
+        <h2>修改密码</h2>
+        <label for="old-password">当前密码</label><input id="old-password" type="password" autocomplete="current-password" required>
+        <label for="new-password">新密码</label><input id="new-password" type="password" autocomplete="new-password" minlength="8" required>
+        <label for="confirm-password">确认新密码</label><input id="confirm-password" type="password" autocomplete="new-password" minlength="8" required>
+        <button class="primary" id="save-password" type="submit">更新密码</button>
+        <div class="message" id="message" role="status"></div>
+        <p class="note">密码至少 8 位。更新成功后，所有已登录设备都会退出，需要重新登录。</p>
+      </form>
+    </section>
+  </main>
+  <script>
+    const message=document.querySelector('#message');
+    function showMessage(text,tone='error'){message.textContent=text;message.className='message show '+tone}
+    async function readError(response){const body=await response.json().catch(()=>({}));return body.detail||body.error||'操作失败'}
+    Promise.all([
+      fetch('/api/auth/me',{credentials:'same-origin'}).then(async r=>{if(!r.ok)throw new Error(await readError(r));return r.json()}),
+      fetch('/api/apps',{credentials:'same-origin'}).then(async r=>{if(!r.ok)throw new Error(await readError(r));return r.json()})
+    ]).then(([auth,catalog])=>{
+      const user=auth.user||auth,name=user.display_name||user.username;
+      document.querySelector('#display-name').textContent=name;
+      document.querySelector('#username').textContent='@'+user.username;
+      document.querySelector('#avatar').textContent=name.slice(0,1).toUpperCase();
+      document.querySelector('#role').textContent=user.role==='admin'?'管理员':'普通用户';
+      document.querySelector('#state').textContent=user.is_active===false?'已停用':'正常';
+      document.querySelector('#apps').textContent=catalog.apps.map(item=>item.name).join('、')||'无';
+      document.querySelector('#permission-count').textContent=String((user.permissions||[]).length);
+      document.querySelector('#admin-link').hidden=user.role!=='admin';
+    }).catch(()=>location.replace('/login?next='+encodeURIComponent('/account')));
+    document.querySelector('#password-form').addEventListener('submit',async event=>{
+      event.preventDefault();message.className='message';
+      const oldPassword=document.querySelector('#old-password').value;
+      const newPassword=document.querySelector('#new-password').value;
+      const confirm=document.querySelector('#confirm-password').value;
+      if(newPassword.length<8){showMessage('新密码至少需要 8 位');return}
+      if(newPassword!==confirm){showMessage('两次输入的新密码不一致');return}
+      const button=document.querySelector('#save-password');button.disabled=true;
+      try{
+        const response=await fetch('/api/auth/password',{method:'POST',headers:{'content-type':'application/json'},credentials:'same-origin',body:JSON.stringify({old_password:oldPassword,new_password:newPassword})});
+        if(!response.ok){showMessage(await readError(response));return}
+        showMessage('密码已更新，正在返回登录页…','ok');setTimeout(()=>location.replace('/login?next='+encodeURIComponent('/account')),800);
+      }catch{showMessage('无法连接服务器')}finally{button.disabled=false}
+    });
+    document.querySelector('#logout').addEventListener('click',async()=>{try{await fetch('/api/auth/logout',{method:'POST',credentials:'same-origin'})}finally{location.replace('/login')}});
+  </script>
+</body>
+</html>

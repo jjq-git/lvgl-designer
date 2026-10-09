@@ -166,6 +166,20 @@ def init_db() -> None:
                 ip TEXT NOT NULL DEFAULT '',
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
             );
+
+            CREATE TABLE IF NOT EXISTS login_events (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER,
+                username TEXT NOT NULL,
+                success INTEGER NOT NULL,
+                created_at TEXT NOT NULL,
+                user_agent TEXT NOT NULL DEFAULT '',
+                ip TEXT NOT NULL DEFAULT '',
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_login_events_created_at
+            ON login_events(created_at DESC);
             """
         )
         conn.executemany(
@@ -519,5 +533,70 @@ def delete_session(session_id: str) -> None:
     try:
         conn.execute("DELETE FROM sessions WHERE id = ?", (session_id,))
         conn.commit()
+    finally:
+        conn.close()
+
+
+def record_login_event(
+    username: str,
+    *,
+    user_id: int | None,
+    success: bool,
+    user_agent: str = "",
+    ip: str = "",
+) -> None:
+    """Persist a bounded audit trail without ever storing credentials."""
+
+    init_db()
+    conn = _get_conn()
+    try:
+        conn.execute(
+            """
+            INSERT INTO login_events (user_id, username, success, created_at, user_agent, ip)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            (
+                user_id,
+                username.strip()[:80],
+                int(success),
+                iso(now_utc()),
+                user_agent[:300],
+                ip[:80],
+            ),
+        )
+        conn.execute(
+            """
+            DELETE FROM login_events
+            WHERE id NOT IN (
+                SELECT id FROM login_events ORDER BY id DESC LIMIT 5000
+            )
+            """
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def list_login_events(limit: int = 100) -> list[dict]:
+    init_db()
+    safe_limit = max(1, min(int(limit), 500))
+    conn = _get_conn()
+    try:
+        rows = conn.execute(
+            """
+            SELECT id, user_id, username, success, created_at, user_agent, ip
+            FROM login_events
+            ORDER BY id DESC
+            LIMIT ?
+            """,
+            (safe_limit,),
+        ).fetchall()
+        return [
+            {
+                **dict(row),
+                "success": bool(row["success"]),
+            }
+            for row in rows
+        ]
     finally:
         conn.close()

@@ -236,7 +236,9 @@ function meterArc(screen, key, subject, x, y, size, value, options = {}) {
     inlineStyles: [
       style({ arc_color: '#263C52', arc_width: options.arcWidth ?? 12 }, { part: 'main' }),
       style({ arc_color: options.color ?? COLORS.cyan, arc_width: options.arcWidth ?? 12 }, { part: 'indicator' }),
-      style({ bg_color: options.color ?? COLORS.cyan, bg_opa: 255, radius: 12 }, { part: 'knob' }),
+      // These arcs are read-only meters.  Keep LVGL's knob part transparent so
+      // the value marker does not crowd or cover the centered meter labels.
+      style({ bg_color: options.color ?? COLORS.cyan, bg_opa: 0, radius: 12 }, { part: 'knob' }),
     ],
     bindings: [{ kind: 'prop', prop: 'value', subject }],
   });
@@ -534,20 +536,20 @@ function buildRoundScreens(screenIds) {
   const layouts = [];
   layouts.push([
     ...roundChrome('home', 0, screenIds),
-    meterArc('home', 'quiet_arc', 'fan_speed', 56, 68, 128, 36, { color: COLORS.cyan, arcWidth: 12 }),
+    meterArc('home', 'quiet_arc', 'fan_speed', 50, 64, 140, 36, { color: COLORS.cyan, arcWidth: 12 }),
     label('home', 'quiet', 'QUIET', 60, 99, 120, { font: 'montserrat_28', align: 'center' }),
     label('home', 'noise', '32 dB', 70, 134, 100, { color: COLORS.cyan, font: 'montserrat_18', align: 'center' }),
-    label('home', 'air', `${ICONS.ok}  AIR GOOD`, 64, 160, 112, { color: COLORS.green, font: 'montserrat_14', align: 'center' }),
+    label('home', 'air', 'AIR GOOD', 64, 160, 112, { color: COLORS.green, font: 'montserrat_14', align: 'center' }),
     button('home', 'start', `${ICONS.play}  START`, 72, 185, 96, 40, { color: COLORS.blue, font: 'montserrat_14', events: [{ kind: 'subject_set', trigger: 'clicked', subject: 'pod_mode', subjectType: 'int', value: '0' }] }),
   ]);
   layouts.push([
     ...roundChrome('air', 1, screenIds),
-    meterArc('air', 'co2_arc', 'co2_level', 60, 68, 120, 586, { min: 350, max: 2000, color: COLORS.green, arcWidth: 11 }),
+    meterArc('air', 'co2_arc', 'co2_level', 54, 68, 132, 586, { min: 350, max: 2000, color: COLORS.green, arcWidth: 11 }),
     label('air', 'co2', '586', 68, 100, 104, { font: 'montserrat_30', align: 'center' }),
-    label('air', 'ppm', 'ppm', 79, 137, 48, { color: COLORS.cyan, font: 'montserrat_14', align: 'center' }),
-    label('air', 'quality', `${ICONS.ok} GOOD`, 124, 137, 68, { color: COLORS.green, font: 'montserrat_14', align: 'left' }),
-    label('air', 'fan', `${ICONS.refresh}  FAN 36%`, 48, 169, 144, { color: COLORS.muted, font: 'montserrat_14', align: 'center', binding: { subject: 'fan_speed', fmt: `${ICONS.refresh}  FAN %d%%` } }),
-    slider('air', 'speed', 'fan_speed', 54, 200, 132, 36, { height: 12 }),
+    label('air', 'ppm', 'ppm', 72, 137, 96, { color: COLORS.cyan, font: 'montserrat_14', align: 'center' }),
+    label('air', 'quality', `${ICONS.ok} GOOD`, 84, 157, 72, { color: COLORS.green, font: 'montserrat_14', align: 'center' }),
+    label('air', 'fan', 'FAN 36%', 48, 178, 144, { color: COLORS.muted, font: 'montserrat_14', align: 'center', binding: { subject: 'fan_speed', fmt: 'FAN %d%%' } }),
+    slider('air', 'speed', 'fan_speed', 54, 205, 132, 36, { height: 12 }),
   ]);
   layouts.push([
     ...roundChrome('light', 2, screenIds),

@@ -68,7 +68,7 @@ runE2e('quiet-pod browser preview', () => {
       expect(cloudRound.display).toMatchObject({ width: 240, height: 240, shape: 'round' });
       expect(cloudRound.texts).toEqual(expect.arrayContaining([
         'HOME',
-        '\uf00c  AIR GOOD',
+        'AIR GOOD',
         '\uf04b  START',
         'SELECT MODE',
         'DEEP',

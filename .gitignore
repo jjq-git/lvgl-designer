@@ -17,6 +17,7 @@ e2e-smoke/
 apps/designer/e2e/artifacts*/
 apps/designer/e2e/out-ui*/
 apps/designer/restyle/shots/
+apps/datasheets/site/
 m0/artifacts/
 scripts/out/
 /artifacts/

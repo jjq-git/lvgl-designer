@@ -9,7 +9,11 @@ import {
   type StoredProjectDocument,
   type WidgetNodeV2,
 } from '@lvd/schema/v2';
-import { createFreshProjectSnapshot, useBuildTargetStore } from '../stores/buildTargetStore';
+import {
+  createFreshProjectSnapshot,
+  useBuildTargetStore,
+  type ControllerPreset,
+} from '../stores/buildTargetStore';
 
 export type { StoredProjectDocument } from '@lvd/schema/v2';
 
@@ -114,9 +118,12 @@ export function createStoredProjectDocument(project: LvProject): ProjectSnapshot
  * Create a snapshot for a brand new project with an identity that cannot collide
  * with another project that happens to use the same display name.
  */
-export function createNewStoredProjectDocument(project: LvProject): ProjectSnapshotV2 {
+export function createNewStoredProjectDocument(
+  project: LvProject,
+  controllerPreset: ControllerPreset | null = null,
+): ProjectSnapshotV2 {
   // 云端创建可能失败；这里必须保持纯函数，不能提前改写当前工程的目标侧车状态。
-  const document = createFreshProjectSnapshot(project);
+  const document = createFreshProjectSnapshot(project, controllerPreset);
   const suffix = newUuid().replaceAll('-', '').slice(0, 12);
   const base = document.uiProject.meta.id.slice('ui:'.length) || 'untitled-ui';
   const uiProjectId = `ui:${base}-${suffix}`;

@@ -4,7 +4,7 @@ import { useProjectStore } from './projectStore';
 import { useProjectsStore } from './projectsStore';
 import { createNewStoredProjectDocument } from '../services/projectPersistence';
 import * as cloud from '../services/cloudStorage';
-import { deleteCloudCache } from '../services/storage';
+import { deleteCloudCache, saveNow } from '../services/storage';
 
 vi.mock('../services/cloudStorage', () => ({
   probeCloudEnabled: vi.fn(),
@@ -22,6 +22,9 @@ vi.mock('../services/storage', () => ({
   listPendingCloud: vi.fn(async () => []),
   markCloudSynced: vi.fn(async () => undefined),
   readCloudCache: vi.fn(async () => null),
+  saveNow: vi.fn(async (_project, expectedRevision?: number) => {
+    useProjectStore.getState().markSaved(expectedRevision);
+  }),
 }));
 
 vi.mock('../services/assets', () => ({
@@ -115,6 +118,35 @@ describe('projectsStore switching and preview safety', () => {
     expect(useProjectStore.getState().project.meta.name).toBe('updated current');
   });
 
+  it('creates a project with the screen and controller chosen in the new-project form', async () => {
+    const updatedAt = new Date().toISOString();
+    cloudMock.createProject.mockResolvedValue({
+      ok: true,
+      data: { id: 'configured-id', name: 'configured', version: 1 },
+    });
+    cloudMock.listProjects.mockResolvedValue({
+      ok: true,
+      data: [{ id: 'configured-id', name: 'configured', version: 1, updated_at: updatedAt }],
+    });
+
+    await useProjectsStore.getState().newProject('configured', {
+      display: { width: 240, height: 240, shape: 'round' },
+      controllerPreset: 'screen-only',
+    });
+
+    const stored = cloudMock.createProject.mock.calls[0]?.[1];
+    if (!stored || !('displayProfile' in stored)) throw new Error('expected a v2 project snapshot');
+    expect(stored?.displayProfile.logicalSize).toEqual({ width: 240, height: 240 });
+    expect(stored?.displayProfile.shape).toBe('round');
+    expect(stored?.controllerProfile?.model).toBe('SCREEN-ONLY');
+    expect(useProjectStore.getState().project.display).toMatchObject({
+      width: 240, height: 240, shape: 'round',
+    });
+    expect(useProjectsStore.getState()).toMatchObject({
+      currentId: 'configured-id', currentName: 'configured', currentVersion: 1,
+    });
+  });
+
   it('blocks manual cloud saves while a history version is being previewed', async () => {
     useProjectStore.getState().mutateV2('preview-only edit', (draft) => {
       draft.meta.name = 'must not sync';
@@ -125,6 +157,19 @@ describe('projectsStore switching and preview safety', () => {
 
     expect(cloudMock.saveProject).not.toHaveBeenCalled();
     expect(useProjectStore.getState().dirty).toBe(true);
+  });
+
+  it('writes the current project locally before synchronizing it to the cloud', async () => {
+    useProjectStore.getState().mutateV2('manual save', (draft) => {
+      draft.meta.name = 'manually saved';
+    });
+    cloudMock.saveProject.mockResolvedValue({ ok: true, data: { version: 4 } });
+
+    await useProjectsStore.getState().saveCurrent();
+
+    expect(vi.mocked(saveNow)).toHaveBeenCalledTimes(1);
+    expect(cloudMock.saveProject).toHaveBeenCalledTimes(1);
+    expect(useProjectStore.getState().dirty).toBe(false);
   });
 
   it('does not pretend an offline cloud deletion succeeded', async () => {

@@ -4,88 +4,96 @@
 import { useEffect, useState } from 'react';
 import { useProjectStore } from './stores/projectStore';
 import { useEditorStore } from './stores/editorStore';
-import { exportUiZip, exportWebUiJson, openProjectFile, saveProjectFile } from './services/exportZip';
+import { exportUiZip, exportWebUiJson, openProjectFile } from './services/exportZip';
 import { UserMenu } from './panels/auth/UserMenu';
 import { useProjectsStore } from './stores/projectsStore';
-import { requestText } from './services/appDialogs';
 import { SyncBadge } from './panels/cloud/SyncBadge';
-import { useBuildTargetStore } from './stores/buildTargetStore';
 import { hasPermission, useAuthStore } from './stores/authStore';
-import { getSiteTargetState } from './services/sitePublications';
-import {
-  displayPresetLabel,
-  displayPresetsFromFrames,
-  FALLBACK_DISPLAY_PRESETS,
-  SITE_FRAME_MANIFEST_URL,
-  unresolvedDisplayPresetLabel,
-} from './services/displayPresets';
+import { getProject } from './services/cloudStorage';
+import { storedProjectDisplay, type ProjectDisplaySpec } from './services/projectPicker';
+import { FALLBACK_DISPLAY_PRESETS } from './services/displayPresets';
+
+interface ProjectPickerOption extends ProjectDisplaySpec {
+  id: string;
+  name: string;
+  version: number;
+}
+
+function presetMatchesDisplay(
+  preset: ProjectDisplaySpec,
+  candidate: ProjectDisplaySpec,
+): boolean {
+  return preset.width === candidate.width
+    && preset.height === candidate.height
+    && preset.shape === candidate.shape;
+}
 
 export function Toolbar(): JSX.Element {
   const dirty = useProjectStore((s) => s.dirty);
   const display = useProjectStore((s) => s.project.display);
   const mode = useEditorStore((s) => s.mode);
   const runtimeKind = useEditorStore((s) => s.runtimeKind);
-  const controllerPreset = useBuildTargetStore((s) => s.controllerPreset);
-  const catalogTargetRef = useBuildTargetStore((s) => s.catalogTargetRef);
   const canPublishSite = useAuthStore((state) => hasPermission(state.me, 'tool.lvgl.publish'));
   const cloudProjectId = useProjectsStore((state) => state.currentId);
+  const cloudProjects = useProjectsStore((state) => state.list);
 
-  const [creatingProject, setCreatingProject] = useState(false);
-  const [displayPresets, setDisplayPresets] = useState(FALLBACK_DISPLAY_PRESETS);
-
-  const matchingPreset = displayPresets.fixed.find((preset) =>
+  const matchingPreset = FALLBACK_DISPLAY_PRESETS.fixed.find((preset) =>
     preset.width === display.width
     && preset.height === display.height
     && preset.shape === display.shape);
-  const customPresetValue = `custom:${display.width}x${display.height}:${display.shape}`;
-  const presetValue = matchingPreset?.frameId ?? customPresetValue;
+  const [selectedPresetId, setSelectedPresetId] = useState(
+    matchingPreset?.frameId ?? FALLBACK_DISPLAY_PRESETS.fixed[0]?.frameId ?? '',
+  );
+  const [selectedProjectId, setSelectedProjectId] = useState(cloudProjectId ?? '');
+  const [projectOptions, setProjectOptions] = useState<ProjectPickerOption[]>([]);
+  const [projectOptionsLoading, setProjectOptionsLoading] = useState(false);
+  const [openingProject, setOpeningProject] = useState(false);
 
   useEffect(() => {
-    if (!canPublishSite) return;
+    if (!matchingPreset) return;
+    setSelectedPresetId(matchingPreset.frameId);
+    setSelectedProjectId(cloudProjectId ?? '');
+  }, [cloudProjectId, matchingPreset?.frameId]);
+
+  useEffect(() => {
     let cancelled = false;
-    void getSiteTargetState()
-      .then((target) => {
-        if (!cancelled) setDisplayPresets(displayPresetsFromFrames(target.frames));
-      })
-      .catch(() => {
-        // 离线或无目标仓库时继续使用 manifest 快照，屏幕选择不应被发布服务阻断。
-      });
+    setProjectOptionsLoading(true);
+    void Promise.all(cloudProjects.map(async (project) => {
+      const result = await getProject(project.id);
+      if (!result.ok) return null;
+      return {
+        id: project.id,
+        name: project.name,
+        version: project.version,
+        ...storedProjectDisplay(result.data.doc),
+      } satisfies ProjectPickerOption;
+    })).then((options) => {
+      if (!cancelled) setProjectOptions(options.filter((option) => option !== null));
+    }).finally(() => {
+      if (!cancelled) setProjectOptionsLoading(false);
+    });
     return () => { cancelled = true; };
-  }, [canPublishSite]);
+  }, [cloudProjects]);
 
-  const applyController = (value: string): void => {
-    useBuildTargetStore.getState().selectController(value === 'screen-only' ? 'screen-only' : null);
-  };
+  const selectedPreset = FALLBACK_DISPLAY_PRESETS.fixed.find(
+    (preset) => preset.frameId === selectedPresetId,
+  );
+  const filteredProjects = selectedPreset
+    ? projectOptions.filter((project) => presetMatchesDisplay(selectedPreset, project))
+    : [];
+  const selectedProjectValue = filteredProjects.some((project) => project.id === selectedProjectId)
+    ? selectedProjectId
+    : '';
 
-  const applyPreset = (v: string): void => {
-    const p = displayPresets.fixed.find((preset) => preset.frameId === v);
-    if (!p) return;
-    useProjectStore.getState().mutateDisplay('改屏幕预设', (display) => {
-      display.width = p.width;
-      display.height = p.height;
-      display.shape = p.shape;
-    });
-  };
-
-  const newProject = async (): Promise<void> => {
-    const input = await requestText({
-      title: '新建独立工程',
-      message: '新工程不会覆盖当前工程。',
-      label: '工程名称',
-      defaultValue: '未命名工程',
-      confirmLabel: '新建',
-    });
-    if (input == null) return;
-    const name = input.trim();
-    if (name === '') {
-      useEditorStore.getState().setBanner('工程名不能为空');
-      return;
-    }
-    setCreatingProject(true);
+  const selectProject = async (projectId: string): Promise<void> => {
+    if (projectId === '') return;
+    setSelectedProjectId(projectId);
+    setOpeningProject(true);
     try {
-      await useProjectsStore.getState().newProject(name);
+      await useProjectsStore.getState().openProject(projectId);
+      if (useProjectsStore.getState().currentId !== projectId) setSelectedProjectId('');
     } finally {
-      setCreatingProject(false);
+      setOpeningProject(false);
     }
   };
 
@@ -93,14 +101,25 @@ export function Toolbar(): JSX.Element {
     <div className="toolbar">
       <div className="toolbar-row toolbar-main-row">
       <div className="toolbar-group toolbar-project-group">
+      <a
+        className="btn toolbar-icon-btn"
+        href="/"
+        aria-label="应用导航"
+        title="返回应用导航"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="4" y="4" width="6" height="6" rx="1" />
+          <rect x="14" y="4" width="6" height="6" rx="1" />
+          <rect x="4" y="14" width="6" height="6" rx="1" />
+          <rect x="14" y="14" width="6" height="6" rx="1" />
+        </svg>
+      </a>
       <button
         type="button"
         className="btn toolbar-icon-btn"
-        disabled={creatingProject}
-        aria-label={creatingProject ? '新建中' : '新建项目'}
-        aria-busy={creatingProject}
-        title={creatingProject ? '新建中…' : '新建项目'}
-        onClick={() => void newProject()}
+        aria-label="新建项目"
+        title="新建项目并选择屏幕与控制器"
+        onClick={() => useProjectsStore.getState().openPanel('projects')}
       >
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9Z" />
@@ -124,7 +143,7 @@ export function Toolbar(): JSX.Element {
         className={`btn toolbar-icon-btn ${dirty ? 'is-dirty' : ''}`}
         aria-label={dirty ? '保存项目（有未保存更改）' : '保存项目'}
         title={dirty ? '保存项目（有未保存更改）' : '保存项目'}
-        onClick={() => saveProjectFile(useProjectStore.getState().project)}
+        onClick={() => { void useProjectsStore.getState().saveCurrent(); }}
       >
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M4 4h14l2 2v14H4Z" />
@@ -171,38 +190,41 @@ export function Toolbar(): JSX.Element {
       </div>
       <div className="toolbar-group toolbar-target-group">
       <span className="sep" />
-      <select
-        className="ed-select toolbar-display-select"
-        aria-label="屏幕分辨率预设"
-        title={`设备清单来源：${SITE_FRAME_MANIFEST_URL}`}
-        value={presetValue}
-        onChange={(e) => applyPreset(e.target.value)}
-      >
-        {displayPresets.fixed.map((preset) => (
-          <option key={preset.frameId} value={preset.frameId}>{displayPresetLabel(preset)}</option>
-        ))}
-        {displayPresets.unresolved.map((preset) => (
-          <option key={preset.frameId} value={preset.frameId} disabled>
-            {unresolvedDisplayPresetLabel(preset)}
+      <div className="toolbar-project-picker" aria-label="按屏幕规格选择界面 UI">
+        <select
+          className="ed-select toolbar-spec-select"
+          aria-label="屏幕规格"
+          title="选择屏幕规格；此操作只筛选界面 UI，不会切换当前工程"
+          value={selectedPresetId}
+          onChange={(event) => {
+            setSelectedPresetId(event.target.value);
+            setSelectedProjectId('');
+          }}
+        >
+          {FALLBACK_DISPLAY_PRESETS.fixed.map((preset) => (
+            <option key={preset.frameId} value={preset.frameId}>
+              {preset.frameId} · {preset.width}×{preset.height}{preset.shape === 'round' ? ' 圆屏' : ''}
+            </option>
+          ))}
+        </select>
+        <select
+          className="ed-select toolbar-ui-select"
+          aria-label="界面 UI"
+          title="选择后打开并显示对应界面 UI"
+          value={selectedProjectValue}
+          disabled={projectOptionsLoading || openingProject || filteredProjects.length === 0}
+          onChange={(event) => { void selectProject(event.target.value); }}
+        >
+          <option value="">
+            {projectOptionsLoading
+              ? '正在读取界面 UI…'
+              : filteredProjects.length === 0 ? '该规格暂无界面 UI' : '请选择界面 UI'}
           </option>
-        ))}
-        {!matchingPreset && (
-          <option value={customPresetValue} disabled>
-            当前：{display.width}×{display.height} {display.shape === 'round' ? '圆' : '方'}（自定义工程，仅兼容）
-          </option>
-        )}
-      </select>
-      <select
-        className="ed-select toolbar-controller-select"
-        aria-label="目标控制器"
-        title="Schema v2 ControllerProfile；发布目标必须锁定一个 Controller revision"
-        value={catalogTargetRef ? 'catalog' : controllerPreset ?? 'unconfirmed'}
-        onChange={(e) => applyController(e.target.value)}
-      >
-        {catalogTargetRef && <option value="catalog">平台目标：{catalogTargetRef}</option>}
-        <option value="unconfirmed">Controller 待选择</option>
-        <option value="screen-only">裸屏（无外壳）</option>
-      </select>
+          {filteredProjects.map((project) => (
+            <option key={project.id} value={project.id}>{project.name} · v{project.version}</option>
+          ))}
+        </select>
+      </div>
       <span className="sep" />
       <button
         type="button"

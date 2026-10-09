@@ -774,7 +774,7 @@
                       },
                       "props": {
                         "bg_color": "#32D6C6",
-                        "bg_opa": 255,
+                        "bg_opa": 0,
                         "radius": 12
                       }
                     }
@@ -2208,7 +2208,7 @@
                       },
                       "props": {
                         "bg_color": "#51D88A",
-                        "bg_opa": 255,
+                        "bg_opa": 0,
                         "radius": 12
                       }
                     }

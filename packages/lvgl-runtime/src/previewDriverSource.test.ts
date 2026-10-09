@@ -128,6 +128,8 @@ describe('preview_driver.c 协议边界', () => {
     expect(source).toContain('lv_obj_set_style_arc_width(');
     expect(source).toContain('lv_style_set_arc_color(');
     expect(source).toContain('lv_style_set_arc_width(');
+    expect(source).toContain('lv_obj_set_style_text_letter_space(');
+    expect(source).toContain('lv_style_set_text_letter_space(');
     expect(source).toContain('lv_dropdown_get_list(');
     expect(source).toContain('lv_dropdown_set_options(');
     expect(source).toContain('lv_dropdown_bind_value(');

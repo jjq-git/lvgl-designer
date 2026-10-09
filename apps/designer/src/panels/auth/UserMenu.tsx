@@ -1,9 +1,7 @@
 /**
  * UserMenu — 工具条右侧的「当前用户」入口。
- * - 显示用户名 + 角色小徽章(管理员 = accent 色);点击展开下拉:
- *   「修改密码」/「用户管理」(仅 admin)/「退出登录」。
+ * - 显示用户名 + 角色小徽章;下拉只保留平台个人中心和退出登录。
  * - me 为空(未登录/后端未接/401)时显示 "—",点击仅重试 fetchMe,不抛错、不白屏。
- * - 模态由 authStore.modal 驱动,容器挂在 App.tsx(见 AuthModals)。
  */
 import { useEffect, useRef, useState } from 'react';
 import { useAuthStore } from '../../stores/authStore';
@@ -62,20 +60,13 @@ export function UserMenu(): JSX.Element {
 
       {open && (
         <div className="usermenu-pop" role="menu">
-          <button
+          <a
             className="usermenu-item"
-            onClick={() => pick(() => useAuthStore.getState().openModal('password'))}
+            href="/account"
+            onClick={() => setOpen(false)}
           >
-            修改密码
-          </button>
-          {isAdmin && (
-            <button
-              className="usermenu-item"
-              onClick={() => pick(() => useAuthStore.getState().openModal('admin'))}
-            >
-              用户管理
-            </button>
-          )}
+            个人中心
+          </a>
           <div className="usermenu-sep" />
           <button
             className="usermenu-item danger"
@@ -87,19 +78,4 @@ export function UserMenu(): JSX.Element {
       )}
     </div>
   );
-}
-
-/**
- * AuthModals — 两个模态的容器,挂在 App.tsx 根部。
- * 由 authStore.modal 驱动;关闭即置 null。
- */
-import { ChangePassword } from './ChangePassword';
-import { AdminPanel } from './AdminPanel';
-
-export function AuthModals(): JSX.Element | null {
-  const modal = useAuthStore((s) => s.modal);
-  const close = (): void => useAuthStore.getState().openModal(null);
-  if (modal === 'password') return <ChangePassword onClose={close} />;
-  if (modal === 'admin') return <AdminPanel onClose={close} />;
-  return null;
 }

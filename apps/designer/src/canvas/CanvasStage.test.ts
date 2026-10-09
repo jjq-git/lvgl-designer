@@ -5,6 +5,7 @@ import {
   deviceFrameBounds,
   selectedIdFromPointerTarget,
   topLevelMovableIds,
+  zoomCanvasAtPointer,
 } from './CanvasStage';
 import { deviceFrameForDisplay } from '../services/displayPresets';
 
@@ -26,6 +27,30 @@ describe('constrainCanvasPan', () => {
       { width: 240, height: 240 },
       0.25,
     )).toEqual({ x: 0, y: 740 });
+  });
+});
+
+describe('zoomCanvasAtPointer', () => {
+  it('zooms for an ordinary wheel delta while keeping the pointed logical position stable', () => {
+    const pointer = { x: 500, y: 400 };
+    const before = { pan: { x: 100, y: 80 }, zoom: 1 };
+    const logicalBefore = {
+      x: (pointer.x - before.pan.x) / before.zoom,
+      y: (pointer.y - before.pan.y) / before.zoom,
+    };
+
+    const after = zoomCanvasAtPointer(
+      before.pan,
+      before.zoom,
+      pointer,
+      -120,
+      { width: 1000, height: 800 },
+      { width: 1440, height: 720 },
+    );
+
+    expect(after.zoom).toBeGreaterThan(before.zoom);
+    expect((pointer.x - after.pan.x) / after.zoom).toBeCloseTo(logicalBefore.x);
+    expect((pointer.y - after.pan.y) / after.zoom).toBeCloseTo(logicalBefore.y);
   });
 });
 

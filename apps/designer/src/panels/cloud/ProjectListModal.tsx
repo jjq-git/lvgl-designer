@@ -14,6 +14,8 @@ import { loadLastProject } from '../../services/storage';
 import type { LvProject } from '@lvd/schema';
 import { useDialogFocus } from '../useDialogFocus';
 import { requestConfirmation, requestText } from '../../services/appDialogs';
+import { displayPresetLabel, FALLBACK_DISPLAY_PRESETS } from '../../services/displayPresets';
+import { useBuildTargetStore } from '../../stores/buildTargetStore';
 import './cloud.css';
 
 export function ProjectListModal({ onClose }: { onClose: () => void }): JSX.Element {
@@ -25,6 +27,17 @@ export function ProjectListModal({ onClose }: { onClose: () => void }): JSX.Elem
   const listError = useProjectsStore((s) => s.listError);
 
   const [newName, setNewName] = useState('');
+  const [newDisplayPreset, setNewDisplayPreset] = useState(() => {
+    const display = useProjectStore.getState().project.display;
+    return FALLBACK_DISPLAY_PRESETS.fixed.find((preset) =>
+      preset.width === display.width
+      && preset.height === display.height
+      && preset.shape === display.shape)?.frameId
+      ?? FALLBACK_DISPLAY_PRESETS.fixed[0]?.frameId
+      ?? '';
+  });
+  const [newController, setNewController] = useState<'unconfirmed' | 'screen-only'>(() =>
+    useBuildTargetStore.getState().controllerPreset === 'screen-only' ? 'screen-only' : 'unconfirmed');
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ tone: 'ok' | 'fail' | 'info'; text: string } | null>(null);
   /** 本地"最近工程"缓存(迁移用),null=无 / undefined=未探测 */
@@ -44,9 +57,17 @@ export function ProjectListModal({ onClose }: { onClose: () => void }): JSX.Elem
       flash('fail', '请填写工程名');
       return;
     }
+    const preset = FALLBACK_DISPLAY_PRESETS.fixed.find((item) => item.frameId === newDisplayPreset);
+    if (!preset) {
+      flash('fail', '请选择屏幕型号');
+      return;
+    }
     const previousProjectId = useProjectStore.getState().uiProject.meta.id;
     setBusy(true);
-    await useProjectsStore.getState().newProject(name);
+    await useProjectsStore.getState().newProject(name, {
+      display: { width: preset.width, height: preset.height, shape: preset.shape },
+      controllerPreset: newController === 'screen-only' ? 'screen-only' : null,
+    });
     setBusy(false);
     if (useProjectStore.getState().uiProject.meta.id !== previousProjectId) {
       setNewName('');
@@ -147,22 +168,62 @@ export function ProjectListModal({ onClose }: { onClose: () => void }): JSX.Elem
             </div>
           )}
 
+          <div className="cloud-new-card">
+                <div className="cloud-section-title">新建工程</div>
+                <div className="cloud-new-grid">
+                  <label className="cloud-new-field cloud-new-name">
+                    <span>工程名称</span>
+                    <input
+                      className="ed-text"
+                      placeholder="请输入新工程名"
+                      value={newName}
+                      disabled={busy}
+                      autoFocus
+                      onChange={(e) => setNewName(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && void onCreate()}
+                    />
+                  </label>
+                  <label className="cloud-new-field cloud-new-display">
+                    <span>屏幕型号</span>
+                    <select
+                      className="ed-select"
+                      aria-label="新工程屏幕型号"
+                      value={newDisplayPreset}
+                      disabled={busy}
+                      onChange={(e) => setNewDisplayPreset(e.target.value)}
+                    >
+                      {FALLBACK_DISPLAY_PRESETS.fixed.map((preset) => (
+                        <option key={preset.frameId} value={preset.frameId}>
+                          {displayPresetLabel(preset)}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="cloud-new-field cloud-new-controller">
+                    <span>控制器</span>
+                    <select
+                      className="ed-select"
+                      aria-label="新工程控制器"
+                      value={newController}
+                      disabled={busy}
+                      onChange={(e) => setNewController(e.target.value as 'unconfirmed' | 'screen-only')}
+                    >
+                      <option value="unconfirmed">Controller 待选择</option>
+                      <option value="screen-only">裸屏（无外壳）</option>
+                    </select>
+                  </label>
+                  <button
+                    className="btn primary cloud-new-submit"
+                    disabled={busy || newName.trim() === '' || newDisplayPreset === ''}
+                    onClick={() => void onCreate()}
+                  >
+                    {busy ? '新建中…' : '新建工程'}
+                  </button>
+                </div>
+          </div>
+
           {cloudEnabled && (
             <>
-              <div className="cloud-new-row">
-                <input
-                  className="ed-text"
-                  placeholder="新工程名"
-                  value={newName}
-                  disabled={busy}
-                  onChange={(e) => setNewName(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && void onCreate()}
-                />
-                <button className="btn primary" disabled={busy || newName.trim() === ''} onClick={() => void onCreate()}>
-                  新建工程
-                </button>
-              </div>
-
               <div className="cloud-section-title">云端工程</div>
               {listLoading && <div className="cloud-state">加载中…</div>}
               {listError && <div className="cloud-state error">{listError}</div>}

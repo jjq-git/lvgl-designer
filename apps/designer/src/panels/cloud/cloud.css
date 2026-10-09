@@ -93,9 +93,37 @@
 .cloud-msg-fail { background: rgba(215, 0, 21, 0.08); color: var(--danger); }
 .cloud-msg-info { background: var(--accent-tint); color: var(--accent); }
 
-/* ---------- 新建工程行 ---------- */
-.cloud-new-row { display: flex; gap: 8px; margin-bottom: 14px; }
-.cloud-new-row .ed-text { flex: 1 1 auto; }
+/* ---------- 新建工程 ---------- */
+.cloud-new-card {
+  padding: 12px;
+  margin-bottom: 16px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-m);
+  background: var(--bg-inset);
+}
+.cloud-new-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 0.55fr);
+  gap: 10px;
+  align-items: end;
+}
+.cloud-new-field {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  color: var(--fg-secondary);
+  font-size: 11px;
+}
+.cloud-new-field .ed-text,
+.cloud-new-field .ed-select { width: 100%; min-width: 0; min-height: 34px; }
+.cloud-new-name { grid-column: 1 / -1; }
+.cloud-new-submit { grid-column: 2; min-height: 34px; justify-self: end; min-width: 110px; }
+
+@media (max-width: 620px) {
+  .cloud-new-grid { grid-template-columns: minmax(0, 1fr); }
+  .cloud-new-name { grid-column: auto; }
+  .cloud-new-submit { grid-column: auto; width: 100%; }
+}
 
 .cloud-section-title {
   font-size: 11px;

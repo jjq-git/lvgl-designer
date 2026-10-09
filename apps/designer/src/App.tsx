@@ -5,14 +5,13 @@
  */
 import {
   useEffect,
-  useRef,
   useState,
+  type PointerEvent as ReactPointerEvent,
 } from 'react';
 import {
   Panel,
   PanelGroup,
   PanelResizeHandle,
-  type ImperativePanelHandle,
 } from 'react-resizable-panels';
 import { Toolbar } from './Toolbar';
 import { CanvasStage } from './canvas/CanvasStage';
@@ -27,7 +26,6 @@ import { loadLastProject, startAutoSave } from './services/storage';
 import { resyncAssets } from './services/assets';
 import { getPipeline } from './canvas/reloadPipeline';
 import { AiPanel } from './panels/ai/AiPanel';
-import { AuthModals } from './panels/auth/UserMenu';
 import { useAuthStore } from './stores/authStore';
 import { useProjectsStore, startCloudSync } from './stores/projectsStore';
 import { CloudPanels } from './panels/cloud/CloudPanels';
@@ -40,6 +38,7 @@ import { useBuildTargetStore } from './stores/buildTargetStore';
 
 let bootstrapped = false;
 const TREE_COLLAPSED_STORAGE_KEY = 'lvd:tree-dock-collapsed';
+const TREE_WIDTH_STORAGE_KEY = 'lvd:tree-dock-width';
 
 function loadTreeCollapsed(): boolean {
   if (typeof window === 'undefined') return false;
@@ -59,6 +58,33 @@ function saveTreeCollapsed(value: boolean): void {
   }
 }
 
+function clampTreeWidth(value: number, compactLayout: boolean): number {
+  const minWidth = compactLayout ? 180 : 220;
+  const viewportWidth = typeof window === 'undefined' ? 1920 : window.innerWidth;
+  const maxWidth = Math.max(minWidth, Math.min(420, viewportWidth * 0.4));
+  return Math.round(Math.min(maxWidth, Math.max(minWidth, value)));
+}
+
+function loadTreeWidth(compactLayout: boolean): number {
+  const fallback = typeof window === 'undefined'
+    ? 280
+    : Math.min(320, Math.max(compactLayout ? 180 : 220, window.innerWidth * 0.18));
+  try {
+    const saved = Number(window.localStorage.getItem(TREE_WIDTH_STORAGE_KEY));
+    return clampTreeWidth(Number.isFinite(saved) && saved > 0 ? saved : fallback, compactLayout);
+  } catch {
+    return clampTreeWidth(fallback, compactLayout);
+  }
+}
+
+function saveTreeWidth(value: number): void {
+  try {
+    window.localStorage.setItem(TREE_WIDTH_STORAGE_KEY, String(value));
+  } catch {
+    // localStorage may be unavailable in privacy-restricted browsers.
+  }
+}
+
 export function App(): JSX.Element {
   const compactLayout = typeof window !== 'undefined' && window.innerWidth <= 1200;
   const banner = useEditorStore((s) => s.banner);
@@ -67,18 +93,41 @@ export function App(): JSX.Element {
   const [catalogOpen, setCatalogOpen] = useState(false);
   const [sitePublicationOpen, setSitePublicationOpen] = useState(false);
   const [treeCollapsed, setTreeCollapsed] = useState(loadTreeCollapsed);
-  const treePanelRef = useRef<ImperativePanelHandle | null>(null);
+  const [treeWidth, setTreeWidth] = useState(() => loadTreeWidth(compactLayout));
 
   const toggleTreeCollapsed = (): void => {
-    const panel = treePanelRef.current;
-    if (!panel) return;
-    if (panel.isCollapsed()) panel.expand();
-    else panel.collapse();
+    setTreeCollapsed((current) => {
+      const next = !current;
+      saveTreeCollapsed(next);
+      return next;
+    });
   };
 
-  useEffect(() => {
-    if (treeCollapsed) treePanelRef.current?.collapse();
-  }, []);
+  const beginTreeResize = (event: ReactPointerEvent<HTMLDivElement>): void => {
+    if (event.button !== 0) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const startX = event.clientX;
+    const startWidth = treeWidth;
+    let finalWidth = treeWidth;
+
+    const onPointerMove = (moveEvent: PointerEvent): void => {
+      finalWidth = clampTreeWidth(startWidth + moveEvent.clientX - startX, compactLayout);
+      setTreeWidth(finalWidth);
+    };
+    const finishResize = (): void => {
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', finishResize);
+      window.removeEventListener('pointercancel', finishResize);
+      saveTreeWidth(finalWidth);
+      document.body.classList.remove('tree-dock-resizing');
+    };
+
+    document.body.classList.add('tree-dock-resizing');
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', finishResize, { once: true });
+    window.addEventListener('pointercancel', finishResize, { once: true });
+  };
 
   /* 启动:恢复最近工程 + 自动保存 + 全局快捷键 */
   useEffect(() => {
@@ -261,76 +310,76 @@ export function App(): JSX.Element {
             </Panel>
             <PanelResizeHandle className="resize-handle" aria-label="调整组件面板宽度" />
             <Panel defaultSize={compactLayout ? 75 : 83} minSize={60} className="design-shell">
-              <PanelGroup direction="horizontal" className="design-main">
-                <Panel
-                  ref={treePanelRef}
-                  id="object-tree-dock"
-                  defaultSize={compactLayout ? 31 : 18}
-                  minSize={compactLayout ? 25 : 14}
-                  maxSize={compactLayout ? 40 : 30}
-                  collapsedSize={0}
-                  collapsible
-                  className={`side tree-dock ${treeCollapsed ? 'collapsed' : ''}`}
-                  onCollapse={() => {
-                    setTreeCollapsed(true);
-                    saveTreeCollapsed(true);
-                  }}
-                  onExpand={() => {
-                    setTreeCollapsed(false);
-                    saveTreeCollapsed(false);
-                  }}
-                >
-                  {!treeCollapsed && (
-                    <>
-                      <div className="tree-dock-header">
-                        <button
-                          className="tree-dock-toggle"
-                          type="button"
-                          aria-expanded="true"
-                          aria-controls="object-tree-section"
-                          title="收起对象树"
-                          onClick={toggleTreeCollapsed}
-                        >
-                          <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <rect x="4" y="4" width="6" height="6" rx="1" />
-                            <rect x="14" y="4" width="6" height="6" rx="1" />
-                            <rect x="9" y="14" width="6" height="6" rx="1" />
-                            <path d="M7 10v2h10v-2M12 12v2" />
-                          </svg>
-                          <span className="tree-dock-title">对象树</span>
-                          <span className="tree-dock-caret" aria-hidden="true">‹</span>
-                        </button>
-                      </div>
-                      <div className="screens-section"><ScreenList /></div>
-                      <div id="object-tree-section" className="tree-dock-body"><ObjectTree /></div>
-                    </>
-                  )}
-                </Panel>
-                <PanelResizeHandle
-                  className={`resize-handle tree-canvas-resize-handle ${treeCollapsed ? 'collapsed' : ''}`}
-                  aria-label="调整对象树宽度"
-                />
-                <Panel defaultSize={compactLayout ? 69 : 82} minSize={60} className="canvas-panel">
+              <div className="design-main">
+                <div className="canvas-panel">
                   <CanvasStage />
-                </Panel>
-              </PanelGroup>
-              {treeCollapsed && (
-                <button
-                  className="tree-dock-collapsed-toggle"
-                  type="button"
-                  aria-expanded="false"
-                  aria-controls="object-tree-section"
-                  title="展开对象树"
-                  onClick={toggleTreeCollapsed}
-                >
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <rect x="4" y="4" width="6" height="6" rx="1" />
-                    <rect x="14" y="4" width="6" height="6" rx="1" />
-                    <rect x="9" y="14" width="6" height="6" rx="1" />
-                    <path d="M7 10v2h10v-2M12 12v2" />
-                  </svg>
-                </button>
-              )}
+                </div>
+                {!treeCollapsed && (
+                  <aside
+                    id="object-tree-dock"
+                    className="side tree-dock tree-dock-overlay"
+                    style={{ width: treeWidth }}
+                  >
+                    <div className="tree-dock-header">
+                      <button
+                        className="tree-dock-toggle"
+                        type="button"
+                        aria-expanded="true"
+                        aria-controls="object-tree-section"
+                        title="收起对象树"
+                        onClick={toggleTreeCollapsed}
+                      >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <rect x="4" y="4" width="6" height="6" rx="1" />
+                          <rect x="14" y="4" width="6" height="6" rx="1" />
+                          <rect x="9" y="14" width="6" height="6" rx="1" />
+                          <path d="M7 10v2h10v-2M12 12v2" />
+                        </svg>
+                        <span className="tree-dock-title">对象树</span>
+                        <span className="tree-dock-caret" aria-hidden="true">‹</span>
+                      </button>
+                    </div>
+                    <div className="screens-section"><ScreenList /></div>
+                    <div id="object-tree-section" className="tree-dock-body"><ObjectTree /></div>
+                    <div
+                      className="tree-dock-resize-handle"
+                      role="separator"
+                      aria-label="调整对象树宽度"
+                      aria-orientation="vertical"
+                      aria-valuemin={compactLayout ? 180 : 220}
+                      aria-valuemax={Math.round(Math.min(420, window.innerWidth * 0.4))}
+                      aria-valuenow={treeWidth}
+                      tabIndex={0}
+                      onPointerDown={beginTreeResize}
+                      onKeyDown={(keyEvent) => {
+                        if (keyEvent.key !== 'ArrowLeft' && keyEvent.key !== 'ArrowRight') return;
+                        keyEvent.preventDefault();
+                        const direction = keyEvent.key === 'ArrowLeft' ? -1 : 1;
+                        const nextWidth = clampTreeWidth(treeWidth + direction * 10, compactLayout);
+                        setTreeWidth(nextWidth);
+                        saveTreeWidth(nextWidth);
+                      }}
+                    />
+                  </aside>
+                )}
+                {treeCollapsed && (
+                  <button
+                    className="tree-dock-collapsed-toggle"
+                    type="button"
+                    aria-expanded="false"
+                    aria-controls="object-tree-section"
+                    title="展开对象树"
+                    onClick={toggleTreeCollapsed}
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <rect x="4" y="4" width="6" height="6" rx="1" />
+                      <rect x="14" y="4" width="6" height="6" rx="1" />
+                      <rect x="9" y="14" width="6" height="6" rx="1" />
+                      <path d="M7 10v2h10v-2M12 12v2" />
+                    </svg>
+                  </button>
+                )}
+              </div>
             </Panel>
           </PanelGroup>
         </Panel>
@@ -345,7 +394,6 @@ export function App(): JSX.Element {
         </Panel>
       </PanelGroup>
       <AiPanel />
-      <AuthModals />
       <CloudPanels />
       {helpOpen && <ShortcutsHelp onClose={() => setHelpOpen(false)} />}
       {catalogOpen && <CatalogPanel onClose={() => setCatalogOpen(false)} />}

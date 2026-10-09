@@ -48,6 +48,24 @@ describe('projectPersistence', () => {
     expect(useBuildTargetStore.getState()).toBe(currentBefore);
   });
 
+  it('stores the controller selected during project creation without mutating the open project', () => {
+    const currentBefore = useBuildTargetStore.getState();
+    const project = createEmptyProject('configured');
+    project.display.width = 480;
+    project.display.height = 480;
+    project.display.shape = 'rect';
+
+    const stored = createNewStoredProjectDocument(project, 'screen-only');
+
+    expect(stored.displayProfile.logicalSize).toEqual({ width: 480, height: 480 });
+    expect(stored.controllerProfile?.model).toBe('SCREEN-ONLY');
+    expect(stored.controllerProfile?.displayRef)
+      .toBe(`${stored.displayProfile.id}@${stored.displayProfile.revision}`);
+    expect(stored.buildTarget.controllerProfileRef)
+      .toBe(`${stored.controllerProfile?.id}@${stored.controllerProfile?.revision}`);
+    expect(useBuildTargetStore.getState()).toBe(currentBefore);
+  });
+
   it('preserves an unresolved 16bpp byte-order gate across reopen', () => {
     const project = createEmptyProject('unconfirmed-rgb565');
     useBuildTargetStore.getState().syncProject(project);

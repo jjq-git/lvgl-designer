@@ -81,12 +81,21 @@ def _password_pair(req: ChangePasswordRequest) -> tuple[str, str]:
 @router.post("/login")
 async def login(req: LoginRequest, request: Request, response: Response):
     user = db.authenticate_user(req.username, req.password)
+    user_agent = request.headers.get("user-agent", "")
+    ip = request.client.host if request.client else ""
+    db.record_login_event(
+        req.username,
+        user_id=user["id"] if user is not None else None,
+        success=user is not None,
+        user_agent=user_agent,
+        ip=ip,
+    )
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid username or password")
     session_id, expires_at = db.create_session(
         user["id"],
-        user_agent=request.headers.get("user-agent", ""),
-        ip=request.client.host if request.client else "",
+        user_agent=user_agent,
+        ip=ip,
     )
     response.set_cookie(
         db.SESSION_COOKIE,
@@ -133,6 +142,11 @@ async def change_own_password(req: ChangePasswordRequest, user: AuthUser = Depen
 @admin_router.get("/permissions")
 async def permissions(_admin: AuthUser = Depends(require_admin)):
     return {"permissions": db.list_permissions()}
+
+
+@admin_router.get("/login-events")
+async def login_events(limit: int = 100, _admin: AuthUser = Depends(require_admin)):
+    return {"events": db.list_login_events(limit)}
 
 
 @admin_router.get("/users")
@@ -188,7 +202,9 @@ async def set_permissions(user_id: int, req: SetPermissionsRequest, admin: AuthU
 
 
 @admin_router.delete("/users/{user_id}")
-async def delete_user(user_id: int, _admin: AuthUser = Depends(require_admin)):
+async def delete_user(user_id: int, admin: AuthUser = Depends(require_admin)):
+    if user_id == admin["id"]:
+        raise HTTPException(status_code=400, detail="cannot delete current user")
     try:
         db.delete_user(user_id)
     except KeyError as exc:

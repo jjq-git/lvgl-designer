@@ -72,6 +72,7 @@
   padding: 6px 12px;
   cursor: pointer;
   font: inherit;
+  text-decoration: none;
   transition: background-color 0.15s ease, color 0.15s ease;
 }
 .usermenu-item:hover { background: var(--accent); color: #fff; }

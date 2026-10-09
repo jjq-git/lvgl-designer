@@ -125,8 +125,12 @@ function makeDraft(project: LvProject): TargetDraft {
 }
 
 /** 为尚未打开的新工程创建独立快照，不读写当前编辑会话。 */
-export function createFreshProjectSnapshot(project: LvProject): ProjectSnapshotV2 {
-  const draft = makeDraft(project);
+export function createFreshProjectSnapshot(
+  project: LvProject,
+  controllerPreset: ControllerPreset | null = null,
+): ProjectSnapshotV2 {
+  const baseDraft = makeDraft(project);
+  const draft = controllerPreset === null ? baseDraft : withController(baseDraft, controllerPreset);
   return {
     kind: 'lvgl-project-snapshot',
     snapshotVersion: 1,

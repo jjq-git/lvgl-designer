@@ -420,7 +420,15 @@ function TreeRow(props: {
             event.stopPropagation();
             onToggle();
           }}
-        >{expanded ? '▾' : '▸'}</button>
+        >
+          <svg
+            className={`tree-expander-icon${expanded ? ' is-expanded' : ''}`}
+            viewBox="0 0 20 20"
+            aria-hidden="true"
+          >
+            <path d="m7.5 4.75 5.25 5.25-5.25 5.25" />
+          </svg>
+        </button>
       ) : <span className="tree-expander-spacer" aria-hidden="true" />}
       <span className="tree-type">{typeLabel}</span>
       <span className="tree-name">{isRoot ? '(屏根)' : label}</span>

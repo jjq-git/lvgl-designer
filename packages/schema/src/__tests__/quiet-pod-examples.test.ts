@@ -165,8 +165,16 @@ describe('quiet pod example projects', () => {
     }
 
     const byName = new Map(snapshot.uiProject.screens.map((screen) => [screen.codeName, screen]));
+    const quietArc = findNode(byName.get('home')!.root, 'home_quiet_arc');
+    expect(quietArc?.styles.find((entry) => entry.selector?.part === 'knob')?.props).toMatchObject({
+      bg_opa: 0,
+    });
+    expect(quietArc?.props).toMatchObject({ x: 50, y: 64, width: 140, height: 140 });
+    expect(findNode(byName.get('home')!.root, 'home_air')?.props.text).toBe('AIR GOOD');
     expect(findNode(byName.get('home')!.root, 'home_start')?.props).toMatchObject({ x: 72, y: 185, width: 96, height: 40 });
-    expect(findNode(byName.get('air')!.root, 'air_speed')?.props).toMatchObject({ x: 54, y: 200, width: 132, height: 12 });
+    expect(findNode(byName.get('air')!.root, 'air_quality')?.props).toMatchObject({ x: 84, y: 157, width: 72 });
+    expect(findNode(byName.get('air')!.root, 'air_fan')?.props.text).toBe('FAN 36%');
+    expect(findNode(byName.get('air')!.root, 'air_speed')?.props).toMatchObject({ x: 54, y: 205, width: 132, height: 12 });
     expect(findNode(byName.get('light')!.root, 'light_master')?.props).toMatchObject({ x: 88, y: 195, width: 64, height: 30 });
     expect(findNode(byName.get('settings')!.root, 'settings_dnd')?.props).toMatchObject({ x: 142, width: 54, height: 28 });
   });

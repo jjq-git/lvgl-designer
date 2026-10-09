@@ -1,7 +1,7 @@
 /**
  * CanvasStage — 画布交互层(design/02 §4)。
  * world 容器 translate(pan)+scale(zoom),canvas 与 svg overlay 同 LVGL 逻辑坐标;
- * ctrl+滚轮缩放 / 空格拖平移;设计态指针状态机(选中/拖动/缩放 = L1 每帧 updateAttrs);
+ * 滚轮缩放 / 空白处拖动平移;设计态指针状态机(选中/拖动/缩放 = L1 每帧 updateAttrs);
  * 运行态 overlay 隐藏、事件透传给 canvas(SDL 自行监听)。
  */
 import { useCallback, useEffect, useRef } from 'react';
@@ -27,7 +27,14 @@ interface DragItem {
 }
 
 type Session =
-  | { kind: 'pan'; startClient: { x: number; y: number }; origPan: { x: number; y: number } }
+  | {
+      kind: 'pan';
+      startClient: { x: number; y: number };
+      origPan: { x: number; y: number };
+      clearSelectionOnClick: boolean;
+      moved: boolean;
+      deferCaptureUntilMove: boolean;
+    }
   | { kind: 'press'; id: string; startL: { x: number; y: number } }
   | {
       kind: 'drag';
@@ -92,6 +99,31 @@ export function constrainCanvasPan(
   return {
     x: Math.min(viewport.width - visibleX, Math.max(visibleX - contentWidth, pan.x)),
     y: Math.min(viewport.height - visibleY, Math.max(visibleY - contentHeight, pan.y)),
+  };
+}
+
+export function zoomCanvasAtPointer(
+  pan: { x: number; y: number },
+  zoom: number,
+  pointer: { x: number; y: number },
+  wheelDelta: number,
+  viewport: { width: number; height: number },
+  displaySize: { width: number; height: number },
+): { zoom: number; pan: { x: number; y: number } } {
+  const nextZoom = Math.min(8, Math.max(0.25, zoom * Math.exp(-wheelDelta * 0.0015)));
+  const logicalX = (pointer.x - pan.x) / zoom;
+  const logicalY = (pointer.y - pan.y) / zoom;
+  return {
+    zoom: nextZoom,
+    pan: constrainCanvasPan(
+      {
+        x: pointer.x - logicalX * nextZoom,
+        y: pointer.y - logicalY * nextZoom,
+      },
+      viewport,
+      displaySize,
+      nextZoom,
+    ),
   };
 }
 
@@ -168,6 +200,7 @@ export function CanvasStage(): JSX.Element {
     const pointerId = activePointerIdRef.current;
     activePointerIdRef.current = null;
     const stage = stageRef.current;
+    stage?.classList.remove('stage-panning');
     if (pointerId !== null && stage?.hasPointerCapture(pointerId)) {
       stage.releasePointerCapture(pointerId);
     }
@@ -320,7 +353,7 @@ export function CanvasStage(): JSX.Element {
     };
   }, [cancelActiveSession]);
 
-  /* ---------- 滚轮:ctrl=缩放;普通=纵移;shift=横移;始终保留一部分屏幕可见 ---------- */
+  /* ---------- 滚轮始终围绕指针缩放，并阻止工作区发生纵向滚动 ---------- */
   useEffect(() => {
     const el = stageRef.current;
     if (!el) return;
@@ -328,35 +361,16 @@ export function CanvasStage(): JSX.Element {
       e.preventDefault();
       const ed = useEditorStore.getState();
       const rect = el.getBoundingClientRect();
-      if (e.ctrlKey || e.metaKey) {
-        const px = e.clientX - rect.left;
-        const py = e.clientY - rect.top;
-        const oldZoom = ed.zoom;
-        const factor = Math.exp(-e.deltaY * 0.0015);
-        const newZoom = Math.min(8, Math.max(0.25, oldZoom * factor));
-        // 保持指针下的逻辑点不动
-        const lx = (px - ed.pan.x) / oldZoom;
-        const ly = (py - ed.pan.y) / oldZoom;
-        const nextPan = constrainCanvasPan(
-          { x: px - lx * newZoom, y: py - ly * newZoom },
-          { width: rect.width, height: rect.height },
-          display,
-          newZoom,
-        );
-        ed.setZoom(newZoom);
-        ed.setPan(nextPan);
-      } else {
-        const horizontalDelta = e.shiftKey
-          ? (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY)
-          : e.deltaX;
-        const verticalDelta = e.shiftKey ? 0 : e.deltaY;
-        ed.setPan(constrainCanvasPan(
-          { x: ed.pan.x - horizontalDelta, y: ed.pan.y - verticalDelta },
-          { width: rect.width, height: rect.height },
-          display,
-          ed.zoom,
-        ));
-      }
+      const next = zoomCanvasAtPointer(
+        ed.pan,
+        ed.zoom,
+        { x: e.clientX - rect.left, y: e.clientY - rect.top },
+        e.deltaY !== 0 ? e.deltaY : e.deltaX,
+        { width: rect.width, height: rect.height },
+        display,
+      );
+      ed.setZoom(next.zoom);
+      ed.setPan(next.pan);
     };
     el.addEventListener('wheel', onWheel, { passive: false });
     return () => el.removeEventListener('wheel', onWheel);
@@ -386,15 +400,44 @@ export function CanvasStage(): JSX.Element {
 
   const onPointerDown = (e: React.PointerEvent): void => {
     const ed = useEditorStore.getState();
-    if (ed.mode === 'play') return;
     const stage = stageRef.current;
     if (!stage) return;
+
+    if (ed.mode === 'play') {
+      if (e.button !== 0) return;
+      // 屏幕内部先保留 LVGL 的单击序列；超过拖动阈值后再把指针捕获转给画布平移。
+      const deferCaptureUntilMove = e.target !== stage;
+      stage.focus({ preventScroll: true });
+      if (!deferCaptureUntilMove) {
+        stage.setPointerCapture(e.pointerId);
+        activePointerIdRef.current = e.pointerId;
+        stage.classList.add('stage-panning');
+      }
+      sessionRef.current = {
+        kind: 'pan',
+        startClient: { x: e.clientX, y: e.clientY },
+        origPan: { ...ed.pan },
+        clearSelectionOnClick: false,
+        moved: false,
+        deferCaptureUntilMove,
+      };
+      return;
+    }
+
     stage.focus({ preventScroll: true });
     stage.setPointerCapture(e.pointerId);
     activePointerIdRef.current = e.pointerId;
 
     if (spaceRef.current || e.button === 1) {
-      sessionRef.current = { kind: 'pan', startClient: { x: e.clientX, y: e.clientY }, origPan: { ...ed.pan } };
+      sessionRef.current = {
+        kind: 'pan',
+        startClient: { x: e.clientX, y: e.clientY },
+        origPan: { ...ed.pan },
+        clearSelectionOnClick: false,
+        moved: false,
+        deferCaptureUntilMove: false,
+      };
+      stage.classList.add('stage-panning');
       return;
     }
     if (e.button !== 0) return;
@@ -423,11 +466,24 @@ export function CanvasStage(): JSX.Element {
     const hitId = selectedIdFromPointerTarget(e.target)
       ?? pipeline.nodeIdAt(Math.round(l.x), Math.round(l.y));
     if (!hitId || hitId === screen?.root.id) {
-      // 空白处按下:进入框选会话(拖出选框才生效;若只是单击则 up 时取消选择)
-      sessionRef.current = {
-        kind: 'marquee', startL: l, additive: e.shiftKey, baseIds: e.shiftKey ? [...ed.selectedIds] : [],
-      };
-      ed.setMarquee(null);
+      if (e.shiftKey) {
+        // Shift+拖动仍保留框选能力。
+        sessionRef.current = {
+          kind: 'marquee', startL: l, additive: true, baseIds: [...ed.selectedIds],
+        };
+        ed.setMarquee(null);
+      } else {
+        // 普通左键拖动画布空白区域时平移内容；只单击时仍取消当前选择。
+        sessionRef.current = {
+          kind: 'pan',
+          startClient: { x: e.clientX, y: e.clientY },
+          origPan: { ...ed.pan },
+          clearSelectionOnClick: true,
+          moved: false,
+          deferCaptureUntilMove: false,
+        };
+        stage.classList.add('stage-panning');
+      }
       return;
     }
     if (e.shiftKey) {
@@ -441,9 +497,37 @@ export function CanvasStage(): JSX.Element {
 
   const onPointerMove = (e: React.PointerEvent): void => {
     const ed = useEditorStore.getState();
+    const s = sessionRef.current;
+
+    if (s?.kind === 'pan') {
+      const stage = stageRef.current;
+      if (!stage) return;
+      const dx = e.clientX - s.startClient.x;
+      const dy = e.clientY - s.startClient.y;
+      if (!s.moved && Math.hypot(dx, dy) <= 2) return;
+      if (!s.moved) {
+        s.moved = true;
+        if (s.deferCaptureUntilMove) {
+          stage.setPointerCapture(e.pointerId);
+          activePointerIdRef.current = e.pointerId;
+        }
+        stage.classList.add('stage-panning');
+      }
+      const rect = stage.getBoundingClientRect();
+      ed.setPan(constrainCanvasPan(
+        {
+          x: s.origPan.x + dx,
+          y: s.origPan.y + dy,
+        },
+        { width: rect.width, height: rect.height },
+        display,
+        ed.zoom,
+      ));
+      return;
+    }
+
     if (ed.mode === 'play') return;
     const l = clientToLogical(e.clientX, e.clientY);
-    const s = sessionRef.current;
     const pipeline = getPipeline();
 
     if (!s) {
@@ -451,22 +535,6 @@ export function CanvasStage(): JSX.Element {
       if (!l || !pipeline) return;
       const inside = l.x >= 0 && l.y >= 0 && l.x < display.width && l.y < display.height;
       ed.setHover(inside ? pipeline.nodeIdAt(Math.round(l.x), Math.round(l.y)) : null);
-      return;
-    }
-
-    if (s.kind === 'pan') {
-      const stage = stageRef.current;
-      if (!stage) return;
-      const rect = stage.getBoundingClientRect();
-      ed.setPan(constrainCanvasPan(
-        {
-          x: s.origPan.x + (e.clientX - s.startClient.x),
-          y: s.origPan.y + (e.clientY - s.startClient.y),
-        },
-        { width: rect.width, height: rect.height },
-        display,
-        ed.zoom,
-      ));
       return;
     }
     if (!l || !pipeline) return;
@@ -569,9 +637,14 @@ export function CanvasStage(): JSX.Element {
     sessionRef.current = null;
     activePointerIdRef.current = null;
     const stage = stageRef.current;
+    stage?.classList.remove('stage-panning');
     if (stage?.hasPointerCapture(e.pointerId)) stage.releasePointerCapture(e.pointerId);
     if (!s) return;
     const ed = useEditorStore.getState();
+    if (s.kind === 'pan') {
+      if (s.clearSelectionOnClick && !s.moved) ed.select([]);
+      return;
+    }
     if (s.kind === 'drag' || s.kind === 'resize') {
       useProjectStore.getState().commitInteraction();
       ed.setGuides(null);
@@ -619,17 +692,21 @@ export function CanvasStage(): JSX.Element {
       aria-label={isPlay ? 'LVGL 运行画布' : 'LVGL 设计画布'}
       aria-describedby="canvas-keyboard-help"
       onFocus={() => useEditorStore.getState().setHover(null)}
-      onPointerDown={isPlay ? undefined : onPointerDown}
-      onPointerMove={isPlay ? undefined : onPointerMove}
-      onPointerUp={isPlay ? undefined : onPointerUp}
-      onPointerCancel={isPlay ? undefined : cancelActiveSession}
-      onLostPointerCapture={isPlay ? undefined : cancelActiveSession}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={cancelActiveSession}
+      onLostPointerCapture={(event) => {
+        // 预览界面开始拖动时，指针捕获会从 canvas 转交给 stage。
+        // 忽略子 canvas 的 lostpointercapture，只处理 stage 自身的捕获丢失。
+        if (event.target === event.currentTarget) cancelActiveSession();
+      }}
       onPointerLeave={() => useEditorStore.getState().setHover(null)}
     >
       <span id="canvas-keyboard-help" className="sr-only">
         {isPlay
-          ? '运行模式。画布事件会发送到 LVGL。'
-          : '设计模式。方向键移动选中对象，Shift 加方向键移动十像素，Ctrl 或 Command 加方向键调整宽高。'}
+          ? '运行模式。单击操作界面，拖动画布任意位置可平移画布。'
+          : '设计模式。滚轮缩放，拖动画布空白区域平移，Shift 拖动框选；方向键移动选中对象。'}
       </span>
       <span className="sr-only" aria-live="polite">
         {selectedIds.length === 0 ? '未选中对象' : `已选中 ${selectedIds.length} 个对象`}
@@ -666,7 +743,7 @@ export function CanvasStage(): JSX.Element {
             <path d="M19 12h-8a6 6 0 0 0-6 6" />
           </svg>
         </button>
-        <span className="canvas-zoom-label" title="Ctrl+滚轮缩放，空格拖动平移">
+        <span className="canvas-zoom-label" title="滚轮缩放，拖动画布任意位置平移">
           {Math.round(zoom * 100)}%
         </span>
         <button

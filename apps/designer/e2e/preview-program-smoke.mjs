@@ -121,7 +121,9 @@ try {
         props: {},
         flags: [],
         states: [],
-        inlineStyles: [{ props: { bg_color: '#123456', bg_opa: 255 } }],
+        inlineStyles: [{ props: {
+          bg_color: '#123456', bg_opa: 255, text_letter_space: 2,
+        } }],
         styleUses: [],
         bindings: [],
         events: [],

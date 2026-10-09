@@ -1945,6 +1945,7 @@ int lvd_preview_set_style_i32(const char * name, const char * key, int32_t value
     else if(strcmp(key, "shadow_spread") == 0) lv_obj_set_style_shadow_spread(r->obj, value, selector);
     else if(strcmp(key, "shadow_opa") == 0) lv_obj_set_style_shadow_opa(r->obj, value, selector);
     else if(strcmp(key, "text_opa") == 0) lv_obj_set_style_text_opa(r->obj, value, selector);
+    else if(strcmp(key, "text_letter_space") == 0) lv_obj_set_style_text_letter_space(r->obj, value, selector);
     else if(strcmp(key, "line_width") == 0) lv_obj_set_style_line_width(r->obj, value, selector);
     else if(strcmp(key, "arc_width") == 0) lv_obj_set_style_arc_width(r->obj, value, selector);
     else if(strcmp(key, "opa") == 0) lv_obj_set_style_opa(r->obj, value, selector);
@@ -2124,6 +2125,7 @@ int lvd_preview_set_named_style_i32(const char * name, const char * key, int32_t
     else if(strcmp(key, "shadow_spread") == 0) lv_style_set_shadow_spread(&r->style, value);
     else if(strcmp(key, "shadow_opa") == 0) lv_style_set_shadow_opa(&r->style, value);
     else if(strcmp(key, "text_opa") == 0) lv_style_set_text_opa(&r->style, value);
+    else if(strcmp(key, "text_letter_space") == 0) lv_style_set_text_letter_space(&r->style, value);
     else if(strcmp(key, "line_width") == 0) lv_style_set_line_width(&r->style, value);
     else if(strcmp(key, "arc_width") == 0) lv_style_set_arc_width(&r->style, value);
     else if(strcmp(key, "opa") == 0) lv_style_set_opa(&r->style, value);

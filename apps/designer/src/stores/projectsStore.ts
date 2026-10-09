@@ -27,6 +27,7 @@ import {
   listPendingCloud,
   markCloudSynced,
   readCloudCache,
+  saveNow,
 } from '../services/storage';
 import * as cloud from '../services/cloudStorage';
 import type { ProjectSummary } from '../services/cloudStorage';
@@ -38,8 +39,14 @@ import {
 } from '../services/projectPersistence';
 import { syncProjectAssetsToCloud } from '../services/assets';
 import { createDesignerProject } from '../services/projectDefaults';
+import type { ControllerPreset } from './buildTargetStore';
 
 export type SyncState = 'synced' | 'saving' | 'offline' | 'conflict';
+
+export interface NewProjectOptions {
+  display?: Pick<LvProject['display'], 'width' | 'height' | 'shape'>;
+  controllerPreset?: ControllerPreset | null;
+}
 
 /** 当前打开的云面板(App.tsx 据此渲染容器) */
 export type CloudPanel = null | 'projects' | 'history';
@@ -77,7 +84,7 @@ export interface ProjectsStoreState {
   /** 打开工程:云优先 → loadProject + 缓存;离线回退缓存 */
   openProject(id: string): Promise<void>;
   /** 新建工程(填名):云上创建成功则设为当前;离线则纯本地占位 */
-  newProject(name: string): Promise<void>;
+  newProject(name: string, options?: NewProjectOptions): Promise<void>;
   /** 保存当前工程(debounce 入口用 scheduleSave;force=true 忽略基线覆盖云端) */
   saveCurrent(force?: boolean): Promise<void>;
   /** dirty 变化触发的防抖保存 */
@@ -217,7 +224,7 @@ export const useProjectsStore = create<ProjectsStoreState>()((set, get) => ({
     banner(`打开工程失败:${r.message}`);
   },
 
-  newProject: async (name) => {
+  newProject: async (name, options = {}) => {
     // A pending save belongs to the currently open project. Finish it before
     // switching identities so it can never run against the newly created one.
     if (saveTimer !== null) {
@@ -228,7 +235,12 @@ export const useProjectsStore = create<ProjectsStoreState>()((set, get) => ({
 
     const doc = createDesignerProject(name);
     doc.meta.name = name;
-    const stored = createNewStoredProjectDocument(doc);
+    if (options.display) {
+      doc.display.width = options.display.width;
+      doc.display.height = options.display.height;
+      doc.display.shape = options.display.shape;
+    }
+    const stored = createNewStoredProjectDocument(doc, options.controllerPreset ?? null);
     if (!get().cloudEnabled) {
       // 纯本地模式:直接进编辑器(靠 storage.ts 的 last 自动保存兜底)
       loadIntoEditor(stored);
@@ -290,6 +302,7 @@ export const useProjectsStore = create<ProjectsStoreState>()((set, get) => ({
     const stored = createStoredProjectDocument(doc);
 
     // 1) 本地永远先写(真相);无云 id(纯本地/离线新建)只能本地
+    await saveNow(doc, savedRevision);
     if (currentId) {
       await cacheCloudProject({
         id: currentId,
@@ -300,7 +313,6 @@ export const useProjectsStore = create<ProjectsStoreState>()((set, get) => ({
         pendingSync: true,
       });
     }
-    useProjectStore.getState().markSaved(savedRevision);
 
     if (!cloudEnabled || !currentId) return; // 纯本地 / 未上云:到此为止
 

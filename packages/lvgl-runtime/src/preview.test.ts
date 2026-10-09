@@ -146,13 +146,14 @@ describe('PreviewProgram runtime executor', () => {
     const p = program();
     p.screens[0]!.root.inlineStyles.push({
       selector: { part: 'main', states: ['pressed'] },
-      props: { bg_color: '#112233', radius: 8, bg_opa: '50%' },
+      props: { bg_color: '#112233', radius: 8, bg_opa: '50%', text_letter_space: 2 },
     });
     const calls: string[] = [];
     executePreviewProgram(p, fakeBridge(calls));
     expect(calls).toContain('style-str:main:bg_color:#112233:main:pressed');
     expect(calls).toContain('style-i32:main:radius:8:main:pressed');
     expect(calls).toContain('style-str:main:bg_opa:50%:main:pressed');
+    expect(calls).toContain('style-i32:main:text_letter_space:2:main:pressed');
   });
 
   it('rejects built-in font sizes that are absent from the WASM runtime', () => {
@@ -171,7 +172,7 @@ describe('PreviewProgram runtime executor', () => {
     const p = program();
     p.globals.styles.push({
       name: 'card',
-      props: { bg_color: '#223344', radius: 12, bg_opa: '80%' },
+      props: { bg_color: '#223344', radius: 12, bg_opa: '80%', text_letter_space: 2 },
     });
     p.screens[0]!.root.styleUses.push({
       styleName: 'card', selector: { part: 'main', states: ['pressed'] },
@@ -182,6 +183,7 @@ describe('PreviewProgram runtime executor', () => {
     expect(calls).toContain('named-style-str:card:bg_color:#223344');
     expect(calls).toContain('named-style-i32:card:radius:12');
     expect(calls).toContain('named-style-str:card:bg_opa:80%');
+    expect(calls).toContain('named-style-i32:card:text_letter_space:2');
     expect(calls).toContain('add-style:main:card:main:pressed');
     expect(calls.indexOf('create-style:card')).toBeLessThan(calls.indexOf('screen:main'));
   });

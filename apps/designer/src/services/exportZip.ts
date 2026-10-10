@@ -10,10 +10,10 @@ import {
 } from '@lvd/asset-pipeline';
 import { createPodscStaticWebUiExport, WebUiDocumentError } from '@lvd/schema/v2';
 import { emitC95 } from './codegen/adapter';
-import { getAssetBytes, resyncAssets } from './assets';
-import { useProjectStore } from '../stores/projectStore';
+import { getAssetBytes } from './assets';
 import { useEditorStore } from '../stores/editorStore';
 import { useBuildTargetStore, validateReleaseTarget } from '../stores/buildTargetStore';
+import { useProjectsStore } from '../stores/projectsStore';
 import { createStoredProjectDocument, loadProjectDocument } from './projectPersistence';
 
 function download(name: string, blob: Blob): void {
@@ -161,11 +161,8 @@ export function openProjectFile(): void {
     try {
       const raw: unknown = JSON.parse(await file.text());
       const { project, validation } = loadProjectDocument(raw);
-      useProjectStore.getState().loadProject(project);
-      void resyncAssets(); // 素材按 sha256 从本机内容寻址库重灌
+      await useProjectsStore.getState().openLocalProject(project);
       const ed = useEditorStore.getState();
-      const home = project.screens.find((s) => s.isHome) ?? project.screens[0];
-      if (home) ed.setActiveScreen(home.id);
       const warns = validation.warnings.length;
       ed.setBanner(warns ? `工程已打开(${warns} 条警告)` : null);
     } catch (e) {

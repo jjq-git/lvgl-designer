@@ -20,6 +20,7 @@ describe('site frame display presets', () => {
       { id: 'WF2D-1030', width: 1440, height: 720, shape: 'rect' },
       { id: 'WF2D-1050', width: 1024, height: 600, shape: 'rect' },
       { id: 'WF2D-8630', width: 480, height: 480, shape: 'rect' },
+      { id: 'WF3-28476', width: 284, height: 76, shape: 'rect' },
     ]);
     expect(FALLBACK_DISPLAY_PRESETS.fixed[4]).toEqual(expect.objectContaining({
       frameId: 'WF2D-8630', resolutionSource: 'demo', width: 480, height: 480, shape: 'rect',
@@ -56,15 +57,21 @@ describe('site frame display presets', () => {
     expect(presets.unresolved).toEqual([]);
   });
 
-  it('maps every built-in display to its local device frame', () => {
+  it('maps every framed built-in display to its local device frame', () => {
     for (const preset of FALLBACK_DISPLAY_PRESETS.fixed) {
       expect(deviceFrameForDisplay(preset)).toEqual(expect.objectContaining({
         frameId: preset.frameId,
-        assetUrl: `frames/${preset.frameId}.svg`,
         svgMarkup: expect.stringContaining('<svg'),
       }));
     }
-    expect(DEVICE_FRAME_PREVIEWS).toHaveLength(5);
+    expect(DEVICE_FRAME_PREVIEWS).toHaveLength(6);
+    expect(deviceFrameForDisplay({ width: 284, height: 76, shape: 'rect' })).toEqual(
+      expect.objectContaining({
+        frameId: 'WF3-28476',
+        assetUrl: 'frames/WF3_FRONT.svg',
+        aperture: expect.objectContaining({ width: 0.614660917, height: 0.16840417 }),
+      }),
+    );
     expect(deviceFrameForDisplay({ width: 320, height: 240, shape: 'rect' })).toBeNull();
   });
 });

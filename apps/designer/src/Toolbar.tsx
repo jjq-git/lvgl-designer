@@ -1,7 +1,8 @@
 /**
  * 工具条:undo/redo、缩放、设计/运行、圆屏开关、屏幕尺寸预设、新建/打开/保存/导出。
  */
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import type { LvProject } from '@lvd/schema';
 import { useProjectStore } from './stores/projectStore';
 import { useEditorStore } from './stores/editorStore';
 import { exportUiZip, exportWebUiJson, openProjectFile } from './services/exportZip';
@@ -12,11 +13,21 @@ import { hasPermission, useAuthStore } from './stores/authStore';
 import { getProject } from './services/cloudStorage';
 import { storedProjectDisplay, type ProjectDisplaySpec } from './services/projectPicker';
 import { FALLBACK_DISPLAY_PRESETS } from './services/displayPresets';
+import { loadLastProject } from './services/storage';
+import {
+  BUILT_IN_PROJECTS,
+  findBuiltInProject,
+  isLegacyWf3NavigationProject,
+} from './services/builtInProjects';
+
+const LOCAL_PROJECT_PICKER_ID = 'local:last';
 
 interface ProjectPickerOption extends ProjectDisplaySpec {
   id: string;
   name: string;
-  version: number;
+  version?: number;
+  source: 'cloud' | 'local' | 'builtin';
+  project?: LvProject;
 }
 
 function presetMatchesDisplay(
@@ -28,9 +39,17 @@ function presetMatchesDisplay(
     && preset.shape === candidate.shape;
 }
 
+function sameProjectOption(
+  left: Pick<ProjectPickerOption, 'name' | 'width' | 'height' | 'shape'>,
+  right: Pick<ProjectPickerOption, 'name' | 'width' | 'height' | 'shape'>,
+): boolean {
+  return left.name.trim() === right.name.trim() && presetMatchesDisplay(left, right);
+}
+
 export function Toolbar(): JSX.Element {
   const dirty = useProjectStore((s) => s.dirty);
-  const display = useProjectStore((s) => s.project.display);
+  const activeProject = useProjectStore((s) => s.project);
+  const display = activeProject.display;
   const mode = useEditorStore((s) => s.mode);
   const runtimeKind = useEditorStore((s) => s.runtimeKind);
   const canPublishSite = useAuthStore((state) => hasPermission(state.me, 'tool.lvgl.publish'));
@@ -46,14 +65,76 @@ export function Toolbar(): JSX.Element {
   );
   const [selectedProjectId, setSelectedProjectId] = useState(cloudProjectId ?? '');
   const [projectOptions, setProjectOptions] = useState<ProjectPickerOption[]>([]);
+  const [storedLocalProjectOption, setStoredLocalProjectOption] = useState<ProjectPickerOption | null>(null);
   const [projectOptionsLoading, setProjectOptionsLoading] = useState(false);
   const [openingProject, setOpeningProject] = useState(false);
+  const refreshingLegacyWf3 = useRef(false);
+  const localProjectOption: ProjectPickerOption | null = cloudProjectId === null
+    ? {
+        id: LOCAL_PROJECT_PICKER_ID,
+        name: activeProject.meta.name || 'untitled',
+        source: 'local',
+        project: activeProject,
+        width: activeProject.display.width,
+        height: activeProject.display.height,
+        shape: activeProject.display.shape,
+      }
+    : storedLocalProjectOption;
+
+  useEffect(() => {
+    if (
+      cloudProjectId !== null
+      || refreshingLegacyWf3.current
+      || !isLegacyWf3NavigationProject(activeProject)
+    ) return;
+    const builtInProject = findBuiltInProject('builtin:wf3-firmware-284x76');
+    if (!builtInProject) return;
+    refreshingLegacyWf3.current = true;
+    setOpeningProject(true);
+    void builtInProject.load()
+      .then((document) => useProjectsStore.getState().openLocalProject(document))
+      .finally(() => {
+        refreshingLegacyWf3.current = false;
+        setOpeningProject(false);
+      });
+  }, [activeProject, cloudProjectId]);
 
   useEffect(() => {
     if (!matchingPreset) return;
     setSelectedPresetId(matchingPreset.frameId);
-    setSelectedProjectId(cloudProjectId ?? '');
-  }, [cloudProjectId, matchingPreset?.frameId]);
+    setSelectedProjectId(cloudProjectId
+      ?? (localProjectOption && presetMatchesDisplay(display, localProjectOption)
+        ? LOCAL_PROJECT_PICKER_ID
+        : ''));
+  }, [
+    cloudProjectId,
+    localProjectOption?.height,
+    localProjectOption?.name,
+    localProjectOption?.shape,
+    localProjectOption?.width,
+    matchingPreset?.frameId,
+  ]);
+
+  useEffect(() => {
+    let cancelled = false;
+    void loadLastProject().then((project) => {
+      if (cancelled) return;
+      if (!project) {
+        setStoredLocalProjectOption(null);
+        return;
+      }
+      setStoredLocalProjectOption({
+        id: LOCAL_PROJECT_PICKER_ID,
+        name: project.meta.name || 'untitled',
+        source: 'local',
+        project,
+        width: project.display.width,
+        height: project.display.height,
+        shape: project.display.shape,
+      });
+    });
+    return () => { cancelled = true; };
+  }, [cloudProjectId]);
 
   useEffect(() => {
     let cancelled = false;
@@ -65,6 +146,7 @@ export function Toolbar(): JSX.Element {
         id: project.id,
         name: project.name,
         version: project.version,
+        source: 'cloud' as const,
         ...storedProjectDisplay(result.data.doc),
       } satisfies ProjectPickerOption;
     })).then((options) => {
@@ -78,8 +160,22 @@ export function Toolbar(): JSX.Element {
   const selectedPreset = FALLBACK_DISPLAY_PRESETS.fixed.find(
     (preset) => preset.frameId === selectedPresetId,
   );
+  const builtInProjectOptions: ProjectPickerOption[] = BUILT_IN_PROJECTS.map((project) => ({
+    id: project.id,
+    name: project.name,
+    source: 'builtin',
+    width: project.width,
+    height: project.height,
+    shape: project.shape,
+  }));
+  const uniqueBuiltInProjectOptions = localProjectOption
+    ? builtInProjectOptions.filter((project) => !sameProjectOption(project, localProjectOption))
+    : builtInProjectOptions;
+  const allProjectOptions = localProjectOption
+    ? [localProjectOption, ...uniqueBuiltInProjectOptions, ...projectOptions]
+    : [...uniqueBuiltInProjectOptions, ...projectOptions];
   const filteredProjects = selectedPreset
-    ? projectOptions.filter((project) => presetMatchesDisplay(selectedPreset, project))
+    ? allProjectOptions.filter((project) => presetMatchesDisplay(selectedPreset, project))
     : [];
   const selectedProjectValue = filteredProjects.some((project) => project.id === selectedProjectId)
     ? selectedProjectId
@@ -90,6 +186,15 @@ export function Toolbar(): JSX.Element {
     setSelectedProjectId(projectId);
     setOpeningProject(true);
     try {
+      if (projectId === LOCAL_PROJECT_PICKER_ID && localProjectOption?.project) {
+        await useProjectsStore.getState().openLocalProject(localProjectOption.project);
+        return;
+      }
+      const builtInProject = findBuiltInProject(projectId);
+      if (builtInProject) {
+        await useProjectsStore.getState().openLocalProject(await builtInProject.load());
+        return;
+      }
       await useProjectsStore.getState().openProject(projectId);
       if (useProjectsStore.getState().currentId !== projectId) setSelectedProjectId('');
     } finally {
@@ -101,19 +206,6 @@ export function Toolbar(): JSX.Element {
     <div className="toolbar">
       <div className="toolbar-row toolbar-main-row">
       <div className="toolbar-group toolbar-project-group">
-      <a
-        className="btn toolbar-icon-btn"
-        href="/"
-        aria-label="应用导航"
-        title="返回应用导航"
-      >
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <rect x="4" y="4" width="6" height="6" rx="1" />
-          <rect x="14" y="4" width="6" height="6" rx="1" />
-          <rect x="4" y="14" width="6" height="6" rx="1" />
-          <rect x="14" y="14" width="6" height="6" rx="1" />
-        </svg>
-      </a>
       <button
         type="button"
         className="btn toolbar-icon-btn"
@@ -212,7 +304,7 @@ export function Toolbar(): JSX.Element {
           aria-label="界面 UI"
           title="选择后打开并显示对应界面 UI"
           value={selectedProjectValue}
-          disabled={projectOptionsLoading || openingProject || filteredProjects.length === 0}
+          disabled={(projectOptionsLoading && !localProjectOption) || openingProject || filteredProjects.length === 0}
           onChange={(event) => { void selectProject(event.target.value); }}
         >
           <option value="">
@@ -221,7 +313,9 @@ export function Toolbar(): JSX.Element {
               : filteredProjects.length === 0 ? '该规格暂无界面 UI' : '请选择界面 UI'}
           </option>
           {filteredProjects.map((project) => (
-            <option key={project.id} value={project.id}>{project.name} · v{project.version}</option>
+            <option key={project.id} value={project.id}>
+              {project.source === 'cloud' ? `${project.name} · v${project.version}` : project.name}
+            </option>
           ))}
         </select>
       </div>
@@ -296,6 +390,19 @@ export function Toolbar(): JSX.Element {
           <path d="M9.8 9a2.4 2.4 0 1 1 3.5 2.1c-.8.4-1.3 1-1.3 1.9M12 17h.01" />
         </svg>
       </button>
+      <a
+        className="btn toolbar-icon-btn"
+        href="/"
+        aria-label="应用导航"
+        title="返回应用导航"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="4" y="4" width="6" height="6" rx="1" />
+          <rect x="14" y="4" width="6" height="6" rx="1" />
+          <rect x="4" y="14" width="6" height="6" rx="1" />
+          <rect x="14" y="14" width="6" height="6" rx="1" />
+        </svg>
+      </a>
       <UserMenu />
       </div>
       </div>

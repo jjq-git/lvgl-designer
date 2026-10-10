@@ -16,7 +16,8 @@
     "typecheck": "corepack pnpm -r typecheck",
     "audit:lvgl-diff": "node scripts/audit-lvgl-version-diff.mjs",
     "generate:quiet-pod-demos": "node scripts/generate-quiet-pod-projects.mjs",
-    "generate:serene-pod-demos": "node scripts/generate-quiet-pod-projects.mjs && node scripts/generate-serene-pod-projects.mjs"
+    "generate:serene-pod-demos": "node scripts/generate-quiet-pod-projects.mjs && node scripts/generate-serene-pod-projects.mjs",
+    "generate:wf3-firmware-ui": "node scripts/generate-wf3-firmware-project.mjs"
   },
   "devDependencies": {
     "playwright": "^1.61.1",

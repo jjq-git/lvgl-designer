@@ -209,7 +209,7 @@ function ComponentApiSection({ node, api }: { node: WidgetNodeV2; api: Component
 
 /**
  * LVGL button 本身没有 text 属性，标准做法是在内部放一个 label。
- * 检查器把这层结构细节收起来：用户直接编辑“按钮文字”，首次输入时自动创建
+ * 检查器把这层结构细节收起来：用户直接编辑“按钮文本 / 图标”，首次输入时自动创建
  * 居中的 label；已有直接 label 时则原位更新，保留它的样式和其它属性。
  */
 function ButtonTextRow({ node }: { node: WidgetNodeV2 }): JSX.Element {
@@ -246,11 +246,11 @@ function ButtonTextRow({ node }: { node: WidgetNodeV2 }): JSX.Element {
 
   return (
     <div className="prop-row">
-      <label title="内部自动创建或更新居中的 Label">按钮文字</label>
+      <label title="内部自动创建或更新居中的 Label">按钮文本 / 图标</label>
       <IconTextEditor
-        ariaLabel="按钮文字"
+        ariaLabel="按钮文本 / 图标"
         value={value}
-        placeholder="输入文字（自动创建标签）"
+        placeholder="输入文本或选择图标"
         onCommit={setText}
       />
     </div>
@@ -307,6 +307,7 @@ function NameRow({ node }: { node: WidgetNodeV2 }): JSX.Element {
 function PropRowEditor({ node, spec }: { node: WidgetNodeV2; spec: PropSpec }): JSX.Element {
   const value = node.props[spec.key];
   const isSet = value !== undefined && value !== null;
+  const label = spec.key === 'text' ? `${spec.ui.label} / 图标` : spec.ui.label;
   const onChange = (v: PropValueV2 | undefined): void =>
     mutateProp(node.id, spec.key, v, `改 ${spec.ui.label}`);
 
@@ -314,13 +315,13 @@ function PropRowEditor({ node, spec }: { node: WidgetNodeV2; spec: PropSpec }): 
     <>
       <div className={`prop-row ${isSet ? '' : 'unset'}`}>
         <label title={spec.key}>
-          {spec.ui.label}
+          {label}
           {spec.channel === 'c-only' && (
             <span className="badge-conly" title="XML parser 未实现:预览画布不生效,仅进导出 C 代码">仅C</span>
           )}
         </label>
         <ValueEditor
-          ariaLabel={spec.ui.label}
+          ariaLabel={label}
           node={node}
           propKey={spec.key}
           type={spec.type}

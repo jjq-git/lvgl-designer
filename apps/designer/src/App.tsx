@@ -35,6 +35,10 @@ import { CatalogPanel } from './panels/catalog/CatalogPanel';
 import { SitePublicationModal } from './panels/SitePublicationModal';
 import { AppDialogHost } from './panels/AppDialogHost';
 import { useBuildTargetStore } from './stores/buildTargetStore';
+import {
+  findBuiltInProject,
+  isLegacyWf3NavigationProject,
+} from './services/builtInProjects';
 
 let bootstrapped = false;
 const TREE_COLLAPSED_STORAGE_KEY = 'lvd:tree-dock-collapsed';
@@ -160,14 +164,14 @@ export function App(): JSX.Element {
       // 3) 纯本地 / 无云工程:回退恢复本地最近工程
       const last = await loadLastProject();
       if (last) {
-        useProjectStore.getState().loadProject(last);
-        const home = last.screens.find((s) => s.isHome) ?? last.screens[0];
-        if (home) useEditorStore.getState().setActiveScreen(home.id);
-        // 素材重灌:等 runtime/pipeline 起来后按 sha256 从 IndexedDB 注册 + reloadAll
-        void resyncAssets();
+        const legacyReplacement = isLegacyWf3NavigationProject(last)
+          ? await findBuiltInProject('builtin:wf3-firmware-284x76')?.load()
+          : undefined;
+        await useProjectsStore.getState().openLocalProject(legacyReplacement ?? last);
       }
     })();
-    const stopAutoSave = startAutoSave();
+    // 本地最近工程与云端工程缓存分开；编辑云端工程时不覆盖本地 UI。
+    const stopAutoSave = startAutoSave(() => useProjectsStore.getState().currentId === null);
     const stopCloudSync = startCloudSync();
 
     const onKey = (e: KeyboardEvent): void => {

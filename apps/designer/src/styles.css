@@ -5,6 +5,14 @@
    完整可替换 src/styles.css(覆盖原 259 行全部选择器)
    ============================================================ */
 
+@font-face {
+  font-family: "Lvd LVGL Symbols";
+  src: url("../../../vendor/lvgl/scripts/built_in_font/FontAwesome5-Solid+Brands+Regular.woff") format("woff");
+  font-display: block;
+  font-style: normal;
+  font-weight: 900;
+}
+
 :root {
   /* 灰阶 */
   --bg-page: #f5f5f7;              /* 页面底 / chrome */
@@ -1212,6 +1220,10 @@ input::placeholder { color: var(--fg-hint); }
   font-size: 12px;
   cursor: pointer;
 }
+.icon-text-picker-btn .lvgl-symbol-glyph {
+  width: 22px;
+  height: 22px;
+}
 .icon-text-picker-btn:hover,
 .icon-text-picker-btn[aria-expanded='true'] {
   border-color: var(--accent);
@@ -1291,7 +1303,26 @@ input::placeholder { color: var(--fg-hint); }
   background: var(--accent-tint);
   color: var(--fg);
 }
-.lvgl-symbol-glyph { color: var(--fg); font-size: 22px; line-height: 1; }
+.lvgl-symbol-glyph {
+  display: inline-flex;
+  width: 26px;
+  height: 26px;
+  flex: 0 0 26px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  color: var(--fg);
+  font-family: "Lvd LVGL Symbols", sans-serif;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 1;
+  opacity: 1;
+  text-align: center;
+  text-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
+}
 .lvgl-symbol-empty {
   grid-column: 1 / -1;
   padding: 20px;

@@ -5,6 +5,7 @@ import { useProjectsStore } from './projectsStore';
 import { createNewStoredProjectDocument } from '../services/projectPersistence';
 import * as cloud from '../services/cloudStorage';
 import { deleteCloudCache, saveNow } from '../services/storage';
+import { primeProjectAssets, resyncAssets } from '../services/assets';
 
 vi.mock('../services/cloudStorage', () => ({
   probeCloudEnabled: vi.fn(),
@@ -28,6 +29,8 @@ vi.mock('../services/storage', () => ({
 }));
 
 vi.mock('../services/assets', () => ({
+  primeProjectAssets: vi.fn(async () => undefined),
+  resyncAssets: vi.fn(async () => undefined),
   syncProjectAssetsToCloud: vi.fn(async () => undefined),
 }));
 
@@ -91,6 +94,8 @@ describe('projectsStore switching and preview safety', () => {
     expect(cloudMock.saveProject).toHaveBeenCalledTimes(1);
     expect(cloudMock.saveProject.mock.calls[0]?.[0]).toBe('old-id');
     expect(cloudMock.getProject).toHaveBeenCalledWith('next-id');
+    expect(primeProjectAssets).toHaveBeenCalledTimes(1);
+    expect(resyncAssets).toHaveBeenCalledTimes(1);
     expect(useProjectsStore.getState().currentId).toBe('next-id');
   });
 
@@ -116,6 +121,23 @@ describe('projectsStore switching and preview safety', () => {
       currentVersion: 4,
     });
     expect(useProjectStore.getState().project.meta.name).toBe('updated current');
+  });
+
+  it('opens the saved local UI without retaining the previous cloud identity', async () => {
+    const local = createEmptyProject('local UI');
+    local.display = { ...local.display, width: 284, height: 76, shape: 'rect' };
+
+    await useProjectsStore.getState().openLocalProject(local);
+
+    expect(useProjectsStore.getState()).toMatchObject({
+      currentId: null,
+      currentName: 'local UI',
+      currentVersion: 0,
+    });
+    expect(useProjectStore.getState().project.meta.name).toBe('local UI');
+    expect(vi.mocked(saveNow)).toHaveBeenCalledTimes(1);
+    expect(primeProjectAssets).toHaveBeenCalledTimes(1);
+    expect(resyncAssets).toHaveBeenCalledTimes(1);
   });
 
   it('creates a project with the screen and controller chosen in the new-project form', async () => {
@@ -168,6 +190,7 @@ describe('projectsStore switching and preview safety', () => {
     await useProjectsStore.getState().saveCurrent();
 
     expect(vi.mocked(saveNow)).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(saveNow).mock.calls[0]?.[2]).toBe('cloud:old-id');
     expect(cloudMock.saveProject).toHaveBeenCalledTimes(1);
     expect(useProjectStore.getState().dirty).toBe(false);
   });

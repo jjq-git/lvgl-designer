@@ -37,9 +37,10 @@ import {
   loadProjectDocument,
   type StoredProjectDocument,
 } from '../services/projectPersistence';
-import { syncProjectAssetsToCloud } from '../services/assets';
+import { primeProjectAssets, resyncAssets, syncProjectAssetsToCloud } from '../services/assets';
 import { createDesignerProject } from '../services/projectDefaults';
 import type { ControllerPreset } from './buildTargetStore';
+import { ensureBuiltInProjectAssets } from '../services/builtInProjects';
 
 export type SyncState = 'synced' | 'saving' | 'offline' | 'conflict';
 
@@ -83,6 +84,8 @@ export interface ProjectsStoreState {
   refreshList(): Promise<void>;
   /** 打开工程:云优先 → loadProject + 缓存;离线回退缓存 */
   openProject(id: string): Promise<void>;
+  /** 打开浏览器 IndexedDB/文件导入的本地工程，与云端工程身份完全隔离。 */
+  openLocalProject(doc: StoredProjectDocument): Promise<void>;
   /** 新建工程(填名):云上创建成功则设为当前;离线则纯本地占位 */
   newProject(name: string, options?: NewProjectOptions): Promise<void>;
   /** 保存当前工程(debounce 入口用 scheduleSave;force=true 忽略基线覆盖云端) */
@@ -102,15 +105,19 @@ export interface ProjectsStoreState {
 /** 把 doc + 名字灌进编辑器(loadProject + 定位首屏)。
  * 云端/缓存来的 doc 是外部输入,先经 loadProjectJson 迁移+校验+补全,
  * 避免结构不完整时下游读 undefined.length 白屏。 */
-function loadIntoEditor(rawDoc: StoredProjectDocument): void {
-  let doc: LvProject;
+function normalizeProject(rawDoc: StoredProjectDocument): LvProject {
   try {
-    doc = loadProjectDocument(rawDoc).project;
+    return loadProjectDocument(rawDoc).project;
   } catch {
     // 校验失败(格式过旧/损坏)→ 兜底空工程,别白屏
-    doc = createDesignerProject();
-    loadProjectDocument(doc);
+    const fallback = createDesignerProject();
+    loadProjectDocument(fallback);
+    return fallback;
   }
+}
+
+function loadIntoEditor(rawDoc: StoredProjectDocument, normalized?: LvProject): void {
+  const doc = normalized ?? normalizeProject(rawDoc);
   useProjectStore.getState().loadProject(doc);
   const home = doc.screens.find((s) => s.isHome) ?? doc.screens[0];
   if (home) useEditorStore.getState().setActiveScreen(home.id);
@@ -183,7 +190,10 @@ export const useProjectsStore = create<ProjectsStoreState>()((set, get) => ({
     const r = await cloud.getProject(id);
     if (r.ok) {
       const doc = r.data.doc;
-      loadIntoEditor(doc);
+      await ensureBuiltInProjectAssets(doc);
+      const normalized = normalizeProject(doc);
+      await primeProjectAssets(normalized);
+      loadIntoEditor(doc, normalized);
       set({
         currentId: id,
         currentName: r.data.name,
@@ -200,13 +210,17 @@ export const useProjectsStore = create<ProjectsStoreState>()((set, get) => ({
         pendingSync: false,
       });
       banner(null);
+      await resyncAssets();
       return;
     }
     // 云端失败 → 回退本地缓存
     if (r.kind === 'offline' || r.kind === 'error') {
       const cached = await readCloudCache(id);
       if (cached) {
-        loadIntoEditor(cached.doc);
+        await ensureBuiltInProjectAssets(cached.doc);
+        const normalized = normalizeProject(cached.doc);
+        await primeProjectAssets(normalized);
+        loadIntoEditor(cached.doc, normalized);
         set({
           currentId: id,
           currentName: cached.name,
@@ -214,6 +228,7 @@ export const useProjectsStore = create<ProjectsStoreState>()((set, get) => ({
           syncState: 'offline',
           conflictCurrent: null,
         });
+        await resyncAssets();
         banner('当前离线,已从本地缓存打开该工程(改动将在联网后同步)');
         return;
       }
@@ -222,6 +237,30 @@ export const useProjectsStore = create<ProjectsStoreState>()((set, get) => ({
     }
     if (r.kind === 'disabled') set({ cloudEnabled: false });
     banner(`打开工程失败:${r.message}`);
+  },
+
+  openLocalProject: async (doc) => {
+    if (saveTimer !== null) {
+      clearTimeout(saveTimer);
+      saveTimer = null;
+    }
+    if (useProjectStore.getState().dirty) await get().saveCurrent();
+
+    await ensureBuiltInProjectAssets(doc);
+    const normalized = normalizeProject(doc);
+    await primeProjectAssets(normalized);
+    loadIntoEditor(doc, normalized);
+    set({
+      currentId: null,
+      currentName: normalized.meta.name || 'untitled',
+      currentVersion: 0,
+      syncState: 'synced',
+      conflictCurrent: null,
+      cloudSyncPaused: false,
+    });
+    await saveNow(normalized, useProjectStore.getState().revision);
+    await resyncAssets();
+    banner(null);
   },
 
   newProject: async (name, options = {}) => {
@@ -245,6 +284,7 @@ export const useProjectsStore = create<ProjectsStoreState>()((set, get) => ({
       // 纯本地模式:直接进编辑器(靠 storage.ts 的 last 自动保存兜底)
       loadIntoEditor(stored);
       set({ currentId: null, currentName: name, currentVersion: 0, syncState: 'offline' });
+      await saveNow(doc, useProjectStore.getState().revision);
       return;
     }
     const r = await cloud.createProject(name, stored);
@@ -302,7 +342,7 @@ export const useProjectsStore = create<ProjectsStoreState>()((set, get) => ({
     const stored = createStoredProjectDocument(doc);
 
     // 1) 本地永远先写(真相);无云 id(纯本地/离线新建)只能本地
-    await saveNow(doc, savedRevision);
+    await saveNow(doc, savedRevision, currentId ? `cloud:${currentId}` : undefined);
     if (currentId) {
       await cacheCloudProject({
         id: currentId,

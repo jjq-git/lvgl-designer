@@ -4,6 +4,7 @@ import frame1040Svg from '../assets/device-frames/WF2D-1040.svg?raw';
 import frame1050Svg from '../assets/device-frames/WF2D-1050.svg?raw';
 import frame8620Svg from '../assets/device-frames/WF2D-8620.svg?raw';
 import frame8630Svg from '../assets/device-frames/WF2D-8630.svg?raw';
+import wf3FrameSvg from '../assets/device-frames/WF3_FRONT.svg?raw';
 
 /**
  * 设备预设的权威来源：ui.podsc.com/site/frames/manifest.json（schemaVersion 1）。
@@ -88,6 +89,13 @@ export const DEVICE_FRAME_PREVIEWS: readonly DeviceFramePreview[] = [
     width: 480, height: 480, shape: 'rect',
     aperture: { x: 0.0865735, y: 0.0865735, width: 0.826853, height: 0.826853, radius: '0' },
   },
+  {
+    frameId: 'WF3-28476', assetUrl: 'frames/WF3_FRONT.svg', svgMarkup: wf3FrameSvg,
+    width: 284, height: 76, shape: 'rect',
+    aperture: {
+      x: 0.192865543, y: 0.415797915, width: 0.614660917, height: 0.16840417, radius: '0',
+    },
+  },
 ];
 
 export function deviceFrameForDisplay(display: {
@@ -136,6 +144,12 @@ const MANIFEST_SNAPSHOT: SiteFrame[] = [
     physicalSize: { width: 86, height: 86, unit: 'mm' },
     resolution: null, shape: 'rect', aspectRatio: '1:1', aspectRatioTolerance: 0.005,
     demoLogicalSizes: [{ width: 480, height: 480, shape: 'rect' }],
+  },
+  {
+    id: 'WF3-28476', model: 'WF3', nameCn: '2.25 英寸条形屏',
+    nameEn: 'WF3 2.25-inch Bar Display', screenSizeInches: 2.25,
+    resolution: { width: 284, height: 76 }, shape: 'rect',
+    demoLogicalSizes: [{ width: 284, height: 76, shape: 'rect' }],
   },
 ];
 

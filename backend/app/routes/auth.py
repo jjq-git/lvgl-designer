@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
 from pydantic import BaseModel, Field
 
 from ..tools.auth import db
@@ -145,8 +145,26 @@ async def permissions(_admin: AuthUser = Depends(require_admin)):
 
 
 @admin_router.get("/login-events")
-async def login_events(limit: int = 100, _admin: AuthUser = Depends(require_admin)):
-    return {"events": db.list_login_events(limit)}
+async def login_events(
+    page: int = Query(1, ge=1),
+    page_size: int | None = Query(None, ge=1, le=100),
+    limit: int | None = Query(None, ge=1, le=500),
+    _admin: AuthUser = Depends(require_admin),
+):
+    # Keep `limit` working for older callers while the UI uses page/page_size.
+    size = page_size if page_size is not None else (limit if limit is not None else 100)
+    total = db.count_login_events()
+    pages = max(1, (total + size - 1) // size)
+    current_page = min(page, pages)
+    return {
+        "events": db.list_login_events(size, (current_page - 1) * size),
+        "pagination": {
+            "page": current_page,
+            "page_size": size,
+            "total": total,
+            "pages": pages,
+        },
+    }
 
 
 @admin_router.get("/users")

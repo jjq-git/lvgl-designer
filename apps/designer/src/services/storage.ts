@@ -33,9 +33,13 @@ export function db(): Promise<IDBPDatabase> {
   return dbPromise;
 }
 
-export async function saveNow(project: LvProject, expectedRevision?: number): Promise<void> {
+export async function saveNow(
+  project: LvProject,
+  expectedRevision?: number,
+  storageKey: string = KEY,
+): Promise<void> {
   const d = await db();
-  await d.put(STORE, cloneStoredProjectDocument(createStoredProjectDocument(project)), KEY);
+  await d.put(STORE, cloneStoredProjectDocument(createStoredProjectDocument(project)), storageKey);
   useProjectStore.getState().markSaved(expectedRevision);
 }
 
@@ -53,7 +57,7 @@ export async function loadLastProject(): Promise<LvProject | null> {
 }
 
 /** 订阅 projectStore:dirty → debounce 2s 写库;beforeunload flush。返回退订。 */
-export function startAutoSave(): () => void {
+export function startAutoSave(shouldSave: () => boolean = () => true): () => void {
   let timer: number | null = null;
   const flush = (): void => {
     if (timer !== null) {
@@ -65,7 +69,7 @@ export function startAutoSave(): () => void {
       return;
     }
     const s = useProjectStore.getState();
-    if (s.dirty) void saveNow(s.project, s.revision);
+    if (s.dirty && shouldSave()) void saveNow(s.project, s.revision);
   };
   const unsub = useProjectStore.subscribe((s, prev) => {
     if (!s.dirty || s.revision === prev.revision) return;

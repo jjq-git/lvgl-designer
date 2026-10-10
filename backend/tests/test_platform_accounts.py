@@ -90,6 +90,22 @@ def test_admin_user_permissions_and_login_audit(tmp_path, monkeypatch):
         audit = events.json()["events"]
         assert [entry["success"] for entry in audit[:2]] == [True, False]
         assert all("password" not in entry for entry in audit)
+        assert events.json()["pagination"] == {
+            "page": 1,
+            "page_size": 10,
+            "total": 2,
+            "pages": 1,
+        }
+
+        second_page = client.get("/api/admin/login-events?page=2&page_size=1")
+        assert second_page.status_code == 200
+        assert second_page.json()["pagination"] == {
+            "page": 2,
+            "page_size": 1,
+            "total": 2,
+            "pages": 2,
+        }
+        assert second_page.json()["events"][0]["success"] is False
 
         self_delete = client.delete(f"/api/admin/users/{admin_user['id']}")
         assert self_delete.status_code == 400

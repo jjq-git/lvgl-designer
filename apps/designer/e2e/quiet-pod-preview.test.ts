@@ -9,6 +9,7 @@ const models = ['WF2D-8620', 'WF2D-1040', 'WF2D-1030', 'WF2D-1050', 'WF2D-8630']
 
 runE2e('quiet-pod browser preview', () => {
   it('renders every generated screen through the real WASM canvas', async () => {
+    const designerUrl = 'http://127.0.0.1:8001/lvgl-designer/';
     const systemChrome = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
     const browser = await chromium.launch(existsSync(systemChrome) ? { executablePath: systemChrome } : {});
     const page = await browser.newPage();
@@ -21,12 +22,12 @@ runE2e('quiet-pod browser preview', () => {
     });
 
     try {
-      await page.goto('http://127.0.0.1:8001/');
-      if (page.url().endsWith('/login.html')) {
+      await page.goto(designerUrl);
+      if (new URL(page.url()).pathname === '/login' || new URL(page.url()).pathname === '/login.html') {
         await page.getByLabel('用户名').fill('admin');
         await page.getByLabel('密码').fill('admin123');
         await page.getByRole('button', { name: '登录' }).click();
-        await page.waitForURL('http://127.0.0.1:8001/');
+        await page.waitForURL(designerUrl);
       }
       try {
         await page.waitForSelector('.rt-badge.rt-wasm', { timeout: 30_000 });

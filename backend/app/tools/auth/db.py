@@ -577,9 +577,20 @@ def record_login_event(
         conn.close()
 
 
-def list_login_events(limit: int = 100) -> list[dict]:
+def count_login_events() -> int:
+    init_db()
+    conn = _get_conn()
+    try:
+        row = conn.execute("SELECT COUNT(*) AS total FROM login_events").fetchone()
+        return int(row["total"])
+    finally:
+        conn.close()
+
+
+def list_login_events(limit: int = 100, offset: int = 0) -> list[dict]:
     init_db()
     safe_limit = max(1, min(int(limit), 500))
+    safe_offset = max(0, int(offset))
     conn = _get_conn()
     try:
         rows = conn.execute(
@@ -587,9 +598,9 @@ def list_login_events(limit: int = 100) -> list[dict]:
             SELECT id, user_id, username, success, created_at, user_agent, ip
             FROM login_events
             ORDER BY id DESC
-            LIMIT ?
+            LIMIT ? OFFSET ?
             """,
-            (safe_limit,),
+            (safe_limit, safe_offset),
         ).fetchall()
         return [
             {

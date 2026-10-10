@@ -7,6 +7,7 @@ import type { ScreenDefV2 } from '@lvd/schema/v2';
 import { useProjectStore } from '../stores/projectStore';
 import { useEditorStore } from '../stores/editorStore';
 import { createDesignerScreenRoot } from '../services/projectDefaults';
+import { removeScreenAndReferences } from '../services/screenOperations';
 
 export function ScreenList(): JSX.Element {
   const screens = useProjectStore((s) => s.uiProject.screens);
@@ -64,12 +65,15 @@ export function ScreenList(): JSX.Element {
   const removeScreen = (id: string): void => {
     const st = useProjectStore.getState();
     if (st.uiProject.screens.length <= 1) return;
+    let removedReferences = 0;
     st.mutateV2('删除屏幕', (draft) => {
-      draft.screens = draft.screens.filter((s) => s.id !== id);
-      if (!draft.screens.some((s) => s.isHome) && draft.screens[0]) draft.screens[0].isHome = true;
+      removedReferences = removeScreenAndReferences(draft, id);
     });
     const remain = useProjectStore.getState().uiProject.screens;
     if (activeScreenId === id && remain[0]) useEditorStore.getState().setActiveScreen(remain[0].id);
+    if (removedReferences > 0) {
+      useEditorStore.getState().setBanner(`删除屏幕时同时清理了 ${removedReferences} 个跳转事件`);
+    }
   };
 
   const commitRename = (id: string): void => {

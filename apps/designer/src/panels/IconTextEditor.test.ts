@@ -9,6 +9,7 @@ import {
   LVGL_SYMBOLS,
   parseLvglSymbolText,
   QUIET_POD_SYMBOLS,
+  WF3_MATERIAL_SYMBOLS,
 } from './IconTextEditor';
 
 const LVGL_95_SYMBOL_CODE_POINTS = [
@@ -64,6 +65,17 @@ describe('LVGL symbol text helpers', () => {
     expect(applyLvglSymbol('ABCD', '\uf054', 'insert', 1, 3)).toBe('A\uf054D');
   });
 
+  it('registers the WF3 Material Symbols used by the reference navigation', () => {
+    expect(WF3_MATERIAL_SYMBOLS.map((item) => item.symbol.codePointAt(0))).toEqual([
+      0xe166, 0xe5cb, 0xe335, 0xe86f, 0xefe6, 0xe915, 0xe1e0,
+      0xf102, 0xec1c, 0xeb2f, 0xe322, 0xe8b8, 0xe6e1, 0xe87b, 0xe1ff,
+      0xe5cc,
+    ]);
+    expect(WF3_MATERIAL_SYMBOLS.every((item) => item.fontFamily === 'wf3-material')).toBe(true);
+    expect(filterLvglSymbols('device_hub').map((item) => item.name)).toContain('Material 设备拓扑');
+    expect(filterLvglSymbols('数据线').map((item) => item.name)).toContain('Material 数据线');
+  });
+
   it('searches symbols by Chinese name and English keyword', () => {
     expect(filterLvglSymbols('主页').map((item) => item.name)).toContain('主页');
     expect(filterLvglSymbols('play').map((item) => item.name)).toContain('播放');
@@ -85,6 +97,8 @@ describe('LVGL symbol text helpers', () => {
     expect(formatLvglSymbolText('\uf04b START')).toBe('[图标:播放] START');
     expect(parseLvglSymbolText('[图标:确认]')).toBe('\uf00c');
     expect(parseLvglSymbolText('[图标:风扇]')).toBe('\uf021');
+    expect(formatLvglSymbolText('\ue335')).toBe('[图标:Material 设备拓扑]');
+    expect(parseLvglSymbolText('[图标:Material 设备拓扑]')).toBe('\ue335');
   });
 
   it('keeps the picker open when its own icon list scrolls', () => {

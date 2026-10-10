@@ -13,6 +13,14 @@
   font-weight: 900;
 }
 
+@font-face {
+  font-family: "WF3 Material Symbols";
+  src: url("../../../examples/wf3-firmware/assets/MaterialSymbolsOutlined-WF3-36.ttf") format("truetype");
+  font-display: block;
+  font-style: normal;
+  font-weight: 400;
+}
+
 :root {
   /* 灰阶 */
   --bg-page: #f5f5f7;              /* 页面底 / chrome */
@@ -1084,6 +1092,9 @@ select.ed-select:focus-visible,
   pointer-events: none;
   overflow: visible;
 }
+.overlay.overlay-design {
+  pointer-events: all;
+}
 
 /* overlay 精修:CSS 覆盖 SVG 表现属性(仅颜色;线宽由 1/zoom 反补偿,勿动) */
 .overlay line { stroke: #ff2d55; }                                  /* 对齐参考线 */
@@ -1095,6 +1106,10 @@ select.ed-select:focus-visible,
 .overlay g > rect:not([data-handle]) {                              /* 选择框 */
   stroke: var(--accent);
   filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.9));            /* 同色系画面上仍可辨 */
+  pointer-events: all;
+  cursor: move;
+  touch-action: none;
+  user-select: none;
 }
 .overlay rect[data-handle] {                                        /* 8 向手柄 */
   fill: #fff;
@@ -1322,6 +1337,10 @@ input::placeholder { color: var(--fg-hint); }
   text-align: center;
   text-rendering: geometricPrecision;
   -webkit-font-smoothing: antialiased;
+}
+.lvgl-symbol-glyph.wf3-material-symbol-glyph {
+  font-family: "WF3 Material Symbols", sans-serif;
+  font-weight: 400;
 }
 .lvgl-symbol-empty {
   grid-column: 1 / -1;

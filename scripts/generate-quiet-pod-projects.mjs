@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { tokenizeProjectTheme } from './theme-tokenize.mjs';
 
 const OUTPUT_DIR = resolve('examples/quiet-pod');
 const NOW = '2026-10-08T00:00:00.000Z';
@@ -18,6 +19,31 @@ const COLORS = {
   amber: '#F5B942',
   green: '#51D88A',
   red: '#FF6B6B',
+};
+
+const QUIET_THEME = {
+  id: 'quiet-dark',
+  displayName: '静音舱深色主题',
+  tokens: [
+    { id: 'color.background', type: 'color', value: COLORS.canvas },
+    { id: 'color.navigation', type: 'color', value: COLORS.rail },
+    { id: 'color.surface', type: 'color', value: COLORS.card },
+    { id: 'color.surface.subtle', type: 'color', value: COLORS.card2 },
+    { id: 'color.border', type: 'color', value: COLORS.line },
+    { id: 'color.text.primary', type: 'color', value: COLORS.text },
+    { id: 'color.text.muted', type: 'color', value: COLORS.muted },
+    { id: 'color.accent', type: 'color', value: COLORS.cyan },
+    { id: 'color.accent.strong', type: 'color', value: COLORS.blue },
+    { id: 'color.status.warning', type: 'color', value: COLORS.amber },
+    { id: 'color.status.success', type: 'color', value: COLORS.green },
+    { id: 'color.status.danger', type: 'color', value: COLORS.red },
+    { id: 'color.shadow', type: 'color', value: '#000000' },
+    { id: 'color.selection', type: 'color', value: '#13305A' },
+    { id: 'color.track', type: 'color', value: '#29425A' },
+    { id: 'color.track.strong', type: 'color', value: '#32465A' },
+    { id: 'color.outline', type: 'color', value: '#263C52' },
+    { id: 'color.text.onaccent', type: 'color', value: '#FFFFFF' },
+  ],
 };
 
 // LVGL's built-in Font Awesome symbol range. These glyphs are compiled into
@@ -321,13 +347,15 @@ function addRectShell(screen, active, width, height, screenIds, options = {}) {
 
   const navY = Math.round(topH * 1.45);
   const gap = Math.round((height - navY - 48) / PAGE_KEYS.length);
+  const navMargin = 12;
+  const navHeight = height >= 700 ? 76 : 66;
   PAGE_KEYS.forEach((key, index) => {
-    children.push(button(screen, `nav_${key}`, `${PAGE_ICONS[index]}  ${PAGE_LABELS[index]}`, 18, navY + index * gap, railW - 36, Math.min(54, gap - 12), {
+    children.push(button(screen, `nav_${key}`, `${PAGE_ICONS[index]}  ${PAGE_LABELS[index]}`, navMargin, navY + index * gap, railW - navMargin * 2, Math.min(navHeight, gap - 12), {
       color: index === active ? COLORS.blue : COLORS.rail,
       borderWidth: index === active ? 0 : 1,
       border: index === active ? COLORS.blue : COLORS.line,
       shadow: index === active,
-      font: 'montserrat_16',
+      font: 'montserrat_18',
       events: navEvent(screenIds[index]),
     }));
   });
@@ -527,8 +555,8 @@ function roundChrome(screen, index, screenIds) {
     // Page names carry product meaning, so keep them readable. Only the
     // universally understood previous/next actions remain icon-only.
     label(screen, 'page_title', PAGE_LABELS[index], 84, 24, 72, { font: 'montserrat_18', color: COLORS.muted, align: 'center' }),
-    ...(index > 0 ? [button(screen, 'back', ICONS.left, 46, 26, 38, 38, { color: COLORS.card, borderWidth: 1, shadow: false, font: 'montserrat_18', events: navEvent(screenIds[index - 1], 'move_right') })] : []),
-    ...(index < 4 ? [button(screen, 'next', ICONS.right, 156, 26, 38, 38, { color: COLORS.card, borderWidth: 1, shadow: false, font: 'montserrat_18', events: navEvent(screenIds[index + 1], 'move_left') })] : []),
+    ...(index > 0 ? [button(screen, 'back', ICONS.left, 36, 20, 48, 48, { color: COLORS.card, borderWidth: 1, shadow: false, font: 'montserrat_20', events: navEvent(screenIds[index - 1], 'move_right') })] : []),
+    ...(index < 4 ? [button(screen, 'next', ICONS.right, 156, 20, 48, 48, { color: COLORS.card, borderWidth: 1, shadow: false, font: 'montserrat_20', events: navEvent(screenIds[index + 1], 'move_left') })] : []),
   ];
 }
 
@@ -570,7 +598,7 @@ function buildRoundScreens(screenIds) {
   ]);
   layouts.push([
     ...roundChrome('settings', 4, screenIds),
-    button('settings', 'home', ICONS.home, 156, 26, 38, 38, { color: COLORS.card, borderWidth: 1, shadow: false, font: 'montserrat_18', events: navEvent(screenIds[0], 'fade_on') }),
+    button('settings', 'home', ICONS.home, 156, 20, 48, 48, { color: COLORS.card, borderWidth: 1, shadow: false, font: 'montserrat_20', events: navEvent(screenIds[0], 'fade_on') }),
     label('settings', 'dnd_label', `${ICONS.mute}  DND`, 42, 82, 96, { font: 'montserrat_16', align: 'left' }),
     toggle('settings', 'dnd', 'dnd_enabled', 142, 77, 54, 28),
     label('settings', 'vent_label', `${ICONS.refresh}  VENT`, 42, 125, 96, { font: 'montserrat_16', align: 'left' }),
@@ -584,11 +612,11 @@ function buildRoundScreens(screenIds) {
 
 function squareNav(screen, active, screenIds) {
   const items = PAGE_ICONS.map((icon, index) => `${icon} ${PAGE_LABELS[index]}`);
-  return items.map((text, index) => button(screen, `nav_${PAGE_KEYS[index]}`, text, 14 + index * 92, 426, 82, 40, {
+  return items.map((text, index) => button(screen, `nav_${PAGE_KEYS[index]}`, text, 8 + index * 93, 420, 88, 52, {
     color: index === active ? COLORS.blue : COLORS.card2,
     borderWidth: index === active ? 0 : 1,
     shadow: false,
-    font: 'montserrat_14',
+    font: 'montserrat_16',
     events: navEvent(screenIds[index]),
   }));
 }
@@ -869,7 +897,7 @@ function createSnapshot(project, preset) {
       modifiedAt: project.meta.modifiedAt,
     },
     designDisplayRef: displayRef,
-    themes: [{ id: 'default', displayName: '默认', tokens: [] }],
+    themes: [],
     subjects: project.subjects.map((subject) => ({
       id: `subject:${subject.name}`,
       codeName: subject.name,
@@ -895,6 +923,7 @@ function createSnapshot(project, preset) {
     translations: null,
     editor: project.editor,
   };
+  tokenizeProjectTheme(uiProject, QUIET_THEME);
   const displayProfile = {
     schemaVersion: 1,
     kind: 'display-profile',
@@ -943,7 +972,7 @@ function createSnapshot(project, preset) {
       displayName: `${preset.model} 静音仓目标`,
       uiProjectRef: uiRef,
       controllerProfileRef: controllerRef,
-      themeRef: `${uiRef}#theme:default`,
+      themeRef: `${uiRef}#theme:${QUIET_THEME.id}`,
       lvglVersion: '9.5.0',
     },
     actionRegistry: BUILTIN_ACTIONS,
@@ -955,6 +984,10 @@ function createSnapshot(project, preset) {
       {
         severity: 'info', code: 'controller-profile-selected', path: 'buildTarget.controllerProfileRef',
         message: `已绑定 ${preset.model} 设备外壳。`,
+      },
+      {
+        severity: 'info', code: 'semantic-theme', path: 'uiProject.themes',
+        message: '界面颜色、阴影、边框和文字字体已绑定静音舱主题 Token。',
       },
     ],
     colorFormatConfirmed: true,

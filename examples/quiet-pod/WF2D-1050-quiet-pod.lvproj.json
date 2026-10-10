@@ -15,9 +15,145 @@
     "designDisplayRef": "display:wf2d-1050-1024x600-rgb565@1",
     "themes": [
       {
-        "id": "default",
-        "displayName": "默认",
-        "tokens": []
+        "id": "quiet-dark",
+        "displayName": "静音舱深色主题",
+        "tokens": [
+          {
+            "id": "color.background",
+            "type": "color",
+            "value": "#06101E"
+          },
+          {
+            "id": "color.navigation",
+            "type": "color",
+            "value": "#0A1728"
+          },
+          {
+            "id": "color.surface",
+            "type": "color",
+            "value": "#102238"
+          },
+          {
+            "id": "color.surface.subtle",
+            "type": "color",
+            "value": "#0C1B2E"
+          },
+          {
+            "id": "color.border",
+            "type": "color",
+            "value": "#203852"
+          },
+          {
+            "id": "color.text.primary",
+            "type": "color",
+            "value": "#F4F8FC"
+          },
+          {
+            "id": "color.text.muted",
+            "type": "color",
+            "value": "#8FA7BD"
+          },
+          {
+            "id": "color.accent",
+            "type": "color",
+            "value": "#32D6C6"
+          },
+          {
+            "id": "color.accent.strong",
+            "type": "color",
+            "value": "#3B82F6"
+          },
+          {
+            "id": "color.status.warning",
+            "type": "color",
+            "value": "#F5B942"
+          },
+          {
+            "id": "color.status.success",
+            "type": "color",
+            "value": "#51D88A"
+          },
+          {
+            "id": "color.status.danger",
+            "type": "color",
+            "value": "#FF6B6B"
+          },
+          {
+            "id": "color.shadow",
+            "type": "color",
+            "value": "#000000"
+          },
+          {
+            "id": "color.selection",
+            "type": "color",
+            "value": "#13305A"
+          },
+          {
+            "id": "color.track",
+            "type": "color",
+            "value": "#29425A"
+          },
+          {
+            "id": "color.track.strong",
+            "type": "color",
+            "value": "#32465A"
+          },
+          {
+            "id": "color.outline",
+            "type": "color",
+            "value": "#263C52"
+          },
+          {
+            "id": "color.text.onaccent",
+            "type": "color",
+            "value": "#FFFFFF"
+          },
+          {
+            "id": "font.size.16",
+            "type": "fontRef",
+            "value": "montserrat_16"
+          },
+          {
+            "id": "font.size.18",
+            "type": "fontRef",
+            "value": "montserrat_18"
+          },
+          {
+            "id": "font.size.20",
+            "type": "fontRef",
+            "value": "montserrat_20"
+          },
+          {
+            "id": "font.size.22",
+            "type": "fontRef",
+            "value": "montserrat_22"
+          },
+          {
+            "id": "font.size.24",
+            "type": "fontRef",
+            "value": "montserrat_24"
+          },
+          {
+            "id": "font.size.28",
+            "type": "fontRef",
+            "value": "montserrat_28"
+          },
+          {
+            "id": "font.size.30",
+            "type": "fontRef",
+            "value": "montserrat_30"
+          },
+          {
+            "id": "font.size.32",
+            "type": "fontRef",
+            "value": "montserrat_32"
+          },
+          {
+            "id": "font.size.36",
+            "type": "fontRef",
+            "value": "montserrat_36"
+          }
+        ]
       }
     ],
     "subjects": [
@@ -158,7 +294,9 @@
           "styles": [
             {
               "props": {
-                "bg_color": "#06101E",
+                "bg_color": {
+                  "$token": "color.background"
+                },
                 "bg_opa": 255,
                 "border_width": 0,
                 "pad_all": 0
@@ -185,9 +323,13 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#0A1728",
+                    "bg_color": {
+                      "$token": "color.navigation"
+                    },
                     "bg_opa": 255,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "border_width": 0,
                     "radius": 0,
                     "pad_all": 0
@@ -213,8 +355,12 @@
               "styles": [
                 {
                   "props": {
-                    "text_color": "#32D6C6",
-                    "text_font": "montserrat_24",
+                    "text_color": {
+                      "$token": "color.accent"
+                    },
+                    "text_font": {
+                      "$token": "font.size.24"
+                    },
                     "text_align": "left",
                     "text_opa": 255
                   }
@@ -239,8 +385,12 @@
               "styles": [
                 {
                   "props": {
-                    "text_color": "#F4F8FC",
-                    "text_font": "montserrat_28",
+                    "text_color": {
+                      "$token": "color.text.primary"
+                    },
+                    "text_font": {
+                      "$token": "font.size.28"
+                    },
                     "text_align": "left",
                     "text_opa": 255
                   }
@@ -265,8 +415,12 @@
               "styles": [
                 {
                   "props": {
-                    "text_color": "#8FA7BD",
-                    "text_font": "montserrat_16",
+                    "text_color": {
+                      "$token": "color.text.muted"
+                    },
+                    "text_font": {
+                      "$token": "font.size.16"
+                    },
                     "text_align": "right",
                     "text_opa": 255
                   }
@@ -281,10 +435,10 @@
               "type": "button",
               "codeName": "home_nav_home",
               "props": {
-                "x": 18,
+                "x": 12,
                 "y": 113,
-                "width": 123,
-                "height": 54
+                "width": 135,
+                "height": 66
               },
               "flags": {
                 "scrollable": false
@@ -293,13 +447,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#3B82F6",
+                    "bg_color": {
+                      "$token": "color.accent.strong"
+                    },
                     "bg_opa": 255,
                     "border_width": 0,
-                    "border_color": "#3B82F6",
+                    "border_color": {
+                      "$token": "color.accent.strong"
+                    },
                     "radius": 18,
                     "shadow_width": 10,
-                    "shadow_color": "#3B82F6",
+                    "shadow_color": {
+                      "$token": "color.accent.strong"
+                    },
                     "shadow_opa": 55,
                     "pad_all": 0
                   }
@@ -311,7 +471,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#32D6C6"
+                    "bg_color": {
+                      "$token": "color.accent"
+                    }
                   }
                 }
               ],
@@ -343,8 +505,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -360,10 +526,10 @@
               "type": "button",
               "codeName": "home_nav_air",
               "props": {
-                "x": 18,
+                "x": 12,
                 "y": 201,
-                "width": 123,
-                "height": 54
+                "width": 135,
+                "height": 66
               },
               "flags": {
                 "scrollable": false
@@ -372,13 +538,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#0A1728",
+                    "bg_color": {
+                      "$token": "color.navigation"
+                    },
                     "bg_opa": 255,
                     "border_width": 1,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "radius": 18,
                     "shadow_width": 0,
-                    "shadow_color": "#0A1728",
+                    "shadow_color": {
+                      "$token": "color.navigation"
+                    },
                     "shadow_opa": 0,
                     "pad_all": 0
                   }
@@ -390,7 +562,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#32D6C6"
+                    "bg_color": {
+                      "$token": "color.accent"
+                    }
                   }
                 }
               ],
@@ -422,8 +596,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -439,10 +617,10 @@
               "type": "button",
               "codeName": "home_nav_light",
               "props": {
-                "x": 18,
+                "x": 12,
                 "y": 289,
-                "width": 123,
-                "height": 54
+                "width": 135,
+                "height": 66
               },
               "flags": {
                 "scrollable": false
@@ -451,13 +629,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#0A1728",
+                    "bg_color": {
+                      "$token": "color.navigation"
+                    },
                     "bg_opa": 255,
                     "border_width": 1,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "radius": 18,
                     "shadow_width": 0,
-                    "shadow_color": "#0A1728",
+                    "shadow_color": {
+                      "$token": "color.navigation"
+                    },
                     "shadow_opa": 0,
                     "pad_all": 0
                   }
@@ -469,7 +653,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#32D6C6"
+                    "bg_color": {
+                      "$token": "color.accent"
+                    }
                   }
                 }
               ],
@@ -501,8 +687,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -518,10 +708,10 @@
               "type": "button",
               "codeName": "home_nav_focus",
               "props": {
-                "x": 18,
+                "x": 12,
                 "y": 377,
-                "width": 123,
-                "height": 54
+                "width": 135,
+                "height": 66
               },
               "flags": {
                 "scrollable": false
@@ -530,13 +720,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#0A1728",
+                    "bg_color": {
+                      "$token": "color.navigation"
+                    },
                     "bg_opa": 255,
                     "border_width": 1,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "radius": 18,
                     "shadow_width": 0,
-                    "shadow_color": "#0A1728",
+                    "shadow_color": {
+                      "$token": "color.navigation"
+                    },
                     "shadow_opa": 0,
                     "pad_all": 0
                   }
@@ -548,7 +744,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#32D6C6"
+                    "bg_color": {
+                      "$token": "color.accent"
+                    }
                   }
                 }
               ],
@@ -580,8 +778,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -597,10 +799,10 @@
               "type": "button",
               "codeName": "home_nav_settings",
               "props": {
-                "x": 18,
+                "x": 12,
                 "y": 465,
-                "width": 123,
-                "height": 54
+                "width": 135,
+                "height": 66
               },
               "flags": {
                 "scrollable": false
@@ -609,13 +811,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#0A1728",
+                    "bg_color": {
+                      "$token": "color.navigation"
+                    },
                     "bg_opa": 255,
                     "border_width": 1,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "radius": 18,
                     "shadow_width": 0,
-                    "shadow_color": "#0A1728",
+                    "shadow_color": {
+                      "$token": "color.navigation"
+                    },
                     "shadow_opa": 0,
                     "pad_all": 0
                   }
@@ -627,7 +835,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#32D6C6"
+                    "bg_color": {
+                      "$token": "color.accent"
+                    }
                   }
                 }
               ],
@@ -659,8 +869,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -688,13 +902,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#0C1B2E",
+                    "bg_color": {
+                      "$token": "color.surface.subtle"
+                    },
                     "bg_opa": 255,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "border_width": 1,
                     "radius": 18,
                     "pad_all": 0,
-                    "shadow_color": "#000000",
+                    "shadow_color": {
+                      "$token": "color.shadow"
+                    },
                     "shadow_width": 18,
                     "shadow_opa": 90,
                     "shadow_offset_y": 6
@@ -719,8 +939,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#8FA7BD",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -755,7 +979,9 @@
                         "part": "main"
                       },
                       "props": {
-                        "arc_color": "#263C52",
+                        "arc_color": {
+                          "$token": "color.outline"
+                        },
                         "arc_width": 14
                       }
                     },
@@ -764,7 +990,9 @@
                         "part": "indicator"
                       },
                       "props": {
-                        "arc_color": "#32D6C6",
+                        "arc_color": {
+                          "$token": "color.accent"
+                        },
                         "arc_width": 14
                       }
                     },
@@ -773,7 +1001,9 @@
                         "part": "knob"
                       },
                       "props": {
-                        "bg_color": "#32D6C6",
+                        "bg_color": {
+                          "$token": "color.accent"
+                        },
                         "bg_opa": 0,
                         "radius": 12
                       }
@@ -804,8 +1034,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_28",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.28"
+                        },
                         "text_align": "center",
                         "text_opa": 255
                       }
@@ -830,8 +1064,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#32D6C6",
-                        "text_font": "montserrat_18",
+                        "text_color": {
+                          "$token": "color.accent"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "center",
                         "text_opa": 255
                       }
@@ -858,13 +1096,19 @@
                   "styles": [
                     {
                       "props": {
-                        "bg_color": "#FF6B6B",
+                        "bg_color": {
+                          "$token": "color.status.danger"
+                        },
                         "bg_opa": 255,
                         "border_width": 0,
-                        "border_color": "#203852",
+                        "border_color": {
+                          "$token": "color.border"
+                        },
                         "radius": 18,
                         "shadow_width": 10,
-                        "shadow_color": "#FF6B6B",
+                        "shadow_color": {
+                          "$token": "color.status.danger"
+                        },
                         "shadow_opa": 55,
                         "pad_all": 0
                       }
@@ -876,7 +1120,9 @@
                         ]
                       },
                       "props": {
-                        "bg_color": "#32D6C6"
+                        "bg_color": {
+                          "$token": "color.accent"
+                        }
                       }
                     }
                   ],
@@ -897,8 +1143,12 @@
                       "styles": [
                         {
                           "props": {
-                            "text_color": "#F4F8FC",
-                            "text_font": "montserrat_16",
+                            "text_color": {
+                              "$token": "color.text.primary"
+                            },
+                            "text_font": {
+                              "$token": "font.size.16"
+                            },
                             "text_align": "center"
                           }
                         }
@@ -928,13 +1178,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#102238",
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
                     "bg_opa": 255,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "border_width": 1,
                     "radius": 18,
                     "pad_all": 0,
-                    "shadow_color": "#000000",
+                    "shadow_color": {
+                      "$token": "color.shadow"
+                    },
                     "shadow_width": 18,
                     "shadow_opa": 90,
                     "shadow_offset_y": 6
@@ -959,8 +1215,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#8FA7BD",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -985,8 +1245,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#51D88A",
-                        "text_font": "montserrat_30",
+                        "text_color": {
+                          "$token": "color.status.success"
+                        },
+                        "text_font": {
+                          "$token": "font.size.30"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -1011,8 +1275,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#8FA7BD",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -1041,13 +1309,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#102238",
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
                     "bg_opa": 255,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "border_width": 1,
                     "radius": 18,
                     "pad_all": 0,
-                    "shadow_color": "#000000",
+                    "shadow_color": {
+                      "$token": "color.shadow"
+                    },
                     "shadow_width": 18,
                     "shadow_opa": 90,
                     "shadow_offset_y": 6
@@ -1072,8 +1346,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#8FA7BD",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -1098,8 +1376,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F5B942",
-                        "text_font": "montserrat_30",
+                        "text_color": {
+                          "$token": "color.status.warning"
+                        },
+                        "text_font": {
+                          "$token": "font.size.30"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -1124,8 +1406,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#8FA7BD",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -1154,13 +1440,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#102238",
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
                     "bg_opa": 255,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "border_width": 1,
                     "radius": 18,
                     "pad_all": 0,
-                    "shadow_color": "#000000",
+                    "shadow_color": {
+                      "$token": "color.shadow"
+                    },
                     "shadow_width": 18,
                     "shadow_opa": 90,
                     "shadow_offset_y": 6
@@ -1185,8 +1477,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#8FA7BD",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -1211,8 +1507,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#3B82F6",
-                        "text_font": "montserrat_30",
+                        "text_color": {
+                          "$token": "color.accent.strong"
+                        },
+                        "text_font": {
+                          "$token": "font.size.30"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -1237,8 +1537,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#8FA7BD",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -1267,9 +1571,13 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#102238",
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
                     "bg_opa": 255,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "border_width": 1,
                     "radius": 18,
                     "pad_all": 0
@@ -1294,8 +1602,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#8FA7BD",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -1320,8 +1632,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -1348,7 +1664,9 @@
                         "part": "main"
                       },
                       "props": {
-                        "bg_color": "#32465A",
+                        "bg_color": {
+                          "$token": "color.track.strong"
+                        },
                         "bg_opa": 255,
                         "radius": 20
                       }
@@ -1361,7 +1679,9 @@
                         ]
                       },
                       "props": {
-                        "bg_color": "#32D6C6",
+                        "bg_color": {
+                          "$token": "color.accent"
+                        },
                         "bg_opa": 255,
                         "radius": 20
                       }
@@ -1371,7 +1691,9 @@
                         "part": "knob"
                       },
                       "props": {
-                        "bg_color": "#FFFFFF",
+                        "bg_color": {
+                          "$token": "color.text.onaccent"
+                        },
                         "bg_opa": 255,
                         "radius": 20
                       }
@@ -1410,8 +1732,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -1438,7 +1764,9 @@
                         "part": "main"
                       },
                       "props": {
-                        "bg_color": "#32465A",
+                        "bg_color": {
+                          "$token": "color.track.strong"
+                        },
                         "bg_opa": 255,
                         "radius": 20
                       }
@@ -1451,7 +1779,9 @@
                         ]
                       },
                       "props": {
-                        "bg_color": "#32D6C6",
+                        "bg_color": {
+                          "$token": "color.accent"
+                        },
                         "bg_opa": 255,
                         "radius": 20
                       }
@@ -1461,7 +1791,9 @@
                         "part": "knob"
                       },
                       "props": {
-                        "bg_color": "#FFFFFF",
+                        "bg_color": {
+                          "$token": "color.text.onaccent"
+                        },
                         "bg_opa": 255,
                         "radius": 20
                       }
@@ -1500,8 +1832,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#8FA7BD",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -1531,7 +1867,9 @@
                         "part": "main"
                       },
                       "props": {
-                        "bg_color": "#29425A",
+                        "bg_color": {
+                          "$token": "color.track"
+                        },
                         "bg_opa": 255,
                         "radius": 10
                       }
@@ -1541,7 +1879,9 @@
                         "part": "indicator"
                       },
                       "props": {
-                        "bg_color": "#F5B942",
+                        "bg_color": {
+                          "$token": "color.status.warning"
+                        },
                         "bg_opa": 255,
                         "radius": 10
                       }
@@ -1551,7 +1891,9 @@
                         "part": "knob"
                       },
                       "props": {
-                        "bg_color": "#FFFFFF",
+                        "bg_color": {
+                          "$token": "color.text.onaccent"
+                        },
                         "bg_opa": 255,
                         "radius": 12,
                         "shadow_width": 8,
@@ -1592,7 +1934,9 @@
           "styles": [
             {
               "props": {
-                "bg_color": "#06101E",
+                "bg_color": {
+                  "$token": "color.background"
+                },
                 "bg_opa": 255,
                 "border_width": 0,
                 "pad_all": 0
@@ -1619,9 +1963,13 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#0A1728",
+                    "bg_color": {
+                      "$token": "color.navigation"
+                    },
                     "bg_opa": 255,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "border_width": 0,
                     "radius": 0,
                     "pad_all": 0
@@ -1647,8 +1995,12 @@
               "styles": [
                 {
                   "props": {
-                    "text_color": "#32D6C6",
-                    "text_font": "montserrat_24",
+                    "text_color": {
+                      "$token": "color.accent"
+                    },
+                    "text_font": {
+                      "$token": "font.size.24"
+                    },
                     "text_align": "left",
                     "text_opa": 255
                   }
@@ -1673,8 +2025,12 @@
               "styles": [
                 {
                   "props": {
-                    "text_color": "#F4F8FC",
-                    "text_font": "montserrat_28",
+                    "text_color": {
+                      "$token": "color.text.primary"
+                    },
+                    "text_font": {
+                      "$token": "font.size.28"
+                    },
                     "text_align": "left",
                     "text_opa": 255
                   }
@@ -1699,8 +2055,12 @@
               "styles": [
                 {
                   "props": {
-                    "text_color": "#8FA7BD",
-                    "text_font": "montserrat_16",
+                    "text_color": {
+                      "$token": "color.text.muted"
+                    },
+                    "text_font": {
+                      "$token": "font.size.16"
+                    },
                     "text_align": "right",
                     "text_opa": 255
                   }
@@ -1715,10 +2075,10 @@
               "type": "button",
               "codeName": "air_nav_home",
               "props": {
-                "x": 18,
+                "x": 12,
                 "y": 113,
-                "width": 123,
-                "height": 54
+                "width": 135,
+                "height": 66
               },
               "flags": {
                 "scrollable": false
@@ -1727,13 +2087,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#0A1728",
+                    "bg_color": {
+                      "$token": "color.navigation"
+                    },
                     "bg_opa": 255,
                     "border_width": 1,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "radius": 18,
                     "shadow_width": 0,
-                    "shadow_color": "#0A1728",
+                    "shadow_color": {
+                      "$token": "color.navigation"
+                    },
                     "shadow_opa": 0,
                     "pad_all": 0
                   }
@@ -1745,7 +2111,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#32D6C6"
+                    "bg_color": {
+                      "$token": "color.accent"
+                    }
                   }
                 }
               ],
@@ -1777,8 +2145,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -1794,10 +2166,10 @@
               "type": "button",
               "codeName": "air_nav_air",
               "props": {
-                "x": 18,
+                "x": 12,
                 "y": 201,
-                "width": 123,
-                "height": 54
+                "width": 135,
+                "height": 66
               },
               "flags": {
                 "scrollable": false
@@ -1806,13 +2178,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#3B82F6",
+                    "bg_color": {
+                      "$token": "color.accent.strong"
+                    },
                     "bg_opa": 255,
                     "border_width": 0,
-                    "border_color": "#3B82F6",
+                    "border_color": {
+                      "$token": "color.accent.strong"
+                    },
                     "radius": 18,
                     "shadow_width": 10,
-                    "shadow_color": "#3B82F6",
+                    "shadow_color": {
+                      "$token": "color.accent.strong"
+                    },
                     "shadow_opa": 55,
                     "pad_all": 0
                   }
@@ -1824,7 +2202,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#32D6C6"
+                    "bg_color": {
+                      "$token": "color.accent"
+                    }
                   }
                 }
               ],
@@ -1856,8 +2236,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -1873,10 +2257,10 @@
               "type": "button",
               "codeName": "air_nav_light",
               "props": {
-                "x": 18,
+                "x": 12,
                 "y": 289,
-                "width": 123,
-                "height": 54
+                "width": 135,
+                "height": 66
               },
               "flags": {
                 "scrollable": false
@@ -1885,13 +2269,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#0A1728",
+                    "bg_color": {
+                      "$token": "color.navigation"
+                    },
                     "bg_opa": 255,
                     "border_width": 1,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "radius": 18,
                     "shadow_width": 0,
-                    "shadow_color": "#0A1728",
+                    "shadow_color": {
+                      "$token": "color.navigation"
+                    },
                     "shadow_opa": 0,
                     "pad_all": 0
                   }
@@ -1903,7 +2293,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#32D6C6"
+                    "bg_color": {
+                      "$token": "color.accent"
+                    }
                   }
                 }
               ],
@@ -1935,8 +2327,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -1952,10 +2348,10 @@
               "type": "button",
               "codeName": "air_nav_focus",
               "props": {
-                "x": 18,
+                "x": 12,
                 "y": 377,
-                "width": 123,
-                "height": 54
+                "width": 135,
+                "height": 66
               },
               "flags": {
                 "scrollable": false
@@ -1964,13 +2360,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#0A1728",
+                    "bg_color": {
+                      "$token": "color.navigation"
+                    },
                     "bg_opa": 255,
                     "border_width": 1,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "radius": 18,
                     "shadow_width": 0,
-                    "shadow_color": "#0A1728",
+                    "shadow_color": {
+                      "$token": "color.navigation"
+                    },
                     "shadow_opa": 0,
                     "pad_all": 0
                   }
@@ -1982,7 +2384,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#32D6C6"
+                    "bg_color": {
+                      "$token": "color.accent"
+                    }
                   }
                 }
               ],
@@ -2014,8 +2418,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -2031,10 +2439,10 @@
               "type": "button",
               "codeName": "air_nav_settings",
               "props": {
-                "x": 18,
+                "x": 12,
                 "y": 465,
-                "width": 123,
-                "height": 54
+                "width": 135,
+                "height": 66
               },
               "flags": {
                 "scrollable": false
@@ -2043,13 +2451,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#0A1728",
+                    "bg_color": {
+                      "$token": "color.navigation"
+                    },
                     "bg_opa": 255,
                     "border_width": 1,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "radius": 18,
                     "shadow_width": 0,
-                    "shadow_color": "#0A1728",
+                    "shadow_color": {
+                      "$token": "color.navigation"
+                    },
                     "shadow_opa": 0,
                     "pad_all": 0
                   }
@@ -2061,7 +2475,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#32D6C6"
+                    "bg_color": {
+                      "$token": "color.accent"
+                    }
                   }
                 }
               ],
@@ -2093,8 +2509,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -2122,13 +2542,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#102238",
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
                     "bg_opa": 255,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "border_width": 1,
                     "radius": 18,
                     "pad_all": 0,
-                    "shadow_color": "#000000",
+                    "shadow_color": {
+                      "$token": "color.shadow"
+                    },
                     "shadow_width": 18,
                     "shadow_opa": 90,
                     "shadow_offset_y": 6
@@ -2153,8 +2579,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#8FA7BD",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -2189,7 +2619,9 @@
                         "part": "main"
                       },
                       "props": {
-                        "arc_color": "#263C52",
+                        "arc_color": {
+                          "$token": "color.outline"
+                        },
                         "arc_width": 18
                       }
                     },
@@ -2198,7 +2630,9 @@
                         "part": "indicator"
                       },
                       "props": {
-                        "arc_color": "#51D88A",
+                        "arc_color": {
+                          "$token": "color.status.success"
+                        },
                         "arc_width": 18
                       }
                     },
@@ -2207,7 +2641,9 @@
                         "part": "knob"
                       },
                       "props": {
-                        "bg_color": "#51D88A",
+                        "bg_color": {
+                          "$token": "color.status.success"
+                        },
                         "bg_opa": 0,
                         "radius": 12
                       }
@@ -2238,8 +2674,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_32",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.32"
+                        },
                         "text_align": "center",
                         "text_opa": 255
                       }
@@ -2264,8 +2704,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#51D88A",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.status.success"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
                         "text_align": "center",
                         "text_opa": 255
                       }
@@ -2294,9 +2738,13 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#102238",
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
                     "bg_opa": 255,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "border_width": 1,
                     "radius": 18,
                     "pad_all": 0
@@ -2321,8 +2769,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_20",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.20"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -2349,7 +2801,9 @@
                         "part": "main"
                       },
                       "props": {
-                        "bg_color": "#32465A",
+                        "bg_color": {
+                          "$token": "color.track.strong"
+                        },
                         "bg_opa": 255,
                         "radius": 20
                       }
@@ -2362,7 +2816,9 @@
                         ]
                       },
                       "props": {
-                        "bg_color": "#32D6C6",
+                        "bg_color": {
+                          "$token": "color.accent"
+                        },
                         "bg_opa": 255,
                         "radius": 20
                       }
@@ -2372,7 +2828,9 @@
                         "part": "knob"
                       },
                       "props": {
-                        "bg_color": "#FFFFFF",
+                        "bg_color": {
+                          "$token": "color.text.onaccent"
+                        },
                         "bg_opa": 255,
                         "radius": 20
                       }
@@ -2411,8 +2869,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#8FA7BD",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -2437,8 +2899,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#32D6C6",
-                        "text_font": "montserrat_18",
+                        "text_color": {
+                          "$token": "color.accent"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "right",
                         "text_opa": 255
                       }
@@ -2475,7 +2941,9 @@
                         "part": "main"
                       },
                       "props": {
-                        "bg_color": "#29425A",
+                        "bg_color": {
+                          "$token": "color.track"
+                        },
                         "bg_opa": 255,
                         "radius": 10
                       }
@@ -2485,7 +2953,9 @@
                         "part": "indicator"
                       },
                       "props": {
-                        "bg_color": "#32D6C6",
+                        "bg_color": {
+                          "$token": "color.accent"
+                        },
                         "bg_opa": 255,
                         "radius": 10
                       }
@@ -2495,7 +2965,9 @@
                         "part": "knob"
                       },
                       "props": {
-                        "bg_color": "#FFFFFF",
+                        "bg_color": {
+                          "$token": "color.text.onaccent"
+                        },
                         "bg_opa": 255,
                         "radius": 12,
                         "shadow_width": 8,
@@ -2528,8 +3000,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_18",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -2556,7 +3032,9 @@
                         "part": "main"
                       },
                       "props": {
-                        "bg_color": "#32465A",
+                        "bg_color": {
+                          "$token": "color.track.strong"
+                        },
                         "bg_opa": 255,
                         "radius": 20
                       }
@@ -2569,7 +3047,9 @@
                         ]
                       },
                       "props": {
-                        "bg_color": "#32D6C6",
+                        "bg_color": {
+                          "$token": "color.accent"
+                        },
                         "bg_opa": 255,
                         "radius": 20
                       }
@@ -2579,7 +3059,9 @@
                         "part": "knob"
                       },
                       "props": {
-                        "bg_color": "#FFFFFF",
+                        "bg_color": {
+                          "$token": "color.text.onaccent"
+                        },
                         "bg_opa": 255,
                         "radius": 20
                       }
@@ -2618,8 +3100,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#8FA7BD",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -2646,13 +3132,19 @@
                   "styles": [
                     {
                       "props": {
-                        "bg_color": "#32D6C6",
+                        "bg_color": {
+                          "$token": "color.accent"
+                        },
                         "bg_opa": 255,
                         "border_width": 0,
-                        "border_color": "#203852",
+                        "border_color": {
+                          "$token": "color.border"
+                        },
                         "radius": 18,
                         "shadow_width": 10,
-                        "shadow_color": "#32D6C6",
+                        "shadow_color": {
+                          "$token": "color.accent"
+                        },
                         "shadow_opa": 55,
                         "pad_all": 0
                       }
@@ -2664,7 +3156,9 @@
                         ]
                       },
                       "props": {
-                        "bg_color": "#32D6C6"
+                        "bg_color": {
+                          "$token": "color.accent"
+                        }
                       }
                     }
                   ],
@@ -2685,8 +3179,12 @@
                       "styles": [
                         {
                           "props": {
-                            "text_color": "#06101E",
-                            "text_font": "montserrat_16",
+                            "text_color": {
+                              "$token": "color.background"
+                            },
+                            "text_font": {
+                              "$token": "font.size.16"
+                            },
                             "text_align": "center"
                           }
                         }
@@ -2720,7 +3218,9 @@
           "styles": [
             {
               "props": {
-                "bg_color": "#06101E",
+                "bg_color": {
+                  "$token": "color.background"
+                },
                 "bg_opa": 255,
                 "border_width": 0,
                 "pad_all": 0
@@ -2747,9 +3247,13 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#0A1728",
+                    "bg_color": {
+                      "$token": "color.navigation"
+                    },
                     "bg_opa": 255,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "border_width": 0,
                     "radius": 0,
                     "pad_all": 0
@@ -2775,8 +3279,12 @@
               "styles": [
                 {
                   "props": {
-                    "text_color": "#32D6C6",
-                    "text_font": "montserrat_24",
+                    "text_color": {
+                      "$token": "color.accent"
+                    },
+                    "text_font": {
+                      "$token": "font.size.24"
+                    },
                     "text_align": "left",
                     "text_opa": 255
                   }
@@ -2801,8 +3309,12 @@
               "styles": [
                 {
                   "props": {
-                    "text_color": "#F4F8FC",
-                    "text_font": "montserrat_28",
+                    "text_color": {
+                      "$token": "color.text.primary"
+                    },
+                    "text_font": {
+                      "$token": "font.size.28"
+                    },
                     "text_align": "left",
                     "text_opa": 255
                   }
@@ -2827,8 +3339,12 @@
               "styles": [
                 {
                   "props": {
-                    "text_color": "#8FA7BD",
-                    "text_font": "montserrat_16",
+                    "text_color": {
+                      "$token": "color.text.muted"
+                    },
+                    "text_font": {
+                      "$token": "font.size.16"
+                    },
                     "text_align": "right",
                     "text_opa": 255
                   }
@@ -2843,10 +3359,10 @@
               "type": "button",
               "codeName": "light_nav_home",
               "props": {
-                "x": 18,
+                "x": 12,
                 "y": 113,
-                "width": 123,
-                "height": 54
+                "width": 135,
+                "height": 66
               },
               "flags": {
                 "scrollable": false
@@ -2855,13 +3371,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#0A1728",
+                    "bg_color": {
+                      "$token": "color.navigation"
+                    },
                     "bg_opa": 255,
                     "border_width": 1,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "radius": 18,
                     "shadow_width": 0,
-                    "shadow_color": "#0A1728",
+                    "shadow_color": {
+                      "$token": "color.navigation"
+                    },
                     "shadow_opa": 0,
                     "pad_all": 0
                   }
@@ -2873,7 +3395,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#32D6C6"
+                    "bg_color": {
+                      "$token": "color.accent"
+                    }
                   }
                 }
               ],
@@ -2905,8 +3429,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -2922,10 +3450,10 @@
               "type": "button",
               "codeName": "light_nav_air",
               "props": {
-                "x": 18,
+                "x": 12,
                 "y": 201,
-                "width": 123,
-                "height": 54
+                "width": 135,
+                "height": 66
               },
               "flags": {
                 "scrollable": false
@@ -2934,13 +3462,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#0A1728",
+                    "bg_color": {
+                      "$token": "color.navigation"
+                    },
                     "bg_opa": 255,
                     "border_width": 1,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "radius": 18,
                     "shadow_width": 0,
-                    "shadow_color": "#0A1728",
+                    "shadow_color": {
+                      "$token": "color.navigation"
+                    },
                     "shadow_opa": 0,
                     "pad_all": 0
                   }
@@ -2952,7 +3486,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#32D6C6"
+                    "bg_color": {
+                      "$token": "color.accent"
+                    }
                   }
                 }
               ],
@@ -2984,8 +3520,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -3001,10 +3541,10 @@
               "type": "button",
               "codeName": "light_nav_light",
               "props": {
-                "x": 18,
+                "x": 12,
                 "y": 289,
-                "width": 123,
-                "height": 54
+                "width": 135,
+                "height": 66
               },
               "flags": {
                 "scrollable": false
@@ -3013,13 +3553,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#3B82F6",
+                    "bg_color": {
+                      "$token": "color.accent.strong"
+                    },
                     "bg_opa": 255,
                     "border_width": 0,
-                    "border_color": "#3B82F6",
+                    "border_color": {
+                      "$token": "color.accent.strong"
+                    },
                     "radius": 18,
                     "shadow_width": 10,
-                    "shadow_color": "#3B82F6",
+                    "shadow_color": {
+                      "$token": "color.accent.strong"
+                    },
                     "shadow_opa": 55,
                     "pad_all": 0
                   }
@@ -3031,7 +3577,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#32D6C6"
+                    "bg_color": {
+                      "$token": "color.accent"
+                    }
                   }
                 }
               ],
@@ -3063,8 +3611,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -3080,10 +3632,10 @@
               "type": "button",
               "codeName": "light_nav_focus",
               "props": {
-                "x": 18,
+                "x": 12,
                 "y": 377,
-                "width": 123,
-                "height": 54
+                "width": 135,
+                "height": 66
               },
               "flags": {
                 "scrollable": false
@@ -3092,13 +3644,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#0A1728",
+                    "bg_color": {
+                      "$token": "color.navigation"
+                    },
                     "bg_opa": 255,
                     "border_width": 1,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "radius": 18,
                     "shadow_width": 0,
-                    "shadow_color": "#0A1728",
+                    "shadow_color": {
+                      "$token": "color.navigation"
+                    },
                     "shadow_opa": 0,
                     "pad_all": 0
                   }
@@ -3110,7 +3668,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#32D6C6"
+                    "bg_color": {
+                      "$token": "color.accent"
+                    }
                   }
                 }
               ],
@@ -3142,8 +3702,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -3159,10 +3723,10 @@
               "type": "button",
               "codeName": "light_nav_settings",
               "props": {
-                "x": 18,
+                "x": 12,
                 "y": 465,
-                "width": 123,
-                "height": 54
+                "width": 135,
+                "height": 66
               },
               "flags": {
                 "scrollable": false
@@ -3171,13 +3735,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#0A1728",
+                    "bg_color": {
+                      "$token": "color.navigation"
+                    },
                     "bg_opa": 255,
                     "border_width": 1,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "radius": 18,
                     "shadow_width": 0,
-                    "shadow_color": "#0A1728",
+                    "shadow_color": {
+                      "$token": "color.navigation"
+                    },
                     "shadow_opa": 0,
                     "pad_all": 0
                   }
@@ -3189,7 +3759,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#32D6C6"
+                    "bg_color": {
+                      "$token": "color.accent"
+                    }
                   }
                 }
               ],
@@ -3221,8 +3793,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -3250,13 +3826,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#102238",
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
                     "bg_opa": 255,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "border_width": 1,
                     "radius": 18,
                     "pad_all": 0,
-                    "shadow_color": "#000000",
+                    "shadow_color": {
+                      "$token": "color.shadow"
+                    },
                     "shadow_width": 18,
                     "shadow_opa": 90,
                     "shadow_offset_y": 6
@@ -3281,8 +3863,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_22",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.22"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -3309,7 +3895,9 @@
                         "part": "main"
                       },
                       "props": {
-                        "bg_color": "#32465A",
+                        "bg_color": {
+                          "$token": "color.track.strong"
+                        },
                         "bg_opa": 255,
                         "radius": 20
                       }
@@ -3322,7 +3910,9 @@
                         ]
                       },
                       "props": {
-                        "bg_color": "#32D6C6",
+                        "bg_color": {
+                          "$token": "color.accent"
+                        },
                         "bg_opa": 255,
                         "radius": 20
                       }
@@ -3332,7 +3922,9 @@
                         "part": "knob"
                       },
                       "props": {
-                        "bg_color": "#FFFFFF",
+                        "bg_color": {
+                          "$token": "color.text.onaccent"
+                        },
                         "bg_opa": 255,
                         "radius": 20
                       }
@@ -3371,8 +3963,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#8FA7BD",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -3397,8 +3993,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F5B942",
-                        "text_font": "montserrat_36",
+                        "text_color": {
+                          "$token": "color.status.warning"
+                        },
+                        "text_font": {
+                          "$token": "font.size.36"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -3435,7 +4035,9 @@
                         "part": "main"
                       },
                       "props": {
-                        "bg_color": "#29425A",
+                        "bg_color": {
+                          "$token": "color.track"
+                        },
                         "bg_opa": 255,
                         "radius": 10
                       }
@@ -3445,7 +4047,9 @@
                         "part": "indicator"
                       },
                       "props": {
-                        "bg_color": "#F5B942",
+                        "bg_color": {
+                          "$token": "color.status.warning"
+                        },
                         "bg_opa": 255,
                         "radius": 10
                       }
@@ -3455,7 +4059,9 @@
                         "part": "knob"
                       },
                       "props": {
-                        "bg_color": "#FFFFFF",
+                        "bg_color": {
+                          "$token": "color.text.onaccent"
+                        },
                         "bg_opa": 255,
                         "radius": 12,
                         "shadow_width": 8,
@@ -3488,8 +4094,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#8FA7BD",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -3514,8 +4124,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#32D6C6",
-                        "text_font": "montserrat_24",
+                        "text_color": {
+                          "$token": "color.accent"
+                        },
+                        "text_font": {
+                          "$token": "font.size.24"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -3552,7 +4166,9 @@
                         "part": "main"
                       },
                       "props": {
-                        "bg_color": "#29425A",
+                        "bg_color": {
+                          "$token": "color.track"
+                        },
                         "bg_opa": 255,
                         "radius": 10
                       }
@@ -3562,7 +4178,9 @@
                         "part": "indicator"
                       },
                       "props": {
-                        "bg_color": "#32D6C6",
+                        "bg_color": {
+                          "$token": "color.accent"
+                        },
                         "bg_opa": 255,
                         "radius": 10
                       }
@@ -3572,7 +4190,9 @@
                         "part": "knob"
                       },
                       "props": {
-                        "bg_color": "#FFFFFF",
+                        "bg_color": {
+                          "$token": "color.text.onaccent"
+                        },
                         "bg_opa": 255,
                         "radius": 12,
                         "shadow_width": 8,
@@ -3609,9 +4229,13 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#102238",
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
                     "bg_opa": 255,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "border_width": 1,
                     "radius": 18,
                     "pad_all": 0
@@ -3636,8 +4260,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#8FA7BD",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -3664,13 +4292,19 @@
                   "styles": [
                     {
                       "props": {
-                        "bg_color": "#3B82F6",
+                        "bg_color": {
+                          "$token": "color.accent.strong"
+                        },
                         "bg_opa": 255,
                         "border_width": 0,
-                        "border_color": "#203852",
+                        "border_color": {
+                          "$token": "color.border"
+                        },
                         "radius": 18,
                         "shadow_width": 10,
-                        "shadow_color": "#3B82F6",
+                        "shadow_color": {
+                          "$token": "color.accent.strong"
+                        },
                         "shadow_opa": 55,
                         "pad_all": 0
                       }
@@ -3682,7 +4316,9 @@
                         ]
                       },
                       "props": {
-                        "bg_color": "#32D6C6"
+                        "bg_color": {
+                          "$token": "color.accent"
+                        }
                       }
                     }
                   ],
@@ -3712,8 +4348,12 @@
                       "styles": [
                         {
                           "props": {
-                            "text_color": "#F4F8FC",
-                            "text_font": "montserrat_16",
+                            "text_color": {
+                              "$token": "color.text.primary"
+                            },
+                            "text_font": {
+                              "$token": "font.size.16"
+                            },
                             "text_align": "center"
                           }
                         }
@@ -3741,13 +4381,19 @@
                   "styles": [
                     {
                       "props": {
-                        "bg_color": "#0C1B2E",
+                        "bg_color": {
+                          "$token": "color.surface.subtle"
+                        },
                         "bg_opa": 255,
                         "border_width": 1,
-                        "border_color": "#203852",
+                        "border_color": {
+                          "$token": "color.border"
+                        },
                         "radius": 18,
                         "shadow_width": 0,
-                        "shadow_color": "#0C1B2E",
+                        "shadow_color": {
+                          "$token": "color.surface.subtle"
+                        },
                         "shadow_opa": 0,
                         "pad_all": 0
                       }
@@ -3759,7 +4405,9 @@
                         ]
                       },
                       "props": {
-                        "bg_color": "#32D6C6"
+                        "bg_color": {
+                          "$token": "color.accent"
+                        }
                       }
                     }
                   ],
@@ -3789,8 +4437,12 @@
                       "styles": [
                         {
                           "props": {
-                            "text_color": "#F4F8FC",
-                            "text_font": "montserrat_16",
+                            "text_color": {
+                              "$token": "color.text.primary"
+                            },
+                            "text_font": {
+                              "$token": "font.size.16"
+                            },
                             "text_align": "center"
                           }
                         }
@@ -3818,13 +4470,19 @@
                   "styles": [
                     {
                       "props": {
-                        "bg_color": "#0C1B2E",
+                        "bg_color": {
+                          "$token": "color.surface.subtle"
+                        },
                         "bg_opa": 255,
                         "border_width": 1,
-                        "border_color": "#203852",
+                        "border_color": {
+                          "$token": "color.border"
+                        },
                         "radius": 18,
                         "shadow_width": 0,
-                        "shadow_color": "#0C1B2E",
+                        "shadow_color": {
+                          "$token": "color.surface.subtle"
+                        },
                         "shadow_opa": 0,
                         "pad_all": 0
                       }
@@ -3836,7 +4494,9 @@
                         ]
                       },
                       "props": {
-                        "bg_color": "#32D6C6"
+                        "bg_color": {
+                          "$token": "color.accent"
+                        }
                       }
                     }
                   ],
@@ -3866,8 +4526,12 @@
                       "styles": [
                         {
                           "props": {
-                            "text_color": "#F4F8FC",
-                            "text_font": "montserrat_16",
+                            "text_color": {
+                              "$token": "color.text.primary"
+                            },
+                            "text_font": {
+                              "$token": "font.size.16"
+                            },
                             "text_align": "center"
                           }
                         }
@@ -3895,13 +4559,19 @@
                   "styles": [
                     {
                       "props": {
-                        "bg_color": "#0C1B2E",
+                        "bg_color": {
+                          "$token": "color.surface.subtle"
+                        },
                         "bg_opa": 255,
                         "border_width": 1,
-                        "border_color": "#203852",
+                        "border_color": {
+                          "$token": "color.border"
+                        },
                         "radius": 18,
                         "shadow_width": 0,
-                        "shadow_color": "#0C1B2E",
+                        "shadow_color": {
+                          "$token": "color.surface.subtle"
+                        },
                         "shadow_opa": 0,
                         "pad_all": 0
                       }
@@ -3913,7 +4583,9 @@
                         ]
                       },
                       "props": {
-                        "bg_color": "#32D6C6"
+                        "bg_color": {
+                          "$token": "color.accent"
+                        }
                       }
                     }
                   ],
@@ -3943,8 +4615,12 @@
                       "styles": [
                         {
                           "props": {
-                            "text_color": "#F4F8FC",
-                            "text_font": "montserrat_16",
+                            "text_color": {
+                              "$token": "color.text.primary"
+                            },
+                            "text_font": {
+                              "$token": "font.size.16"
+                            },
                             "text_align": "center"
                           }
                         }
@@ -3978,7 +4654,9 @@
           "styles": [
             {
               "props": {
-                "bg_color": "#06101E",
+                "bg_color": {
+                  "$token": "color.background"
+                },
                 "bg_opa": 255,
                 "border_width": 0,
                 "pad_all": 0
@@ -4005,9 +4683,13 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#0A1728",
+                    "bg_color": {
+                      "$token": "color.navigation"
+                    },
                     "bg_opa": 255,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "border_width": 0,
                     "radius": 0,
                     "pad_all": 0
@@ -4033,8 +4715,12 @@
               "styles": [
                 {
                   "props": {
-                    "text_color": "#32D6C6",
-                    "text_font": "montserrat_24",
+                    "text_color": {
+                      "$token": "color.accent"
+                    },
+                    "text_font": {
+                      "$token": "font.size.24"
+                    },
                     "text_align": "left",
                     "text_opa": 255
                   }
@@ -4059,8 +4745,12 @@
               "styles": [
                 {
                   "props": {
-                    "text_color": "#F4F8FC",
-                    "text_font": "montserrat_28",
+                    "text_color": {
+                      "$token": "color.text.primary"
+                    },
+                    "text_font": {
+                      "$token": "font.size.28"
+                    },
                     "text_align": "left",
                     "text_opa": 255
                   }
@@ -4085,8 +4775,12 @@
               "styles": [
                 {
                   "props": {
-                    "text_color": "#8FA7BD",
-                    "text_font": "montserrat_16",
+                    "text_color": {
+                      "$token": "color.text.muted"
+                    },
+                    "text_font": {
+                      "$token": "font.size.16"
+                    },
                     "text_align": "right",
                     "text_opa": 255
                   }
@@ -4101,10 +4795,10 @@
               "type": "button",
               "codeName": "focus_nav_home",
               "props": {
-                "x": 18,
+                "x": 12,
                 "y": 113,
-                "width": 123,
-                "height": 54
+                "width": 135,
+                "height": 66
               },
               "flags": {
                 "scrollable": false
@@ -4113,13 +4807,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#0A1728",
+                    "bg_color": {
+                      "$token": "color.navigation"
+                    },
                     "bg_opa": 255,
                     "border_width": 1,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "radius": 18,
                     "shadow_width": 0,
-                    "shadow_color": "#0A1728",
+                    "shadow_color": {
+                      "$token": "color.navigation"
+                    },
                     "shadow_opa": 0,
                     "pad_all": 0
                   }
@@ -4131,7 +4831,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#32D6C6"
+                    "bg_color": {
+                      "$token": "color.accent"
+                    }
                   }
                 }
               ],
@@ -4163,8 +4865,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -4180,10 +4886,10 @@
               "type": "button",
               "codeName": "focus_nav_air",
               "props": {
-                "x": 18,
+                "x": 12,
                 "y": 201,
-                "width": 123,
-                "height": 54
+                "width": 135,
+                "height": 66
               },
               "flags": {
                 "scrollable": false
@@ -4192,13 +4898,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#0A1728",
+                    "bg_color": {
+                      "$token": "color.navigation"
+                    },
                     "bg_opa": 255,
                     "border_width": 1,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "radius": 18,
                     "shadow_width": 0,
-                    "shadow_color": "#0A1728",
+                    "shadow_color": {
+                      "$token": "color.navigation"
+                    },
                     "shadow_opa": 0,
                     "pad_all": 0
                   }
@@ -4210,7 +4922,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#32D6C6"
+                    "bg_color": {
+                      "$token": "color.accent"
+                    }
                   }
                 }
               ],
@@ -4242,8 +4956,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -4259,10 +4977,10 @@
               "type": "button",
               "codeName": "focus_nav_light",
               "props": {
-                "x": 18,
+                "x": 12,
                 "y": 289,
-                "width": 123,
-                "height": 54
+                "width": 135,
+                "height": 66
               },
               "flags": {
                 "scrollable": false
@@ -4271,13 +4989,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#0A1728",
+                    "bg_color": {
+                      "$token": "color.navigation"
+                    },
                     "bg_opa": 255,
                     "border_width": 1,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "radius": 18,
                     "shadow_width": 0,
-                    "shadow_color": "#0A1728",
+                    "shadow_color": {
+                      "$token": "color.navigation"
+                    },
                     "shadow_opa": 0,
                     "pad_all": 0
                   }
@@ -4289,7 +5013,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#32D6C6"
+                    "bg_color": {
+                      "$token": "color.accent"
+                    }
                   }
                 }
               ],
@@ -4321,8 +5047,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -4338,10 +5068,10 @@
               "type": "button",
               "codeName": "focus_nav_focus",
               "props": {
-                "x": 18,
+                "x": 12,
                 "y": 377,
-                "width": 123,
-                "height": 54
+                "width": 135,
+                "height": 66
               },
               "flags": {
                 "scrollable": false
@@ -4350,13 +5080,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#3B82F6",
+                    "bg_color": {
+                      "$token": "color.accent.strong"
+                    },
                     "bg_opa": 255,
                     "border_width": 0,
-                    "border_color": "#3B82F6",
+                    "border_color": {
+                      "$token": "color.accent.strong"
+                    },
                     "radius": 18,
                     "shadow_width": 10,
-                    "shadow_color": "#3B82F6",
+                    "shadow_color": {
+                      "$token": "color.accent.strong"
+                    },
                     "shadow_opa": 55,
                     "pad_all": 0
                   }
@@ -4368,7 +5104,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#32D6C6"
+                    "bg_color": {
+                      "$token": "color.accent"
+                    }
                   }
                 }
               ],
@@ -4400,8 +5138,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -4417,10 +5159,10 @@
               "type": "button",
               "codeName": "focus_nav_settings",
               "props": {
-                "x": 18,
+                "x": 12,
                 "y": 465,
-                "width": 123,
-                "height": 54
+                "width": 135,
+                "height": 66
               },
               "flags": {
                 "scrollable": false
@@ -4429,13 +5171,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#0A1728",
+                    "bg_color": {
+                      "$token": "color.navigation"
+                    },
                     "bg_opa": 255,
                     "border_width": 1,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "radius": 18,
                     "shadow_width": 0,
-                    "shadow_color": "#0A1728",
+                    "shadow_color": {
+                      "$token": "color.navigation"
+                    },
                     "shadow_opa": 0,
                     "pad_all": 0
                   }
@@ -4447,7 +5195,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#32D6C6"
+                    "bg_color": {
+                      "$token": "color.accent"
+                    }
                   }
                 }
               ],
@@ -4479,8 +5229,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -4506,8 +5260,12 @@
               "styles": [
                 {
                   "props": {
-                    "text_color": "#F4F8FC",
-                    "text_font": "montserrat_22",
+                    "text_color": {
+                      "$token": "color.text.primary"
+                    },
+                    "text_font": {
+                      "$token": "font.size.22"
+                    },
                     "text_align": "left",
                     "text_opa": 255
                   }
@@ -4534,13 +5292,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#13305A",
+                    "bg_color": {
+                      "$token": "color.selection"
+                    },
                     "bg_opa": 255,
-                    "border_color": "#3B82F6",
+                    "border_color": {
+                      "$token": "color.accent.strong"
+                    },
                     "border_width": 2,
                     "radius": 18,
                     "pad_all": 0,
-                    "shadow_color": "#000000",
+                    "shadow_color": {
+                      "$token": "color.shadow"
+                    },
                     "shadow_width": 18,
                     "shadow_opa": 90,
                     "shadow_offset_y": 6
@@ -4565,8 +5329,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#3B82F6",
-                        "text_font": "montserrat_20",
+                        "text_color": {
+                          "$token": "color.accent.strong"
+                        },
+                        "text_font": {
+                          "$token": "font.size.20"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -4591,8 +5359,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_18",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -4617,8 +5389,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#8FA7BD",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -4645,13 +5421,19 @@
                   "styles": [
                     {
                       "props": {
-                        "bg_color": "#3B82F6",
+                        "bg_color": {
+                          "$token": "color.accent.strong"
+                        },
                         "bg_opa": 255,
                         "border_width": 0,
-                        "border_color": "#203852",
+                        "border_color": {
+                          "$token": "color.border"
+                        },
                         "radius": 18,
                         "shadow_width": 10,
-                        "shadow_color": "#3B82F6",
+                        "shadow_color": {
+                          "$token": "color.accent.strong"
+                        },
                         "shadow_opa": 55,
                         "pad_all": 0
                       }
@@ -4663,7 +5445,9 @@
                         ]
                       },
                       "props": {
-                        "bg_color": "#32D6C6"
+                        "bg_color": {
+                          "$token": "color.accent"
+                        }
                       }
                     }
                   ],
@@ -4693,8 +5477,12 @@
                       "styles": [
                         {
                           "props": {
-                            "text_color": "#F4F8FC",
-                            "text_font": "montserrat_16",
+                            "text_color": {
+                              "$token": "color.text.primary"
+                            },
+                            "text_font": {
+                              "$token": "font.size.16"
+                            },
                             "text_align": "center"
                           }
                         }
@@ -4724,9 +5512,13 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#102238",
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
                     "bg_opa": 255,
-                    "border_color": "#32D6C6",
+                    "border_color": {
+                      "$token": "color.accent"
+                    },
                     "border_width": 1,
                     "radius": 18,
                     "pad_all": 0
@@ -4751,8 +5543,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#32D6C6",
-                        "text_font": "montserrat_20",
+                        "text_color": {
+                          "$token": "color.accent"
+                        },
+                        "text_font": {
+                          "$token": "font.size.20"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -4777,8 +5573,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_18",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -4803,8 +5603,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#8FA7BD",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -4831,13 +5635,19 @@
                   "styles": [
                     {
                       "props": {
-                        "bg_color": "#32D6C6",
+                        "bg_color": {
+                          "$token": "color.accent"
+                        },
                         "bg_opa": 255,
                         "border_width": 0,
-                        "border_color": "#203852",
+                        "border_color": {
+                          "$token": "color.border"
+                        },
                         "radius": 18,
                         "shadow_width": 10,
-                        "shadow_color": "#32D6C6",
+                        "shadow_color": {
+                          "$token": "color.accent"
+                        },
                         "shadow_opa": 55,
                         "pad_all": 0
                       }
@@ -4849,7 +5659,9 @@
                         ]
                       },
                       "props": {
-                        "bg_color": "#32D6C6"
+                        "bg_color": {
+                          "$token": "color.accent"
+                        }
                       }
                     }
                   ],
@@ -4879,8 +5691,12 @@
                       "styles": [
                         {
                           "props": {
-                            "text_color": "#06101E",
-                            "text_font": "montserrat_16",
+                            "text_color": {
+                              "$token": "color.background"
+                            },
+                            "text_font": {
+                              "$token": "font.size.16"
+                            },
                             "text_align": "center"
                           }
                         }
@@ -4910,9 +5726,13 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#102238",
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
                     "bg_opa": 255,
-                    "border_color": "#F5B942",
+                    "border_color": {
+                      "$token": "color.status.warning"
+                    },
                     "border_width": 1,
                     "radius": 18,
                     "pad_all": 0
@@ -4937,8 +5757,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F5B942",
-                        "text_font": "montserrat_20",
+                        "text_color": {
+                          "$token": "color.status.warning"
+                        },
+                        "text_font": {
+                          "$token": "font.size.20"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -4963,8 +5787,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_18",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -4989,8 +5817,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#8FA7BD",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -5017,13 +5849,19 @@
                   "styles": [
                     {
                       "props": {
-                        "bg_color": "#F5B942",
+                        "bg_color": {
+                          "$token": "color.status.warning"
+                        },
                         "bg_opa": 255,
                         "border_width": 0,
-                        "border_color": "#203852",
+                        "border_color": {
+                          "$token": "color.border"
+                        },
                         "radius": 18,
                         "shadow_width": 10,
-                        "shadow_color": "#F5B942",
+                        "shadow_color": {
+                          "$token": "color.status.warning"
+                        },
                         "shadow_opa": 55,
                         "pad_all": 0
                       }
@@ -5035,7 +5873,9 @@
                         ]
                       },
                       "props": {
-                        "bg_color": "#32D6C6"
+                        "bg_color": {
+                          "$token": "color.accent"
+                        }
                       }
                     }
                   ],
@@ -5065,8 +5905,12 @@
                       "styles": [
                         {
                           "props": {
-                            "text_color": "#F4F8FC",
-                            "text_font": "montserrat_16",
+                            "text_color": {
+                              "$token": "color.text.primary"
+                            },
+                            "text_font": {
+                              "$token": "font.size.16"
+                            },
                             "text_align": "center"
                           }
                         }
@@ -5096,9 +5940,13 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#102238",
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
                     "bg_opa": 255,
-                    "border_color": "#51D88A",
+                    "border_color": {
+                      "$token": "color.status.success"
+                    },
                     "border_width": 1,
                     "radius": 18,
                     "pad_all": 0
@@ -5123,8 +5971,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#51D88A",
-                        "text_font": "montserrat_20",
+                        "text_color": {
+                          "$token": "color.status.success"
+                        },
+                        "text_font": {
+                          "$token": "font.size.20"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -5149,8 +6001,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_18",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -5175,8 +6031,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#8FA7BD",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -5203,13 +6063,19 @@
                   "styles": [
                     {
                       "props": {
-                        "bg_color": "#51D88A",
+                        "bg_color": {
+                          "$token": "color.status.success"
+                        },
                         "bg_opa": 255,
                         "border_width": 0,
-                        "border_color": "#203852",
+                        "border_color": {
+                          "$token": "color.border"
+                        },
                         "radius": 18,
                         "shadow_width": 10,
-                        "shadow_color": "#51D88A",
+                        "shadow_color": {
+                          "$token": "color.status.success"
+                        },
                         "shadow_opa": 55,
                         "pad_all": 0
                       }
@@ -5221,7 +6087,9 @@
                         ]
                       },
                       "props": {
-                        "bg_color": "#32D6C6"
+                        "bg_color": {
+                          "$token": "color.accent"
+                        }
                       }
                     }
                   ],
@@ -5251,8 +6119,12 @@
                       "styles": [
                         {
                           "props": {
-                            "text_color": "#06101E",
-                            "text_font": "montserrat_16",
+                            "text_color": {
+                              "$token": "color.background"
+                            },
+                            "text_font": {
+                              "$token": "font.size.16"
+                            },
                             "text_align": "center"
                           }
                         }
@@ -5286,7 +6158,9 @@
           "styles": [
             {
               "props": {
-                "bg_color": "#06101E",
+                "bg_color": {
+                  "$token": "color.background"
+                },
                 "bg_opa": 255,
                 "border_width": 0,
                 "pad_all": 0
@@ -5313,9 +6187,13 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#0A1728",
+                    "bg_color": {
+                      "$token": "color.navigation"
+                    },
                     "bg_opa": 255,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "border_width": 0,
                     "radius": 0,
                     "pad_all": 0
@@ -5341,8 +6219,12 @@
               "styles": [
                 {
                   "props": {
-                    "text_color": "#32D6C6",
-                    "text_font": "montserrat_24",
+                    "text_color": {
+                      "$token": "color.accent"
+                    },
+                    "text_font": {
+                      "$token": "font.size.24"
+                    },
                     "text_align": "left",
                     "text_opa": 255
                   }
@@ -5367,8 +6249,12 @@
               "styles": [
                 {
                   "props": {
-                    "text_color": "#F4F8FC",
-                    "text_font": "montserrat_28",
+                    "text_color": {
+                      "$token": "color.text.primary"
+                    },
+                    "text_font": {
+                      "$token": "font.size.28"
+                    },
                     "text_align": "left",
                     "text_opa": 255
                   }
@@ -5393,8 +6279,12 @@
               "styles": [
                 {
                   "props": {
-                    "text_color": "#8FA7BD",
-                    "text_font": "montserrat_16",
+                    "text_color": {
+                      "$token": "color.text.muted"
+                    },
+                    "text_font": {
+                      "$token": "font.size.16"
+                    },
                     "text_align": "right",
                     "text_opa": 255
                   }
@@ -5409,10 +6299,10 @@
               "type": "button",
               "codeName": "settings_nav_home",
               "props": {
-                "x": 18,
+                "x": 12,
                 "y": 113,
-                "width": 123,
-                "height": 54
+                "width": 135,
+                "height": 66
               },
               "flags": {
                 "scrollable": false
@@ -5421,13 +6311,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#0A1728",
+                    "bg_color": {
+                      "$token": "color.navigation"
+                    },
                     "bg_opa": 255,
                     "border_width": 1,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "radius": 18,
                     "shadow_width": 0,
-                    "shadow_color": "#0A1728",
+                    "shadow_color": {
+                      "$token": "color.navigation"
+                    },
                     "shadow_opa": 0,
                     "pad_all": 0
                   }
@@ -5439,7 +6335,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#32D6C6"
+                    "bg_color": {
+                      "$token": "color.accent"
+                    }
                   }
                 }
               ],
@@ -5471,8 +6369,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -5488,10 +6390,10 @@
               "type": "button",
               "codeName": "settings_nav_air",
               "props": {
-                "x": 18,
+                "x": 12,
                 "y": 201,
-                "width": 123,
-                "height": 54
+                "width": 135,
+                "height": 66
               },
               "flags": {
                 "scrollable": false
@@ -5500,13 +6402,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#0A1728",
+                    "bg_color": {
+                      "$token": "color.navigation"
+                    },
                     "bg_opa": 255,
                     "border_width": 1,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "radius": 18,
                     "shadow_width": 0,
-                    "shadow_color": "#0A1728",
+                    "shadow_color": {
+                      "$token": "color.navigation"
+                    },
                     "shadow_opa": 0,
                     "pad_all": 0
                   }
@@ -5518,7 +6426,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#32D6C6"
+                    "bg_color": {
+                      "$token": "color.accent"
+                    }
                   }
                 }
               ],
@@ -5550,8 +6460,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -5567,10 +6481,10 @@
               "type": "button",
               "codeName": "settings_nav_light",
               "props": {
-                "x": 18,
+                "x": 12,
                 "y": 289,
-                "width": 123,
-                "height": 54
+                "width": 135,
+                "height": 66
               },
               "flags": {
                 "scrollable": false
@@ -5579,13 +6493,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#0A1728",
+                    "bg_color": {
+                      "$token": "color.navigation"
+                    },
                     "bg_opa": 255,
                     "border_width": 1,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "radius": 18,
                     "shadow_width": 0,
-                    "shadow_color": "#0A1728",
+                    "shadow_color": {
+                      "$token": "color.navigation"
+                    },
                     "shadow_opa": 0,
                     "pad_all": 0
                   }
@@ -5597,7 +6517,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#32D6C6"
+                    "bg_color": {
+                      "$token": "color.accent"
+                    }
                   }
                 }
               ],
@@ -5629,8 +6551,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -5646,10 +6572,10 @@
               "type": "button",
               "codeName": "settings_nav_focus",
               "props": {
-                "x": 18,
+                "x": 12,
                 "y": 377,
-                "width": 123,
-                "height": 54
+                "width": 135,
+                "height": 66
               },
               "flags": {
                 "scrollable": false
@@ -5658,13 +6584,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#0A1728",
+                    "bg_color": {
+                      "$token": "color.navigation"
+                    },
                     "bg_opa": 255,
                     "border_width": 1,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "radius": 18,
                     "shadow_width": 0,
-                    "shadow_color": "#0A1728",
+                    "shadow_color": {
+                      "$token": "color.navigation"
+                    },
                     "shadow_opa": 0,
                     "pad_all": 0
                   }
@@ -5676,7 +6608,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#32D6C6"
+                    "bg_color": {
+                      "$token": "color.accent"
+                    }
                   }
                 }
               ],
@@ -5708,8 +6642,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -5725,10 +6663,10 @@
               "type": "button",
               "codeName": "settings_nav_settings",
               "props": {
-                "x": 18,
+                "x": 12,
                 "y": 465,
-                "width": 123,
-                "height": 54
+                "width": 135,
+                "height": 66
               },
               "flags": {
                 "scrollable": false
@@ -5737,13 +6675,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#3B82F6",
+                    "bg_color": {
+                      "$token": "color.accent.strong"
+                    },
                     "bg_opa": 255,
                     "border_width": 0,
-                    "border_color": "#3B82F6",
+                    "border_color": {
+                      "$token": "color.accent.strong"
+                    },
                     "radius": 18,
                     "shadow_width": 10,
-                    "shadow_color": "#3B82F6",
+                    "shadow_color": {
+                      "$token": "color.accent.strong"
+                    },
                     "shadow_opa": 55,
                     "pad_all": 0
                   }
@@ -5755,7 +6699,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#32D6C6"
+                    "bg_color": {
+                      "$token": "color.accent"
+                    }
                   }
                 }
               ],
@@ -5787,8 +6733,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -5816,9 +6766,13 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#102238",
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
                     "bg_opa": 255,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "border_width": 1,
                     "radius": 18,
                     "pad_all": 0
@@ -5843,8 +6797,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_18",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -5869,8 +6827,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#8FA7BD",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -5897,7 +6859,9 @@
                         "part": "main"
                       },
                       "props": {
-                        "bg_color": "#32465A",
+                        "bg_color": {
+                          "$token": "color.track.strong"
+                        },
                         "bg_opa": 255,
                         "radius": 20
                       }
@@ -5910,7 +6874,9 @@
                         ]
                       },
                       "props": {
-                        "bg_color": "#32D6C6",
+                        "bg_color": {
+                          "$token": "color.accent"
+                        },
                         "bg_opa": 255,
                         "radius": 20
                       }
@@ -5920,7 +6886,9 @@
                         "part": "knob"
                       },
                       "props": {
-                        "bg_color": "#FFFFFF",
+                        "bg_color": {
+                          "$token": "color.text.onaccent"
+                        },
                         "bg_opa": 255,
                         "radius": 20
                       }
@@ -5963,9 +6931,13 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#102238",
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
                     "bg_opa": 255,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "border_width": 1,
                     "radius": 18,
                     "pad_all": 0
@@ -5990,8 +6962,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_18",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -6016,8 +6992,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#8FA7BD",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -6044,7 +7024,9 @@
                         "part": "main"
                       },
                       "props": {
-                        "bg_color": "#32465A",
+                        "bg_color": {
+                          "$token": "color.track.strong"
+                        },
                         "bg_opa": 255,
                         "radius": 20
                       }
@@ -6057,7 +7039,9 @@
                         ]
                       },
                       "props": {
-                        "bg_color": "#32D6C6",
+                        "bg_color": {
+                          "$token": "color.accent"
+                        },
                         "bg_opa": 255,
                         "radius": 20
                       }
@@ -6067,7 +7051,9 @@
                         "part": "knob"
                       },
                       "props": {
-                        "bg_color": "#FFFFFF",
+                        "bg_color": {
+                          "$token": "color.text.onaccent"
+                        },
                         "bg_opa": 255,
                         "radius": 20
                       }
@@ -6110,9 +7096,13 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#102238",
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
                     "bg_opa": 255,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "border_width": 1,
                     "radius": 18,
                     "pad_all": 0
@@ -6137,8 +7127,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_18",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -6163,8 +7157,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#8FA7BD",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -6191,7 +7189,9 @@
                         "part": "main"
                       },
                       "props": {
-                        "bg_color": "#32465A",
+                        "bg_color": {
+                          "$token": "color.track.strong"
+                        },
                         "bg_opa": 255,
                         "radius": 20
                       }
@@ -6204,7 +7204,9 @@
                         ]
                       },
                       "props": {
-                        "bg_color": "#32D6C6",
+                        "bg_color": {
+                          "$token": "color.accent"
+                        },
                         "bg_opa": 255,
                         "radius": 20
                       }
@@ -6214,7 +7216,9 @@
                         "part": "knob"
                       },
                       "props": {
-                        "bg_color": "#FFFFFF",
+                        "bg_color": {
+                          "$token": "color.text.onaccent"
+                        },
                         "bg_opa": 255,
                         "radius": 20
                       }
@@ -6257,9 +7261,13 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#102238",
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
                     "bg_opa": 255,
-                    "border_color": "#203852",
+                    "border_color": {
+                      "$token": "color.border"
+                    },
                     "border_width": 1,
                     "radius": 18,
                     "pad_all": 0
@@ -6284,8 +7292,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#8FA7BD",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -6310,8 +7322,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#F4F8FC",
-                        "text_font": "montserrat_22",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.22"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -6336,8 +7352,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#32D6C6",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.accent"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -6362,8 +7382,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#8FA7BD",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -6388,8 +7412,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#51D88A",
-                        "text_font": "montserrat_16",
+                        "text_color": {
+                          "$token": "color.status.success"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
                         "text_align": "left",
                         "text_opa": 255
                       }
@@ -6416,13 +7444,19 @@
                   "styles": [
                     {
                       "props": {
-                        "bg_color": "#0C1B2E",
+                        "bg_color": {
+                          "$token": "color.surface.subtle"
+                        },
                         "bg_opa": 255,
                         "border_width": 1,
-                        "border_color": "#FF6B6B",
+                        "border_color": {
+                          "$token": "color.status.danger"
+                        },
                         "radius": 18,
                         "shadow_width": 0,
-                        "shadow_color": "#0C1B2E",
+                        "shadow_color": {
+                          "$token": "color.surface.subtle"
+                        },
                         "shadow_opa": 0,
                         "pad_all": 0
                       }
@@ -6434,7 +7468,9 @@
                         ]
                       },
                       "props": {
-                        "bg_color": "#32D6C6"
+                        "bg_color": {
+                          "$token": "color.accent"
+                        }
                       }
                     }
                   ],
@@ -6455,8 +7491,12 @@
                       "styles": [
                         {
                           "props": {
-                            "text_color": "#FF6B6B",
-                            "text_font": "montserrat_16",
+                            "text_color": {
+                              "$token": "color.status.danger"
+                            },
+                            "text_font": {
+                              "$token": "font.size.16"
+                            },
                             "text_align": "center"
                           }
                         }
@@ -6539,7 +7579,7 @@
     "displayName": "WF2D-1050 静音仓目标",
     "uiProjectRef": "ui:wf2d-1050-quiet-pod@1",
     "controllerProfileRef": "controller:wf2d-1050@1",
-    "themeRef": "ui:wf2d-1050-quiet-pod@1#theme:default",
+    "themeRef": "ui:wf2d-1050-quiet-pod@1#theme:quiet-dark",
     "lvglVersion": "9.5.0"
   },
   "actionRegistry": {
@@ -6662,6 +7702,12 @@
       "code": "controller-profile-selected",
       "path": "buildTarget.controllerProfileRef",
       "message": "已绑定 WF2D-1050 设备外壳。"
+    },
+    {
+      "severity": "info",
+      "code": "semantic-theme",
+      "path": "uiProject.themes",
+      "message": "界面颜色、阴影、边框和文字字体已绑定静音舱主题 Token。"
     }
   ],
   "colorFormatConfirmed": true

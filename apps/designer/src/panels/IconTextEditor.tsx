@@ -5,7 +5,28 @@ export interface LvglSymbolOption {
   name: string;
   symbol: string;
   keywords: string;
+  fontFamily?: 'lvgl' | 'wf3-material';
 }
+
+/** Material Symbols used by the WF3 firmware UI reference design. */
+export const WF3_MATERIAL_SYMBOLS: readonly LvglSymbolOption[] = [
+  { name: 'Material 返回', symbol: '\ue166', keywords: 'undo return back 返回 撤销', fontFamily: 'wf3-material' },
+  { name: 'Material 左箭头', symbol: '\ue5cb', keywords: 'chevron_left left previous 向左 上一个', fontFamily: 'wf3-material' },
+  { name: 'Material 设备拓扑', symbol: '\ue335', keywords: 'device_hub topology node 设备 拓扑 节点', fontFamily: 'wf3-material' },
+  { name: 'Material 代码', symbol: '\ue86f', keywords: 'code source brackets 代码 源码', fontFamily: 'wf3-material' },
+  { name: 'Material 数据线', symbol: '\uefe6', keywords: 'cable wire connector 数据线 连接线', fontFamily: 'wf3-material' },
+  { name: 'Material 双向传输', symbol: '\ue915', keywords: 'compare_arrows exchange transfer 双向 传输 交换', fontFamily: 'wf3-material' },
+  { name: 'Material USB', symbol: '\ue1e0', keywords: 'usb device interface 接口 设备', fontFamily: 'wf3-material' },
+  { name: 'Material CAN 总线', symbol: '\uf102', keywords: 'electrical_services can rs485 bus 总线 接口', fontFamily: 'wf3-material' },
+  { name: 'Material 电压', symbol: '\uec1c', keywords: 'electric_bolt voltage 电压 电平 闪电', fontFamily: 'wf3-material' },
+  { name: 'Material 网络', symbol: '\ueb2f', keywords: 'lan network ethernet 网络 网口', fontFamily: 'wf3-material' },
+  { name: 'Material 系统芯片', symbol: '\ue322', keywords: 'memory chip system 系统 芯片 内存', fontFamily: 'wf3-material' },
+  { name: 'Material 设置', symbol: '\ue8b8', keywords: 'settings gear 设置 齿轮', fontFamily: 'wf3-material' },
+  { name: 'Material 监控', symbol: '\ue6e1', keywords: 'show_chart monitor chart 监控 图表', fontFamily: 'wf3-material' },
+  { name: 'Material 积木', symbol: '\ue87b', keywords: 'extension block puzzle 积木 扩展', fontFamily: 'wf3-material' },
+  { name: 'Material 温度', symbol: '\ue1ff', keywords: 'device_thermostat temperature 温度 测温', fontFamily: 'wf3-material' },
+  { name: 'Material 右箭头', symbol: '\ue5cc', keywords: 'chevron_right right next 向右 下一个', fontFamily: 'wf3-material' },
+];
 
 export const LVGL_BUILTIN_SYMBOLS: readonly LvglSymbolOption[] = [
   { name: '主页', symbol: '\uf015', keywords: 'home 首页' },
@@ -199,8 +220,14 @@ export const IOT_SYMBOLS: readonly LvglSymbolOption[] = [
 ];
 
 export const LVGL_SYMBOLS: readonly LvglSymbolOption[] = [
+  ...WF3_MATERIAL_SYMBOLS,
   ...IOT_SYMBOLS,
   ...QUIET_POD_SYMBOLS,
+  ...LVGL_BUILTIN_SYMBOLS,
+];
+
+const EDITOR_SYMBOLS: readonly LvglSymbolOption[] = [
+  ...WF3_MATERIAL_SYMBOLS,
   ...LVGL_BUILTIN_SYMBOLS,
 ];
 
@@ -208,12 +235,18 @@ function symbolPreview(option: LvglSymbolOption): string {
   return option.symbol;
 }
 
+function symbolClassName(option: LvglSymbolOption): string {
+  return option.fontFamily === 'wf3-material'
+    ? 'lvgl-symbol-glyph wf3-material-symbol-glyph'
+    : 'lvgl-symbol-glyph';
+}
+
 function symbolToken(option: LvglSymbolOption): string {
   return `[图标:${option.name}]`;
 }
 
 export function formatLvglSymbolText(value: string): string {
-  return LVGL_BUILTIN_SYMBOLS.reduce(
+  return EDITOR_SYMBOLS.reduce(
     (text, option) => text.replaceAll(option.symbol, symbolToken(option)),
     value,
   );
@@ -372,7 +405,7 @@ export function IconTextEditor(props: {
     setOpen(false);
   };
 
-  const currentSymbols = LVGL_BUILTIN_SYMBOLS.filter((option) =>
+  const currentSymbols = EDITOR_SYMBOLS.filter((option) =>
     props.value.includes(option.symbol) || current.includes(symbolToken(option)));
   return (
     <div className="icon-text-editor" ref={rootRef}>
@@ -407,7 +440,7 @@ export function IconTextEditor(props: {
         onClick={openPicker}
       >
         {currentSymbols[0]
-          ? <span className="lvgl-symbol-glyph">{symbolPreview(currentSymbols[0])}</span>
+          ? <span className={symbolClassName(currentSymbols[0])}>{symbolPreview(currentSymbols[0])}</span>
           : '图标'}
       </button>
       {open && createPortal(
@@ -441,7 +474,7 @@ export function IconTextEditor(props: {
                   title={`${option.name} · U+${option.symbol.codePointAt(0)!.toString(16).toUpperCase()}`}
                   onClick={() => choose(option)}
                 >
-                  <span className="lvgl-symbol-glyph" aria-hidden="true">{preview}</span>
+                  <span className={symbolClassName(option)} aria-hidden="true">{preview}</span>
                   <span>{option.name}</span>
                 </button>
               );

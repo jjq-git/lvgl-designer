@@ -69,6 +69,7 @@ export interface ProjectStoreState {
   mutateDisplay(label: string, recipe: (draft: DisplayConfig) => void, opts?: MutateOptions): void;
   mutateV2(label: string, recipe: (draft: UiProject) => void, opts?: MutateOptions): void;
   mutateActionRegistry(label: string, recipe: (draft: ActionRegistry) => void): void;
+  selectTheme(themeId: string): boolean;
   beginInteraction(label: string, coalesceKey: string): void;
   commitInteraction(): void;
   abortInteraction(): void;
@@ -237,6 +238,23 @@ export const useProjectStore = create<ProjectStoreState>()((set, get) => ({
       undoStack: recordHistory(s.undoStack, entry),
       redoStack: [],
     });
+  },
+
+  selectTheme(themeId) {
+    if (interaction) get().commitInteraction();
+    const s = get();
+    if (!useBuildTargetStore.getState().selectEmbeddedTheme(themeId)) return false;
+    const projected = projectFromUi(s.uiProject);
+    useBuildTargetStore.getState().replaceUiProject(projected, s.uiProject);
+    set({
+      project: projected,
+      revision: s.revision + 1,
+      dirty: true,
+      lastPatches: [],
+      lastChangeKind: 'mutate',
+      redoStack: [],
+    });
+    return true;
   },
 
   beginInteraction(label, coalesceKey) {

@@ -32,6 +32,7 @@ import { CloudPanels } from './panels/cloud/CloudPanels';
 import { copySelection, pasteClipboard, duplicateSelection } from './services/clipboard';
 import { ShortcutsHelp } from './panels/ShortcutsHelp';
 import { CatalogPanel } from './panels/catalog/CatalogPanel';
+import { ThemePanel } from './panels/theme/ThemePanel';
 import { SitePublicationModal } from './panels/SitePublicationModal';
 import { AppDialogHost } from './panels/AppDialogHost';
 import { useBuildTargetStore } from './stores/buildTargetStore';
@@ -92,7 +93,7 @@ function saveTreeWidth(value: number): void {
 export function App(): JSX.Element {
   const compactLayout = typeof window !== 'undefined' && window.innerWidth <= 1200;
   const banner = useEditorStore((s) => s.banner);
-  const [leftTab, setLeftTab] = useState<'widgets' | 'assets'>('widgets');
+  const [leftTab, setLeftTab] = useState<'widgets' | 'assets' | 'theme'>('widgets');
   const [helpOpen, setHelpOpen] = useState(false);
   const [catalogOpen, setCatalogOpen] = useState(false);
   const [sitePublicationOpen, setSitePublicationOpen] = useState(false);
@@ -307,9 +308,15 @@ export function App(): JSX.Element {
                   className={`left-tab ${leftTab === 'assets' ? 'active' : ''}`}
                   onClick={() => setLeftTab('assets')}
                 >素材</button>
+                <button
+                  className={`left-tab ${leftTab === 'theme' ? 'active' : ''}`}
+                  onClick={() => setLeftTab('theme')}
+                >主题</button>
               </div>
-              <div className="side-section palette-section">
-                {leftTab === 'widgets' ? <WidgetPalette /> : <AssetPanel />}
+              <div className={`side-section palette-section ${leftTab === 'theme' ? 'theme-palette-section' : ''}`}>
+                {leftTab === 'widgets' && <WidgetPalette />}
+                {leftTab === 'assets' && <AssetPanel />}
+                {leftTab === 'theme' && <ThemePanel />}
               </div>
             </Panel>
             <PanelResizeHandle className="resize-handle" aria-label="调整组件面板宽度" />

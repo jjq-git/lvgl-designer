@@ -1,0 +1,3798 @@
+{
+  "kind": "lvgl-project-snapshot",
+  "snapshotVersion": 1,
+  "uiProject": {
+    "schemaVersion": 2,
+    "kind": "lvgl-ui-project",
+    "meta": {
+      "id": "ui:wf2d-8630-greenhouse",
+      "revision": 1,
+      "name": "WF2D-8630 智慧温室控制台",
+      "appVersion": "1.0.0",
+      "createdAt": "2026-10-10T00:00:00.000Z",
+      "modifiedAt": "2026-10-10T00:00:00.000Z"
+    },
+    "designDisplayRef": "display:wf2d-8630-480x480-rgb565@1",
+    "themes": [
+      {
+        "id": "showcase-wf2d-8630",
+        "displayName": "WF2D-8630 智慧温室控制台主题",
+        "tokens": [
+          {
+            "id": "color.background",
+            "type": "color",
+            "value": "#F3F0E6"
+          },
+          {
+            "id": "color.surface",
+            "type": "color",
+            "value": "#FFFDF7"
+          },
+          {
+            "id": "color.surface2",
+            "type": "color",
+            "value": "#E1E8D0"
+          },
+          {
+            "id": "color.border",
+            "type": "color",
+            "value": "#BAC6A2"
+          },
+          {
+            "id": "color.text.primary",
+            "type": "color",
+            "value": "#243622"
+          },
+          {
+            "id": "color.text.muted",
+            "type": "color",
+            "value": "#6E7E67"
+          },
+          {
+            "id": "color.text.onaccent",
+            "type": "color",
+            "value": "#FFFFFF"
+          },
+          {
+            "id": "color.accent",
+            "type": "color",
+            "value": "#3D7A42"
+          },
+          {
+            "id": "color.accent2",
+            "type": "color",
+            "value": "#A6C64C"
+          },
+          {
+            "id": "color.success",
+            "type": "color",
+            "value": "#5D9D5B"
+          },
+          {
+            "id": "color.warning",
+            "type": "color",
+            "value": "#D99638"
+          },
+          {
+            "id": "color.danger",
+            "type": "color",
+            "value": "#C75C4C"
+          },
+          {
+            "id": "color.track",
+            "type": "color",
+            "value": "#D4DDC3"
+          },
+          {
+            "id": "color.shadow",
+            "type": "color",
+            "value": "#7F8A73"
+          },
+          {
+            "id": "font.size.12",
+            "type": "fontRef",
+            "value": "montserrat_12"
+          },
+          {
+            "id": "font.size.14",
+            "type": "fontRef",
+            "value": "montserrat_14"
+          },
+          {
+            "id": "font.size.16",
+            "type": "fontRef",
+            "value": "montserrat_16"
+          },
+          {
+            "id": "font.size.18",
+            "type": "fontRef",
+            "value": "montserrat_18"
+          },
+          {
+            "id": "font.size.20",
+            "type": "fontRef",
+            "value": "montserrat_20"
+          },
+          {
+            "id": "font.size.22",
+            "type": "fontRef",
+            "value": "montserrat_22"
+          },
+          {
+            "id": "font.size.24",
+            "type": "fontRef",
+            "value": "montserrat_24"
+          },
+          {
+            "id": "font.size.28",
+            "type": "fontRef",
+            "value": "montserrat_28"
+          },
+          {
+            "id": "font.size.30",
+            "type": "fontRef",
+            "value": "montserrat_30"
+          },
+          {
+            "id": "font.size.36",
+            "type": "fontRef",
+            "value": "montserrat_36"
+          },
+          {
+            "id": "font.size.40",
+            "type": "fontRef",
+            "value": "montserrat_40"
+          },
+          {
+            "id": "font.size.44",
+            "type": "fontRef",
+            "value": "montserrat_44"
+          }
+        ]
+      }
+    ],
+    "subjects": [],
+    "screens": [
+      {
+        "id": "10000000-0000-4000-9000-000000000001",
+        "codeName": "greenhouse_home",
+        "displayName": "温室总览",
+        "isHome": true,
+        "styles": [],
+        "consts": [],
+        "root": {
+          "id": "10000000-0000-4000-9000-000000000040",
+          "type": "obj",
+          "codeName": "greenhouse_home_root",
+          "props": {},
+          "flags": {
+            "scrollable": false
+          },
+          "styleRefs": [],
+          "styles": [
+            {
+              "props": {
+                "bg_color": {
+                  "$token": "color.background"
+                },
+                "bg_opa": 255,
+                "border_width": 0,
+                "pad_all": 0
+              }
+            }
+          ],
+          "events": [],
+          "bindings": [],
+          "children": [
+            {
+              "id": "10000000-0000-4000-9000-000000000018",
+              "type": "label",
+              "codeName": "green_brand",
+              "props": {
+                "text": "GROVE",
+                "x": 22,
+                "y": 18,
+                "width": 150,
+                "height": 32
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": {
+                      "$token": "color.accent"
+                    },
+                    "text_font": {
+                      "$token": "font.size.24"
+                    },
+                    "text_align": "left",
+                    "text_opa": 255
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000019",
+              "type": "label",
+              "codeName": "green_status",
+              "props": {
+                "text": "ZONE A  /  ONLINE",
+                "x": 236,
+                "y": 23,
+                "width": 222,
+                "height": 26
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": {
+                      "$token": "color.text.muted"
+                    },
+                    "text_font": {
+                      "$token": "font.size.16"
+                    },
+                    "text_align": "right",
+                    "text_opa": 255
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000011",
+              "type": "obj",
+              "codeName": "green_health",
+              "props": {
+                "x": 20,
+                "y": 70,
+                "width": 276,
+                "height": 190
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface2"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 22,
+                    "pad_all": 0,
+                    "shadow_color": {
+                      "$token": "color.shadow"
+                    },
+                    "shadow_width": 10,
+                    "shadow_opa": 24,
+                    "shadow_offset_y": 4
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "10000000-0000-4000-9000-000000000005",
+                  "type": "label",
+                  "codeName": "green_health_title",
+                  "props": {
+                    "text": "PLANT HEALTH",
+                    "x": 20,
+                    "y": 16,
+                    "width": 236,
+                    "height": 24
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000006",
+                  "type": "arc",
+                  "codeName": "green_health_arc",
+                  "props": {
+                    "x": 20,
+                    "y": 42,
+                    "width": 128,
+                    "height": 128,
+                    "min_value": 0,
+                    "max_value": 100,
+                    "value": 84,
+                    "bg_start_angle": 135,
+                    "bg_end_angle": 45,
+                    "start_angle": 135,
+                    "end_angle": 45,
+                    "knob_offset": -3
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "selector": {
+                        "part": "main"
+                      },
+                      "props": {
+                        "arc_color": {
+                          "$token": "color.track"
+                        },
+                        "arc_width": 12
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "indicator"
+                      },
+                      "props": {
+                        "arc_color": {
+                          "$token": "color.accent2"
+                        },
+                        "arc_width": 12
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "knob"
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.accent2"
+                        },
+                        "bg_opa": 0,
+                        "radius": 20
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000007",
+                  "type": "label",
+                  "codeName": "green_health_value",
+                  "props": {
+                    "text": "84",
+                    "x": 48,
+                    "y": 79,
+                    "width": 72,
+                    "height": 38
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.30"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000008",
+                  "type": "label",
+                  "codeName": "green_health_unit",
+                  "props": {
+                    "text": "GOOD",
+                    "x": 154,
+                    "y": 73,
+                    "width": 100,
+                    "height": 28
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.success"
+                        },
+                        "text_font": {
+                          "$token": "font.size.20"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000009",
+                  "type": "label",
+                  "codeName": "green_health_zone",
+                  "props": {
+                    "text": "ZONE A",
+                    "x": 148,
+                    "y": 108,
+                    "width": 112,
+                    "height": 20
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000010",
+                  "type": "label",
+                  "codeName": "green_health_crop",
+                  "props": {
+                    "text": "BASIL",
+                    "x": 148,
+                    "y": 132,
+                    "width": 112,
+                    "height": 20
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.accent"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000023",
+              "type": "obj",
+              "codeName": "green_temp",
+              "props": {
+                "x": 308,
+                "y": 70,
+                "width": 152,
+                "height": 56
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 12,
+                    "pad_all": 0,
+                    "shadow_color": {
+                      "$token": "color.shadow"
+                    },
+                    "shadow_width": 0,
+                    "shadow_opa": 0,
+                    "shadow_offset_y": 0
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "10000000-0000-4000-9000-000000000020",
+                  "type": "label",
+                  "codeName": "green_temp_title",
+                  "props": {
+                    "text": "AIR TEMP",
+                    "x": 12,
+                    "y": 7,
+                    "width": 72,
+                    "height": 18
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000021",
+                  "type": "label",
+                  "codeName": "green_temp_value",
+                  "props": {
+                    "text": "23.8",
+                    "x": 12,
+                    "y": 25,
+                    "width": 72,
+                    "height": 24
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.warning"
+                        },
+                        "text_font": {
+                          "$token": "font.size.20"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000022",
+                  "type": "label",
+                  "codeName": "green_temp_unit",
+                  "props": {
+                    "text": "C",
+                    "x": 82,
+                    "y": 28,
+                    "width": 58,
+                    "height": 18
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "right",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000027",
+              "type": "obj",
+              "codeName": "green_soil",
+              "props": {
+                "x": 308,
+                "y": 136,
+                "width": 152,
+                "height": 56
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 12,
+                    "pad_all": 0,
+                    "shadow_color": {
+                      "$token": "color.shadow"
+                    },
+                    "shadow_width": 0,
+                    "shadow_opa": 0,
+                    "shadow_offset_y": 0
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "10000000-0000-4000-9000-000000000024",
+                  "type": "label",
+                  "codeName": "green_soil_title",
+                  "props": {
+                    "text": "SOIL",
+                    "x": 12,
+                    "y": 7,
+                    "width": 72,
+                    "height": 18
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000025",
+                  "type": "label",
+                  "codeName": "green_soil_value",
+                  "props": {
+                    "text": "61",
+                    "x": 12,
+                    "y": 25,
+                    "width": 72,
+                    "height": 24
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.accent"
+                        },
+                        "text_font": {
+                          "$token": "font.size.20"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000026",
+                  "type": "label",
+                  "codeName": "green_soil_unit",
+                  "props": {
+                    "text": "%",
+                    "x": 82,
+                    "y": 28,
+                    "width": 58,
+                    "height": 18
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "right",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000031",
+              "type": "obj",
+              "codeName": "green_light",
+              "props": {
+                "x": 308,
+                "y": 202,
+                "width": 152,
+                "height": 56
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 12,
+                    "pad_all": 0,
+                    "shadow_color": {
+                      "$token": "color.shadow"
+                    },
+                    "shadow_width": 0,
+                    "shadow_opa": 0,
+                    "shadow_offset_y": 0
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "10000000-0000-4000-9000-000000000028",
+                  "type": "label",
+                  "codeName": "green_light_title",
+                  "props": {
+                    "text": "LIGHT",
+                    "x": 12,
+                    "y": 7,
+                    "width": 72,
+                    "height": 18
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000029",
+                  "type": "label",
+                  "codeName": "green_light_value",
+                  "props": {
+                    "text": "740",
+                    "x": 12,
+                    "y": 25,
+                    "width": 72,
+                    "height": 24
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.accent2"
+                        },
+                        "text_font": {
+                          "$token": "font.size.20"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000030",
+                  "type": "label",
+                  "codeName": "green_light_unit",
+                  "props": {
+                    "text": "lux",
+                    "x": 82,
+                    "y": 28,
+                    "width": 58,
+                    "height": 18
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "right",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000017",
+              "type": "obj",
+              "codeName": "green_irrigation",
+              "props": {
+                "x": 20,
+                "y": 276,
+                "width": 440,
+                "height": 120
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 20,
+                    "pad_all": 0,
+                    "shadow_color": {
+                      "$token": "color.shadow"
+                    },
+                    "shadow_width": 10,
+                    "shadow_opa": 24,
+                    "shadow_offset_y": 4
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "10000000-0000-4000-9000-000000000012",
+                  "type": "label",
+                  "codeName": "green_irrigation_title",
+                  "props": {
+                    "text": "IRRIGATION",
+                    "x": 20,
+                    "y": 16,
+                    "width": 180,
+                    "height": 24
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000013",
+                  "type": "label",
+                  "codeName": "green_irrigation_note",
+                  "props": {
+                    "text": "Next cycle  14:30",
+                    "x": 20,
+                    "y": 44,
+                    "width": 220,
+                    "height": 22
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000014",
+                  "type": "bar",
+                  "codeName": "green_water_level",
+                  "props": {
+                    "x": 20,
+                    "y": 78,
+                    "width": 250,
+                    "height": 14,
+                    "min_value": 0,
+                    "max_value": 100,
+                    "value": 72
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "selector": {
+                        "part": "main"
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.track"
+                        },
+                        "bg_opa": 255,
+                        "radius": 7
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "indicator"
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.accent"
+                        },
+                        "bg_opa": 255,
+                        "radius": 7
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000016",
+                  "type": "button",
+                  "codeName": "green_water_now",
+                  "props": {
+                    "x": 296,
+                    "y": 52,
+                    "width": 124,
+                    "height": 50
+                  },
+                  "flags": {
+                    "scrollable": false
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.accent"
+                        },
+                        "bg_opa": 255,
+                        "border_color": {
+                          "$token": "color.accent"
+                        },
+                        "border_width": 1,
+                        "radius": 14,
+                        "pad_all": 0,
+                        "shadow_width": 8,
+                        "shadow_color": {
+                          "$token": "color.accent"
+                        },
+                        "shadow_opa": 28
+                      }
+                    },
+                    {
+                      "selector": {
+                        "states": [
+                          "pressed"
+                        ]
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.accent2"
+                        }
+                      }
+                    }
+                  ],
+                  "events": [
+                    {
+                      "on": "clicked",
+                      "action": "screen.open",
+                      "args": {
+                        "screen": "10000000-0000-4000-9000-000000000003",
+                        "anim": "fade_in",
+                        "duration": 180,
+                        "delay": 0
+                      }
+                    }
+                  ],
+                  "bindings": [],
+                  "children": [
+                    {
+                      "id": "10000000-0000-4000-9000-000000000015",
+                      "type": "label",
+                      "codeName": "green_water_now_text",
+                      "props": {
+                        "text": "  WATER",
+                        "align": "center",
+                        "width": "100%",
+                        "height": "content"
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "text_color": {
+                              "$token": "color.text.onaccent"
+                            },
+                            "text_font": {
+                              "$token": "font.size.14"
+                            },
+                            "text_align": "center",
+                            "text_opa": 255
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000033",
+              "type": "button",
+              "codeName": "green_nav_overview",
+              "props": {
+                "x": 20,
+                "y": 408,
+                "width": 100,
+                "height": 52
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.accent"
+                    },
+                    "border_width": 1,
+                    "radius": 14,
+                    "pad_all": 0,
+                    "shadow_width": 8,
+                    "shadow_color": {
+                      "$token": "color.accent"
+                    },
+                    "shadow_opa": 28
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent2"
+                    }
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "10000000-0000-4000-9000-000000000001",
+                    "anim": "fade_in",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "10000000-0000-4000-9000-000000000032",
+                  "type": "label",
+                  "codeName": "green_nav_overview_text",
+                  "props": {
+                    "text": "  HOME",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.onaccent"
+                        },
+                        "text_font": {
+                          "$token": "font.size.14"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000035",
+              "type": "button",
+              "codeName": "green_nav_zones",
+              "props": {
+                "x": 130,
+                "y": 408,
+                "width": 100,
+                "height": 52
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 14,
+                    "pad_all": 0,
+                    "shadow_width": 0,
+                    "shadow_color": {
+                      "$token": "color.surface"
+                    },
+                    "shadow_opa": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent2"
+                    }
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "10000000-0000-4000-9000-000000000002",
+                    "anim": "fade_in",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "10000000-0000-4000-9000-000000000034",
+                  "type": "label",
+                  "codeName": "green_nav_zones_text",
+                  "props": {
+                    "text": "  ZONES",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.14"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000037",
+              "type": "button",
+              "codeName": "green_nav_water",
+              "props": {
+                "x": 240,
+                "y": 408,
+                "width": 100,
+                "height": 52
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 14,
+                    "pad_all": 0,
+                    "shadow_width": 0,
+                    "shadow_color": {
+                      "$token": "color.surface"
+                    },
+                    "shadow_opa": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent2"
+                    }
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "10000000-0000-4000-9000-000000000003",
+                    "anim": "fade_in",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "10000000-0000-4000-9000-000000000036",
+                  "type": "label",
+                  "codeName": "green_nav_water_text",
+                  "props": {
+                    "text": "  WATER",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.14"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000039",
+              "type": "button",
+              "codeName": "green_nav_log",
+              "props": {
+                "x": 350,
+                "y": 408,
+                "width": 100,
+                "height": 52
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 14,
+                    "pad_all": 0,
+                    "shadow_width": 0,
+                    "shadow_color": {
+                      "$token": "color.surface"
+                    },
+                    "shadow_opa": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent2"
+                    }
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "10000000-0000-4000-9000-000000000004",
+                    "anim": "fade_in",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "10000000-0000-4000-9000-000000000038",
+                  "type": "label",
+                  "codeName": "green_nav_log_text",
+                  "props": {
+                    "text": "  LOG",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.14"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "10000000-0000-4000-9000-000000000002",
+        "codeName": "greenhouse_zones",
+        "displayName": "种植分区",
+        "isHome": false,
+        "styles": [],
+        "consts": [],
+        "root": {
+          "id": "10000000-0000-4000-9000-000000000060",
+          "type": "obj",
+          "codeName": "greenhouse_zones_root",
+          "props": {},
+          "flags": {
+            "scrollable": false
+          },
+          "styleRefs": [],
+          "styles": [
+            {
+              "props": {
+                "bg_color": {
+                  "$token": "color.background"
+                },
+                "bg_opa": 255,
+                "border_width": 0,
+                "pad_all": 0
+              }
+            }
+          ],
+          "events": [],
+          "bindings": [],
+          "children": [
+            {
+              "id": "10000000-0000-4000-9000-000000000041",
+              "type": "label",
+              "codeName": "green_zones_title",
+              "props": {
+                "text": "  GROW ZONES",
+                "x": 22,
+                "y": 18,
+                "width": 260,
+                "height": 32
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": {
+                      "$token": "color.accent"
+                    },
+                    "text_font": {
+                      "$token": "font.size.24"
+                    },
+                    "text_align": "left",
+                    "text_opa": 255
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000043",
+              "type": "button",
+              "codeName": "green_zones_back",
+              "props": {
+                "x": 350,
+                "y": 12,
+                "width": 108,
+                "height": 44
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 14,
+                    "pad_all": 0,
+                    "shadow_width": 0,
+                    "shadow_color": {
+                      "$token": "color.surface"
+                    },
+                    "shadow_opa": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent2"
+                    }
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "10000000-0000-4000-9000-000000000001",
+                    "anim": "move_right",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "10000000-0000-4000-9000-000000000042",
+                  "type": "label",
+                  "codeName": "green_zones_back_text",
+                  "props": {
+                    "text": "  BACK",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.14"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000047",
+              "type": "obj",
+              "codeName": "green_zone_a",
+              "props": {
+                "x": 20,
+                "y": 74,
+                "width": 440,
+                "height": 92
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface2"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 18,
+                    "pad_all": 0,
+                    "shadow_color": {
+                      "$token": "color.shadow"
+                    },
+                    "shadow_width": 0,
+                    "shadow_opa": 0,
+                    "shadow_offset_y": 0
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "10000000-0000-4000-9000-000000000044",
+                  "type": "label",
+                  "codeName": "green_zone_a_name",
+                  "props": {
+                    "text": "  ZONE A / BASIL",
+                    "x": 18,
+                    "y": 14,
+                    "width": 230,
+                    "height": 24
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.success"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000045",
+                  "type": "label",
+                  "codeName": "green_zone_a_value",
+                  "props": {
+                    "text": "23.8 C   /   SOIL 61%",
+                    "x": 18,
+                    "y": 48,
+                    "width": 260,
+                    "height": 24
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000046",
+                  "type": "label",
+                  "codeName": "green_zone_a_state",
+                  "props": {
+                    "text": "OPTIMAL",
+                    "x": 318,
+                    "y": 34,
+                    "width": 104,
+                    "height": 26
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.success"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
+                        "text_align": "right",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000051",
+              "type": "obj",
+              "codeName": "green_zone_b",
+              "props": {
+                "x": 20,
+                "y": 180,
+                "width": 440,
+                "height": 92
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 18,
+                    "pad_all": 0,
+                    "shadow_color": {
+                      "$token": "color.shadow"
+                    },
+                    "shadow_width": 0,
+                    "shadow_opa": 0,
+                    "shadow_offset_y": 0
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "10000000-0000-4000-9000-000000000048",
+                  "type": "label",
+                  "codeName": "green_zone_b_name",
+                  "props": {
+                    "text": "  ZONE B / LETTUCE",
+                    "x": 18,
+                    "y": 14,
+                    "width": 240,
+                    "height": 24
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.accent"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000049",
+                  "type": "label",
+                  "codeName": "green_zone_b_value",
+                  "props": {
+                    "text": "22.6 C   /   SOIL 54%",
+                    "x": 18,
+                    "y": 48,
+                    "width": 260,
+                    "height": 24
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000050",
+                  "type": "label",
+                  "codeName": "green_zone_b_state",
+                  "props": {
+                    "text": "LIGHT +8%",
+                    "x": 298,
+                    "y": 34,
+                    "width": 124,
+                    "height": 26
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.warning"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
+                        "text_align": "right",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000055",
+              "type": "obj",
+              "codeName": "green_zone_c",
+              "props": {
+                "x": 20,
+                "y": 286,
+                "width": 440,
+                "height": 92
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 18,
+                    "pad_all": 0,
+                    "shadow_color": {
+                      "$token": "color.shadow"
+                    },
+                    "shadow_width": 0,
+                    "shadow_opa": 0,
+                    "shadow_offset_y": 0
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "10000000-0000-4000-9000-000000000052",
+                  "type": "label",
+                  "codeName": "green_zone_c_name",
+                  "props": {
+                    "text": "  ZONE C / MINT",
+                    "x": 18,
+                    "y": 14,
+                    "width": 230,
+                    "height": 24
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.accent"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000053",
+                  "type": "label",
+                  "codeName": "green_zone_c_value",
+                  "props": {
+                    "text": "24.1 C   /   SOIL 47%",
+                    "x": 18,
+                    "y": 48,
+                    "width": 260,
+                    "height": 24
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000054",
+                  "type": "label",
+                  "codeName": "green_zone_c_state",
+                  "props": {
+                    "text": "WATER SOON",
+                    "x": 288,
+                    "y": 34,
+                    "width": 134,
+                    "height": 26
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.warning"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
+                        "text_align": "right",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000057",
+              "type": "button",
+              "codeName": "green_zones_water",
+              "props": {
+                "x": 20,
+                "y": 402,
+                "width": 210,
+                "height": 58
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.accent"
+                    },
+                    "border_width": 1,
+                    "radius": 16,
+                    "pad_all": 0,
+                    "shadow_width": 8,
+                    "shadow_color": {
+                      "$token": "color.accent"
+                    },
+                    "shadow_opa": 28
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent2"
+                    }
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "10000000-0000-4000-9000-000000000003",
+                    "anim": "fade_in",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "10000000-0000-4000-9000-000000000056",
+                  "type": "label",
+                  "codeName": "green_zones_water_text",
+                  "props": {
+                    "text": "  IRRIGATION",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.onaccent"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000059",
+              "type": "button",
+              "codeName": "green_zones_log",
+              "props": {
+                "x": 250,
+                "y": 402,
+                "width": 210,
+                "height": 58
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 16,
+                    "pad_all": 0,
+                    "shadow_width": 0,
+                    "shadow_color": {
+                      "$token": "color.surface"
+                    },
+                    "shadow_opa": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent2"
+                    }
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "10000000-0000-4000-9000-000000000004",
+                    "anim": "fade_in",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "10000000-0000-4000-9000-000000000058",
+                  "type": "label",
+                  "codeName": "green_zones_log_text",
+                  "props": {
+                    "text": "  EVENT LOG",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "10000000-0000-4000-9000-000000000003",
+        "codeName": "greenhouse_water",
+        "displayName": "灌溉控制",
+        "isHome": false,
+        "styles": [],
+        "consts": [],
+        "root": {
+          "id": "10000000-0000-4000-9000-000000000079",
+          "type": "obj",
+          "codeName": "greenhouse_water_root",
+          "props": {},
+          "flags": {
+            "scrollable": false
+          },
+          "styleRefs": [],
+          "styles": [
+            {
+              "props": {
+                "bg_color": {
+                  "$token": "color.background"
+                },
+                "bg_opa": 255,
+                "border_width": 0,
+                "pad_all": 0
+              }
+            }
+          ],
+          "events": [],
+          "bindings": [],
+          "children": [
+            {
+              "id": "10000000-0000-4000-9000-000000000061",
+              "type": "label",
+              "codeName": "green_water_title",
+              "props": {
+                "text": "  IRRIGATION",
+                "x": 22,
+                "y": 18,
+                "width": 260,
+                "height": 32
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": {
+                      "$token": "color.accent"
+                    },
+                    "text_font": {
+                      "$token": "font.size.24"
+                    },
+                    "text_align": "left",
+                    "text_opa": 255
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000063",
+              "type": "button",
+              "codeName": "green_water_back",
+              "props": {
+                "x": 350,
+                "y": 12,
+                "width": 108,
+                "height": 44
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 14,
+                    "pad_all": 0,
+                    "shadow_width": 0,
+                    "shadow_color": {
+                      "$token": "color.surface"
+                    },
+                    "shadow_opa": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent2"
+                    }
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "10000000-0000-4000-9000-000000000001",
+                    "anim": "move_right",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "10000000-0000-4000-9000-000000000062",
+                  "type": "label",
+                  "codeName": "green_water_back_text",
+                  "props": {
+                    "text": "  BACK",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.14"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000068",
+              "type": "obj",
+              "codeName": "green_water_tank",
+              "props": {
+                "x": 20,
+                "y": 76,
+                "width": 440,
+                "height": 132
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface2"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 20,
+                    "pad_all": 0,
+                    "shadow_color": {
+                      "$token": "color.shadow"
+                    },
+                    "shadow_width": 10,
+                    "shadow_opa": 24,
+                    "shadow_offset_y": 4
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "10000000-0000-4000-9000-000000000064",
+                  "type": "label",
+                  "codeName": "green_water_tank_title",
+                  "props": {
+                    "text": "NUTRIENT TANK",
+                    "x": 20,
+                    "y": 16,
+                    "width": 200,
+                    "height": 24
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000065",
+                  "type": "label",
+                  "codeName": "green_water_tank_value",
+                  "props": {
+                    "text": "72%",
+                    "x": 20,
+                    "y": 46,
+                    "width": 100,
+                    "height": 40
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.accent"
+                        },
+                        "text_font": {
+                          "$token": "font.size.30"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000066",
+                  "type": "bar",
+                  "codeName": "green_water_tank_bar",
+                  "props": {
+                    "x": 132,
+                    "y": 58,
+                    "width": 284,
+                    "height": 18,
+                    "min_value": 0,
+                    "max_value": 100,
+                    "value": 72
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "selector": {
+                        "part": "main"
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.track"
+                        },
+                        "bg_opa": 255,
+                        "radius": 9
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "indicator"
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.accent"
+                        },
+                        "bg_opa": 255,
+                        "radius": 9
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000067",
+                  "type": "label",
+                  "codeName": "green_water_tank_note",
+                  "props": {
+                    "text": "  FLOW AND PH NORMAL",
+                    "x": 20,
+                    "y": 98,
+                    "width": 396,
+                    "height": 22
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.success"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000074",
+              "type": "obj",
+              "codeName": "green_water_schedule",
+              "props": {
+                "x": 20,
+                "y": 224,
+                "width": 440,
+                "height": 132
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 20,
+                    "pad_all": 0,
+                    "shadow_color": {
+                      "$token": "color.shadow"
+                    },
+                    "shadow_width": 10,
+                    "shadow_opa": 24,
+                    "shadow_offset_y": 4
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "10000000-0000-4000-9000-000000000069",
+                  "type": "label",
+                  "codeName": "green_water_schedule_title",
+                  "props": {
+                    "text": "  NEXT CYCLES",
+                    "x": 20,
+                    "y": 16,
+                    "width": 200,
+                    "height": 24
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000070",
+                  "type": "label",
+                  "codeName": "green_water_schedule_a",
+                  "props": {
+                    "text": "14:30   ZONE C   4 MIN",
+                    "x": 20,
+                    "y": 50,
+                    "width": 260,
+                    "height": 24
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000071",
+                  "type": "label",
+                  "codeName": "green_water_schedule_b",
+                  "props": {
+                    "text": "16:10   ZONE A   3 MIN",
+                    "x": 20,
+                    "y": 82,
+                    "width": 260,
+                    "height": 24
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000073",
+                  "type": "button",
+                  "codeName": "green_water_start",
+                  "props": {
+                    "x": 300,
+                    "y": 50,
+                    "width": 116,
+                    "height": 54
+                  },
+                  "flags": {
+                    "scrollable": false
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.accent"
+                        },
+                        "bg_opa": 255,
+                        "border_color": {
+                          "$token": "color.accent"
+                        },
+                        "border_width": 1,
+                        "radius": 14,
+                        "pad_all": 0,
+                        "shadow_width": 8,
+                        "shadow_color": {
+                          "$token": "color.accent"
+                        },
+                        "shadow_opa": 28
+                      }
+                    },
+                    {
+                      "selector": {
+                        "states": [
+                          "pressed"
+                        ]
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.accent2"
+                        }
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": [
+                    {
+                      "id": "10000000-0000-4000-9000-000000000072",
+                      "type": "label",
+                      "codeName": "green_water_start_text",
+                      "props": {
+                        "text": "  START",
+                        "align": "center",
+                        "width": "100%",
+                        "height": "content"
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "text_color": {
+                              "$token": "color.text.onaccent"
+                            },
+                            "text_font": {
+                              "$token": "font.size.16"
+                            },
+                            "text_align": "center",
+                            "text_opa": 255
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000076",
+              "type": "button",
+              "codeName": "green_water_zones",
+              "props": {
+                "x": 20,
+                "y": 382,
+                "width": 210,
+                "height": 66
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 16,
+                    "pad_all": 0,
+                    "shadow_width": 0,
+                    "shadow_color": {
+                      "$token": "color.surface"
+                    },
+                    "shadow_opa": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent2"
+                    }
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "10000000-0000-4000-9000-000000000002",
+                    "anim": "fade_in",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "10000000-0000-4000-9000-000000000075",
+                  "type": "label",
+                  "codeName": "green_water_zones_text",
+                  "props": {
+                    "text": "  ZONES",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000078",
+              "type": "button",
+              "codeName": "green_water_home",
+              "props": {
+                "x": 250,
+                "y": 382,
+                "width": 210,
+                "height": 66
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.accent"
+                    },
+                    "border_width": 1,
+                    "radius": 16,
+                    "pad_all": 0,
+                    "shadow_width": 8,
+                    "shadow_color": {
+                      "$token": "color.accent"
+                    },
+                    "shadow_opa": 28
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent2"
+                    }
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "10000000-0000-4000-9000-000000000001",
+                    "anim": "fade_in",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "10000000-0000-4000-9000-000000000077",
+                  "type": "label",
+                  "codeName": "green_water_home_text",
+                  "props": {
+                    "text": "  OVERVIEW",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.onaccent"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "10000000-0000-4000-9000-000000000004",
+        "codeName": "greenhouse_log",
+        "displayName": "温室日志",
+        "isHome": false,
+        "styles": [],
+        "consts": [],
+        "root": {
+          "id": "10000000-0000-4000-9000-000000000097",
+          "type": "obj",
+          "codeName": "greenhouse_log_root",
+          "props": {},
+          "flags": {
+            "scrollable": false
+          },
+          "styleRefs": [],
+          "styles": [
+            {
+              "props": {
+                "bg_color": {
+                  "$token": "color.background"
+                },
+                "bg_opa": 255,
+                "border_width": 0,
+                "pad_all": 0
+              }
+            }
+          ],
+          "events": [],
+          "bindings": [],
+          "children": [
+            {
+              "id": "10000000-0000-4000-9000-000000000080",
+              "type": "label",
+              "codeName": "green_log_title",
+              "props": {
+                "text": "  EVENT LOG",
+                "x": 22,
+                "y": 18,
+                "width": 260,
+                "height": 32
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": {
+                      "$token": "color.accent"
+                    },
+                    "text_font": {
+                      "$token": "font.size.24"
+                    },
+                    "text_align": "left",
+                    "text_opa": 255
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000082",
+              "type": "button",
+              "codeName": "green_log_back",
+              "props": {
+                "x": 350,
+                "y": 12,
+                "width": 108,
+                "height": 44
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 14,
+                    "pad_all": 0,
+                    "shadow_width": 0,
+                    "shadow_color": {
+                      "$token": "color.surface"
+                    },
+                    "shadow_opa": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent2"
+                    }
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "10000000-0000-4000-9000-000000000001",
+                    "anim": "move_right",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "10000000-0000-4000-9000-000000000081",
+                  "type": "label",
+                  "codeName": "green_log_back_text",
+                  "props": {
+                    "text": "  BACK",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.14"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000092",
+              "type": "obj",
+              "codeName": "green_log_list",
+              "props": {
+                "x": 20,
+                "y": 76,
+                "width": 440,
+                "height": 292
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 20,
+                    "pad_all": 0,
+                    "shadow_color": {
+                      "$token": "color.shadow"
+                    },
+                    "shadow_width": 10,
+                    "shadow_opa": 24,
+                    "shadow_offset_y": 4
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "10000000-0000-4000-9000-000000000083",
+                  "type": "label",
+                  "codeName": "green_log_one_icon",
+                  "props": {
+                    "text": "",
+                    "x": 18,
+                    "y": 22,
+                    "width": 34,
+                    "height": 34
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.success"
+                        },
+                        "text_font": {
+                          "$token": "font.size.24"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000084",
+                  "type": "label",
+                  "codeName": "green_log_one",
+                  "props": {
+                    "text": "09:18  Zone A cycle complete",
+                    "x": 64,
+                    "y": 20,
+                    "width": 338,
+                    "height": 28
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000085",
+                  "type": "label",
+                  "codeName": "green_log_one_note",
+                  "props": {
+                    "text": "3.2 L delivered / flow normal",
+                    "x": 64,
+                    "y": 50,
+                    "width": 338,
+                    "height": 22
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.14"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000086",
+                  "type": "label",
+                  "codeName": "green_log_two_icon",
+                  "props": {
+                    "text": "",
+                    "x": 18,
+                    "y": 104,
+                    "width": 34,
+                    "height": 34
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.warning"
+                        },
+                        "text_font": {
+                          "$token": "font.size.24"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000087",
+                  "type": "label",
+                  "codeName": "green_log_two",
+                  "props": {
+                    "text": "08:42  Zone B light raised",
+                    "x": 64,
+                    "y": 102,
+                    "width": 338,
+                    "height": 28
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000088",
+                  "type": "label",
+                  "codeName": "green_log_two_note",
+                  "props": {
+                    "text": "Target restored to 760 lux",
+                    "x": 64,
+                    "y": 132,
+                    "width": 338,
+                    "height": 22
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.14"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000089",
+                  "type": "label",
+                  "codeName": "green_log_three_icon",
+                  "props": {
+                    "text": "",
+                    "x": 18,
+                    "y": 186,
+                    "width": 34,
+                    "height": 34
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.accent"
+                        },
+                        "text_font": {
+                          "$token": "font.size.24"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000090",
+                  "type": "label",
+                  "codeName": "green_log_three",
+                  "props": {
+                    "text": "07:55  Ventilation cycle",
+                    "x": 64,
+                    "y": 184,
+                    "width": 338,
+                    "height": 28
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.18"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000091",
+                  "type": "label",
+                  "codeName": "green_log_three_note",
+                  "props": {
+                    "text": "Humidity reduced to 58%",
+                    "x": 64,
+                    "y": 214,
+                    "width": 338,
+                    "height": 22
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.14"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000094",
+              "type": "button",
+              "codeName": "green_log_clear",
+              "props": {
+                "x": 20,
+                "y": 392,
+                "width": 210,
+                "height": 60
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 16,
+                    "pad_all": 0,
+                    "shadow_width": 0,
+                    "shadow_color": {
+                      "$token": "color.surface"
+                    },
+                    "shadow_opa": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent2"
+                    }
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "10000000-0000-4000-9000-000000000093",
+                  "type": "label",
+                  "codeName": "green_log_clear_text",
+                  "props": {
+                    "text": "  MARK READ",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000096",
+              "type": "button",
+              "codeName": "green_log_home",
+              "props": {
+                "x": 250,
+                "y": 392,
+                "width": 210,
+                "height": 60
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.accent"
+                    },
+                    "border_width": 1,
+                    "radius": 16,
+                    "pad_all": 0,
+                    "shadow_width": 8,
+                    "shadow_color": {
+                      "$token": "color.accent"
+                    },
+                    "shadow_opa": 28
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent2"
+                    }
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "10000000-0000-4000-9000-000000000001",
+                    "anim": "fade_in",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "10000000-0000-4000-9000-000000000095",
+                  "type": "label",
+                  "codeName": "green_log_home_text",
+                  "props": {
+                    "text": "  OVERVIEW",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.onaccent"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "components": [],
+    "styles": [],
+    "consts": [],
+    "assets": {
+      "fonts": [],
+      "images": [],
+      "icons": []
+    },
+    "translations": null,
+    "editor": {
+      "deviceModel": "WF2D-8630",
+      "deviceTitle": "3.95 inch square demo",
+      "example": "device-showcase-suite-v1",
+      "showcase": "greenhouse"
+    }
+  },
+  "displayProfile": {
+    "schemaVersion": 1,
+    "kind": "display-profile",
+    "id": "display:wf2d-8630-480x480-rgb565",
+    "revision": 1,
+    "displayName": "WF2D-8630 480×480 矩形屏 RGB565",
+    "logicalSize": {
+      "width": 480,
+      "height": 480
+    },
+    "shape": "rect",
+    "colorFormat": "RGB565",
+    "dpi": 130
+  },
+  "controllerProfile": {
+    "schemaVersion": 1,
+    "kind": "controller-profile",
+    "id": "controller:wf2d-8630",
+    "revision": 1,
+    "model": "WF2D-8630",
+    "displayName": "WF2D-8630 设备外壳",
+    "displayRef": "display:wf2d-8630-480x480-rgb565@1",
+    "frame": {
+      "assetRef": "asset:controller/wf2d-8630.svg@sha256:9df6a6386ab20ef085b2bde7c119b5825188e9cff866923325857a32f6b97346",
+      "viewBox": {
+        "x": 0,
+        "y": 0,
+        "width": 86,
+        "height": 86
+      },
+      "screenViewport": {
+        "x": 7.445321,
+        "y": 7.445321,
+        "width": 71.109358,
+        "height": 71.109358,
+        "rotation": 0,
+        "clip": {
+          "type": "roundedRect",
+          "radius": 0.75
+        }
+      }
+    }
+  },
+  "buildTarget": {
+    "schemaVersion": 1,
+    "kind": "lvgl-build-target",
+    "id": "target:wf2d-8630-greenhouse",
+    "revision": 1,
+    "displayName": "WF2D-8630 智慧温室控制台目标",
+    "uiProjectRef": "ui:wf2d-8630-greenhouse@1",
+    "controllerProfileRef": "controller:wf2d-8630@1",
+    "themeRef": "ui:wf2d-8630-greenhouse@1#theme:showcase-wf2d-8630",
+    "lvglVersion": "9.5.0"
+  },
+  "actionRegistry": {
+    "screen.open": {
+      "id": "screen.open",
+      "displayName": "打开屏幕",
+      "params": [
+        {
+          "name": "screen",
+          "type": "screenRef",
+          "required": true
+        },
+        {
+          "name": "anim",
+          "type": "string"
+        },
+        {
+          "name": "duration",
+          "type": "int"
+        },
+        {
+          "name": "delay",
+          "type": "int"
+        }
+      ]
+    },
+    "screen.create": {
+      "id": "screen.create",
+      "displayName": "创建并打开屏幕",
+      "description": "目标屏未创建时先创建再加载",
+      "params": [
+        {
+          "name": "screen",
+          "type": "screenRef",
+          "required": true
+        },
+        {
+          "name": "anim",
+          "type": "string"
+        },
+        {
+          "name": "duration",
+          "type": "int"
+        },
+        {
+          "name": "delay",
+          "type": "int"
+        }
+      ]
+    },
+    "screen.back": {
+      "id": "screen.back",
+      "displayName": "返回上一屏",
+      "params": []
+    },
+    "subject.set": {
+      "id": "subject.set",
+      "displayName": "设置 Subject",
+      "params": [
+        {
+          "name": "subject",
+          "type": "subjectRef",
+          "required": true
+        },
+        {
+          "name": "value",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    "subject.toggle": {
+      "id": "subject.toggle",
+      "displayName": "翻转 Subject",
+      "params": [
+        {
+          "name": "subject",
+          "type": "subjectRef",
+          "required": true
+        }
+      ]
+    },
+    "subject.increment": {
+      "id": "subject.increment",
+      "displayName": "递增 Subject",
+      "params": [
+        {
+          "name": "subject",
+          "type": "subjectRef",
+          "required": true
+        },
+        {
+          "name": "step",
+          "type": "int"
+        },
+        {
+          "name": "min",
+          "type": "int"
+        },
+        {
+          "name": "max",
+          "type": "int"
+        },
+        {
+          "name": "rollover",
+          "type": "bool"
+        }
+      ]
+    }
+  },
+  "migrationNotes": [
+    {
+      "severity": "info",
+      "code": "color-format-confirmed",
+      "path": "display.colorFormat",
+      "message": "WF2D-8630 示例已确认使用 RGB565。"
+    },
+    {
+      "severity": "info",
+      "code": "controller-profile-selected",
+      "path": "buildTarget.controllerProfileRef",
+      "message": "已绑定 WF2D-8630 设备外壳。"
+    },
+    {
+      "severity": "info",
+      "code": "device-showcase-layout-v1",
+      "path": "uiProject.screens",
+      "message": "WF2D-8630 使用独立的 智慧温室控制台 场景、视觉系统与触控布局，并包含 4 个可导航页面。"
+    }
+  ],
+  "colorFormatConfirmed": true
+}

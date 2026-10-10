@@ -53,16 +53,51 @@ function collectText(node: WidgetNodeV2): string[] {
   return [...own, ...node.children.flatMap(collectText)];
 }
 
-function collectTextFontSizes(node: WidgetNodeV2): Array<{ name: string; text: string; size: number }> {
+function activeThemeValues(snapshot: ProjectSnapshotV2): Map<string, string | number> {
+  const themeId = snapshot.buildTarget.themeRef.match(/#theme:(.+)$/)?.[1];
+  const theme = snapshot.uiProject.themes.find((candidate) => candidate.id === themeId);
+  return new Map(theme?.tokens.map((token) => [token.id, token.value]) ?? []);
+}
+
+function resolveThemeValue(
+  value: unknown,
+  themeValues: ReadonlyMap<string, string | number>,
+): unknown {
+  if (value && typeof value === 'object' && '$token' in value) {
+    const tokenId = (value as { $token?: unknown }).$token;
+    if (typeof tokenId === 'string') return themeValues.get(tokenId);
+  }
+  return value;
+}
+
+function collectTextFontSizes(
+  node: WidgetNodeV2,
+  themeValues: ReadonlyMap<string, string | number>,
+): Array<{ name: string; text: string; size: number }> {
   const text = typeof node.props.text === 'string' ? node.props.text : null;
-  const font = node.styles
+  const resolvedFont = node.styles
     .map((entry) => entry.props.text_font)
+    .map((value) => resolveThemeValue(value, themeValues))
     .find((value): value is string => typeof value === 'string');
+  const font = resolvedFont ?? null;
   const match = font ? /^montserrat_(\d+)$/.exec(font) : null;
   const own = text !== null && match
     ? [{ name: node.codeName ?? node.type, text, size: Number(match[1]) }]
     : [];
-  return [...own, ...node.children.flatMap(collectTextFontSizes)];
+  return [
+    ...own,
+    ...node.children.flatMap((child) => collectTextFontSizes(child, themeValues)),
+  ];
+}
+
+function collectUnthemedVisualValues(node: WidgetNodeV2): string[] {
+  const own = node.styles.flatMap((entry) => Object.entries(entry.props)
+    .filter(([prop, value]) => (
+      (prop === 'text_font' && typeof value === 'string')
+      || (typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value))
+    ))
+    .map(([prop]) => `${node.codeName ?? node.type}.${prop}`));
+  return [...own, ...node.children.flatMap(collectUnthemedVisualValues)];
 }
 
 function findNode(root: WidgetNodeV2, codeName: string): WidgetNodeV2 | undefined {
@@ -72,6 +107,17 @@ function findNode(root: WidgetNodeV2, codeName: string): WidgetNodeV2 | undefine
     if (found) return found;
   }
   return undefined;
+}
+
+function collectPrimaryNavigation(root: WidgetNodeV2): WidgetNodeV2[] {
+  const name = root.codeName ?? '';
+  const own = root.type === 'button' && (
+    name.includes('_nav_')
+    || name.endsWith('_back')
+    || name.endsWith('_next')
+    || name === 'settings_home'
+  ) ? [root] : [];
+  return own.concat(...root.children.map(collectPrimaryNavigation));
 }
 
 describe('quiet pod example projects', () => {
@@ -103,6 +149,14 @@ describe('quiet pod example projects', () => {
         },
       }).errors).toEqual([]);
       expect(snapshot.migrationNotes.filter((note) => note.severity === 'must-confirm')).toEqual([]);
+      expect(snapshot.buildTarget.themeRef).toMatch(/#theme:quiet-dark$/);
+      expect(snapshot.uiProject.themes.map((theme) => theme.id)).toEqual(['quiet-dark']);
+      const themeValues = activeThemeValues(snapshot);
+      expect(themeValues.get('color.background')).toBe('#06101E');
+      expect([...themeValues.values()].some((value) => value === 'montserrat_16')).toBe(true);
+      expect(snapshot.uiProject.screens.flatMap((screen) => (
+        collectUnthemedVisualValues(screen.root)
+      ))).toEqual([]);
       snapshot.uiProject.screens.forEach((screen) => {
         screen.root.children.forEach((child, index) => {
           expectInsideCanvas(
@@ -115,7 +169,9 @@ describe('quiet pod example projects', () => {
       });
 
       const minimumTextSize = preset.width <= 240 ? 14 : preset.width <= 480 ? 14 : 16;
-      const textNodes = snapshot.uiProject.screens.flatMap((screen) => collectTextFontSizes(screen.root));
+      const textNodes = snapshot.uiProject.screens.flatMap((screen) => (
+        collectTextFontSizes(screen.root, themeValues)
+      ));
       expect(textNodes.length).toBeGreaterThan(0);
       expect(
         textNodes.filter((item) => item.size < minimumTextSize),
@@ -127,6 +183,19 @@ describe('quiet pod example projects', () => {
       expect(allText).not.toContain('QUIET\nPOD');
       if (preset.shape !== 'round') {
         expect(allText.filter((value) => value === 'BRAND A')).toHaveLength(5);
+      }
+
+      const navigation = snapshot.uiProject.screens.flatMap((screen) => (
+        collectPrimaryNavigation(screen.root)
+      ));
+      expect(navigation.length).toBeGreaterThan(0);
+      const minimumWidth = preset.shape === 'round' ? 48 : preset.width <= 480 ? 88 : 120;
+      const minimumHeight = preset.shape === 'round' ? 48 : preset.width <= 480
+        ? 52
+        : preset.height >= 700 ? 76 : 66;
+      for (const item of navigation) {
+        expect(Number(item.props.width), `${preset.model}.${item.codeName} width`).toBeGreaterThanOrEqual(minimumWidth);
+        expect(Number(item.props.height), `${preset.model}.${item.codeName} height`).toBeGreaterThanOrEqual(minimumHeight);
       }
     });
   }
@@ -160,7 +229,7 @@ describe('quiet pod example projects', () => {
 
       for (const suffix of ['back', 'next', 'home']) {
         const nav = findNode(screen.root, `${screen.codeName}_${suffix}`);
-        if (nav) expect(nav.props).toMatchObject({ y: 26, width: 38, height: 38 });
+        if (nav) expect(nav.props).toMatchObject({ y: 20, width: 48, height: 48 });
       }
     }
 

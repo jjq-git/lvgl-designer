@@ -50,6 +50,14 @@ interface Delta {
   screens: Set<string>;
 }
 
+function compactRuntimeError(error: unknown): string {
+  const message = error instanceof Error ? error.message : String(error);
+  const limit = 240;
+  return message.length <= limit
+    ? message
+    : `${message.slice(0, limit).trimEnd()}…（完整错误见浏览器控制台）`;
+}
+
 function classify(patches: Patch[], project: LvProject): Delta {
   const d: Delta = { level: 0, displayChanged: false, l1: new Map(), screens: new Set() };
   const raise = (lv: 1 | 3 | 4): void => {
@@ -273,7 +281,7 @@ export class ReloadPipeline {
     } catch (e) {
       // 兜底:任何热重载异常回落全量重载,并亮横幅
       console.error('[reloadPipeline]', e);
-      useEditorStore.getState().setBanner(`热重载异常:${(e as Error).message}`);
+      useEditorStore.getState().setBanner(`热重载异常:${compactRuntimeError(e)}`);
       try {
         this.reloadAllNow();
       } catch (e2) {
@@ -404,11 +412,19 @@ export class ReloadPipeline {
     if (!screen) return;
     try {
       if (!this.loadedScreens.has(screen.name)) {
-        this.reloadScreens(new Set([screen.id]), project);
+        if (this.runtime.supportsPreviewProgram()) {
+          // LVGL 9.5 PreviewProgram host intentionally has no legacy
+          // lvd_reload_screen export. An unloaded screen can still be observed
+          // during startup/project replacement, so rebuild the transactional
+          // program before switching instead of falling into the XML bridge.
+          this.reloadAllNow();
+        } else {
+          this.reloadScreens(new Set([screen.id]), project);
+        }
       }
       this.runtime.loadScreen(screen.name);
     } catch (e) {
-      useEditorStore.getState().setBanner(`切屏失败:${(e as Error).message}`);
+      useEditorStore.getState().setBanner(`切屏失败:${compactRuntimeError(e)}`);
     }
     this.bump();
   }

@@ -12,30 +12,51 @@ export interface BuiltInProjectDescriptor {
   load(): Promise<StoredProjectDocument>;
 }
 
+export const WF3_BUILT_IN_REVISION = 9;
+
 export async function ensureBuiltInProjectAssets(
   document: StoredProjectDocument,
 ): Promise<void> {
   if (typeof window === 'undefined') return;
-  const fontFile = isProjectSnapshotV2(document)
-    ? document.uiProject.assets.fonts.find((font) => font.file.fileName === 'NotoSansSC-WF3.ttf')?.file
-    : (document as LvProject).assets.fonts.find(
-        (font) => font.file.fileName === 'NotoSansSC-WF3.ttf',
-      )?.file;
-  if (!fontFile || await getAssetBytes(fontFile.sha256)) return;
+  const fonts = isProjectSnapshotV2(document)
+    ? document.uiProject.assets.fonts
+    : (document as LvProject).assets.fonts;
+  const fontFiles = fonts
+    .map((font) => font.file)
+    .filter((file, index, files) => (
+      (file.fileName === 'NotoSansSC-WF3.ttf'
+        || file.fileName === 'MaterialSymbolsOutlined-WF3-32.ttf'
+        || file.fileName === 'MaterialSymbolsOutlined-WF3-36.ttf')
+      && files.findIndex((candidate) => candidate.sha256 === file.sha256) === index
+    ));
 
-  const { default: fontUrl } = await import(
-    '../../../../examples/wf3-firmware/assets/NotoSansSC-WF3.ttf?url'
-  );
-  const response = await fetch(fontUrl);
-  if (!response.ok) throw new Error(`WF3 内置字体加载失败：HTTP ${response.status}`);
-  const bytes = await response.arrayBuffer();
-  const actualSha = await sha256Hex(new Uint8Array(bytes));
-  if (actualSha !== fontFile.sha256) throw new Error('WF3 内置字体校验失败');
-  await putAssetBytes(fontFile.sha256, {
-    bytes,
-    mime: 'font/ttf',
-    fileName: fontFile.fileName,
-  });
+  for (const fontFile of fontFiles) {
+    if (await getAssetBytes(fontFile.sha256)) continue;
+    let fontUrl: string;
+    if (fontFile.fileName === 'NotoSansSC-WF3.ttf') {
+      fontUrl = (await import(
+        '../../../../examples/wf3-firmware/assets/NotoSansSC-WF3.ttf?url'
+      )).default;
+    } else if (fontFile.fileName === 'MaterialSymbolsOutlined-WF3-32.ttf') {
+      fontUrl = (await import(
+        '../../../../examples/wf3-firmware/assets/MaterialSymbolsOutlined-WF3-32.ttf?url'
+      )).default;
+    } else {
+      fontUrl = (await import(
+        '../../../../examples/wf3-firmware/assets/MaterialSymbolsOutlined-WF3-36.ttf?url'
+      )).default;
+    }
+    const response = await fetch(fontUrl);
+    if (!response.ok) throw new Error(`WF3 内置字体加载失败：HTTP ${response.status}`);
+    const bytes = await response.arrayBuffer();
+    const actualSha = await sha256Hex(new Uint8Array(bytes));
+    if (actualSha !== fontFile.sha256) throw new Error('WF3 内置字体校验失败');
+    await putAssetBytes(fontFile.sha256, {
+      bytes,
+      mime: 'font/ttf',
+      fileName: fontFile.fileName,
+    });
+  }
 }
 
 export const BUILT_IN_PROJECTS: readonly BuiltInProjectDescriptor[] = [
@@ -59,7 +80,7 @@ export function findBuiltInProject(id: string): BuiltInProjectDescriptor | undef
   return BUILT_IN_PROJECTS.find((project) => project.id === id);
 }
 
-/** Replace only the short-lived generated WF3 draft that used unrelated generic icons. */
+/** Replace cached WF3 drafts until they match the current bundled UI and fonts. */
 export function isLegacyWf3NavigationProject(project: LvProject): boolean {
   const isTaggedExample = project.editor?.example === 'wf3-firmware-import';
   if (
@@ -69,16 +90,29 @@ export function isLegacyWf3NavigationProject(project: LvProject): boolean {
     || project.display.shape !== 'rect'
     || project.screens.length !== 46
   ) return false;
+  const builtInRevision = project.editor?.builtInRevision;
+  if (
+    typeof builtInRevision !== 'number'
+    || builtInRevision < WF3_BUILT_IN_REVISION
+  ) return true;
   const home = project.screens.find((screen) =>
     screen.name === 'wf3_home' || screen.isHome === true);
   if (!home) return false;
   const directNames = new Set(home.root.children.map((node) => node.name));
+  const hasCarouselNavigation = directNames.has('wf3_home_carousel_previous')
+    && directNames.has('wf3_home_carousel_next')
+    && [...directNames].some((name) => name?.startsWith('wf3_home_carousel_0_'));
+  if (hasCarouselNavigation) return false;
   const titleBar = home.root.children.find((node) => node.name === 'wf3_home_titlebar');
   const title = titleBar?.children[0]?.props.text;
-  const hasCurrentMenu = directNames.has('wf3_home_menu_0')
-    && directNames.has('wf3_home_menu_5')
-    && title === '功能菜单';
-  if (hasCurrentMenu) return false;
+  const hasReferenceNavigation = directNames.has('wf3_home_reference_nav_0')
+    && directNames.has('wf3_home_reference_nav_6')
+    && title === 'UART';
+  if (hasReferenceNavigation) return false;
   return title === 'UART'
-    || [...directNames].some((name) => name?.startsWith('wf3_home_nav_'));
+    || title === '功能菜单'
+    || [...directNames].some((name) => (
+      name?.startsWith('wf3_home_nav_')
+      || name?.startsWith('wf3_home_menu_')
+    ));
 }

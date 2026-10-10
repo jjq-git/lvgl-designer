@@ -33,4 +33,25 @@ describe('ReloadPipeline startup recovery', () => {
     expect(runtime.loadScreen).toHaveBeenCalled();
     pipeline.dispose();
   });
+
+  it('rebuilds PreviewProgram instead of calling the legacy screen reload export', () => {
+    const project = createEmptyProject('preview-screen-switch');
+    useProjectStore.getState().loadProject(project);
+    const runtime = {
+      setResolution: vi.fn(),
+      supportsPreviewProgram: () => true,
+      loadPreviewProgram: vi.fn(),
+      loadScreen: vi.fn(),
+      reloadScreen: vi.fn(() => {
+        throw new Error('legacy lvd_reload_screen must not be used');
+      }),
+    } as unknown as LvglRuntimeApi;
+    const pipeline = new ReloadPipeline(runtime);
+
+    pipeline.loadScreenById(project.screens[0]!.id);
+
+    expect(runtime.loadPreviewProgram).toHaveBeenCalledOnce();
+    expect(runtime.reloadScreen).not.toHaveBeenCalled();
+    expect(runtime.loadScreen).toHaveBeenCalledWith(project.screens[0]!.name);
+  });
 });

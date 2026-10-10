@@ -1,0 +1,1730 @@
+{
+  "kind": "lvgl-project-snapshot",
+  "snapshotVersion": 1,
+  "uiProject": {
+    "schemaVersion": 2,
+    "kind": "lvgl-ui-project",
+    "meta": {
+      "id": "ui:wf2d-8620-focus-orbit",
+      "revision": 1,
+      "name": "WF2D-8620 专注节奏计时器",
+      "appVersion": "1.0.0",
+      "createdAt": "2026-10-10T00:00:00.000Z",
+      "modifiedAt": "2026-10-10T00:00:00.000Z"
+    },
+    "designDisplayRef": "display:wf2d-8620-240x240-rgb565@1",
+    "themes": [
+      {
+        "id": "showcase-wf2d-8620",
+        "displayName": "WF2D-8620 专注节奏计时器主题",
+        "tokens": [
+          {
+            "id": "color.background",
+            "type": "color",
+            "value": "#120C24"
+          },
+          {
+            "id": "color.surface",
+            "type": "color",
+            "value": "#21153D"
+          },
+          {
+            "id": "color.surface2",
+            "type": "color",
+            "value": "#302052"
+          },
+          {
+            "id": "color.border",
+            "type": "color",
+            "value": "#513C77"
+          },
+          {
+            "id": "color.text.primary",
+            "type": "color",
+            "value": "#FFF7FF"
+          },
+          {
+            "id": "color.text.muted",
+            "type": "color",
+            "value": "#B6A8D2"
+          },
+          {
+            "id": "color.text.onaccent",
+            "type": "color",
+            "value": "#FFFFFF"
+          },
+          {
+            "id": "color.accent",
+            "type": "color",
+            "value": "#FF4FB3"
+          },
+          {
+            "id": "color.accent2",
+            "type": "color",
+            "value": "#8C6CFF"
+          },
+          {
+            "id": "color.success",
+            "type": "color",
+            "value": "#50E3C2"
+          },
+          {
+            "id": "color.warning",
+            "type": "color",
+            "value": "#FFC857"
+          },
+          {
+            "id": "color.danger",
+            "type": "color",
+            "value": "#FF6B7A"
+          },
+          {
+            "id": "color.track",
+            "type": "color",
+            "value": "#3A2A59"
+          },
+          {
+            "id": "color.shadow",
+            "type": "color",
+            "value": "#07030F"
+          },
+          {
+            "id": "font.size.12",
+            "type": "fontRef",
+            "value": "montserrat_12"
+          },
+          {
+            "id": "font.size.14",
+            "type": "fontRef",
+            "value": "montserrat_14"
+          },
+          {
+            "id": "font.size.16",
+            "type": "fontRef",
+            "value": "montserrat_16"
+          },
+          {
+            "id": "font.size.18",
+            "type": "fontRef",
+            "value": "montserrat_18"
+          },
+          {
+            "id": "font.size.20",
+            "type": "fontRef",
+            "value": "montserrat_20"
+          },
+          {
+            "id": "font.size.22",
+            "type": "fontRef",
+            "value": "montserrat_22"
+          },
+          {
+            "id": "font.size.24",
+            "type": "fontRef",
+            "value": "montserrat_24"
+          },
+          {
+            "id": "font.size.28",
+            "type": "fontRef",
+            "value": "montserrat_28"
+          },
+          {
+            "id": "font.size.30",
+            "type": "fontRef",
+            "value": "montserrat_30"
+          },
+          {
+            "id": "font.size.36",
+            "type": "fontRef",
+            "value": "montserrat_36"
+          },
+          {
+            "id": "font.size.40",
+            "type": "fontRef",
+            "value": "montserrat_40"
+          },
+          {
+            "id": "font.size.44",
+            "type": "fontRef",
+            "value": "montserrat_44"
+          }
+        ]
+      }
+    ],
+    "subjects": [],
+    "screens": [
+      {
+        "id": "10000000-0000-4000-9000-000000000001",
+        "codeName": "focus_home",
+        "displayName": "专注计时",
+        "isHome": true,
+        "styles": [],
+        "consts": [],
+        "root": {
+          "id": "10000000-0000-4000-9000-000000000016",
+          "type": "obj",
+          "codeName": "focus_home_root",
+          "props": {},
+          "flags": {
+            "scrollable": false
+          },
+          "styleRefs": [],
+          "styles": [
+            {
+              "props": {
+                "bg_color": {
+                  "$token": "color.background"
+                },
+                "bg_opa": 255,
+                "border_width": 0,
+                "pad_all": 0
+              }
+            }
+          ],
+          "events": [],
+          "bindings": [],
+          "children": [
+            {
+              "id": "10000000-0000-4000-9000-000000000004",
+              "type": "label",
+              "codeName": "focus_brand",
+              "props": {
+                "text": "FLOW",
+                "x": 72,
+                "y": 18,
+                "width": 96,
+                "height": 24
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": {
+                      "$token": "color.text.muted"
+                    },
+                    "text_font": {
+                      "$token": "font.size.18"
+                    },
+                    "text_align": "center",
+                    "text_opa": 255
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000006",
+              "type": "button",
+              "codeName": "focus_open_log",
+              "props": {
+                "x": 10,
+                "y": 94,
+                "width": 44,
+                "height": 48
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface2"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 20,
+                    "pad_all": 0,
+                    "shadow_width": 0,
+                    "shadow_color": {
+                      "$token": "color.surface2"
+                    },
+                    "shadow_opa": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent2"
+                    }
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "10000000-0000-4000-9000-000000000002",
+                    "anim": "fade_in",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "10000000-0000-4000-9000-000000000005",
+                  "type": "label",
+                  "codeName": "focus_open_log_text",
+                  "props": {
+                    "text": "",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000008",
+              "type": "button",
+              "codeName": "focus_open_sound",
+              "props": {
+                "x": 186,
+                "y": 94,
+                "width": 44,
+                "height": 48
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface2"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 20,
+                    "pad_all": 0,
+                    "shadow_width": 0,
+                    "shadow_color": {
+                      "$token": "color.surface2"
+                    },
+                    "shadow_opa": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent2"
+                    }
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "10000000-0000-4000-9000-000000000003",
+                    "anim": "fade_in",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "10000000-0000-4000-9000-000000000007",
+                  "type": "label",
+                  "codeName": "focus_open_sound_text",
+                  "props": {
+                    "text": "",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000009",
+              "type": "arc",
+              "codeName": "focus_ring",
+              "props": {
+                "x": 56,
+                "y": 44,
+                "width": 128,
+                "height": 128,
+                "min_value": 0,
+                "max_value": 100,
+                "value": 68,
+                "bg_start_angle": 135,
+                "bg_end_angle": 45,
+                "start_angle": 135,
+                "end_angle": 45,
+                "knob_offset": -3
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "selector": {
+                    "part": "main"
+                  },
+                  "props": {
+                    "arc_color": {
+                      "$token": "color.track"
+                    },
+                    "arc_width": 12
+                  }
+                },
+                {
+                  "selector": {
+                    "part": "indicator"
+                  },
+                  "props": {
+                    "arc_color": {
+                      "$token": "color.accent"
+                    },
+                    "arc_width": 12
+                  }
+                },
+                {
+                  "selector": {
+                    "part": "knob"
+                  },
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent"
+                    },
+                    "bg_opa": 0,
+                    "radius": 20
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000010",
+              "type": "label",
+              "codeName": "focus_time",
+              "props": {
+                "text": "25:00",
+                "x": 62,
+                "y": 84,
+                "width": 116,
+                "height": 42
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": {
+                      "$token": "color.text.primary"
+                    },
+                    "text_font": {
+                      "$token": "font.size.36"
+                    },
+                    "text_align": "center",
+                    "text_opa": 255
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000011",
+              "type": "label",
+              "codeName": "focus_mode",
+              "props": {
+                "text": "DEEP FOCUS",
+                "x": 65,
+                "y": 126,
+                "width": 110,
+                "height": 22
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": {
+                      "$token": "color.success"
+                    },
+                    "text_font": {
+                      "$token": "font.size.14"
+                    },
+                    "text_align": "center",
+                    "text_opa": 255
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000013",
+              "type": "button",
+              "codeName": "focus_pause",
+              "props": {
+                "x": 44,
+                "y": 178,
+                "width": 92,
+                "height": 42
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.accent"
+                    },
+                    "border_width": 1,
+                    "radius": 21,
+                    "pad_all": 0,
+                    "shadow_width": 8,
+                    "shadow_color": {
+                      "$token": "color.accent"
+                    },
+                    "shadow_opa": 28
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent2"
+                    }
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "10000000-0000-4000-9000-000000000012",
+                  "type": "label",
+                  "codeName": "focus_pause_text",
+                  "props": {
+                    "text": "  PAUSE",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.onaccent"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000015",
+              "type": "button",
+              "codeName": "focus_extend",
+              "props": {
+                "x": 144,
+                "y": 178,
+                "width": 52,
+                "height": 42
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface2"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 22,
+                    "pad_all": 0,
+                    "shadow_width": 0,
+                    "shadow_color": {
+                      "$token": "color.surface2"
+                    },
+                    "shadow_opa": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent2"
+                    }
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "10000000-0000-4000-9000-000000000014",
+                  "type": "label",
+                  "codeName": "focus_extend_text",
+                  "props": {
+                    "text": "  +5",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "10000000-0000-4000-9000-000000000002",
+        "codeName": "focus_log",
+        "displayName": "专注记录",
+        "isHome": false,
+        "styles": [],
+        "consts": [],
+        "root": {
+          "id": "10000000-0000-4000-9000-000000000027",
+          "type": "obj",
+          "codeName": "focus_log_root",
+          "props": {},
+          "flags": {
+            "scrollable": false
+          },
+          "styleRefs": [],
+          "styles": [
+            {
+              "props": {
+                "bg_color": {
+                  "$token": "color.background"
+                },
+                "bg_opa": 255,
+                "border_width": 0,
+                "pad_all": 0
+              }
+            }
+          ],
+          "events": [],
+          "bindings": [],
+          "children": [
+            {
+              "id": "10000000-0000-4000-9000-000000000017",
+              "type": "label",
+              "codeName": "focus_log_brand",
+              "props": {
+                "text": "FLOW / LOG",
+                "x": 60,
+                "y": 16,
+                "width": 120,
+                "height": 24
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": {
+                      "$token": "color.text.muted"
+                    },
+                    "text_font": {
+                      "$token": "font.size.18"
+                    },
+                    "text_align": "center",
+                    "text_opa": 255
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000022",
+              "type": "obj",
+              "codeName": "focus_log_card",
+              "props": {
+                "x": 22,
+                "y": 50,
+                "width": 196,
+                "height": 116
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface2"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 20,
+                    "pad_all": 0,
+                    "shadow_color": {
+                      "$token": "color.shadow"
+                    },
+                    "shadow_width": 0,
+                    "shadow_opa": 0,
+                    "shadow_offset_y": 0
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "10000000-0000-4000-9000-000000000018",
+                  "type": "label",
+                  "codeName": "focus_log_today",
+                  "props": {
+                    "text": "TODAY",
+                    "x": 16,
+                    "y": 12,
+                    "width": 72,
+                    "height": 18
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000019",
+                  "type": "label",
+                  "codeName": "focus_log_sessions",
+                  "props": {
+                    "text": "3 SESSIONS",
+                    "x": 16,
+                    "y": 32,
+                    "width": 164,
+                    "height": 28
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.22"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000020",
+                  "type": "label",
+                  "codeName": "focus_log_minutes",
+                  "props": {
+                    "text": "68 MIN FOCUSED",
+                    "x": 16,
+                    "y": 62,
+                    "width": 164,
+                    "height": 22
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.success"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000021",
+                  "type": "bar",
+                  "codeName": "focus_log_goal",
+                  "props": {
+                    "x": 16,
+                    "y": 91,
+                    "width": 164,
+                    "height": 12,
+                    "min_value": 0,
+                    "max_value": 100,
+                    "value": 76
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "selector": {
+                        "part": "main"
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.track"
+                        },
+                        "bg_opa": 255,
+                        "radius": 6
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "indicator"
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.accent"
+                        },
+                        "bg_opa": 255,
+                        "radius": 6
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000024",
+              "type": "button",
+              "codeName": "focus_log_back",
+              "props": {
+                "x": 48,
+                "y": 178,
+                "width": 60,
+                "height": 42
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.accent"
+                    },
+                    "border_width": 1,
+                    "radius": 20,
+                    "pad_all": 0,
+                    "shadow_width": 8,
+                    "shadow_color": {
+                      "$token": "color.accent"
+                    },
+                    "shadow_opa": 28
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent2"
+                    }
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "10000000-0000-4000-9000-000000000001",
+                    "anim": "move_right",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "10000000-0000-4000-9000-000000000023",
+                  "type": "label",
+                  "codeName": "focus_log_back_text",
+                  "props": {
+                    "text": "",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.onaccent"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000026",
+              "type": "button",
+              "codeName": "focus_log_sound",
+              "props": {
+                "x": 116,
+                "y": 178,
+                "width": 76,
+                "height": 42
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface2"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 20,
+                    "pad_all": 0,
+                    "shadow_width": 0,
+                    "shadow_color": {
+                      "$token": "color.surface2"
+                    },
+                    "shadow_opa": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent2"
+                    }
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "10000000-0000-4000-9000-000000000003",
+                    "anim": "fade_in",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "10000000-0000-4000-9000-000000000025",
+                  "type": "label",
+                  "codeName": "focus_log_sound_text",
+                  "props": {
+                    "text": "  SOUND",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "10000000-0000-4000-9000-000000000003",
+        "codeName": "focus_sound",
+        "displayName": "声音场景",
+        "isHome": false,
+        "styles": [],
+        "consts": [],
+        "root": {
+          "id": "10000000-0000-4000-9000-000000000038",
+          "type": "obj",
+          "codeName": "focus_sound_root",
+          "props": {},
+          "flags": {
+            "scrollable": false
+          },
+          "styleRefs": [],
+          "styles": [
+            {
+              "props": {
+                "bg_color": {
+                  "$token": "color.background"
+                },
+                "bg_opa": 255,
+                "border_width": 0,
+                "pad_all": 0
+              }
+            }
+          ],
+          "events": [],
+          "bindings": [],
+          "children": [
+            {
+              "id": "10000000-0000-4000-9000-000000000028",
+              "type": "label",
+              "codeName": "focus_sound_brand",
+              "props": {
+                "text": "SOUND SPACE",
+                "x": 54,
+                "y": 16,
+                "width": 132,
+                "height": 24
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": {
+                      "$token": "color.text.muted"
+                    },
+                    "text_font": {
+                      "$token": "font.size.18"
+                    },
+                    "text_align": "center",
+                    "text_opa": 255
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000033",
+              "type": "obj",
+              "codeName": "focus_sound_card",
+              "props": {
+                "x": 22,
+                "y": 50,
+                "width": 196,
+                "height": 116
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface2"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 20,
+                    "pad_all": 0,
+                    "shadow_color": {
+                      "$token": "color.shadow"
+                    },
+                    "shadow_width": 0,
+                    "shadow_opa": 0,
+                    "shadow_offset_y": 0
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "10000000-0000-4000-9000-000000000029",
+                  "type": "label",
+                  "codeName": "focus_sound_scene",
+                  "props": {
+                    "text": "SOFT RAIN",
+                    "x": 16,
+                    "y": 12,
+                    "width": 164,
+                    "height": 28
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.22"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000030",
+                  "type": "label",
+                  "codeName": "focus_sound_note",
+                  "props": {
+                    "text": "Low distraction ambience",
+                    "x": 16,
+                    "y": 44,
+                    "width": 164,
+                    "height": 20
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000031",
+                  "type": "label",
+                  "codeName": "focus_sound_volume",
+                  "props": {
+                    "text": "VOLUME  42%",
+                    "x": 16,
+                    "y": 70,
+                    "width": 164,
+                    "height": 18
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.success"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "10000000-0000-4000-9000-000000000032",
+                  "type": "bar",
+                  "codeName": "focus_sound_level",
+                  "props": {
+                    "x": 16,
+                    "y": 92,
+                    "width": 164,
+                    "height": 12,
+                    "min_value": 0,
+                    "max_value": 100,
+                    "value": 42
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "selector": {
+                        "part": "main"
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.track"
+                        },
+                        "bg_opa": 255,
+                        "radius": 6
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "indicator"
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.accent2"
+                        },
+                        "bg_opa": 255,
+                        "radius": 6
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000035",
+              "type": "button",
+              "codeName": "focus_sound_back",
+              "props": {
+                "x": 48,
+                "y": 178,
+                "width": 60,
+                "height": 42
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface2"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 20,
+                    "pad_all": 0,
+                    "shadow_width": 0,
+                    "shadow_color": {
+                      "$token": "color.surface2"
+                    },
+                    "shadow_opa": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent2"
+                    }
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "10000000-0000-4000-9000-000000000001",
+                    "anim": "move_right",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "10000000-0000-4000-9000-000000000034",
+                  "type": "label",
+                  "codeName": "focus_sound_back_text",
+                  "props": {
+                    "text": "",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "10000000-0000-4000-9000-000000000037",
+              "type": "button",
+              "codeName": "focus_sound_play",
+              "props": {
+                "x": 116,
+                "y": 178,
+                "width": 76,
+                "height": 42
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.accent"
+                    },
+                    "border_width": 1,
+                    "radius": 20,
+                    "pad_all": 0,
+                    "shadow_width": 8,
+                    "shadow_color": {
+                      "$token": "color.accent"
+                    },
+                    "shadow_opa": 28
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent2"
+                    }
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "10000000-0000-4000-9000-000000000001",
+                    "anim": "fade_in",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "10000000-0000-4000-9000-000000000036",
+                  "type": "label",
+                  "codeName": "focus_sound_play_text",
+                  "props": {
+                    "text": "  PLAY",
+                    "align": "center",
+                    "width": "100%",
+                    "height": "content"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.onaccent"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "components": [],
+    "styles": [],
+    "consts": [],
+    "assets": {
+      "fonts": [],
+      "images": [],
+      "icons": []
+    },
+    "translations": null,
+    "editor": {
+      "deviceModel": "WF2D-8620",
+      "deviceTitle": "1.28 inch round",
+      "example": "device-showcase-suite-v1",
+      "showcase": "focus-orbit"
+    }
+  },
+  "displayProfile": {
+    "schemaVersion": 1,
+    "kind": "display-profile",
+    "id": "display:wf2d-8620-240x240-rgb565",
+    "revision": 1,
+    "displayName": "WF2D-8620 240×240 圆屏 RGB565",
+    "logicalSize": {
+      "width": 240,
+      "height": 240
+    },
+    "shape": "round",
+    "colorFormat": "RGB565",
+    "dpi": 130
+  },
+  "controllerProfile": {
+    "schemaVersion": 1,
+    "kind": "controller-profile",
+    "id": "controller:wf2d-8620",
+    "revision": 1,
+    "model": "WF2D-8620",
+    "displayName": "WF2D-8620 设备外壳",
+    "displayRef": "display:wf2d-8620-240x240-rgb565@1",
+    "frame": {
+      "assetRef": "asset:controller/wf2d-8620.svg@sha256:8075730339576576a88750c143dd7568321c0545c5a8cb4701345b3b7b872cad",
+      "viewBox": {
+        "x": 0,
+        "y": 0,
+        "width": 86,
+        "height": 86
+      },
+      "screenViewport": {
+        "x": 20.149972,
+        "y": 20.149972,
+        "width": 45.69996999999999,
+        "height": 45.69996999999999,
+        "rotation": 0,
+        "clip": {
+          "type": "circle"
+        }
+      }
+    }
+  },
+  "buildTarget": {
+    "schemaVersion": 1,
+    "kind": "lvgl-build-target",
+    "id": "target:wf2d-8620-focus-orbit",
+    "revision": 1,
+    "displayName": "WF2D-8620 专注节奏计时器目标",
+    "uiProjectRef": "ui:wf2d-8620-focus-orbit@1",
+    "controllerProfileRef": "controller:wf2d-8620@1",
+    "themeRef": "ui:wf2d-8620-focus-orbit@1#theme:showcase-wf2d-8620",
+    "lvglVersion": "9.5.0"
+  },
+  "actionRegistry": {
+    "screen.open": {
+      "id": "screen.open",
+      "displayName": "打开屏幕",
+      "params": [
+        {
+          "name": "screen",
+          "type": "screenRef",
+          "required": true
+        },
+        {
+          "name": "anim",
+          "type": "string"
+        },
+        {
+          "name": "duration",
+          "type": "int"
+        },
+        {
+          "name": "delay",
+          "type": "int"
+        }
+      ]
+    },
+    "screen.create": {
+      "id": "screen.create",
+      "displayName": "创建并打开屏幕",
+      "description": "目标屏未创建时先创建再加载",
+      "params": [
+        {
+          "name": "screen",
+          "type": "screenRef",
+          "required": true
+        },
+        {
+          "name": "anim",
+          "type": "string"
+        },
+        {
+          "name": "duration",
+          "type": "int"
+        },
+        {
+          "name": "delay",
+          "type": "int"
+        }
+      ]
+    },
+    "screen.back": {
+      "id": "screen.back",
+      "displayName": "返回上一屏",
+      "params": []
+    },
+    "subject.set": {
+      "id": "subject.set",
+      "displayName": "设置 Subject",
+      "params": [
+        {
+          "name": "subject",
+          "type": "subjectRef",
+          "required": true
+        },
+        {
+          "name": "value",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    "subject.toggle": {
+      "id": "subject.toggle",
+      "displayName": "翻转 Subject",
+      "params": [
+        {
+          "name": "subject",
+          "type": "subjectRef",
+          "required": true
+        }
+      ]
+    },
+    "subject.increment": {
+      "id": "subject.increment",
+      "displayName": "递增 Subject",
+      "params": [
+        {
+          "name": "subject",
+          "type": "subjectRef",
+          "required": true
+        },
+        {
+          "name": "step",
+          "type": "int"
+        },
+        {
+          "name": "min",
+          "type": "int"
+        },
+        {
+          "name": "max",
+          "type": "int"
+        },
+        {
+          "name": "rollover",
+          "type": "bool"
+        }
+      ]
+    }
+  },
+  "migrationNotes": [
+    {
+      "severity": "info",
+      "code": "color-format-confirmed",
+      "path": "display.colorFormat",
+      "message": "WF2D-8620 示例已确认使用 RGB565。"
+    },
+    {
+      "severity": "info",
+      "code": "controller-profile-selected",
+      "path": "buildTarget.controllerProfileRef",
+      "message": "已绑定 WF2D-8620 设备外壳。"
+    },
+    {
+      "severity": "info",
+      "code": "device-showcase-layout-v1",
+      "path": "uiProject.screens",
+      "message": "WF2D-8620 使用独立的 专注节奏计时器 场景、视觉系统与触控布局，并包含 3 个可导航页面。"
+    }
+  ],
+  "colorFormatConfirmed": true
+}

@@ -83,6 +83,30 @@ Theme Token 用**语义 ID**(`color.text.primary`),正则 `/^[a-z][a-z0-9]*(\.[a
 - 类型不匹配 → **拒绝**。`color` token 不能赋给 `radius`(size 类)属性;映射表在 `theme.ts` 的 `TOKEN_ASSIGNABLE`。
 - `extends` 支持继承,子覆盖父;**成环或父不存在返回 `null`**,调用方报错,不静默降级。
 
+### 跨工程主题约定
+
+可复用组件只引用设备无关的语义 token，不直接写产品色值。推荐每个工程保留两层主题：
+
+```text
+industrial-base（完整的通用 token 契约）
+└── product-light（只覆盖产品品牌色和设备状态色）
+```
+
+通用 token 至少覆盖 `color.background`、`color.surface`、`color.border`、
+`color.text.primary`、`color.text.muted`、`color.accent`、`color.status.*`、
+`radius.*`、`spacing.*` 和 `opacity.*`。工程专用颜色也应使用语义名称，例如
+`color.voltage.v5`，不要使用 `green.500` 或控件名称作为 token ID。
+
+`scripts/generate-wf3-firmware-project.mjs` 是首个完整样例：WF3 工程选择
+`wf3-light`，它继承 `industrial-base`；页面和公共命名样式只保存 `$token`
+引用，加载预览和生成代码时再按 `BuildTarget.themeRef` 解析成字面值。其他工程可复制
+基础 token 契约并创建自己的派生主题，无需沿用 WF3 的颜色。
+
+编辑器顶部工具栏的调色板按钮会打开“主题配置”：可选择工程内 Theme、编辑颜色与数值
+token、把继承值提升为当前主题覆盖、恢复父主题值、新建派生主题，以及切换
+`BuildTarget.themeRef` 当前生效主题。Token 修改进入工程的撤销/重做与保存链路；Catalog
+中的 Theme revision 发布仍由“目标与构建”窗口负责。
+
 ## 5. Event 与 Action 分离(§5.3)
 
 Event 是 LVGL 事件,Action 是业务命令:

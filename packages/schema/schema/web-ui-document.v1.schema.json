@@ -1473,7 +1473,15 @@
                     "type": "string"
                   },
                   "op": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                      "eq",
+                      "not_eq",
+                      "gt",
+                      "ge",
+                      "lt",
+                      "le"
+                    ]
                   },
                   "subject": {
                     "type": "string"
@@ -1502,7 +1510,15 @@
                     "type": "string"
                   },
                   "op": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                      "eq",
+                      "not_eq",
+                      "gt",
+                      "ge",
+                      "lt",
+                      "le"
+                    ]
                   },
                   "subject": {
                     "type": "string"

@@ -18,6 +18,7 @@ import {
   formatRef,
   isTokenRef,
   migrateV1ToV2,
+  resolveTheme,
   validateCrossRefs,
   type ActionRegistry,
   type BuildTarget,
@@ -378,6 +379,7 @@ export interface BuildTargetStoreState extends TargetDraft {
   confirmColorFormat(format: PreviewColorFormat): boolean;
   clearColorFormatConfirmation(): void;
   selectController(preset: ControllerPreset | null): void;
+  selectEmbeddedTheme(themeId: string): boolean;
   selectCatalogTarget(
     buildTarget: BuildTarget,
     display: DisplayProfile,
@@ -545,6 +547,22 @@ export const useBuildTargetStore = create<BuildTargetStoreState>()((set, get) =>
       ? withoutController(fromState(state))
       : withController(fromState(state), preset);
     set({ ...next, catalogTargetRef: null, revision: state.revision + 1 });
+  },
+
+  selectEmbeddedTheme(themeId) {
+    const state = get();
+    if (resolveTheme(state.uiProject.themes, themeId) === null) return false;
+    const uiRef = `${state.uiProject.meta.id}@${state.uiProject.meta.revision}` as `ui:${string}@${number}`;
+    set({
+      buildTargetDraft: {
+        ...state.buildTargetDraft,
+        uiProjectRef: uiRef,
+        themeRef: `${uiRef}#theme:${themeId}`,
+      },
+      catalogTargetRef: null,
+      revision: state.revision + 1,
+    });
+    return true;
   },
 
   selectCatalogTarget(buildTarget, display, controller, theme) {

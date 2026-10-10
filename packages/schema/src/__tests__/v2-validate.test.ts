@@ -243,6 +243,15 @@ describe('v2 语义层', () => {
     expect(c).toContain('style-not-found');
   });
 
+  it('rejects binding comparison operators that the runtime cannot execute', () => {
+    const p = project();
+    p.screens[0]!.root.bindings = [{
+      kind: 'flag', flag: 'hidden', op: 'ne', subject: 'subject:level', refValue: 0,
+    } as never];
+
+    expect(codes(p)).toContain('schema');
+  });
+
   it('绑定能力和数据源类型不匹配 → 拒绝', () => {
     const p = project();
     p.subjects.push({ id: 'subject:text', codeName: 'text', type: 'string', initial: '1' });

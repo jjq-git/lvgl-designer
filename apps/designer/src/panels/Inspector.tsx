@@ -7,7 +7,7 @@
  * - 样式页:STYLE_PROPS m1Inspector 子集,state/part 选择器(part 按 widget parts)
  * - 值=default 灰显;改动即 mutate(coalesceKey 800ms 合并);清除=删属性 → 管线自动走 L3 复位
  */
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import {
   M1_INSPECTOR_STYLE_KEYS,
   M1_TEXT_FONTS,
@@ -67,8 +67,13 @@ const GROUP_ORDER: { key: PropSpec['ui']['group']; label: string }[] = [
 
 export function Inspector(): JSX.Element {
   const selectedIds = useEditorStore((s) => s.selectedIds);
+  const mode = useEditorStore((s) => s.mode);
   const project = useProjectStore((s) => s.uiProject);
   const [tab, setTab] = useState<'props' | 'style' | 'interaction'>('props');
+
+  const ensureDesignMode = (): void => {
+    if (mode === 'play') useEditorStore.getState().setMode('design');
+  };
 
   if (selectedIds.length === 0) {
     return <div className="inspector empty">未选中对象</div>;
@@ -82,7 +87,7 @@ export function Inspector(): JSX.Element {
   const activeTab = tab === 'interaction' && !interaction.visible ? 'props' : tab;
 
   return (
-    <div className="inspector">
+    <div className="inspector" onPointerDownCapture={ensureDesignMode} onFocusCapture={ensureDesignMode}>
       <div className="tabs">
         <button className={activeTab === 'props' ? 'active' : ''} onClick={() => setTab('props')}>属性</button>
         <button className={activeTab === 'style' ? 'active' : ''} onClick={() => setTab('style')}>样式</button>
@@ -1846,28 +1851,24 @@ function ValueEditor(props: {
       return <SizeEditor ariaLabel={ariaLabel} value={value} placeholder={ph} onChange={onChange} />;
     case 'int':
       return (
-        <input
+        <NumberCommitEditor
           aria-label={ariaLabel}
-          className="ed-num"
-          type="number"
           min={min}
           max={max}
           placeholder={ph}
           value={typeof value === 'number' ? value : ''}
-          onChange={(e) => onChange(e.target.value === '' ? undefined : Number(e.target.value))}
+          onCommit={onChange}
         />
       );
     case 'opa':
       return (
-        <input
+        <NumberCommitEditor
           aria-label={ariaLabel}
-          className="ed-num"
-          type="number"
           min={0}
           max={255}
           placeholder={ph || '255'}
           value={typeof value === 'number' ? value : ''}
-          onChange={(e) => onChange(e.target.value === '' ? undefined : Number(e.target.value))}
+          onCommit={onChange}
         />
       );
     case 'bool':
@@ -1903,16 +1904,14 @@ function ValueEditor(props: {
       );
     case 'float':
       return (
-        <input
+        <NumberCommitEditor
           aria-label={ariaLabel}
-          className="ed-num"
-          type="number"
           step="any"
           min={min}
           max={max}
           placeholder={ph}
           value={typeof value === 'number' ? value : ''}
-          onChange={(e) => onChange(e.target.value === '' ? undefined : Number(e.target.value))}
+          onCommit={onChange}
         />
       );
     case 'subject': {
@@ -2116,6 +2115,64 @@ function TextAreaCommitEditor(props: {
 }
 
 /** size:px / % / content 三态(lv_xml_to_size 语义) */
+function NumberCommitEditor(props: {
+  'aria-label'?: string;
+  value: number | '';
+  placeholder?: string;
+  min?: number;
+  max?: number;
+  step?: number | 'any';
+  onCommit: (value: number | undefined) => void;
+}): JSX.Element {
+  const [draft, setDraft] = useState<string | null>(null);
+  const lastCommittedDraft = useRef<string | null>(null);
+
+  const commit = (): void => {
+    if (draft === null) return;
+    const trimmed = draft.trim();
+    if (trimmed === '') {
+      props.onCommit(undefined);
+      setDraft(null);
+      return;
+    }
+    const next = Number(trimmed);
+    if (Number.isFinite(next) && draft !== lastCommittedDraft.current) {
+      lastCommittedDraft.current = draft;
+      props.onCommit(next);
+    }
+    setDraft(null);
+  };
+  return (
+    <input
+      aria-label={props['aria-label']}
+      className="ed-num"
+      type="number"
+      min={props.min}
+      max={props.max}
+      step={props.step}
+      placeholder={props.placeholder}
+      value={draft ?? props.value}
+      onChange={(event) => {
+        const nextDraft = event.target.value;
+        setDraft(nextDraft);
+        const next = Number(nextDraft);
+        if (nextDraft.trim() !== '' && Number.isFinite(next)) {
+          lastCommittedDraft.current = nextDraft;
+          props.onCommit(next);
+        }
+      }}
+      onBlur={commit}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter') event.currentTarget.blur();
+        if (event.key === 'Escape') {
+          setDraft(null);
+          event.currentTarget.blur();
+        }
+      }}
+    />
+  );
+}
+
 function SizeEditor(props: {
   ariaLabel?: string;
   value: PropValueV2 | undefined;
@@ -2144,19 +2201,16 @@ function SizeEditor(props: {
   return (
     <span className="ed-size">
       {mode !== 'content' && (
-        <input
+        <NumberCommitEditor
           aria-label={props.ariaLabel}
-          className="ed-num"
-          type="number"
           placeholder={props.placeholder}
           value={num}
-          onChange={(e) => {
-            if (e.target.value === '') {
+          onCommit={(next) => {
+            if (next === undefined) {
               onChange(undefined);
               return;
             }
-            const n = Number(e.target.value);
-            onChange(mode === '%' ? `${n}%` : n);
+            onChange(mode === '%' ? `${next}%` : next);
           }}
         />
       )}

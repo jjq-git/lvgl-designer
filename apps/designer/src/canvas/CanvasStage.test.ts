@@ -94,4 +94,16 @@ describe('selectedIdFromPointerTarget', () => {
     expect(selectedIdFromPointerTarget(null)).toBeNull();
     expect(selectedIdFromPointerTarget({} as EventTarget)).toBeNull();
   });
+
+  it('recovers the selected node id from a descendant inside the selection group', () => {
+    const owner = {
+      getAttribute: (name: string) => name === 'data-selected-id' ? 'selected-arc' : null,
+    };
+    const target = {
+      getAttribute: () => null,
+      closest: (selector: string) => selector === '[data-selected-id]' ? owner : null,
+    };
+
+    expect(selectedIdFromPointerTarget(target as unknown as EventTarget)).toBe('selected-arc');
+  });
 });

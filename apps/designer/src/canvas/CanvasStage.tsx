@@ -134,9 +134,23 @@ export function zoomCanvasAtPointer(
  * draggable back into view.
  */
 export function selectedIdFromPointerTarget(target: EventTarget | null): string | null {
-  const candidate = target as { getAttribute?: (name: string) => string | null } | null;
-  if (typeof candidate?.getAttribute !== 'function') return null;
-  return candidate.getAttribute('data-selected-id') || null;
+  const candidate = target as {
+    getAttribute?: (name: string) => string | null;
+    closest?: (selector: string) => { getAttribute?: (name: string) => string | null } | null;
+  } | null;
+  if (!candidate) return null;
+
+  const direct = typeof candidate.getAttribute === 'function'
+    ? candidate.getAttribute('data-selected-id')
+    : null;
+  if (direct) return direct;
+
+  const owner = typeof candidate.closest === 'function'
+    ? candidate.closest('[data-selected-id]')
+    : null;
+  return typeof owner?.getAttribute === 'function'
+    ? owner.getAttribute('data-selected-id') || null
+    : null;
 }
 
 function setNodeProps(id: string, label: string, props: Record<string, number>): void {
@@ -497,7 +511,7 @@ export function CanvasStage(): JSX.Element {
 
   const onPointerMove = (e: React.PointerEvent): void => {
     const ed = useEditorStore.getState();
-    const s = sessionRef.current;
+    let s = sessionRef.current;
 
     if (s?.kind === 'pan') {
       const stage = stageRef.current;
@@ -576,12 +590,13 @@ export function CanvasStage(): JSX.Element {
       }
       const label = items.length > 1 ? `移动 ${items.length} 个对象` : `移动 ${hit.node.name ?? hit.node.type}`;
       useProjectStore.getState().beginInteraction(label, `drag:${s.id}`);
-      sessionRef.current = {
+      const dragSession: Extract<Session, { kind: 'drag' }> = {
         kind: 'drag', id: primaryId, startL: s.startL,
         origRel: { x: rect.x - parentRect.x, y: rect.y - parentRect.y },
         startRect: rect, siblingRects, items,
       };
-      return;
+      sessionRef.current = dragSession;
+      s = dragSession;
     }
 
     if (s.kind === 'drag') {

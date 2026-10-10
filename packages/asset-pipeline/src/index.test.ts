@@ -51,4 +51,34 @@ describe('font asset pipeline', () => {
     const font = readFileSync(new URL('../spike/Montserrat-Medium.ttf', import.meta.url));
     await expect(findMissingFontCodePoints(font, [0x41, 0x4e2d])).resolves.toEqual([0x4e2d]);
   });
+
+  it('covers every glyph used through custom fonts in the WF3 example', async () => {
+    const snapshot = JSON.parse(readFileSync(new URL(
+      '../../../examples/wf3-firmware/WF3-284x76-firmware-ui.lvproj.json',
+      import.meta.url,
+    ), 'utf8')) as {
+      uiProject: {
+        assets: { fonts: Array<{ codeName: string; file: { fileName: string } }> };
+      };
+    };
+    const symbolsByFont = collectProjectTextSymbolsByFont(snapshot.uiProject);
+    const requestedByFile = new Map<string, Set<number>>();
+    for (const asset of snapshot.uiProject.assets.fonts) {
+      const requested = requestedByFile.get(asset.file.fileName) ?? new Set<number>();
+      for (const symbol of symbolsByFont[asset.codeName] ?? '') {
+        const codePoint = symbol.codePointAt(0);
+        if (codePoint !== undefined) requested.add(codePoint);
+      }
+      requestedByFile.set(asset.file.fileName, requested);
+    }
+
+    expect([...requestedByFile.values()].every((points) => points.size > 0)).toBe(true);
+    for (const [fileName, requested] of requestedByFile) {
+      const font = readFileSync(new URL(
+        `../../../examples/wf3-firmware/assets/${fileName}`,
+        import.meta.url,
+      ));
+      expect(await findMissingFontCodePoints(font, [...requested]), fileName).toEqual([]);
+    }
+  });
 });

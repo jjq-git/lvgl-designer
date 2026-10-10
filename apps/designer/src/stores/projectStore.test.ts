@@ -4,6 +4,8 @@ import { migrateV1ToV2, snapshotToEditorProject, type ProjectSnapshotV2 } from '
 import { useBuildTargetStore } from './buildTargetStore';
 import { findNodeByIdV2, useProjectStore } from './projectStore';
 import { createStoredProjectDocument } from '../services/projectPersistence';
+import { loadProjectDocument } from '../services/projectPersistence';
+import { BUILT_IN_PROJECTS } from '../services/builtInProjects';
 
 function loadTokenProject(): void {
   const source = createEmptyProject(`native-v2-${Math.random()}`);
@@ -66,6 +68,52 @@ describe('projectStore native UiProject edits', () => {
     useProjectStore.getState().redo();
     expect(useProjectStore.getState().uiProject.screens[0]!.root.styles[0]!.props.text_color)
       .toBe('#000000');
+  });
+
+  it('switches the embedded theme and persists the selected BuildTarget theme', () => {
+    useProjectStore.getState().mutateV2('add dark theme', (draft) => {
+      draft.themes.push({
+        id: 'dark',
+        displayName: 'Dark',
+        extends: 'default',
+        tokens: [{ id: 'color.text.primary', type: 'color', value: '#101010' }],
+      });
+    });
+
+    expect(useProjectStore.getState().selectTheme('missing')).toBe(false);
+    expect(useProjectStore.getState().selectTheme('dark')).toBe(true);
+    expect(useBuildTargetStore.getState().buildTargetDraft.themeRef).toMatch(/#theme:dark$/);
+    expect(useProjectStore.getState().project.screens[0]!.root.inlineStyles[0]!.props.text_color)
+      .toBe('#101010');
+    expect(createStoredProjectDocument(useProjectStore.getState().project).buildTarget.themeRef)
+      .toMatch(/#theme:dark$/);
+  });
+
+  it('reprojects the bundled WF3 UI when switching to the industrial base theme', async () => {
+    const document = await BUILT_IN_PROJECTS[0]!.load();
+    const loaded = loadProjectDocument(document);
+    useProjectStore.getState().loadProject(loaded.project);
+
+    expect(useProjectStore.getState().selectTheme('industrial-base')).toBe(true);
+
+    const back = useProjectStore.getState().project.screens
+      .find((screen) => screen.name === 'wf3_home')
+      ?.root.children.find((node) => node.name === 'wf3_home_back');
+    expect(useBuildTargetStore.getState().buildTargetDraft.themeRef)
+      .toMatch(/#theme:industrial-base$/);
+    expect(back?.inlineStyles[0]?.props.bg_color).toBe('#0F766E');
+  });
+
+  it('reprojects active token value edits for immediate canvas refresh', () => {
+    useProjectStore.getState().mutateV2('change active theme color', (draft) => {
+      const token = draft.themes[0]!.tokens.find((item) => item.id === 'color.text.primary');
+      if (token) token.value = '#12AB34';
+    });
+
+    const state = useProjectStore.getState();
+    expect(state.uiProject.themes[0]!.tokens[0]!.value).toBe('#12AB34');
+    expect(state.project.screens[0]!.root.inlineStyles[0]!.props.text_color).toBe('#12AB34');
+    expect(state.lastPatches.length).toBeGreaterThan(0);
   });
 
   it('persists custom device actions and includes them in undo/redo', () => {

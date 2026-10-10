@@ -8,7 +8,7 @@ import { isProjectInteractionActive, useProjectStore } from '../stores/projectSt
 import {
   cloneStoredProjectDocument,
   createStoredProjectDocument,
-  loadProjectDocument,
+  parseProjectDocument,
   type StoredProjectDocument,
 } from './projectPersistence';
 
@@ -49,7 +49,9 @@ export async function loadLastProject(): Promise<LvProject | null> {
     const d = await db();
     const raw = await d.get(STORE, KEY);
     if (!raw) return null;
-    return loadProjectDocument(raw).project;
+    // Toolbar calls this in the background only to populate the local-project
+    // picker. It must never replace the active cloud project's BuildTarget.
+    return parseProjectDocument(raw).project;
   } catch (e) {
     console.warn('[storage] 恢复最近工程失败', e);
     return null;

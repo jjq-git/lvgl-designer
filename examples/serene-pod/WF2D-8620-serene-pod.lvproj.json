@@ -9,15 +9,121 @@
       "revision": 1,
       "name": "WF2D-8620 自然舒适舱界面",
       "appVersion": "1.0.0",
-      "createdAt": "2026-10-09T00:00:00.000Z",
-      "modifiedAt": "2026-10-09T00:00:00.000Z"
+      "createdAt": "2026-10-10T00:00:00.000Z",
+      "modifiedAt": "2026-10-10T00:00:00.000Z"
     },
     "designDisplayRef": "display:wf2d-8620-240x240-rgb565@1",
     "themes": [
       {
-        "id": "default",
-        "displayName": "默认",
-        "tokens": []
+        "id": "serene-wf2d-8620",
+        "displayName": "WF2D-8620 自然舒适主题",
+        "tokens": [
+          {
+            "id": "color.background",
+            "type": "color",
+            "value": "#071A1B"
+          },
+          {
+            "id": "color.surface",
+            "type": "color",
+            "value": "#102E2D"
+          },
+          {
+            "id": "color.surface.subtle",
+            "type": "color",
+            "value": "#153C39"
+          },
+          {
+            "id": "color.border",
+            "type": "color",
+            "value": "#2A5953"
+          },
+          {
+            "id": "color.text.primary",
+            "type": "color",
+            "value": "#F0F7F3"
+          },
+          {
+            "id": "color.text.muted",
+            "type": "color",
+            "value": "#9BB6AF"
+          },
+          {
+            "id": "color.text.onaccent",
+            "type": "color",
+            "value": "#FFFFFF"
+          },
+          {
+            "id": "color.accent",
+            "type": "color",
+            "value": "#42D0AF"
+          },
+          {
+            "id": "color.accent.strong",
+            "type": "color",
+            "value": "#6CE0C3"
+          },
+          {
+            "id": "color.status.warning",
+            "type": "color",
+            "value": "#F0B85B"
+          },
+          {
+            "id": "color.status.success",
+            "type": "color",
+            "value": "#52C48A"
+          },
+          {
+            "id": "color.status.danger",
+            "type": "color",
+            "value": "#F0766B"
+          },
+          {
+            "id": "color.track",
+            "type": "color",
+            "value": "#234A46"
+          },
+          {
+            "id": "color.shadow",
+            "type": "color",
+            "value": "#000000"
+          },
+          {
+            "id": "color.palette.263c52",
+            "type": "color",
+            "value": "#263C52"
+          },
+          {
+            "id": "font.size.14",
+            "type": "fontRef",
+            "value": "montserrat_14"
+          },
+          {
+            "id": "font.size.16",
+            "type": "fontRef",
+            "value": "montserrat_16"
+          },
+          {
+            "id": "font.size.18",
+            "type": "fontRef",
+            "value": "montserrat_18"
+          },
+          {
+            "id": "font.size.20",
+            "type": "fontRef",
+            "value": "montserrat_20"
+          },
+          {
+            "id": "font.size.28",
+            "type": "fontRef",
+            "value": "montserrat_28"
+          },
+          {
+            "id": "font.size.30",
+            "type": "fontRef",
+            "value": "montserrat_30"
+          }
+        ]
       }
     ],
     "subjects": [
@@ -158,7 +264,9 @@
           "styles": [
             {
               "props": {
-                "bg_color": "#F4F1EA",
+                "bg_color": {
+                  "$token": "color.background"
+                },
                 "bg_opa": 255,
                 "border_width": 0,
                 "pad_all": 0
@@ -173,18 +281,22 @@
               "type": "label",
               "codeName": "home_page_title",
               "props": {
-                "text": "HOME",
-                "x": 84,
-                "y": 24,
-                "width": 72,
-                "height": "content"
+                "text": "",
+                "x": 96,
+                "y": 16,
+                "width": 48,
+                "height": 32
               },
               "styleRefs": [],
               "styles": [
                 {
                   "props": {
-                    "text_color": "#61777A",
-                    "text_font": "montserrat_18",
+                    "text_color": {
+                      "$token": "color.text.muted"
+                    },
+                    "text_font": {
+                      "$token": "font.size.18"
+                    },
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -199,10 +311,10 @@
               "type": "button",
               "codeName": "home_next",
               "props": {
-                "x": 156,
-                "y": 26,
-                "width": 38,
-                "height": 38
+                "x": 154,
+                "y": 28,
+                "width": 48,
+                "height": 48
               },
               "flags": {
                 "scrollable": false
@@ -211,13 +323,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#FFFFFF",
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
                     "bg_opa": 255,
                     "border_width": 1,
-                    "border_color": "#C9D6D2",
-                    "radius": 22,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "radius": 24,
                     "shadow_width": 0,
-                    "shadow_color": "#FFFFFF",
+                    "shadow_color": {
+                      "$token": "color.surface"
+                    },
                     "shadow_opa": 0,
                     "pad_all": 0
                   }
@@ -229,7 +347,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#1B9AAA"
+                    "bg_color": {
+                      "$token": "color.accent.strong"
+                    }
                   }
                 }
               ],
@@ -261,8 +381,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#163033",
-                        "text_font": "montserrat_18",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.20"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -278,10 +402,10 @@
               "type": "arc",
               "codeName": "home_quiet_arc",
               "props": {
-                "x": 50,
-                "y": 64,
-                "width": 140,
-                "height": 140,
+                "x": 58,
+                "y": 54,
+                "width": 124,
+                "height": 124,
                 "min_value": 0,
                 "max_value": 100,
                 "value": 36,
@@ -298,7 +422,9 @@
                     "part": "main"
                   },
                   "props": {
-                    "arc_color": "#263C52",
+                    "arc_color": {
+                      "$token": "color.palette.263c52"
+                    },
                     "arc_width": 12
                   }
                 },
@@ -307,7 +433,9 @@
                     "part": "indicator"
                   },
                   "props": {
-                    "arc_color": "#1B9AAA",
+                    "arc_color": {
+                      "$token": "color.accent.strong"
+                    },
                     "arc_width": 12
                   }
                 },
@@ -316,7 +444,9 @@
                     "part": "knob"
                   },
                   "props": {
-                    "bg_color": "#1B9AAA",
+                    "bg_color": {
+                      "$token": "color.accent.strong"
+                    },
                     "bg_opa": 0,
                     "radius": 12
                   }
@@ -339,16 +469,20 @@
               "props": {
                 "text": "CALM",
                 "x": 60,
-                "y": 99,
+                "y": 86,
                 "width": 120,
-                "height": "content"
+                "height": 28
               },
               "styleRefs": [],
               "styles": [
                 {
                   "props": {
-                    "text_color": "#163033",
-                    "text_font": "montserrat_28",
+                    "text_color": {
+                      "$token": "color.text.primary"
+                    },
+                    "text_font": {
+                      "$token": "font.size.28"
+                    },
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -365,16 +499,20 @@
               "props": {
                 "text": "32 dB",
                 "x": 70,
-                "y": 134,
+                "y": 118,
                 "width": 100,
-                "height": "content"
+                "height": 24
               },
               "styleRefs": [],
               "styles": [
                 {
                   "props": {
-                    "text_color": "#1B9AAA",
-                    "text_font": "montserrat_18",
+                    "text_color": {
+                      "$token": "color.accent.strong"
+                    },
+                    "text_font": {
+                      "$token": "font.size.18"
+                    },
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -391,16 +529,20 @@
               "props": {
                 "text": "AIR GOOD",
                 "x": 64,
-                "y": 160,
+                "y": 144,
                 "width": 112,
-                "height": "content"
+                "height": 22
               },
               "styleRefs": [],
               "styles": [
                 {
                   "props": {
-                    "text_color": "#2E9D75",
-                    "text_font": "montserrat_14",
+                    "text_color": {
+                      "$token": "color.status.success"
+                    },
+                    "text_font": {
+                      "$token": "font.size.14"
+                    },
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -415,10 +557,10 @@
               "type": "button",
               "codeName": "home_start",
               "props": {
-                "x": 72,
-                "y": 185,
-                "width": 96,
-                "height": 40
+                "x": 76,
+                "y": 170,
+                "width": 88,
+                "height": 42
               },
               "flags": {
                 "scrollable": false
@@ -427,14 +569,20 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#167D83",
+                    "bg_color": {
+                      "$token": "color.accent"
+                    },
                     "bg_opa": 255,
                     "border_width": 0,
-                    "border_color": "#C9D6D2",
-                    "radius": 22,
-                    "shadow_width": 10,
-                    "shadow_color": "#167D83",
-                    "shadow_opa": 32,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "radius": 23,
+                    "shadow_width": 0,
+                    "shadow_color": {
+                      "$token": "color.accent"
+                    },
+                    "shadow_opa": 24,
                     "pad_all": 0
                   }
                 },
@@ -445,7 +593,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#1B9AAA"
+                    "bg_color": {
+                      "$token": "color.accent.strong"
+                    }
                   }
                 }
               ],
@@ -475,8 +625,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#FFFFFF",
-                        "text_font": "montserrat_14",
+                        "text_color": {
+                          "$token": "color.surface"
+                        },
+                        "text_font": {
+                          "$token": "font.size.14"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -508,7 +662,9 @@
           "styles": [
             {
               "props": {
-                "bg_color": "#F4F1EA",
+                "bg_color": {
+                  "$token": "color.background"
+                },
                 "bg_opa": 255,
                 "border_width": 0,
                 "pad_all": 0
@@ -524,17 +680,21 @@
               "codeName": "air_page_title",
               "props": {
                 "text": "AIR",
-                "x": 84,
-                "y": 24,
-                "width": 72,
-                "height": "content"
+                "x": 70,
+                "y": 14,
+                "width": 100,
+                "height": 32
               },
               "styleRefs": [],
               "styles": [
                 {
                   "props": {
-                    "text_color": "#61777A",
-                    "text_font": "montserrat_18",
+                    "text_color": {
+                      "$token": "color.text.muted"
+                    },
+                    "text_font": {
+                      "$token": "font.size.18"
+                    },
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -549,10 +709,10 @@
               "type": "button",
               "codeName": "air_back",
               "props": {
-                "x": 46,
-                "y": 26,
-                "width": 38,
-                "height": 38
+                "x": 40,
+                "y": 174,
+                "width": 48,
+                "height": 48
               },
               "flags": {
                 "scrollable": false
@@ -561,13 +721,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#FFFFFF",
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
                     "bg_opa": 255,
                     "border_width": 1,
-                    "border_color": "#C9D6D2",
-                    "radius": 22,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "radius": 24,
                     "shadow_width": 0,
-                    "shadow_color": "#FFFFFF",
+                    "shadow_color": {
+                      "$token": "color.surface"
+                    },
                     "shadow_opa": 0,
                     "pad_all": 0
                   }
@@ -579,7 +745,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#1B9AAA"
+                    "bg_color": {
+                      "$token": "color.accent.strong"
+                    }
                   }
                 }
               ],
@@ -611,8 +779,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#163033",
-                        "text_font": "montserrat_18",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.20"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -628,10 +800,10 @@
               "type": "button",
               "codeName": "air_next",
               "props": {
-                "x": 156,
-                "y": 26,
-                "width": 38,
-                "height": 38
+                "x": 152,
+                "y": 174,
+                "width": 48,
+                "height": 48
               },
               "flags": {
                 "scrollable": false
@@ -640,13 +812,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#FFFFFF",
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
                     "bg_opa": 255,
                     "border_width": 1,
-                    "border_color": "#C9D6D2",
-                    "radius": 22,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "radius": 24,
                     "shadow_width": 0,
-                    "shadow_color": "#FFFFFF",
+                    "shadow_color": {
+                      "$token": "color.surface"
+                    },
                     "shadow_opa": 0,
                     "pad_all": 0
                   }
@@ -658,7 +836,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#1B9AAA"
+                    "bg_color": {
+                      "$token": "color.accent.strong"
+                    }
                   }
                 }
               ],
@@ -690,8 +870,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#163033",
-                        "text_font": "montserrat_18",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.20"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -707,10 +891,10 @@
               "type": "arc",
               "codeName": "air_co2_arc",
               "props": {
-                "x": 54,
-                "y": 68,
-                "width": 132,
-                "height": 132,
+                "x": 58,
+                "y": 48,
+                "width": 124,
+                "height": 124,
                 "min_value": 350,
                 "max_value": 2000,
                 "value": 586,
@@ -727,7 +911,9 @@
                     "part": "main"
                   },
                   "props": {
-                    "arc_color": "#263C52",
+                    "arc_color": {
+                      "$token": "color.palette.263c52"
+                    },
                     "arc_width": 11
                   }
                 },
@@ -736,7 +922,9 @@
                     "part": "indicator"
                   },
                   "props": {
-                    "arc_color": "#2E9D75",
+                    "arc_color": {
+                      "$token": "color.status.success"
+                    },
                     "arc_width": 11
                   }
                 },
@@ -745,7 +933,9 @@
                     "part": "knob"
                   },
                   "props": {
-                    "bg_color": "#2E9D75",
+                    "bg_color": {
+                      "$token": "color.status.success"
+                    },
                     "bg_opa": 0,
                     "radius": 12
                   }
@@ -768,16 +958,20 @@
               "props": {
                 "text": "586",
                 "x": 68,
-                "y": 100,
+                "y": 80,
                 "width": 104,
-                "height": "content"
+                "height": 28
               },
               "styleRefs": [],
               "styles": [
                 {
                   "props": {
-                    "text_color": "#163033",
-                    "text_font": "montserrat_30",
+                    "text_color": {
+                      "$token": "color.text.primary"
+                    },
+                    "text_font": {
+                      "$token": "font.size.30"
+                    },
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -794,16 +988,20 @@
               "props": {
                 "text": "ppm",
                 "x": 72,
-                "y": 137,
+                "y": 108,
                 "width": 96,
-                "height": "content"
+                "height": 22
               },
               "styleRefs": [],
               "styles": [
                 {
                   "props": {
-                    "text_color": "#1B9AAA",
-                    "text_font": "montserrat_14",
+                    "text_color": {
+                      "$token": "color.accent.strong"
+                    },
+                    "text_font": {
+                      "$token": "font.size.14"
+                    },
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -820,16 +1018,20 @@
               "props": {
                 "text": " GOOD",
                 "x": 84,
-                "y": 157,
+                "y": 130,
                 "width": 72,
-                "height": "content"
+                "height": 22
               },
               "styleRefs": [],
               "styles": [
                 {
                   "props": {
-                    "text_color": "#2E9D75",
-                    "text_font": "montserrat_14",
+                    "text_color": {
+                      "$token": "color.status.success"
+                    },
+                    "text_font": {
+                      "$token": "font.size.14"
+                    },
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -846,16 +1048,20 @@
               "props": {
                 "text": "FAN 36%",
                 "x": 48,
-                "y": 178,
+                "y": 152,
                 "width": 144,
-                "height": "content"
+                "height": 20
               },
               "styleRefs": [],
               "styles": [
                 {
                   "props": {
-                    "text_color": "#61777A",
-                    "text_font": "montserrat_14",
+                    "text_color": {
+                      "$token": "color.text.muted"
+                    },
+                    "text_font": {
+                      "$token": "font.size.14"
+                    },
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -877,10 +1083,10 @@
               "type": "slider",
               "codeName": "air_speed",
               "props": {
-                "x": 54,
-                "y": 205,
-                "width": 132,
-                "height": 12,
+                "x": 74,
+                "y": 174,
+                "width": 92,
+                "height": 8,
                 "min_value": 0,
                 "max_value": 100,
                 "value": 36
@@ -892,7 +1098,9 @@
                     "part": "main"
                   },
                   "props": {
-                    "bg_color": "#CFDBD8",
+                    "bg_color": {
+                      "$token": "color.track"
+                    },
                     "bg_opa": 255,
                     "radius": 10
                   }
@@ -902,7 +1110,9 @@
                     "part": "indicator"
                   },
                   "props": {
-                    "bg_color": "#1B9AAA",
+                    "bg_color": {
+                      "$token": "color.accent.strong"
+                    },
                     "bg_opa": 255,
                     "radius": 10
                   }
@@ -912,11 +1122,13 @@
                     "part": "knob"
                   },
                   "props": {
-                    "bg_color": "#FFFFFF",
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
                     "bg_opa": 255,
                     "radius": 12,
                     "shadow_width": 8,
-                    "shadow_opa": 32
+                    "shadow_opa": 24
                   }
                 }
               ],
@@ -951,7 +1163,9 @@
           "styles": [
             {
               "props": {
-                "bg_color": "#F4F1EA",
+                "bg_color": {
+                  "$token": "color.background"
+                },
                 "bg_opa": 255,
                 "border_width": 0,
                 "pad_all": 0
@@ -967,17 +1181,21 @@
               "codeName": "light_page_title",
               "props": {
                 "text": "LIGHT",
-                "x": 84,
-                "y": 24,
-                "width": 72,
-                "height": "content"
+                "x": 70,
+                "y": 14,
+                "width": 100,
+                "height": 32
               },
               "styleRefs": [],
               "styles": [
                 {
                   "props": {
-                    "text_color": "#61777A",
-                    "text_font": "montserrat_18",
+                    "text_color": {
+                      "$token": "color.text.muted"
+                    },
+                    "text_font": {
+                      "$token": "font.size.18"
+                    },
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -992,10 +1210,10 @@
               "type": "button",
               "codeName": "light_back",
               "props": {
-                "x": 46,
-                "y": 26,
-                "width": 38,
-                "height": 38
+                "x": 40,
+                "y": 174,
+                "width": 48,
+                "height": 48
               },
               "flags": {
                 "scrollable": false
@@ -1004,13 +1222,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#FFFFFF",
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
                     "bg_opa": 255,
                     "border_width": 1,
-                    "border_color": "#C9D6D2",
-                    "radius": 22,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "radius": 24,
                     "shadow_width": 0,
-                    "shadow_color": "#FFFFFF",
+                    "shadow_color": {
+                      "$token": "color.surface"
+                    },
                     "shadow_opa": 0,
                     "pad_all": 0
                   }
@@ -1022,7 +1246,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#1B9AAA"
+                    "bg_color": {
+                      "$token": "color.accent.strong"
+                    }
                   }
                 }
               ],
@@ -1054,8 +1280,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#163033",
-                        "text_font": "montserrat_18",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.20"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -1071,10 +1301,10 @@
               "type": "button",
               "codeName": "light_next",
               "props": {
-                "x": 156,
-                "y": 26,
-                "width": 38,
-                "height": 38
+                "x": 152,
+                "y": 174,
+                "width": 48,
+                "height": 48
               },
               "flags": {
                 "scrollable": false
@@ -1083,13 +1313,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#FFFFFF",
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
                     "bg_opa": 255,
                     "border_width": 1,
-                    "border_color": "#C9D6D2",
-                    "radius": 22,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "radius": 24,
                     "shadow_width": 0,
-                    "shadow_color": "#FFFFFF",
+                    "shadow_color": {
+                      "$token": "color.surface"
+                    },
                     "shadow_opa": 0,
                     "pad_all": 0
                   }
@@ -1101,7 +1337,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#1B9AAA"
+                    "bg_color": {
+                      "$token": "color.accent.strong"
+                    }
                   }
                 }
               ],
@@ -1133,8 +1371,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#163033",
-                        "text_font": "montserrat_18",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.20"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -1150,10 +1392,10 @@
               "type": "arc",
               "codeName": "light_brightness_arc",
               "props": {
-                "x": 58,
-                "y": 68,
-                "width": 124,
-                "height": 124,
+                "x": 66,
+                "y": 46,
+                "width": 108,
+                "height": 108,
                 "min_value": 0,
                 "max_value": 100,
                 "value": 68,
@@ -1170,7 +1412,9 @@
                     "part": "main"
                   },
                   "props": {
-                    "arc_color": "#263C52",
+                    "arc_color": {
+                      "$token": "color.palette.263c52"
+                    },
                     "arc_width": 11
                   }
                 },
@@ -1179,7 +1423,9 @@
                     "part": "indicator"
                   },
                   "props": {
-                    "arc_color": "#D99A2B",
+                    "arc_color": {
+                      "$token": "color.status.warning"
+                    },
                     "arc_width": 11
                   }
                 },
@@ -1188,7 +1434,9 @@
                     "part": "knob"
                   },
                   "props": {
-                    "bg_color": "#D99A2B",
+                    "bg_color": {
+                      "$token": "color.status.warning"
+                    },
                     "bg_opa": 0,
                     "radius": 12
                   }
@@ -1211,16 +1459,20 @@
               "props": {
                 "text": "68%",
                 "x": 65,
-                "y": 102,
+                "y": 82,
                 "width": 110,
-                "height": "content"
+                "height": 28
               },
               "styleRefs": [],
               "styles": [
                 {
                   "props": {
-                    "text_color": "#D99A2B",
-                    "text_font": "montserrat_30",
+                    "text_color": {
+                      "$token": "color.status.warning"
+                    },
+                    "text_font": {
+                      "$token": "font.size.30"
+                    },
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -1244,16 +1496,20 @@
               "props": {
                 "text": "4200 K",
                 "x": 65,
-                "y": 140,
+                "y": 116,
                 "width": 110,
-                "height": "content"
+                "height": 24
               },
               "styleRefs": [],
               "styles": [
                 {
                   "props": {
-                    "text_color": "#1B9AAA",
-                    "text_font": "montserrat_16",
+                    "text_color": {
+                      "$token": "color.accent.strong"
+                    },
+                    "text_font": {
+                      "$token": "font.size.16"
+                    },
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -1276,17 +1532,21 @@
               "codeName": "light_master_label",
               "props": {
                 "text": "MASTER",
-                "x": 74,
-                "y": 172,
-                "width": 92,
-                "height": "content"
+                "x": 50,
+                "y": 154,
+                "width": 82,
+                "height": 18
               },
               "styleRefs": [],
               "styles": [
                 {
                   "props": {
-                    "text_color": "#61777A",
-                    "text_font": "montserrat_14",
+                    "text_color": {
+                      "$token": "color.text.muted"
+                    },
+                    "text_font": {
+                      "$token": "font.size.14"
+                    },
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -1301,10 +1561,10 @@
               "type": "switch",
               "codeName": "light_master",
               "props": {
-                "x": 88,
-                "y": 195,
+                "x": 136,
+                "y": 140,
                 "width": 64,
-                "height": 30
+                "height": 34
               },
               "styleRefs": [],
               "styles": [
@@ -1313,7 +1573,9 @@
                     "part": "main"
                   },
                   "props": {
-                    "bg_color": "#C6D3CF",
+                    "bg_color": {
+                      "$token": "color.track"
+                    },
                     "bg_opa": 255,
                     "radius": 20
                   }
@@ -1326,7 +1588,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#1B9AAA",
+                    "bg_color": {
+                      "$token": "color.accent.strong"
+                    },
                     "bg_opa": 255,
                     "radius": 20
                   }
@@ -1336,7 +1600,9 @@
                     "part": "knob"
                   },
                   "props": {
-                    "bg_color": "#FFFFFF",
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
                     "bg_opa": 255,
                     "radius": 20
                   }
@@ -1381,7 +1647,9 @@
           "styles": [
             {
               "props": {
-                "bg_color": "#F4F1EA",
+                "bg_color": {
+                  "$token": "color.background"
+                },
                 "bg_opa": 255,
                 "border_width": 0,
                 "pad_all": 0
@@ -1397,17 +1665,21 @@
               "codeName": "focus_page_title",
               "props": {
                 "text": "FOCUS",
-                "x": 84,
-                "y": 24,
-                "width": 72,
-                "height": "content"
+                "x": 70,
+                "y": 14,
+                "width": 100,
+                "height": 32
               },
               "styleRefs": [],
               "styles": [
                 {
                   "props": {
-                    "text_color": "#61777A",
-                    "text_font": "montserrat_18",
+                    "text_color": {
+                      "$token": "color.text.muted"
+                    },
+                    "text_font": {
+                      "$token": "font.size.18"
+                    },
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -1422,10 +1694,10 @@
               "type": "button",
               "codeName": "focus_back",
               "props": {
-                "x": 46,
-                "y": 26,
-                "width": 38,
-                "height": 38
+                "x": 40,
+                "y": 174,
+                "width": 48,
+                "height": 48
               },
               "flags": {
                 "scrollable": false
@@ -1434,13 +1706,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#FFFFFF",
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
                     "bg_opa": 255,
                     "border_width": 1,
-                    "border_color": "#C9D6D2",
-                    "radius": 22,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "radius": 24,
                     "shadow_width": 0,
-                    "shadow_color": "#FFFFFF",
+                    "shadow_color": {
+                      "$token": "color.surface"
+                    },
                     "shadow_opa": 0,
                     "pad_all": 0
                   }
@@ -1452,7 +1730,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#1B9AAA"
+                    "bg_color": {
+                      "$token": "color.accent.strong"
+                    }
                   }
                 }
               ],
@@ -1484,8 +1764,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#163033",
-                        "text_font": "montserrat_18",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.20"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -1501,10 +1785,10 @@
               "type": "button",
               "codeName": "focus_next",
               "props": {
-                "x": 156,
-                "y": 26,
-                "width": 38,
-                "height": 38
+                "x": 152,
+                "y": 174,
+                "width": 48,
+                "height": 48
               },
               "flags": {
                 "scrollable": false
@@ -1513,13 +1797,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#FFFFFF",
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
                     "bg_opa": 255,
                     "border_width": 1,
-                    "border_color": "#C9D6D2",
-                    "radius": 22,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "radius": 24,
                     "shadow_width": 0,
-                    "shadow_color": "#FFFFFF",
+                    "shadow_color": {
+                      "$token": "color.surface"
+                    },
                     "shadow_opa": 0,
                     "pad_all": 0
                   }
@@ -1531,7 +1821,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#1B9AAA"
+                    "bg_color": {
+                      "$token": "color.accent.strong"
+                    }
                   }
                 }
               ],
@@ -1563,8 +1855,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#163033",
-                        "text_font": "montserrat_18",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.20"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -1582,16 +1878,20 @@
               "props": {
                 "text": "SELECT MODE",
                 "x": 60,
-                "y": 72,
+                "y": 52,
                 "width": 120,
-                "height": "content"
+                "height": 24
               },
               "styleRefs": [],
               "styles": [
                 {
                   "props": {
-                    "text_color": "#61777A",
-                    "text_font": "montserrat_14",
+                    "text_color": {
+                      "$token": "color.text.muted"
+                    },
+                    "text_font": {
+                      "$token": "font.size.14"
+                    },
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -1606,10 +1906,10 @@
               "type": "button",
               "codeName": "focus_deep",
               "props": {
-                "x": 41,
-                "y": 98,
-                "width": 76,
-                "height": 42
+                "x": 38,
+                "y": 78,
+                "width": 78,
+                "height": 44
               },
               "flags": {
                 "scrollable": false
@@ -1618,14 +1918,20 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#167D83",
+                    "bg_color": {
+                      "$token": "color.accent"
+                    },
                     "bg_opa": 255,
                     "border_width": 0,
-                    "border_color": "#C9D6D2",
-                    "radius": 22,
-                    "shadow_width": 10,
-                    "shadow_color": "#167D83",
-                    "shadow_opa": 32,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "radius": 23,
+                    "shadow_width": 0,
+                    "shadow_color": {
+                      "$token": "color.accent"
+                    },
+                    "shadow_opa": 24,
                     "pad_all": 0
                   }
                 },
@@ -1636,7 +1942,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#1B9AAA"
+                    "bg_color": {
+                      "$token": "color.accent.strong"
+                    }
                   }
                 }
               ],
@@ -1666,8 +1974,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#FFFFFF",
-                        "text_font": "montserrat_14",
+                        "text_color": {
+                          "$token": "color.surface"
+                        },
+                        "text_font": {
+                          "$token": "font.size.14"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -1683,10 +1995,10 @@
               "type": "button",
               "codeName": "focus_meet",
               "props": {
-                "x": 123,
-                "y": 98,
-                "width": 76,
-                "height": 42
+                "x": 124,
+                "y": 78,
+                "width": 78,
+                "height": 44
               },
               "flags": {
                 "scrollable": false
@@ -1695,13 +2007,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#FFFFFF",
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
                     "bg_opa": 255,
                     "border_width": 1,
-                    "border_color": "#C9D6D2",
-                    "radius": 22,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "radius": 23,
                     "shadow_width": 0,
-                    "shadow_color": "#FFFFFF",
+                    "shadow_color": {
+                      "$token": "color.surface"
+                    },
                     "shadow_opa": 0,
                     "pad_all": 0
                   }
@@ -1713,7 +2031,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#1B9AAA"
+                    "bg_color": {
+                      "$token": "color.accent.strong"
+                    }
                   }
                 }
               ],
@@ -1743,8 +2063,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#163033",
-                        "text_font": "montserrat_14",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.14"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -1760,10 +2084,10 @@
               "type": "button",
               "codeName": "focus_call",
               "props": {
-                "x": 41,
-                "y": 148,
-                "width": 76,
-                "height": 42
+                "x": 38,
+                "y": 128,
+                "width": 78,
+                "height": 44
               },
               "flags": {
                 "scrollable": false
@@ -1772,13 +2096,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#FFFFFF",
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
                     "bg_opa": 255,
                     "border_width": 1,
-                    "border_color": "#C9D6D2",
-                    "radius": 22,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "radius": 23,
                     "shadow_width": 0,
-                    "shadow_color": "#FFFFFF",
+                    "shadow_color": {
+                      "$token": "color.surface"
+                    },
                     "shadow_opa": 0,
                     "pad_all": 0
                   }
@@ -1790,7 +2120,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#1B9AAA"
+                    "bg_color": {
+                      "$token": "color.accent.strong"
+                    }
                   }
                 }
               ],
@@ -1820,8 +2152,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#163033",
-                        "text_font": "montserrat_14",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.14"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -1837,10 +2173,10 @@
               "type": "button",
               "codeName": "focus_reset",
               "props": {
-                "x": 123,
-                "y": 148,
-                "width": 76,
-                "height": 42
+                "x": 124,
+                "y": 128,
+                "width": 78,
+                "height": 44
               },
               "flags": {
                 "scrollable": false
@@ -1849,13 +2185,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#FFFFFF",
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
                     "bg_opa": 255,
                     "border_width": 1,
-                    "border_color": "#C9D6D2",
-                    "radius": 22,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "radius": 23,
                     "shadow_width": 0,
-                    "shadow_color": "#FFFFFF",
+                    "shadow_color": {
+                      "$token": "color.surface"
+                    },
                     "shadow_opa": 0,
                     "pad_all": 0
                   }
@@ -1867,7 +2209,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#1B9AAA"
+                    "bg_color": {
+                      "$token": "color.accent.strong"
+                    }
                   }
                 }
               ],
@@ -1897,8 +2241,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#163033",
-                        "text_font": "montserrat_14",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.14"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -1915,17 +2263,21 @@
               "codeName": "focus_time",
               "props": {
                 "text": "50 MIN",
-                "x": 70,
-                "y": 205,
-                "width": 100,
-                "height": "content"
+                "x": 88,
+                "y": 176,
+                "width": 64,
+                "height": 22
               },
               "styleRefs": [],
               "styles": [
                 {
                   "props": {
-                    "text_color": "#1B9AAA",
-                    "text_font": "montserrat_16",
+                    "text_color": {
+                      "$token": "color.accent.strong"
+                    },
+                    "text_font": {
+                      "$token": "font.size.16"
+                    },
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -1956,7 +2308,9 @@
           "styles": [
             {
               "props": {
-                "bg_color": "#F4F1EA",
+                "bg_color": {
+                  "$token": "color.background"
+                },
                 "bg_opa": 255,
                 "border_width": 0,
                 "pad_all": 0
@@ -1972,17 +2326,21 @@
               "codeName": "settings_page_title",
               "props": {
                 "text": "SET",
-                "x": 84,
-                "y": 24,
-                "width": 72,
-                "height": "content"
+                "x": 70,
+                "y": 14,
+                "width": 100,
+                "height": 32
               },
               "styleRefs": [],
               "styles": [
                 {
                   "props": {
-                    "text_color": "#61777A",
-                    "text_font": "montserrat_18",
+                    "text_color": {
+                      "$token": "color.text.muted"
+                    },
+                    "text_font": {
+                      "$token": "font.size.18"
+                    },
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -1997,10 +2355,10 @@
               "type": "button",
               "codeName": "settings_back",
               "props": {
-                "x": 46,
-                "y": 26,
-                "width": 38,
-                "height": 38
+                "x": 40,
+                "y": 174,
+                "width": 48,
+                "height": 48
               },
               "flags": {
                 "scrollable": false
@@ -2009,13 +2367,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#FFFFFF",
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
                     "bg_opa": 255,
                     "border_width": 1,
-                    "border_color": "#C9D6D2",
-                    "radius": 22,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "radius": 24,
                     "shadow_width": 0,
-                    "shadow_color": "#FFFFFF",
+                    "shadow_color": {
+                      "$token": "color.surface"
+                    },
                     "shadow_opa": 0,
                     "pad_all": 0
                   }
@@ -2027,7 +2391,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#1B9AAA"
+                    "bg_color": {
+                      "$token": "color.accent.strong"
+                    }
                   }
                 }
               ],
@@ -2059,8 +2425,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#163033",
-                        "text_font": "montserrat_18",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.20"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -2076,10 +2446,10 @@
               "type": "button",
               "codeName": "settings_home",
               "props": {
-                "x": 156,
-                "y": 26,
-                "width": 38,
-                "height": 38
+                "x": 152,
+                "y": 174,
+                "width": 48,
+                "height": 48
               },
               "flags": {
                 "scrollable": false
@@ -2088,13 +2458,19 @@
               "styles": [
                 {
                   "props": {
-                    "bg_color": "#FFFFFF",
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
                     "bg_opa": 255,
                     "border_width": 1,
-                    "border_color": "#C9D6D2",
-                    "radius": 22,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "radius": 24,
                     "shadow_width": 0,
-                    "shadow_color": "#FFFFFF",
+                    "shadow_color": {
+                      "$token": "color.surface"
+                    },
                     "shadow_opa": 0,
                     "pad_all": 0
                   }
@@ -2106,7 +2482,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#1B9AAA"
+                    "bg_color": {
+                      "$token": "color.accent.strong"
+                    }
                   }
                 }
               ],
@@ -2138,8 +2516,12 @@
                   "styles": [
                     {
                       "props": {
-                        "text_color": "#163033",
-                        "text_font": "montserrat_18",
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.20"
+                        },
                         "text_align": "center"
                       }
                     }
@@ -2157,16 +2539,20 @@
               "props": {
                 "text": "  DND",
                 "x": 42,
-                "y": 82,
+                "y": 46,
                 "width": 96,
-                "height": "content"
+                "height": 22
               },
               "styleRefs": [],
               "styles": [
                 {
                   "props": {
-                    "text_color": "#163033",
-                    "text_font": "montserrat_16",
+                    "text_color": {
+                      "$token": "color.text.primary"
+                    },
+                    "text_font": {
+                      "$token": "font.size.16"
+                    },
                     "text_align": "left",
                     "text_opa": 255
                   }
@@ -2182,7 +2568,7 @@
               "codeName": "settings_dnd",
               "props": {
                 "x": 142,
-                "y": 77,
+                "y": 46,
                 "width": 54,
                 "height": 28
               },
@@ -2193,7 +2579,9 @@
                     "part": "main"
                   },
                   "props": {
-                    "bg_color": "#C6D3CF",
+                    "bg_color": {
+                      "$token": "color.track"
+                    },
                     "bg_opa": 255,
                     "radius": 20
                   }
@@ -2206,7 +2594,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#1B9AAA",
+                    "bg_color": {
+                      "$token": "color.accent.strong"
+                    },
                     "bg_opa": 255,
                     "radius": 20
                   }
@@ -2216,7 +2606,9 @@
                     "part": "knob"
                   },
                   "props": {
-                    "bg_color": "#FFFFFF",
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
                     "bg_opa": 255,
                     "radius": 20
                   }
@@ -2247,16 +2639,20 @@
               "props": {
                 "text": "  VENT",
                 "x": 42,
-                "y": 125,
+                "y": 80,
                 "width": 96,
-                "height": "content"
+                "height": 22
               },
               "styleRefs": [],
               "styles": [
                 {
                   "props": {
-                    "text_color": "#163033",
-                    "text_font": "montserrat_16",
+                    "text_color": {
+                      "$token": "color.text.primary"
+                    },
+                    "text_font": {
+                      "$token": "font.size.16"
+                    },
                     "text_align": "left",
                     "text_opa": 255
                   }
@@ -2272,7 +2668,7 @@
               "codeName": "settings_vent",
               "props": {
                 "x": 142,
-                "y": 120,
+                "y": 80,
                 "width": 54,
                 "height": 28
               },
@@ -2283,7 +2679,9 @@
                     "part": "main"
                   },
                   "props": {
-                    "bg_color": "#C6D3CF",
+                    "bg_color": {
+                      "$token": "color.track"
+                    },
                     "bg_opa": 255,
                     "radius": 20
                   }
@@ -2296,7 +2694,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#1B9AAA",
+                    "bg_color": {
+                      "$token": "color.accent.strong"
+                    },
                     "bg_opa": 255,
                     "radius": 20
                   }
@@ -2306,7 +2706,9 @@
                     "part": "knob"
                   },
                   "props": {
-                    "bg_color": "#FFFFFF",
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
                     "bg_opa": 255,
                     "radius": 20
                   }
@@ -2337,16 +2739,20 @@
               "props": {
                 "text": "  LIGHT",
                 "x": 42,
-                "y": 168,
+                "y": 114,
                 "width": 96,
-                "height": "content"
+                "height": 22
               },
               "styleRefs": [],
               "styles": [
                 {
                   "props": {
-                    "text_color": "#163033",
-                    "text_font": "montserrat_16",
+                    "text_color": {
+                      "$token": "color.text.primary"
+                    },
+                    "text_font": {
+                      "$token": "font.size.16"
+                    },
                     "text_align": "left",
                     "text_opa": 255
                   }
@@ -2362,7 +2768,7 @@
               "codeName": "settings_light",
               "props": {
                 "x": 142,
-                "y": 163,
+                "y": 114,
                 "width": 54,
                 "height": 28
               },
@@ -2373,7 +2779,9 @@
                     "part": "main"
                   },
                   "props": {
-                    "bg_color": "#C6D3CF",
+                    "bg_color": {
+                      "$token": "color.track"
+                    },
                     "bg_opa": 255,
                     "radius": 20
                   }
@@ -2386,7 +2794,9 @@
                     ]
                   },
                   "props": {
-                    "bg_color": "#1B9AAA",
+                    "bg_color": {
+                      "$token": "color.accent.strong"
+                    },
                     "bg_opa": 255,
                     "radius": 20
                   }
@@ -2396,7 +2806,9 @@
                     "part": "knob"
                   },
                   "props": {
-                    "bg_color": "#FFFFFF",
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
                     "bg_opa": 255,
                     "radius": 20
                   }
@@ -2426,17 +2838,21 @@
               "codeName": "settings_version",
               "props": {
                 "text": "WF2D-8620  v1.4",
-                "x": 50,
-                "y": 211,
-                "width": 140,
-                "height": "content"
+                "x": 58,
+                "y": 146,
+                "width": 124,
+                "height": 22
               },
               "styleRefs": [],
               "styles": [
                 {
                   "props": {
-                    "text_color": "#61777A",
-                    "text_font": "montserrat_14",
+                    "text_color": {
+                      "$token": "color.text.muted"
+                    },
+                    "text_font": {
+                      "$token": "font.size.14"
+                    },
                     "text_align": "center",
                     "text_opa": 255
                   }
@@ -2515,7 +2931,7 @@
     "displayName": "WF2D-8620 自然舒适舱目标",
     "uiProjectRef": "ui:wf2d-8620-serene-pod@1",
     "controllerProfileRef": "controller:wf2d-8620@1",
-    "themeRef": "ui:wf2d-8620-serene-pod@1#theme:default",
+    "themeRef": "ui:wf2d-8620-serene-pod@1#theme:serene-wf2d-8620",
     "lvglVersion": "9.5.0"
   },
   "actionRegistry": {
@@ -2641,9 +3057,15 @@
     },
     {
       "severity": "info",
-      "code": "serene-device-layout",
+      "code": "serene-device-layout-v2",
       "path": "uiProject.screens",
-      "message": "WF2D-8620 使用自然舒适主题与设备专属布局。"
+      "message": "WF2D-8620 使用自然舒适舱独立视觉体系与大触控布局。"
+    },
+    {
+      "severity": "info",
+      "code": "semantic-theme",
+      "path": "uiProject.themes",
+      "message": "WF2D-8620 的颜色、阴影、边框和文字字体已绑定自然舒适主题 Token。"
     }
   ],
   "colorFormatConfirmed": true

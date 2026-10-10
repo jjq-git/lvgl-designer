@@ -14,11 +14,16 @@ import {
   useBuildTargetStore,
   type ControllerPreset,
 } from '../stores/buildTargetStore';
+import { generateThemeFromCurrentStyles } from './themeBinding';
 
 export type { StoredProjectDocument } from '@lvd/schema/v2';
 
 export interface ProjectStructureRepair {
-  code: 'tileview-direct-children-repaired';
+  code: 'tileview-direct-children-repaired'
+    | 'binding-comparison-operator-repaired'
+    | 'snapshot-references-repaired'
+    | 'editable-theme-generated'
+    | 'serene-brand-repaired';
   path: string;
   count: number;
 }
@@ -71,6 +76,77 @@ function repairTileviewChildren(
   });
 }
 
+function repairBindingComparisonOperators(node: WidgetNodeV2): number {
+  let count = 0;
+  for (const binding of node.bindings as Array<{ kind: string; op?: string }>) {
+    if ((binding.kind === 'flag' || binding.kind === 'state') && binding.op === 'ne') {
+      binding.op = 'not_eq';
+      count += 1;
+    }
+  }
+  return count + node.children.reduce(
+    (total, child) => total + repairBindingComparisonOperators(child),
+    0,
+  );
+}
+
+function repairSereneBrand(project: ProjectSnapshotV2['uiProject']): number {
+  const isSereneProject = project.editor?.example === 'serene-pod-control-suite'
+    || project.meta.name.includes('自然舒适舱');
+  if (!isSereneProject) return 0;
+  const visit = (node: WidgetNodeV2): number => {
+    let count = 0;
+    if (node.props.text === 'SERENE') {
+      node.props.text = 'BRAND A';
+      count += 1;
+    }
+    return count + node.children.reduce((total, child) => total + visit(child), 0);
+  };
+  return [
+    ...project.screens.map((screen) => screen.root),
+    ...project.components.map((component) => component.root),
+  ].reduce((total, root) => total + visit(root), 0);
+}
+
+function repairSnapshotReferences(document: ProjectSnapshotV2, generatedThemeId?: string): number {
+  let count = 0;
+  const displayRef = (`${document.displayProfile.id}@${document.displayProfile.revision}`) as typeof document.uiProject.designDisplayRef;
+  const uiProjectRef = (`${document.uiProject.meta.id}@${document.uiProject.meta.revision}`) as typeof document.buildTarget.uiProjectRef;
+  if (document.uiProject.designDisplayRef !== displayRef) {
+    document.uiProject.designDisplayRef = displayRef;
+    count += 1;
+  }
+  if (document.controllerProfile && document.controllerProfile.displayRef !== displayRef) {
+    document.controllerProfile.displayRef = displayRef;
+    count += 1;
+  }
+  if (document.buildTarget.uiProjectRef !== uiProjectRef) {
+    document.buildTarget.uiProjectRef = uiProjectRef;
+    count += 1;
+  }
+  if (document.controllerProfile) {
+    const controllerRef = (`${document.controllerProfile.id}@${document.controllerProfile.revision}`) as NonNullable<typeof document.buildTarget.controllerProfileRef>;
+    if (document.buildTarget.controllerProfileRef !== controllerRef) {
+      document.buildTarget.controllerProfileRef = controllerRef;
+      count += 1;
+    }
+  }
+
+  const embeddedThemeId = document.buildTarget.themeRef.match(/#theme:(.+)$/)?.[1];
+  const selectedThemeId = generatedThemeId
+    ?? (embeddedThemeId && document.uiProject.themes.some((theme) => theme.id === embeddedThemeId)
+      ? embeddedThemeId
+      : undefined);
+  if (selectedThemeId) {
+    const themeRef = `${uiProjectRef}#theme:${selectedThemeId}` as typeof document.buildTarget.themeRef;
+    if (document.buildTarget.themeRef !== themeRef) {
+      document.buildTarget.themeRef = themeRef;
+      count += 1;
+    }
+  }
+  return count;
+}
+
 /** Repair project trees written by builds that allowed ordinary widgets directly under tileview. */
 export function repairStoredProjectDocument(raw: unknown): {
   document: unknown;
@@ -86,12 +162,59 @@ export function repairStoredProjectDocument(raw: unknown): {
   document.uiProject.components.forEach((component, index) => {
     repairTileviewChildren(component.root, `uiProject.components[${index}].root`, repairs);
   });
+  const repairedBindingCount = [
+    ...document.uiProject.screens.map((screen) => screen.root),
+    ...document.uiProject.components.map((component) => component.root),
+  ].reduce(
+    (count, root) => count + repairBindingComparisonOperators(root),
+    0,
+  );
+  if (repairedBindingCount > 0) {
+    repairs.push({
+      code: 'binding-comparison-operator-repaired',
+      path: 'uiProject',
+      count: repairedBindingCount,
+    });
+  }
+  const repairedBrandCount = repairSereneBrand(document.uiProject);
+  if (repairedBrandCount > 0) {
+    repairs.push({
+      code: 'serene-brand-repaired',
+      path: 'uiProject.screens',
+      count: repairedBrandCount,
+    });
+  }
+  const preferredThemeId = document.buildTarget.themeRef.match(/#theme:(.+)$/)?.[1] ?? 'default';
+  const generatedTheme = generateThemeFromCurrentStyles(document.uiProject, preferredThemeId);
+  if (generatedTheme) {
+    repairs.push({
+      code: 'editable-theme-generated',
+      path: 'uiProject.themes',
+      count: generatedTheme.bindingCount,
+    });
+  }
+  const repairedReferenceCount = repairSnapshotReferences(document, generatedTheme?.themeId);
+  if (repairedReferenceCount > 0) {
+    repairs.push({
+      code: 'snapshot-references-repaired',
+      path: 'uiProject.designDisplayRef',
+      count: repairedReferenceCount,
+    });
+  }
   for (const repair of repairs) {
     document.migrationNotes.push({
       severity: 'info',
       code: repair.code,
       path: repair.path,
-      message: `已将 tileview 下的 ${repair.count} 个直属组件移入 tileview-tile`,
+      message: repair.code === 'tileview-direct-children-repaired'
+        ? `已将 tileview 下的 ${repair.count} 个直属组件移入 tileview-tile`
+        : repair.code === 'binding-comparison-operator-repaired'
+          ? `已将 ${repair.count} 处旧版 ne 比较条件迁移为 not_eq`
+          : repair.code === 'editable-theme-generated'
+            ? `已将 ${repair.count} 处现有颜色和字体转换为可编辑主题 Token`
+            : repair.code === 'serene-brand-repaired'
+              ? `已将 ${repair.count} 处 SERENE 品牌文字更新为 BRAND A`
+              : `已修复 ${repair.count} 处工程显示、控制器或主题引用`,
     });
   }
   return { document, repairs };
@@ -140,16 +263,25 @@ export function createNewStoredProjectDocument(
   return document;
 }
 
-/** Load either a current v2 snapshot or a legacy v1 document. */
-export function loadProjectDocument(raw: unknown): LoadedDesignerProjectDocument {
+/**
+ * Parse either a current v2 snapshot or a legacy v1 document without changing
+ * the active editor session. Use this for background metadata/cache reads.
+ */
+export function parseProjectDocument(raw: unknown): LoadedDesignerProjectDocument {
   const repaired = repairStoredProjectDocument(raw);
   const loaded = loadStoredProjectDocument(repaired.document);
+  return { ...loaded, repairs: repaired.repairs };
+}
+
+/** Load a parsed document into the active BuildTarget session. */
+export function loadProjectDocument(raw: unknown): LoadedDesignerProjectDocument {
+  const loaded = parseProjectDocument(raw);
   if (loaded.snapshot === null) {
     useBuildTargetStore.getState().syncProject(loaded.project);
   } else {
     useBuildTargetStore.getState().loadSnapshot(loaded.project, loaded.snapshot);
   }
-  return { ...loaded, repairs: repaired.repairs };
+  return loaded;
 }
 
 export function cloneStoredProjectDocument(document: StoredProjectDocument): StoredProjectDocument {

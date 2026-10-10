@@ -21,12 +21,13 @@ runE2e('serene pod browser preview', () => {
     });
 
     try {
-      await page.goto('http://127.0.0.1:8001/');
-      if (page.url().endsWith('/login.html')) {
+      const designerUrl = 'http://127.0.0.1:8001/lvgl-designer/';
+      await page.goto(designerUrl);
+      if (new URL(page.url()).pathname === '/login' || new URL(page.url()).pathname === '/login.html') {
         await page.locator('#username').fill('admin');
         await page.locator('#password').fill('admin123');
         await page.locator('#login-form').evaluate((form: HTMLFormElement) => form.requestSubmit());
-        await page.waitForURL('http://127.0.0.1:8001/');
+        await page.waitForURL(designerUrl);
       }
       await page.waitForSelector('.rt-badge.rt-wasm', { timeout: 30_000 });
 
@@ -92,6 +93,37 @@ runE2e('serene pod browser preview', () => {
           }
         }
       }
+
+      const selectedArc = await page.evaluate(() => {
+        const lvd = (window as unknown as { __lvd: any }).__lvd;
+        const home = lvd.projectStore.getState().uiProject.screens.find((screen: any) => screen.codeName === 'home');
+        const findNode = (node: any): any => node.codeName === 'home_quiet_arc'
+          ? node
+          : node.children.map(findNode).find(Boolean);
+        const arc = findNode(home.root);
+        lvd.editorStore.getState().setActiveScreen(home.id);
+        lvd.editorStore.getState().select([arc.id]);
+        return { id: arc.id, x: arc.props.x, y: arc.props.y };
+      });
+      await page.waitForTimeout(100);
+      const selection = page.locator(`.overlay rect[data-selected-id="${selectedArc.id}"]`);
+      expect(await selection.getAttribute('pointer-events')).toBe('all');
+      const selectionBox = await selection.boundingBox();
+      expect(selectionBox).not.toBeNull();
+      await page.mouse.move(selectionBox!.x + selectionBox!.width / 2, selectionBox!.y + selectionBox!.height / 2);
+      await page.mouse.down();
+      await page.mouse.move(selectionBox!.x + selectionBox!.width / 2 + 36, selectionBox!.y + selectionBox!.height / 2 + 24, { steps: 4 });
+      await page.mouse.up();
+      const draggedArc = await page.evaluate((id) => {
+        const lvd = (window as unknown as { __lvd: any }).__lvd;
+        const findNode = (node: any): any => node.id === id ? node : node.children.map(findNode).find(Boolean);
+        const home = lvd.projectStore.getState().uiProject.screens.find((screen: any) => screen.codeName === 'home');
+        return findNode(home.root).props;
+      }, selectedArc.id);
+      expect(draggedArc.x).toBeGreaterThan(selectedArc.x);
+      expect(draggedArc.y).toBeGreaterThan(selectedArc.y);
+      await page.evaluate(() => (window as unknown as { __lvd: any }).__lvd.projectStore.getState().undo());
+
       expect(errors).toEqual([]);
     } finally {
       await browser.close();

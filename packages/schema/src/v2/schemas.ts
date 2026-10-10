@@ -193,10 +193,12 @@ export const zUiEvent = z.object({
   args: z.record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.strictObject({ $token: z.string() })])).optional(),
 });
 
+export const zCmpOp = z.enum(['eq', 'not_eq', 'gt', 'ge', 'lt', 'le']);
+
 export const zBinding = z.union([
   z.strictObject({ kind: z.literal('prop'), prop: z.string(), subject: z.string(), fmt: z.string().optional() }),
-  z.strictObject({ kind: z.literal('flag'), flag: z.string(), op: z.string(), subject: z.string(), refValue: z.number() }),
-  z.strictObject({ kind: z.literal('state'), state: z.string(), op: z.string(), subject: z.string(), refValue: z.number() }),
+  z.strictObject({ kind: z.literal('flag'), flag: z.string(), op: zCmpOp, subject: z.string(), refValue: z.number() }),
+  z.strictObject({ kind: z.literal('state'), state: z.string(), op: zCmpOp, subject: z.string(), refValue: z.number() }),
   z.strictObject({
     kind: z.literal('style'), styleId: z.string(), selector: zSelector.optional(),
     subject: z.string(), refValue: z.number(),

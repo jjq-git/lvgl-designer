@@ -41,6 +41,27 @@ describe('six differentiated quiet-pod interfaces', () => {
       expect(snapshot.buildTarget.themeRef).toMatch(new RegExp(`#theme:${item.theme}$`));
       expect(snapshot.uiProject.themes.map((theme) => theme.id)).toEqual([item.theme]);
 
+      if (item.feature === 'focus') {
+        const home = snapshot.uiProject.screens.find((screen) => screen.isHome);
+        const focus = snapshot.uiProject.screens.find((screen) => screen.codeName === 'focus');
+        const card = home?.root.children.find((node) => node.codeName === 'home_focus_card');
+        const start = home?.root.children.find((node) => node.codeName === 'home_focus_start');
+        expect(card).toMatchObject({
+          type: 'button',
+          props: { x: 40, y: 38, width: 160, height: 132 },
+          events: [{
+            on: 'clicked',
+            action: 'screen.open',
+            args: { screen: focus?.id, anim: 'fade_in', duration: 180, delay: 0 },
+          }],
+        });
+        expect(start?.events).toEqual([{
+          on: 'clicked',
+          action: 'subject.set',
+          args: { subject: 'subject:pod_mode', value: '2' },
+        }]);
+      }
+
       if (snapshot.controllerProfile) {
         expect(validateCrossRefs({
           uiProject: snapshot.uiProject,

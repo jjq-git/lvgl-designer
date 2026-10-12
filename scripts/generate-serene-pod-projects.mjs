@@ -684,10 +684,6 @@ function layoutRoundScreen(screen) {
   const back = findNode(screen, `${prefix}_back`);
   const next = findNode(screen, `${prefix}_next`);
   const home = findNode(screen, `${prefix}_home`);
-  // Keep the 48 px touch targets inside the circular display's safe area.
-  // The previous x=30/y=184 placement was legal in the 240 px square bounds,
-  // but the lower corners (and sometimes their glyphs) were clipped by the
-  // physical round mask.
   if (back) setRect(back, 40, 174, 48, 48);
   if (next) setRect(next, 152, 174, 48, 48);
   if (home) setRect(home, 152, 174, 48, 48);
@@ -698,7 +694,19 @@ function layoutRoundScreen(screen) {
   if (prefix === 'home') {
     title.props.text = '';
     setRect(title, 96, 16, 48, 32);
-    if (next) setRect(next, 154, 28, 48, 48);
+    if (next) {
+      next.codeName = 'home_feature_card';
+      next.props = { x: 45, y: 48, width: 150, height: 116 };
+      next.styles = [
+        { props: { bg_opa: 0, border_width: 0, shadow_width: 0, radius: 58, pad_all: 0 } },
+        { selector: { states: ['pressed'] }, props: { bg_opa: 0 } },
+      ];
+      next.children = [];
+      const currentIndex = screen.root.children.indexOf(next);
+      if (currentIndex >= 0) screen.root.children.splice(currentIndex, 1);
+      const startIndex = screen.root.children.findIndex((node) => node.codeName === 'home_start');
+      screen.root.children.splice(startIndex >= 0 ? startIndex : screen.root.children.length, 0, next);
+    }
     setRect(findNode(screen, 'home_quiet_arc'), 58, 54, 124, 124);
     setRect(findNode(screen, 'home_quiet'), 60, 86, 120, 28);
     setRect(findNode(screen, 'home_noise'), 70, 118, 100, 24);

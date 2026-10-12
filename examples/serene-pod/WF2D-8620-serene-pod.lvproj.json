@@ -307,97 +307,6 @@
               "children": []
             },
             {
-              "id": "00000000-0000-4000-8000-000000000008",
-              "type": "button",
-              "codeName": "home_next",
-              "props": {
-                "x": 154,
-                "y": 28,
-                "width": 48,
-                "height": 48
-              },
-              "flags": {
-                "scrollable": false
-              },
-              "styleRefs": [],
-              "styles": [
-                {
-                  "props": {
-                    "bg_color": {
-                      "$token": "color.surface"
-                    },
-                    "bg_opa": 255,
-                    "border_width": 1,
-                    "border_color": {
-                      "$token": "color.border"
-                    },
-                    "radius": 24,
-                    "shadow_width": 0,
-                    "shadow_color": {
-                      "$token": "color.surface"
-                    },
-                    "shadow_opa": 0,
-                    "pad_all": 0
-                  }
-                },
-                {
-                  "selector": {
-                    "states": [
-                      "pressed"
-                    ]
-                  },
-                  "props": {
-                    "bg_color": {
-                      "$token": "color.accent.strong"
-                    }
-                  }
-                }
-              ],
-              "events": [
-                {
-                  "on": "clicked",
-                  "action": "screen.open",
-                  "args": {
-                    "screen": "00000000-0000-4000-8000-000000000002",
-                    "anim": "move_left",
-                    "duration": 180,
-                    "delay": 0
-                  }
-                }
-              ],
-              "bindings": [],
-              "children": [
-                {
-                  "id": "00000000-0000-4000-8000-000000000007",
-                  "type": "label",
-                  "codeName": "home_next_text",
-                  "props": {
-                    "text": "",
-                    "align": "center",
-                    "width": "100%",
-                    "height": "content"
-                  },
-                  "styleRefs": [],
-                  "styles": [
-                    {
-                      "props": {
-                        "text_color": {
-                          "$token": "color.text.primary"
-                        },
-                        "text_font": {
-                          "$token": "font.size.20"
-                        },
-                        "text_align": "center"
-                      }
-                    }
-                  ],
-                  "events": [],
-                  "bindings": [],
-                  "children": []
-                }
-              ]
-            },
-            {
               "id": "00000000-0000-4000-8000-000000000009",
               "type": "arc",
               "codeName": "home_quiet_arc",
@@ -549,6 +458,59 @@
                 }
               ],
               "events": [],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000000008",
+              "type": "button",
+              "codeName": "home_feature_card",
+              "props": {
+                "x": 45,
+                "y": 48,
+                "width": 150,
+                "height": 116
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_opa": 0,
+                    "border_width": 0,
+                    "shadow_width": 0,
+                    "radius": 58,
+                    "pad_all": 0,
+                    "border_color": {
+                      "$token": "color.border"
+                    }
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_opa": 0
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "00000000-0000-4000-8000-000000000002",
+                    "anim": "move_left",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
               "bindings": [],
               "children": []
             },

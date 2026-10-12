@@ -269,7 +269,7 @@
         "styles": [],
         "consts": [],
         "root": {
-          "id": "00000000-0000-4000-8000-000000900006",
+          "id": "00000000-0000-4000-8000-000000900007",
           "type": "obj",
           "codeName": "home_root",
           "props": {},
@@ -438,6 +438,59 @@
                 }
               ],
               "events": [],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000900006",
+              "type": "button",
+              "codeName": "home_focus_card",
+              "props": {
+                "x": 40,
+                "y": 38,
+                "width": 160,
+                "height": 132
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_opa": 0,
+                    "border_width": 0,
+                    "shadow_width": 0,
+                    "radius": 66,
+                    "pad_all": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent"
+                    },
+                    "bg_opa": 24
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "00000000-0000-4000-8000-000000000004",
+                    "anim": "fade_in",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
               "bindings": [],
               "children": []
             },

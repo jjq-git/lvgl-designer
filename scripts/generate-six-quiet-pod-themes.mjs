@@ -75,6 +75,19 @@ function button(codeName, text, x, y, width, height, event, options = {}) {
   return node;
 }
 
+function navigationOverlay(codeName, x, y, width, height, screen) {
+  const node = base('button', codeName, { x, y, width, height }, [
+    style({ bg_opa: 0, border_width: 0, shadow_width: 0, radius: Math.floor(Math.min(width, height) / 2), pad_all: 0 }),
+    style({ bg_color: token('color.accent'), bg_opa: 24 }, { states: ['pressed'] }),
+  ]);
+  node.events = [{
+    on: 'clicked',
+    action: 'screen.open',
+    args: { screen, anim: 'fade_in', duration: 180, delay: 0 },
+  }];
+  return node;
+}
+
 function arc(codeName, x, y, size, value, width = 14, binding) {
   const node = base('arc', codeName, { x, y, width: size, height: size, min_value: 0, max_value: 100, value, bg_start_angle: 135, bg_end_angle: 45, start_angle: 135, end_angle: 45, knob_offset: -3 }, [
     style({ arc_color: token('color.track'), arc_width: width }, { part: 'main' }),
@@ -99,13 +112,20 @@ function root(children) {
   return base('obj', 'home_root', {}, [style({ bg_color: token('color.background'), bg_opa: 255, border_width: 0, pad_all: 0 })], children);
 }
 
-function focusHome() {
+function focusHome({ focusScreenId }) {
+  const kicker = label('home_kicker', 'DEEP FOCUS', 58, 18, 124, 24, 'font.size.14', 'color.text.muted', 'center');
+  const focusArc = arc('home_focus_arc', 40, 38, 160, 75, 13);
+  const timer = label('home_timer', '25:00', 56, 82, 128, 38, 'font.size.28', 'color.text.primary', 'center');
+  const cycle = label('home_cycle', 'CYCLE  3 / 4', 64, 124, 112, 20, 'font.size.14', 'color.accent.strong', 'center');
+  const start = button('home_focus_start', 'START', 72, 178, 96, 42, { on: 'clicked', action: 'subject.set', args: { subject: 'subject:pod_mode', value: '2' } }, { radius: 22, shadow: 8 });
+  const card = navigationOverlay('home_focus_card', 40, 38, 160, 132, focusScreenId);
   return root([
-    label('home_kicker', 'DEEP FOCUS', 58, 18, 124, 24, 'font.size.14', 'color.text.muted', 'center'),
-    arc('home_focus_arc', 40, 38, 160, 75, 13),
-    label('home_timer', '25:00', 56, 82, 128, 38, 'font.size.28', 'color.text.primary', 'center'),
-    label('home_cycle', 'CYCLE  3 / 4', 64, 124, 112, 20, 'font.size.14', 'color.accent.strong', 'center'),
-    button('home_focus_start', 'START', 72, 178, 96, 42, { on: 'clicked', action: 'subject.set', args: { subject: 'subject:pod_mode', value: '2' } }, { radius: 22, shadow: 8 }),
+    kicker,
+    focusArc,
+    timer,
+    cycle,
+    card,
+    start,
   ]);
 }
 
@@ -301,12 +321,16 @@ function generate(preset) {
     name: `${preset.model} 静音舱 · ${preset.featureName}`,
     modifiedAt: '2026-10-12T00:00:00.000Z',
   };
+  const focusScreenId = snapshot.uiProject.screens.find((screen) => screen.codeName === 'focus')?.id;
+  if (preset.feature === 'focus' && !focusScreenId) {
+    throw new Error(`${preset.model} focus screen is missing`);
+  }
   snapshot.uiProject.screens[0] = {
     ...snapshot.uiProject.screens[0],
     displayName: preset.featureName,
     codeName: 'home',
     isHome: true,
-    root: HOME_BUILDERS[preset.feature](),
+    root: HOME_BUILDERS[preset.feature]({ focusScreenId }),
   };
   if (preset.feature === 'dnd') {
     snapshot.uiProject.screens = [snapshot.uiProject.screens[0]];

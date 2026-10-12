@@ -187,7 +187,14 @@ describe('serene pod example projects', () => {
 
     const round = loadExample('WF2D-8620').snapshot.uiProject.screens.find((screen) => screen.codeName === 'home')!;
     expect(findNode(round.root, 'home_page_title')?.props.text).toBe('');
-    expect(findNode(round.root, 'home_next')?.props).toMatchObject({ x: 154, y: 28, width: 48, height: 48 });
+    const featureCard = findNode(round.root, 'home_feature_card')!;
+    expect(featureCard.props).toMatchObject({ x: 45, y: 48, width: 150, height: 116 });
+    expect(featureCard.children).toEqual([]);
+    expect(featureCard.styles[0]?.props).toMatchObject({ bg_opa: 0, border_width: 0, shadow_width: 0 });
+    expect(featureCard.events[0]).toMatchObject({
+      on: 'clicked', action: 'screen.open',
+      args: { screen: '00000000-0000-4000-8000-000000000002' },
+    });
 
     const roundFocus = loadExample('WF2D-8620').snapshot.uiProject.screens.find((screen) => screen.codeName === 'focus')!;
     expect(findNode(roundFocus.root, 'focus_back')?.props).toMatchObject({ x: 40, y: 174, width: 48, height: 48 });

@@ -65,6 +65,24 @@ describe('site frame display presets', () => {
       }));
     }
     expect(DEVICE_FRAME_PREVIEWS).toHaveLength(6);
+    const round240Frame = deviceFrameForDisplay({ width: 240, height: 240, shape: 'round' });
+    expect(round240Frame).toEqual(
+      expect.objectContaining({
+        frameId: 'WF2D-8620',
+        aperture: {
+          x: 0.287442,
+          y: 0.287442,
+          width: 0.425116,
+          height: 0.425116,
+          radius: '50%',
+        },
+      }),
+    );
+    const glassGradient = round240Frame?.svgMarkup.match(
+      /<radialGradient id="glassG"[\s\S]*?<\/radialGradient>/,
+    )?.[0];
+    expect(glassGradient).toBeDefined();
+    expect(glassGradient?.match(/stop-color="#000000"/g)).toHaveLength(4);
     expect(deviceFrameForDisplay({ width: 284, height: 76, shape: 'rect' })).toEqual(
       expect.objectContaining({
         frameId: 'WF3-28476',

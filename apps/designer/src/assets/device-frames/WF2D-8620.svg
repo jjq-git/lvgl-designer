@@ -12,7 +12,7 @@
 <linearGradient id="chromeCross" gradientUnits="userSpaceOnUse" x1="394.6751" y1="511.9465" x2="352.6751" y2="555.9465">
 <stop offset="0" stop-color="#ffffff" stop-opacity="0.55"></stop><stop offset="0.25" stop-color="#ffffff" stop-opacity="0"></stop><stop offset="0.62" stop-color="#000000" stop-opacity="0.35"></stop><stop offset="0.85" stop-color="#ffffff" stop-opacity="0.45"></stop><stop offset="1" stop-color="#ffffff" stop-opacity="0.1"></stop></linearGradient>
 <radialGradient id="glassG" gradientUnits="userSpaceOnUse" cx="365.6751" cy="522.9465" r="32">
-<stop offset="0" stop-color="#26282a"></stop><stop offset="0.42" stop-color="#131416"></stop><stop offset="0.78" stop-color="#08090a"></stop><stop offset="1" stop-color="#000000"></stop></radialGradient>
+<stop offset="0" stop-color="#000000"></stop><stop offset="0.42" stop-color="#000000"></stop><stop offset="0.78" stop-color="#000000"></stop><stop offset="1" stop-color="#000000"></stop></radialGradient>
 <radialGradient id="ledHalo" gradientUnits="userSpaceOnUse" cx="373.4750753" cy="533.8464779" r="30">
 <stop offset="0.80" stop-color="#ff4d7a" stop-opacity="0"></stop><stop offset="0.875" stop-color="#3fe08c" stop-opacity="0.5"></stop><stop offset="0.93" stop-color="#37b6ff" stop-opacity="0.45"></stop><stop offset="1" stop-color="#b45cff" stop-opacity="0"></stop></radialGradient>
 <filter id="haloBlur" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="2.6"></feGaussianBlur></filter>

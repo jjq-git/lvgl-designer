@@ -61,7 +61,9 @@ export const DEVICE_FRAME_PREVIEWS: readonly DeviceFramePreview[] = [
   {
     frameId: 'WF2D-8620', assetUrl: 'frames/WF2D-8620.svg', svgMarkup: frame8620Svg,
     width: 240, height: 240, shape: 'round',
-    aperture: { x: 0.234302, y: 0.234302, width: 0.531395, height: 0.531395, radius: '50%' },
+    // The SVG glass is larger than the active LCD. The remaining concentric
+    // area is physical black glass and must never be covered by UI pixels.
+    aperture: { x: 0.287442, y: 0.287442, width: 0.425116, height: 0.425116, radius: '50%' },
   },
   {
     frameId: 'WF2D-1040', assetUrl: 'frames/WF2D-1040.svg', svgMarkup: frame1040Svg,

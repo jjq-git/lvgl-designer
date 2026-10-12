@@ -12,6 +12,7 @@ import { SyncBadge } from './panels/cloud/SyncBadge';
 import { hasPermission, useAuthStore } from './stores/authStore';
 import { getProject } from './services/cloudStorage';
 import {
+  excludeCloudDuplicateLocal,
   excludePersistedBuiltIns,
   storedProjectDisplay,
   type ProjectDisplaySpec,
@@ -165,15 +166,18 @@ export function Toolbar(): JSX.Element {
     height: project.height,
     shape: project.shape,
   }));
-  const persistedProjectOptions = localProjectOption
-    ? [localProjectOption, ...projectOptions]
+  const visibleLocalProjectOption = cloudProjectId === null
+    ? localProjectOption
+    : excludeCloudDuplicateLocal(localProjectOption, projectOptions);
+  const persistedProjectOptions = visibleLocalProjectOption
+    ? [visibleLocalProjectOption, ...projectOptions]
     : projectOptions;
   const uniqueBuiltInProjectOptions = excludePersistedBuiltIns(
     builtInProjectOptions,
     persistedProjectOptions,
   );
-  const allProjectOptions = localProjectOption
-    ? [localProjectOption, ...uniqueBuiltInProjectOptions, ...projectOptions]
+  const allProjectOptions = visibleLocalProjectOption
+    ? [visibleLocalProjectOption, ...uniqueBuiltInProjectOptions, ...projectOptions]
     : [...uniqueBuiltInProjectOptions, ...projectOptions];
   const filteredProjects = selectedPreset
     ? allProjectOptions.filter((project) => presetMatchesDisplay(selectedPreset, project))

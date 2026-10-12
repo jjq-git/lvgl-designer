@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { createEmptyProject } from '@lvd/schema';
 import { createNewStoredProjectDocument } from './projectPersistence';
-import { excludePersistedBuiltIns, storedProjectDisplay } from './projectPicker';
+import {
+  excludeCloudDuplicateLocal,
+  excludePersistedBuiltIns,
+  storedProjectDisplay,
+} from './projectPicker';
 
 describe('projectPicker', () => {
   it('reads a legacy project display without opening it', () => {
@@ -33,5 +37,43 @@ describe('projectPicker', () => {
     ];
 
     expect(excludePersistedBuiltIns(builtIns, persisted)).toEqual([builtIns[1]]);
+  });
+
+  it('hides a cached local project when the same cloud project is available', () => {
+    const local = {
+      name: 'WF2D-1040 静音舱 · 空气质量',
+      width: 1080,
+      height: 720,
+      shape: 'rect' as const,
+    };
+    const cloudProjects = [
+      {
+        name: 'WF2D-1040 静音舱 · 空气质量',
+        width: 1080,
+        height: 720,
+        shape: 'rect' as const,
+      },
+    ];
+
+    expect(excludeCloudDuplicateLocal(local, cloudProjects)).toBeNull();
+  });
+
+  it('keeps a cached local project when it is distinct from cloud projects', () => {
+    const local = {
+      name: '本地草稿',
+      width: 1080,
+      height: 720,
+      shape: 'rect' as const,
+    };
+    const cloudProjects = [
+      {
+        name: 'WF2D-1040 静音舱 · 空气质量',
+        width: 1080,
+        height: 720,
+        shape: 'rect' as const,
+      },
+    ];
+
+    expect(excludeCloudDuplicateLocal(local, cloudProjects)).toBe(local);
   });
 });

@@ -702,7 +702,21 @@ function harborVessel(screens) {
     card('harbor_vessel_identity', 24, 100, 420, 594, [
       label('harbor_vessel_identity_title', 'NORTH STAR', 28, 26, 360, 44, 36, 'color.accent'),
       label('harbor_vessel_identity_type', 'CONTAINER / IMO 9482217', 28, 78, 360, 28, 18, 'color.text.muted'),
-      label('harbor_vessel_identity_icon', ICON.next, 126, 132, 168, 140, 44, 'color.accent2', 'center'),
+      card('harbor_vessel_approach', 28, 116, 364, 172, [
+        label('harbor_vessel_approach_status', 'LIVE APPROACH', 16, 12, 150, 22, 14, 'color.success'),
+        label('harbor_vessel_approach_heading', 'HDG 082\u00b0  /  8 kn', 174, 12, 174, 22, 14, 'color.accent', 'right'),
+        card('harbor_vessel_container_1', 44, 44, 42, 24, [], { fill: 'color.accent2', border: 'color.accent2', radius: 3, shadow: false }),
+        card('harbor_vessel_container_2', 92, 44, 42, 24, [], { fill: 'color.warning', border: 'color.warning', radius: 3, shadow: false }),
+        card('harbor_vessel_container_3', 140, 44, 42, 24, [], { fill: 'color.success', border: 'color.success', radius: 3, shadow: false }),
+        card('harbor_vessel_container_4', 188, 44, 42, 24, [], { fill: 'color.accent2', border: 'color.accent2', radius: 3, shadow: false }),
+        card('harbor_vessel_container_5', 236, 44, 42, 24, [], { fill: 'color.warning', border: 'color.warning', radius: 3, shadow: false }),
+        card('harbor_vessel_bridge', 284, 38, 36, 30, [], { fill: 'color.surface', border: 'color.accent', radius: 4, shadow: false }),
+        card('harbor_vessel_hull', 32, 72, 300, 38, [
+          label('harbor_vessel_hull_name', 'NORTH STAR', 20, 8, 260, 22, 16, 'color.text.onaccent', 'center'),
+        ], { fill: 'color.accent', border: 'color.accent', radius: 16, shadow: false }),
+        card('harbor_vessel_waterline', 20, 118, 324, 3, [], { fill: 'color.accent2', border: 'color.accent2', radius: 2, shadow: false }),
+        label('harbor_vessel_approach_route', `PILOT POINT  3.8 NM  ${ICON.next}  BERTH A2`, 18, 134, 328, 24, 16, 'color.accent', 'center'),
+      ], { fill: 'color.surface2', border: 'color.border', radius: 12, shadow: false }),
       label('harbor_vessel_length_label', 'LENGTH', 28, 312, 140, 24, 16, 'color.text.muted'),
       label('harbor_vessel_length', '294 m', 190, 306, 180, 32, 24),
       label('harbor_vessel_draft_label', 'DRAFT', 28, 366, 140, 24, 16, 'color.text.muted'),

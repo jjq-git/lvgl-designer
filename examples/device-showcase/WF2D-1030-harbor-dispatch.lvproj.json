@@ -2428,7 +2428,7 @@
         "styles": [],
         "consts": [],
         "root": {
-          "id": "10000000-0000-4000-9000-000000000119",
+          "id": "10000000-0000-4000-9000-000000000131",
           "type": "obj",
           "codeName": "harbor_vessel_root",
           "props": {},
@@ -2645,7 +2645,7 @@
               ]
             },
             {
-              "id": "10000000-0000-4000-9000-000000000085",
+              "id": "10000000-0000-4000-9000-000000000097",
               "type": "obj",
               "codeName": "harbor_vessel_identity",
               "props": {
@@ -2744,37 +2744,489 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000077",
-                  "type": "label",
-                  "codeName": "harbor_vessel_identity_icon",
+                  "id": "10000000-0000-4000-9000-000000000089",
+                  "type": "obj",
+                  "codeName": "harbor_vessel_approach",
                   "props": {
-                    "text": "",
-                    "x": 126,
-                    "y": 132,
-                    "width": 168,
-                    "height": 140
+                    "x": 28,
+                    "y": 116,
+                    "width": 364,
+                    "height": 172
+                  },
+                  "flags": {
+                    "scrollable": false
                   },
                   "styleRefs": [],
                   "styles": [
                     {
                       "props": {
-                        "text_color": {
-                          "$token": "color.accent2"
+                        "bg_color": {
+                          "$token": "color.surface2"
                         },
-                        "text_font": {
-                          "$token": "font.size.44"
+                        "bg_opa": 255,
+                        "border_color": {
+                          "$token": "color.border"
                         },
-                        "text_align": "center",
-                        "text_opa": 255
+                        "border_width": 1,
+                        "radius": 12,
+                        "pad_all": 0,
+                        "shadow_color": {
+                          "$token": "color.shadow"
+                        },
+                        "shadow_width": 0,
+                        "shadow_opa": 0,
+                        "shadow_offset_y": 0
                       }
                     }
                   ],
                   "events": [],
                   "bindings": [],
-                  "children": []
+                  "children": [
+                    {
+                      "id": "10000000-0000-4000-9000-000000000077",
+                      "type": "label",
+                      "codeName": "harbor_vessel_approach_status",
+                      "props": {
+                        "text": "LIVE APPROACH",
+                        "x": 16,
+                        "y": 12,
+                        "width": 150,
+                        "height": 22
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "text_color": {
+                              "$token": "color.success"
+                            },
+                            "text_font": {
+                              "$token": "font.size.14"
+                            },
+                            "text_align": "left",
+                            "text_opa": 255
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": []
+                    },
+                    {
+                      "id": "10000000-0000-4000-9000-000000000078",
+                      "type": "label",
+                      "codeName": "harbor_vessel_approach_heading",
+                      "props": {
+                        "text": "HDG 082°  /  8 kn",
+                        "x": 174,
+                        "y": 12,
+                        "width": 174,
+                        "height": 22
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "text_color": {
+                              "$token": "color.accent"
+                            },
+                            "text_font": {
+                              "$token": "font.size.14"
+                            },
+                            "text_align": "right",
+                            "text_opa": 255
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": []
+                    },
+                    {
+                      "id": "10000000-0000-4000-9000-000000000079",
+                      "type": "obj",
+                      "codeName": "harbor_vessel_container_1",
+                      "props": {
+                        "x": 44,
+                        "y": 44,
+                        "width": 42,
+                        "height": 24
+                      },
+                      "flags": {
+                        "scrollable": false
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "bg_color": {
+                              "$token": "color.accent2"
+                            },
+                            "bg_opa": 255,
+                            "border_color": {
+                              "$token": "color.accent2"
+                            },
+                            "border_width": 1,
+                            "radius": 3,
+                            "pad_all": 0,
+                            "shadow_color": {
+                              "$token": "color.shadow"
+                            },
+                            "shadow_width": 0,
+                            "shadow_opa": 0,
+                            "shadow_offset_y": 0
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": []
+                    },
+                    {
+                      "id": "10000000-0000-4000-9000-000000000080",
+                      "type": "obj",
+                      "codeName": "harbor_vessel_container_2",
+                      "props": {
+                        "x": 92,
+                        "y": 44,
+                        "width": 42,
+                        "height": 24
+                      },
+                      "flags": {
+                        "scrollable": false
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "bg_color": {
+                              "$token": "color.warning"
+                            },
+                            "bg_opa": 255,
+                            "border_color": {
+                              "$token": "color.warning"
+                            },
+                            "border_width": 1,
+                            "radius": 3,
+                            "pad_all": 0,
+                            "shadow_color": {
+                              "$token": "color.shadow"
+                            },
+                            "shadow_width": 0,
+                            "shadow_opa": 0,
+                            "shadow_offset_y": 0
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": []
+                    },
+                    {
+                      "id": "10000000-0000-4000-9000-000000000081",
+                      "type": "obj",
+                      "codeName": "harbor_vessel_container_3",
+                      "props": {
+                        "x": 140,
+                        "y": 44,
+                        "width": 42,
+                        "height": 24
+                      },
+                      "flags": {
+                        "scrollable": false
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "bg_color": {
+                              "$token": "color.success"
+                            },
+                            "bg_opa": 255,
+                            "border_color": {
+                              "$token": "color.success"
+                            },
+                            "border_width": 1,
+                            "radius": 3,
+                            "pad_all": 0,
+                            "shadow_color": {
+                              "$token": "color.shadow"
+                            },
+                            "shadow_width": 0,
+                            "shadow_opa": 0,
+                            "shadow_offset_y": 0
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": []
+                    },
+                    {
+                      "id": "10000000-0000-4000-9000-000000000082",
+                      "type": "obj",
+                      "codeName": "harbor_vessel_container_4",
+                      "props": {
+                        "x": 188,
+                        "y": 44,
+                        "width": 42,
+                        "height": 24
+                      },
+                      "flags": {
+                        "scrollable": false
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "bg_color": {
+                              "$token": "color.accent2"
+                            },
+                            "bg_opa": 255,
+                            "border_color": {
+                              "$token": "color.accent2"
+                            },
+                            "border_width": 1,
+                            "radius": 3,
+                            "pad_all": 0,
+                            "shadow_color": {
+                              "$token": "color.shadow"
+                            },
+                            "shadow_width": 0,
+                            "shadow_opa": 0,
+                            "shadow_offset_y": 0
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": []
+                    },
+                    {
+                      "id": "10000000-0000-4000-9000-000000000083",
+                      "type": "obj",
+                      "codeName": "harbor_vessel_container_5",
+                      "props": {
+                        "x": 236,
+                        "y": 44,
+                        "width": 42,
+                        "height": 24
+                      },
+                      "flags": {
+                        "scrollable": false
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "bg_color": {
+                              "$token": "color.warning"
+                            },
+                            "bg_opa": 255,
+                            "border_color": {
+                              "$token": "color.warning"
+                            },
+                            "border_width": 1,
+                            "radius": 3,
+                            "pad_all": 0,
+                            "shadow_color": {
+                              "$token": "color.shadow"
+                            },
+                            "shadow_width": 0,
+                            "shadow_opa": 0,
+                            "shadow_offset_y": 0
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": []
+                    },
+                    {
+                      "id": "10000000-0000-4000-9000-000000000084",
+                      "type": "obj",
+                      "codeName": "harbor_vessel_bridge",
+                      "props": {
+                        "x": 284,
+                        "y": 38,
+                        "width": 36,
+                        "height": 30
+                      },
+                      "flags": {
+                        "scrollable": false
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "bg_color": {
+                              "$token": "color.surface"
+                            },
+                            "bg_opa": 255,
+                            "border_color": {
+                              "$token": "color.accent"
+                            },
+                            "border_width": 1,
+                            "radius": 4,
+                            "pad_all": 0,
+                            "shadow_color": {
+                              "$token": "color.shadow"
+                            },
+                            "shadow_width": 0,
+                            "shadow_opa": 0,
+                            "shadow_offset_y": 0
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": []
+                    },
+                    {
+                      "id": "10000000-0000-4000-9000-000000000086",
+                      "type": "obj",
+                      "codeName": "harbor_vessel_hull",
+                      "props": {
+                        "x": 32,
+                        "y": 72,
+                        "width": 300,
+                        "height": 38
+                      },
+                      "flags": {
+                        "scrollable": false
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "bg_color": {
+                              "$token": "color.accent"
+                            },
+                            "bg_opa": 255,
+                            "border_color": {
+                              "$token": "color.accent"
+                            },
+                            "border_width": 1,
+                            "radius": 16,
+                            "pad_all": 0,
+                            "shadow_color": {
+                              "$token": "color.shadow"
+                            },
+                            "shadow_width": 0,
+                            "shadow_opa": 0,
+                            "shadow_offset_y": 0
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": [
+                        {
+                          "id": "10000000-0000-4000-9000-000000000085",
+                          "type": "label",
+                          "codeName": "harbor_vessel_hull_name",
+                          "props": {
+                            "text": "NORTH STAR",
+                            "x": 20,
+                            "y": 8,
+                            "width": 260,
+                            "height": 22
+                          },
+                          "styleRefs": [],
+                          "styles": [
+                            {
+                              "props": {
+                                "text_color": {
+                                  "$token": "color.text.onaccent"
+                                },
+                                "text_font": {
+                                  "$token": "font.size.16"
+                                },
+                                "text_align": "center",
+                                "text_opa": 255
+                              }
+                            }
+                          ],
+                          "events": [],
+                          "bindings": [],
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "id": "10000000-0000-4000-9000-000000000087",
+                      "type": "obj",
+                      "codeName": "harbor_vessel_waterline",
+                      "props": {
+                        "x": 20,
+                        "y": 118,
+                        "width": 324,
+                        "height": 3
+                      },
+                      "flags": {
+                        "scrollable": false
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "bg_color": {
+                              "$token": "color.accent2"
+                            },
+                            "bg_opa": 255,
+                            "border_color": {
+                              "$token": "color.accent2"
+                            },
+                            "border_width": 1,
+                            "radius": 2,
+                            "pad_all": 0,
+                            "shadow_color": {
+                              "$token": "color.shadow"
+                            },
+                            "shadow_width": 0,
+                            "shadow_opa": 0,
+                            "shadow_offset_y": 0
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": []
+                    },
+                    {
+                      "id": "10000000-0000-4000-9000-000000000088",
+                      "type": "label",
+                      "codeName": "harbor_vessel_approach_route",
+                      "props": {
+                        "text": "PILOT POINT  3.8 NM    BERTH A2",
+                        "x": 18,
+                        "y": 134,
+                        "width": 328,
+                        "height": 24
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "text_color": {
+                              "$token": "color.accent"
+                            },
+                            "text_font": {
+                              "$token": "font.size.16"
+                            },
+                            "text_align": "center",
+                            "text_opa": 255
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": []
+                    }
+                  ]
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000078",
+                  "id": "10000000-0000-4000-9000-000000000090",
                   "type": "label",
                   "codeName": "harbor_vessel_length_label",
                   "props": {
@@ -2804,7 +3256,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000079",
+                  "id": "10000000-0000-4000-9000-000000000091",
                   "type": "label",
                   "codeName": "harbor_vessel_length",
                   "props": {
@@ -2834,7 +3286,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000080",
+                  "id": "10000000-0000-4000-9000-000000000092",
                   "type": "label",
                   "codeName": "harbor_vessel_draft_label",
                   "props": {
@@ -2864,7 +3316,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000081",
+                  "id": "10000000-0000-4000-9000-000000000093",
                   "type": "label",
                   "codeName": "harbor_vessel_draft",
                   "props": {
@@ -2894,7 +3346,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000082",
+                  "id": "10000000-0000-4000-9000-000000000094",
                   "type": "label",
                   "codeName": "harbor_vessel_cargo_label",
                   "props": {
@@ -2924,7 +3376,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000083",
+                  "id": "10000000-0000-4000-9000-000000000095",
                   "type": "label",
                   "codeName": "harbor_vessel_cargo",
                   "props": {
@@ -2954,7 +3406,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000084",
+                  "id": "10000000-0000-4000-9000-000000000096",
                   "type": "label",
                   "codeName": "harbor_vessel_document_status",
                   "props": {
@@ -2986,7 +3438,7 @@
               ]
             },
             {
-              "id": "10000000-0000-4000-9000-000000000100",
+              "id": "10000000-0000-4000-9000-000000000112",
               "type": "obj",
               "codeName": "harbor_vessel_plan",
               "props": {
@@ -3025,7 +3477,7 @@
               "bindings": [],
               "children": [
                 {
-                  "id": "10000000-0000-4000-9000-000000000086",
+                  "id": "10000000-0000-4000-9000-000000000098",
                   "type": "label",
                   "codeName": "harbor_vessel_plan_title",
                   "props": {
@@ -3055,7 +3507,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000087",
+                  "id": "10000000-0000-4000-9000-000000000099",
                   "type": "label",
                   "codeName": "harbor_vessel_step1_icon",
                   "props": {
@@ -3085,7 +3537,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000088",
+                  "id": "10000000-0000-4000-9000-000000000100",
                   "type": "label",
                   "codeName": "harbor_vessel_step1",
                   "props": {
@@ -3115,7 +3567,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000089",
+                  "id": "10000000-0000-4000-9000-000000000101",
                   "type": "label",
                   "codeName": "harbor_vessel_step1_note",
                   "props": {
@@ -3145,7 +3597,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000090",
+                  "id": "10000000-0000-4000-9000-000000000102",
                   "type": "label",
                   "codeName": "harbor_vessel_step2_icon",
                   "props": {
@@ -3175,7 +3627,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000091",
+                  "id": "10000000-0000-4000-9000-000000000103",
                   "type": "label",
                   "codeName": "harbor_vessel_step2",
                   "props": {
@@ -3205,7 +3657,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000092",
+                  "id": "10000000-0000-4000-9000-000000000104",
                   "type": "label",
                   "codeName": "harbor_vessel_step2_note",
                   "props": {
@@ -3235,7 +3687,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000093",
+                  "id": "10000000-0000-4000-9000-000000000105",
                   "type": "label",
                   "codeName": "harbor_vessel_step3_icon",
                   "props": {
@@ -3265,7 +3717,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000094",
+                  "id": "10000000-0000-4000-9000-000000000106",
                   "type": "label",
                   "codeName": "harbor_vessel_step3",
                   "props": {
@@ -3295,7 +3747,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000095",
+                  "id": "10000000-0000-4000-9000-000000000107",
                   "type": "label",
                   "codeName": "harbor_vessel_step3_note",
                   "props": {
@@ -3325,7 +3777,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000097",
+                  "id": "10000000-0000-4000-9000-000000000109",
                   "type": "button",
                   "codeName": "harbor_vessel_radio",
                   "props": {
@@ -3386,7 +3838,7 @@
                   "bindings": [],
                   "children": [
                     {
-                      "id": "10000000-0000-4000-9000-000000000096",
+                      "id": "10000000-0000-4000-9000-000000000108",
                       "type": "label",
                       "codeName": "harbor_vessel_radio_text",
                       "props": {
@@ -3417,7 +3869,7 @@
                   ]
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000099",
+                  "id": "10000000-0000-4000-9000-000000000111",
                   "type": "button",
                   "codeName": "harbor_vessel_berth",
                   "props": {
@@ -3478,7 +3930,7 @@
                   "bindings": [],
                   "children": [
                     {
-                      "id": "10000000-0000-4000-9000-000000000098",
+                      "id": "10000000-0000-4000-9000-000000000110",
                       "type": "label",
                       "codeName": "harbor_vessel_berth_text",
                       "props": {
@@ -3511,7 +3963,7 @@
               ]
             },
             {
-              "id": "10000000-0000-4000-9000-000000000118",
+              "id": "10000000-0000-4000-9000-000000000130",
               "type": "obj",
               "codeName": "harbor_vessel_conditions",
               "props": {
@@ -3550,7 +4002,7 @@
               "bindings": [],
               "children": [
                 {
-                  "id": "10000000-0000-4000-9000-000000000101",
+                  "id": "10000000-0000-4000-9000-000000000113",
                   "type": "label",
                   "codeName": "harbor_vessel_conditions_title",
                   "props": {
@@ -3580,7 +4032,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000105",
+                  "id": "10000000-0000-4000-9000-000000000117",
                   "type": "obj",
                   "codeName": "harbor_vessel_wind",
                   "props": {
@@ -3619,7 +4071,7 @@
                   "bindings": [],
                   "children": [
                     {
-                      "id": "10000000-0000-4000-9000-000000000102",
+                      "id": "10000000-0000-4000-9000-000000000114",
                       "type": "label",
                       "codeName": "harbor_vessel_wind_title",
                       "props": {
@@ -3649,7 +4101,7 @@
                       "children": []
                     },
                     {
-                      "id": "10000000-0000-4000-9000-000000000103",
+                      "id": "10000000-0000-4000-9000-000000000115",
                       "type": "label",
                       "codeName": "harbor_vessel_wind_value",
                       "props": {
@@ -3679,7 +4131,7 @@
                       "children": []
                     },
                     {
-                      "id": "10000000-0000-4000-9000-000000000104",
+                      "id": "10000000-0000-4000-9000-000000000116",
                       "type": "label",
                       "codeName": "harbor_vessel_wind_unit",
                       "props": {
@@ -3711,7 +4163,7 @@
                   ]
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000109",
+                  "id": "10000000-0000-4000-9000-000000000121",
                   "type": "obj",
                   "codeName": "harbor_vessel_tide",
                   "props": {
@@ -3750,7 +4202,7 @@
                   "bindings": [],
                   "children": [
                     {
-                      "id": "10000000-0000-4000-9000-000000000106",
+                      "id": "10000000-0000-4000-9000-000000000118",
                       "type": "label",
                       "codeName": "harbor_vessel_tide_title",
                       "props": {
@@ -3780,7 +4232,7 @@
                       "children": []
                     },
                     {
-                      "id": "10000000-0000-4000-9000-000000000107",
+                      "id": "10000000-0000-4000-9000-000000000119",
                       "type": "label",
                       "codeName": "harbor_vessel_tide_value",
                       "props": {
@@ -3810,7 +4262,7 @@
                       "children": []
                     },
                     {
-                      "id": "10000000-0000-4000-9000-000000000108",
+                      "id": "10000000-0000-4000-9000-000000000120",
                       "type": "label",
                       "codeName": "harbor_vessel_tide_unit",
                       "props": {
@@ -3842,7 +4294,7 @@
                   ]
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000113",
+                  "id": "10000000-0000-4000-9000-000000000125",
                   "type": "obj",
                   "codeName": "harbor_vessel_depth",
                   "props": {
@@ -3881,7 +4333,7 @@
                   "bindings": [],
                   "children": [
                     {
-                      "id": "10000000-0000-4000-9000-000000000110",
+                      "id": "10000000-0000-4000-9000-000000000122",
                       "type": "label",
                       "codeName": "harbor_vessel_depth_title",
                       "props": {
@@ -3911,7 +4363,7 @@
                       "children": []
                     },
                     {
-                      "id": "10000000-0000-4000-9000-000000000111",
+                      "id": "10000000-0000-4000-9000-000000000123",
                       "type": "label",
                       "codeName": "harbor_vessel_depth_value",
                       "props": {
@@ -3941,7 +4393,7 @@
                       "children": []
                     },
                     {
-                      "id": "10000000-0000-4000-9000-000000000112",
+                      "id": "10000000-0000-4000-9000-000000000124",
                       "type": "label",
                       "codeName": "harbor_vessel_depth_unit",
                       "props": {
@@ -3973,7 +4425,7 @@
                   ]
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000117",
+                  "id": "10000000-0000-4000-9000-000000000129",
                   "type": "obj",
                   "codeName": "harbor_vessel_clearance",
                   "props": {
@@ -4012,7 +4464,7 @@
                   "bindings": [],
                   "children": [
                     {
-                      "id": "10000000-0000-4000-9000-000000000114",
+                      "id": "10000000-0000-4000-9000-000000000126",
                       "type": "label",
                       "codeName": "harbor_vessel_clearance_title",
                       "props": {
@@ -4042,7 +4494,7 @@
                       "children": []
                     },
                     {
-                      "id": "10000000-0000-4000-9000-000000000115",
+                      "id": "10000000-0000-4000-9000-000000000127",
                       "type": "label",
                       "codeName": "harbor_vessel_clearance_value",
                       "props": {
@@ -4072,7 +4524,7 @@
                       "children": []
                     },
                     {
-                      "id": "10000000-0000-4000-9000-000000000116",
+                      "id": "10000000-0000-4000-9000-000000000128",
                       "type": "label",
                       "codeName": "harbor_vessel_clearance_unit",
                       "props": {
@@ -4116,7 +4568,7 @@
         "styles": [],
         "consts": [],
         "root": {
-          "id": "10000000-0000-4000-9000-000000000159",
+          "id": "10000000-0000-4000-9000-000000000171",
           "type": "obj",
           "codeName": "harbor_berths_root",
           "props": {},
@@ -4140,7 +4592,7 @@
           "bindings": [],
           "children": [
             {
-              "id": "10000000-0000-4000-9000-000000000124",
+              "id": "10000000-0000-4000-9000-000000000136",
               "type": "obj",
               "codeName": "harbor_berths_header",
               "props": {
@@ -4179,7 +4631,7 @@
               "bindings": [],
               "children": [
                 {
-                  "id": "10000000-0000-4000-9000-000000000120",
+                  "id": "10000000-0000-4000-9000-000000000132",
                   "type": "label",
                   "codeName": "harbor_berths_title",
                   "props": {
@@ -4209,7 +4661,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000121",
+                  "id": "10000000-0000-4000-9000-000000000133",
                   "type": "label",
                   "codeName": "harbor_berths_status",
                   "props": {
@@ -4239,7 +4691,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000123",
+                  "id": "10000000-0000-4000-9000-000000000135",
                   "type": "button",
                   "codeName": "harbor_berths_back",
                   "props": {
@@ -4300,7 +4752,7 @@
                   "bindings": [],
                   "children": [
                     {
-                      "id": "10000000-0000-4000-9000-000000000122",
+                      "id": "10000000-0000-4000-9000-000000000134",
                       "type": "label",
                       "codeName": "harbor_berths_back_text",
                       "props": {
@@ -4333,7 +4785,7 @@
               ]
             },
             {
-              "id": "10000000-0000-4000-9000-000000000130",
+              "id": "10000000-0000-4000-9000-000000000142",
               "type": "obj",
               "codeName": "harbor_berth_a1",
               "props": {
@@ -4372,7 +4824,7 @@
               "bindings": [],
               "children": [
                 {
-                  "id": "10000000-0000-4000-9000-000000000125",
+                  "id": "10000000-0000-4000-9000-000000000137",
                   "type": "label",
                   "codeName": "harbor_berth_a1_code",
                   "props": {
@@ -4402,7 +4854,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000126",
+                  "id": "10000000-0000-4000-9000-000000000138",
                   "type": "label",
                   "codeName": "harbor_berth_a1_state",
                   "props": {
@@ -4432,7 +4884,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000127",
+                  "id": "10000000-0000-4000-9000-000000000139",
                   "type": "label",
                   "codeName": "harbor_berth_a1_vessel",
                   "props": {
@@ -4462,7 +4914,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000128",
+                  "id": "10000000-0000-4000-9000-000000000140",
                   "type": "bar",
                   "codeName": "harbor_berth_a1_progress",
                   "props": {
@@ -4506,7 +4958,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000129",
+                  "id": "10000000-0000-4000-9000-000000000141",
                   "type": "label",
                   "codeName": "harbor_berth_a1_eta",
                   "props": {
@@ -4538,7 +4990,7 @@
               ]
             },
             {
-              "id": "10000000-0000-4000-9000-000000000136",
+              "id": "10000000-0000-4000-9000-000000000148",
               "type": "obj",
               "codeName": "harbor_berth_a2",
               "props": {
@@ -4577,7 +5029,7 @@
               "bindings": [],
               "children": [
                 {
-                  "id": "10000000-0000-4000-9000-000000000131",
+                  "id": "10000000-0000-4000-9000-000000000143",
                   "type": "label",
                   "codeName": "harbor_berth_a2_code",
                   "props": {
@@ -4607,7 +5059,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000132",
+                  "id": "10000000-0000-4000-9000-000000000144",
                   "type": "label",
                   "codeName": "harbor_berth_a2_state",
                   "props": {
@@ -4637,7 +5089,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000133",
+                  "id": "10000000-0000-4000-9000-000000000145",
                   "type": "label",
                   "codeName": "harbor_berth_a2_vessel",
                   "props": {
@@ -4667,7 +5119,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000134",
+                  "id": "10000000-0000-4000-9000-000000000146",
                   "type": "bar",
                   "codeName": "harbor_berth_a2_progress",
                   "props": {
@@ -4711,7 +5163,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000135",
+                  "id": "10000000-0000-4000-9000-000000000147",
                   "type": "label",
                   "codeName": "harbor_berth_a2_eta",
                   "props": {
@@ -4743,7 +5195,7 @@
               ]
             },
             {
-              "id": "10000000-0000-4000-9000-000000000142",
+              "id": "10000000-0000-4000-9000-000000000154",
               "type": "obj",
               "codeName": "harbor_berth_b1",
               "props": {
@@ -4782,7 +5234,7 @@
               "bindings": [],
               "children": [
                 {
-                  "id": "10000000-0000-4000-9000-000000000137",
+                  "id": "10000000-0000-4000-9000-000000000149",
                   "type": "label",
                   "codeName": "harbor_berth_b1_code",
                   "props": {
@@ -4812,7 +5264,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000138",
+                  "id": "10000000-0000-4000-9000-000000000150",
                   "type": "label",
                   "codeName": "harbor_berth_b1_state",
                   "props": {
@@ -4842,7 +5294,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000139",
+                  "id": "10000000-0000-4000-9000-000000000151",
                   "type": "label",
                   "codeName": "harbor_berth_b1_vessel",
                   "props": {
@@ -4872,7 +5324,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000140",
+                  "id": "10000000-0000-4000-9000-000000000152",
                   "type": "bar",
                   "codeName": "harbor_berth_b1_progress",
                   "props": {
@@ -4916,7 +5368,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000141",
+                  "id": "10000000-0000-4000-9000-000000000153",
                   "type": "label",
                   "codeName": "harbor_berth_b1_eta",
                   "props": {
@@ -4948,7 +5400,7 @@
               ]
             },
             {
-              "id": "10000000-0000-4000-9000-000000000148",
+              "id": "10000000-0000-4000-9000-000000000160",
               "type": "obj",
               "codeName": "harbor_berth_c1",
               "props": {
@@ -4987,7 +5439,7 @@
               "bindings": [],
               "children": [
                 {
-                  "id": "10000000-0000-4000-9000-000000000143",
+                  "id": "10000000-0000-4000-9000-000000000155",
                   "type": "label",
                   "codeName": "harbor_berth_c1_code",
                   "props": {
@@ -5017,7 +5469,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000144",
+                  "id": "10000000-0000-4000-9000-000000000156",
                   "type": "label",
                   "codeName": "harbor_berth_c1_state",
                   "props": {
@@ -5047,7 +5499,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000145",
+                  "id": "10000000-0000-4000-9000-000000000157",
                   "type": "label",
                   "codeName": "harbor_berth_c1_vessel",
                   "props": {
@@ -5077,7 +5529,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000146",
+                  "id": "10000000-0000-4000-9000-000000000158",
                   "type": "bar",
                   "codeName": "harbor_berth_c1_progress",
                   "props": {
@@ -5121,7 +5573,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000147",
+                  "id": "10000000-0000-4000-9000-000000000159",
                   "type": "label",
                   "codeName": "harbor_berth_c1_eta",
                   "props": {
@@ -5153,7 +5605,7 @@
               ]
             },
             {
-              "id": "10000000-0000-4000-9000-000000000156",
+              "id": "10000000-0000-4000-9000-000000000168",
               "type": "obj",
               "codeName": "harbor_berth_timeline",
               "props": {
@@ -5192,7 +5644,7 @@
               "bindings": [],
               "children": [
                 {
-                  "id": "10000000-0000-4000-9000-000000000149",
+                  "id": "10000000-0000-4000-9000-000000000161",
                   "type": "label",
                   "codeName": "harbor_berth_timeline_title",
                   "props": {
@@ -5222,7 +5674,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000150",
+                  "id": "10000000-0000-4000-9000-000000000162",
                   "type": "label",
                   "codeName": "harbor_berth_timeline_1",
                   "props": {
@@ -5252,7 +5704,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000151",
+                  "id": "10000000-0000-4000-9000-000000000163",
                   "type": "label",
                   "codeName": "harbor_berth_timeline_1_text",
                   "props": {
@@ -5282,7 +5734,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000152",
+                  "id": "10000000-0000-4000-9000-000000000164",
                   "type": "label",
                   "codeName": "harbor_berth_timeline_2",
                   "props": {
@@ -5312,7 +5764,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000153",
+                  "id": "10000000-0000-4000-9000-000000000165",
                   "type": "label",
                   "codeName": "harbor_berth_timeline_2_text",
                   "props": {
@@ -5342,7 +5794,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000155",
+                  "id": "10000000-0000-4000-9000-000000000167",
                   "type": "button",
                   "codeName": "harbor_berth_confirm",
                   "props": {
@@ -5392,7 +5844,7 @@
                   "bindings": [],
                   "children": [
                     {
-                      "id": "10000000-0000-4000-9000-000000000154",
+                      "id": "10000000-0000-4000-9000-000000000166",
                       "type": "label",
                       "codeName": "harbor_berth_confirm_text",
                       "props": {
@@ -5425,7 +5877,7 @@
               ]
             },
             {
-              "id": "10000000-0000-4000-9000-000000000158",
+              "id": "10000000-0000-4000-9000-000000000170",
               "type": "button",
               "codeName": "harbor_berth_vessel",
               "props": {
@@ -5486,7 +5938,7 @@
               "bindings": [],
               "children": [
                 {
-                  "id": "10000000-0000-4000-9000-000000000157",
+                  "id": "10000000-0000-4000-9000-000000000169",
                   "type": "label",
                   "codeName": "harbor_berth_vessel_text",
                   "props": {
@@ -5527,7 +5979,7 @@
         "styles": [],
         "consts": [],
         "root": {
-          "id": "10000000-0000-4000-9000-000000000191",
+          "id": "10000000-0000-4000-9000-000000000203",
           "type": "obj",
           "codeName": "harbor_radio_root",
           "props": {},
@@ -5551,7 +6003,7 @@
           "bindings": [],
           "children": [
             {
-              "id": "10000000-0000-4000-9000-000000000164",
+              "id": "10000000-0000-4000-9000-000000000176",
               "type": "obj",
               "codeName": "harbor_radio_header",
               "props": {
@@ -5590,7 +6042,7 @@
               "bindings": [],
               "children": [
                 {
-                  "id": "10000000-0000-4000-9000-000000000160",
+                  "id": "10000000-0000-4000-9000-000000000172",
                   "type": "label",
                   "codeName": "harbor_radio_title",
                   "props": {
@@ -5620,7 +6072,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000161",
+                  "id": "10000000-0000-4000-9000-000000000173",
                   "type": "label",
                   "codeName": "harbor_radio_status",
                   "props": {
@@ -5650,7 +6102,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000163",
+                  "id": "10000000-0000-4000-9000-000000000175",
                   "type": "button",
                   "codeName": "harbor_radio_back",
                   "props": {
@@ -5711,7 +6163,7 @@
                   "bindings": [],
                   "children": [
                     {
-                      "id": "10000000-0000-4000-9000-000000000162",
+                      "id": "10000000-0000-4000-9000-000000000174",
                       "type": "label",
                       "codeName": "harbor_radio_back_text",
                       "props": {
@@ -5744,7 +6196,7 @@
               ]
             },
             {
-              "id": "10000000-0000-4000-9000-000000000175",
+              "id": "10000000-0000-4000-9000-000000000187",
               "type": "obj",
               "codeName": "harbor_radio_channels",
               "props": {
@@ -5783,7 +6235,7 @@
               "bindings": [],
               "children": [
                 {
-                  "id": "10000000-0000-4000-9000-000000000165",
+                  "id": "10000000-0000-4000-9000-000000000177",
                   "type": "label",
                   "codeName": "harbor_radio_channels_title",
                   "props": {
@@ -5813,7 +6265,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000167",
+                  "id": "10000000-0000-4000-9000-000000000179",
                   "type": "button",
                   "codeName": "harbor_radio_ch12",
                   "props": {
@@ -5863,7 +6315,7 @@
                   "bindings": [],
                   "children": [
                     {
-                      "id": "10000000-0000-4000-9000-000000000166",
+                      "id": "10000000-0000-4000-9000-000000000178",
                       "type": "label",
                       "codeName": "harbor_radio_ch12_text",
                       "props": {
@@ -5894,7 +6346,7 @@
                   ]
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000169",
+                  "id": "10000000-0000-4000-9000-000000000181",
                   "type": "button",
                   "codeName": "harbor_radio_ch16",
                   "props": {
@@ -5944,7 +6396,7 @@
                   "bindings": [],
                   "children": [
                     {
-                      "id": "10000000-0000-4000-9000-000000000168",
+                      "id": "10000000-0000-4000-9000-000000000180",
                       "type": "label",
                       "codeName": "harbor_radio_ch16_text",
                       "props": {
@@ -5975,7 +6427,7 @@
                   ]
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000171",
+                  "id": "10000000-0000-4000-9000-000000000183",
                   "type": "button",
                   "codeName": "harbor_radio_ch09",
                   "props": {
@@ -6025,7 +6477,7 @@
                   "bindings": [],
                   "children": [
                     {
-                      "id": "10000000-0000-4000-9000-000000000170",
+                      "id": "10000000-0000-4000-9000-000000000182",
                       "type": "label",
                       "codeName": "harbor_radio_ch09_text",
                       "props": {
@@ -6056,7 +6508,7 @@
                   ]
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000173",
+                  "id": "10000000-0000-4000-9000-000000000185",
                   "type": "button",
                   "codeName": "harbor_radio_ch71",
                   "props": {
@@ -6106,7 +6558,7 @@
                   "bindings": [],
                   "children": [
                     {
-                      "id": "10000000-0000-4000-9000-000000000172",
+                      "id": "10000000-0000-4000-9000-000000000184",
                       "type": "label",
                       "codeName": "harbor_radio_ch71_text",
                       "props": {
@@ -6137,7 +6589,7 @@
                   ]
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000174",
+                  "id": "10000000-0000-4000-9000-000000000186",
                   "type": "label",
                   "codeName": "harbor_radio_signal",
                   "props": {
@@ -6169,7 +6621,7 @@
               ]
             },
             {
-              "id": "10000000-0000-4000-9000-000000000183",
+              "id": "10000000-0000-4000-9000-000000000195",
               "type": "obj",
               "codeName": "harbor_radio_active",
               "props": {
@@ -6208,7 +6660,7 @@
               "bindings": [],
               "children": [
                 {
-                  "id": "10000000-0000-4000-9000-000000000176",
+                  "id": "10000000-0000-4000-9000-000000000188",
                   "type": "label",
                   "codeName": "harbor_radio_active_title",
                   "props": {
@@ -6238,7 +6690,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000177",
+                  "id": "10000000-0000-4000-9000-000000000189",
                   "type": "label",
                   "codeName": "harbor_radio_active_icon",
                   "props": {
@@ -6268,7 +6720,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000178",
+                  "id": "10000000-0000-4000-9000-000000000190",
                   "type": "label",
                   "codeName": "harbor_radio_active_vessel",
                   "props": {
@@ -6298,7 +6750,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000179",
+                  "id": "10000000-0000-4000-9000-000000000191",
                   "type": "label",
                   "codeName": "harbor_radio_active_message",
                   "props": {
@@ -6328,7 +6780,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000180",
+                  "id": "10000000-0000-4000-9000-000000000192",
                   "type": "label",
                   "codeName": "harbor_radio_active_time",
                   "props": {
@@ -6358,7 +6810,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000182",
+                  "id": "10000000-0000-4000-9000-000000000194",
                   "type": "button",
                   "codeName": "harbor_radio_ptt",
                   "props": {
@@ -6408,7 +6860,7 @@
                   "bindings": [],
                   "children": [
                     {
-                      "id": "10000000-0000-4000-9000-000000000181",
+                      "id": "10000000-0000-4000-9000-000000000193",
                       "type": "label",
                       "codeName": "harbor_radio_ptt_text",
                       "props": {
@@ -6441,7 +6893,7 @@
               ]
             },
             {
-              "id": "10000000-0000-4000-9000-000000000190",
+              "id": "10000000-0000-4000-9000-000000000202",
               "type": "obj",
               "codeName": "harbor_radio_log",
               "props": {
@@ -6480,7 +6932,7 @@
               "bindings": [],
               "children": [
                 {
-                  "id": "10000000-0000-4000-9000-000000000184",
+                  "id": "10000000-0000-4000-9000-000000000196",
                   "type": "label",
                   "codeName": "harbor_radio_log_title",
                   "props": {
@@ -6510,7 +6962,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000185",
+                  "id": "10000000-0000-4000-9000-000000000197",
                   "type": "label",
                   "codeName": "harbor_radio_log_one",
                   "props": {
@@ -6540,7 +6992,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000186",
+                  "id": "10000000-0000-4000-9000-000000000198",
                   "type": "label",
                   "codeName": "harbor_radio_log_two",
                   "props": {
@@ -6570,7 +7022,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000187",
+                  "id": "10000000-0000-4000-9000-000000000199",
                   "type": "label",
                   "codeName": "harbor_radio_log_three",
                   "props": {
@@ -6600,7 +7052,7 @@
                   "children": []
                 },
                 {
-                  "id": "10000000-0000-4000-9000-000000000189",
+                  "id": "10000000-0000-4000-9000-000000000201",
                   "type": "button",
                   "codeName": "harbor_radio_vessel",
                   "props": {
@@ -6661,7 +7113,7 @@
                   "bindings": [],
                   "children": [
                     {
-                      "id": "10000000-0000-4000-9000-000000000188",
+                      "id": "10000000-0000-4000-9000-000000000200",
                       "type": "label",
                       "codeName": "harbor_radio_vessel_text",
                       "props": {

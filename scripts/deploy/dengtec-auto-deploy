@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+state_root=/home/jiao/.local/share/dengtec-auto-deploy
+checkout_root="$state_root/checkouts"
+status_root="$state_root/status"
+lock_file="$state_root/controller.lock"
+overall_status=0
+
+mkdir -p "$checkout_root" "$status_root"
+exec 9>"$lock_file"
+if ! flock -n 9; then
+    echo 'Another automatic deployment check is still running; skipping.'
+    exit 0
+fi
+
+log() {
+    printf '%s %s\n' "$(date --iso-8601=seconds)" "$*"
+}
+
+retry_delay() {
+    case "$1" in
+        1) echo 120 ;;
+        2) echo 300 ;;
+        3) echo 900 ;;
+        4) echo 1800 ;;
+        *) echo 3600 ;;
+    esac
+}
+
+deploy_repository() {
+    local name=$1
+    local remote=$2
+    local deploy_script=$3
+    local checkout="$checkout_root/$name"
+    local success_file="$status_root/$name.success"
+    local failure_file="$status_root/$name.failure"
+    local sha success_sha failed_sha attempts next_attempt now delay
+
+    log "[$name] checking origin/main"
+    if [[ ! -d "$checkout/.git" ]]; then
+        if ! git clone --no-tags --single-branch --branch main "$remote" "$checkout"; then
+            log "[$name] clone failed"
+            overall_status=1
+            return
+        fi
+    fi
+
+    git -C "$checkout" remote set-url origin "$remote"
+    if ! git -C "$checkout" fetch --no-tags --prune origin \
+        '+refs/heads/main:refs/remotes/origin/main'; then
+        log "[$name] fetch failed"
+        overall_status=1
+        return
+    fi
+    sha=$(git -C "$checkout" rev-parse refs/remotes/origin/main)
+    success_sha=''
+    [[ -f "$success_file" ]] && read -r success_sha <"$success_file"
+    if [[ "$sha" == "$success_sha" ]]; then
+        log "[$name] already deployed at ${sha:0:12}"
+        return
+    fi
+
+    failed_sha=''
+    attempts=0
+    next_attempt=0
+    if [[ -f "$failure_file" ]]; then
+        read -r failed_sha attempts next_attempt <"$failure_file" || true
+    fi
+    now=$(date +%s)
+    if [[ "$sha" == "$failed_sha" ]] && (( now < next_attempt )); then
+        log "[$name] previous attempt failed; retry scheduled after $(date -d "@$next_attempt" --iso-8601=seconds)"
+        return
+    fi
+    if [[ "$sha" != "$failed_sha" ]]; then
+        attempts=0
+    fi
+
+    if ! git -C "$checkout" checkout --force --detach "$sha"; then
+        log "[$name] checkout failed"
+        overall_status=1
+        return
+    fi
+    if ! git -C "$checkout" clean -ffd \
+        -e node_modules \
+        -e 'packages/*/node_modules' \
+        -e 'apps/*/node_modules'; then
+        log "[$name] workspace cleanup failed"
+        overall_status=1
+        return
+    fi
+
+    log "[$name] deploying ${sha:0:12}"
+    if AUTODEPLOY_COMMIT_SHA="$sha" bash "$checkout/$deploy_script"; then
+        printf '%s\n' "$sha" >"$success_file"
+        rm -f -- "$failure_file"
+        log "[$name] deployment succeeded at ${sha:0:12}"
+    else
+        attempts=$((attempts + 1))
+        delay=$(retry_delay "$attempts")
+        next_attempt=$((now + delay))
+        printf '%s %s %s\n' "$sha" "$attempts" "$next_attempt" >"$failure_file"
+        log "[$name] deployment failed; retry ${attempts} in ${delay}s"
+        overall_status=1
+    fi
+}
+
+deploy_repository \
+    datasheets \
+    http://192.168.1.88:3000/learn_data_github/datasheets.git \
+    scripts/deploy/auto-deploy-host.sh
+
+deploy_repository \
+    lvgl-designer \
+    http://192.168.1.88:3000/learn_data_github/lvgl_json_lvgl.git \
+    scripts/deploy/auto-deploy-host.sh
+
+exit "$overall_status"

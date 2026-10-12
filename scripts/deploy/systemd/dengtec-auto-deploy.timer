@@ -1,0 +1,12 @@
+[Unit]
+Description=Check DENGTEC repositories for deployable commits
+
+[Timer]
+OnBootSec=1min
+OnUnitInactiveSec=2min
+AccuracySec=15s
+Persistent=true
+Unit=dengtec-auto-deploy.service
+
+[Install]
+WantedBy=timers.target

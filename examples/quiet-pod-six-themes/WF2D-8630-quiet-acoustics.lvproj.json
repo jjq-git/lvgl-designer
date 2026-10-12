@@ -284,7 +284,7 @@
         "styles": [],
         "consts": [],
         "root": {
-          "id": "00000000-0000-4000-8000-000000900022",
+          "id": "00000000-0000-4000-8000-000000900023",
           "type": "obj",
           "codeName": "home_root",
           "props": {},
@@ -1011,7 +1011,61 @@
               ]
             },
             {
-              "id": "00000000-0000-4000-8000-000000900021",
+              "id": "00000000-0000-4000-8000-000000900020",
+              "type": "button",
+              "codeName": "home_acoustic_card",
+              "props": {
+                "x": 18,
+                "y": 66,
+                "width": 444,
+                "height": 222
+              },
+              "flags": {
+                "scrollable": false,
+                "clickable": true
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_opa": 0,
+                    "border_width": 0,
+                    "shadow_width": 0,
+                    "radius": 111,
+                    "pad_all": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent"
+                    },
+                    "bg_opa": 24
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "screen.open",
+                  "args": {
+                    "screen": "00000000-0000-4000-8000-000000000002",
+                    "anim": "fade_in",
+                    "duration": 180,
+                    "delay": 0
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000900022",
               "type": "button",
               "codeName": "home_anc_toggle",
               "props": {
@@ -1069,7 +1123,7 @@
               "bindings": [],
               "children": [
                 {
-                  "id": "00000000-0000-4000-8000-000000900020",
+                  "id": "00000000-0000-4000-8000-000000900021",
                   "type": "label",
                   "codeName": "home_anc_toggle_text",
                   "props": {
@@ -1136,18 +1190,30 @@
           "children": [
             {
               "id": "00000000-0000-4000-8000-000000000036",
-              "type": "image",
+              "type": "label",
               "codeName": "air_brand_logo",
               "props": {
-                "src": "podsc_logo",
+                "text": "",
                 "x": 18,
                 "y": 15,
                 "width": 32,
-                "height": 32,
-                "inner_align": "center"
+                "height": 32
               },
               "styleRefs": [],
-              "styles": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": {
+                      "$token": "color.accent"
+                    },
+                    "text_font": {
+                      "$token": "font.size.20"
+                    },
+                    "text_align": "center",
+                    "text_opa": 255
+                  }
+                }
+              ],
               "events": [],
               "bindings": [],
               "children": []
@@ -2316,18 +2382,30 @@
           "children": [
             {
               "id": "00000000-0000-4000-8000-000000000063",
-              "type": "image",
+              "type": "label",
               "codeName": "light_brand_logo",
               "props": {
-                "src": "podsc_logo",
+                "text": "",
                 "x": 18,
                 "y": 15,
                 "width": 32,
-                "height": 32,
-                "inner_align": "center"
+                "height": 32
               },
               "styleRefs": [],
-              "styles": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": {
+                      "$token": "color.accent"
+                    },
+                    "text_font": {
+                      "$token": "font.size.20"
+                    },
+                    "text_align": "center",
+                    "text_opa": 255
+                  }
+                }
+              ],
               "events": [],
               "bindings": [],
               "children": []
@@ -3435,18 +3513,30 @@
           "children": [
             {
               "id": "00000000-0000-4000-8000-000000000088",
-              "type": "image",
+              "type": "label",
               "codeName": "focus_brand_logo",
               "props": {
-                "src": "podsc_logo",
+                "text": "",
                 "x": 18,
                 "y": 15,
                 "width": 32,
-                "height": 32,
-                "inner_align": "center"
+                "height": 32
               },
               "styleRefs": [],
-              "styles": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": {
+                      "$token": "color.accent"
+                    },
+                    "text_font": {
+                      "$token": "font.size.20"
+                    },
+                    "text_align": "center",
+                    "text_opa": 255
+                  }
+                }
+              ],
               "events": [],
               "bindings": [],
               "children": []
@@ -4745,18 +4835,30 @@
           "children": [
             {
               "id": "00000000-0000-4000-8000-000000000121",
-              "type": "image",
+              "type": "label",
               "codeName": "settings_brand_logo",
               "props": {
-                "src": "podsc_logo",
+                "text": "",
                 "x": 18,
                 "y": 15,
                 "width": 32,
-                "height": 32,
-                "inner_align": "center"
+                "height": 32
               },
               "styleRefs": [],
-              "styles": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": {
+                      "$token": "color.accent"
+                    },
+                    "text_font": {
+                      "$token": "font.size.20"
+                    },
+                    "text_align": "center",
+                    "text_opa": 255
+                  }
+                }
+              ],
               "events": [],
               "bindings": [],
               "children": []
@@ -5823,21 +5925,7 @@
     "consts": [],
     "assets": {
       "fonts": [],
-      "images": [
-        {
-          "id": "image:podsc_logo",
-          "codeName": "podsc_logo",
-          "displayName": "PodsC logo",
-          "file": {
-            "fileName": "podsc-logo.png",
-            "sha256": "62b180096ec767434d2670cbb8eb2e8382fbfbd44c0b2f097612f2710c09c3c3",
-            "byteSize": 568
-          },
-          "conv": {
-            "colorFormat": "ARGB8888"
-          }
-        }
-      ],
+      "images": [],
       "icons": []
     },
     "translations": null,

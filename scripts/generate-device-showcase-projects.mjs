@@ -35,6 +35,7 @@ const ICON = {
   check: '\uF00C', power: '\uF011', light: '\uF0E7', eye: '\uF06E',
   settings: '\uF013', wifi: '\uF1EB', volume: '\uF028', warning: '\uF071',
 };
+const QUIET_POD_ICON = '\uF52B';
 const iconText = (icon, text = '') => text ? `${icon}  ${text}` : icon;
 
 function node(type, codeName, props, styles = [], children = [], extras = {}) {
@@ -52,9 +53,7 @@ function label(name, text, x, y, width, height, font = 18, color = 'color.text.p
 }
 
 function brandLogo(name, x, y) {
-  return node('image', name, {
-    src: 'podsc_logo', x, y, width: 32, height: 32, inner_align: 'center',
-  });
+  return label(name, QUIET_POD_ICON, x, y, 32, 32, 20, 'color.accent', 'center');
 }
 
 function card(name, x, y, width, height, children = [], options = {}) {

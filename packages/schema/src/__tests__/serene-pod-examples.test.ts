@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { validateProject, type LvProject } from '../index.js';
 import {
+  createPodscStaticWebUiDocument,
   isProjectSnapshotV2,
   loadStoredProjectDocument,
   validateCrossRefs,
@@ -95,6 +96,7 @@ describe('serene pod example projects', () => {
       expect(snapshot.uiProject.themes.map((theme) => theme.id)).toEqual([
         `serene-${preset.model.toLowerCase()}`,
       ]);
+      expect(() => createPodscStaticWebUiDocument(snapshot)).not.toThrow();
       expect(resolveThemeValue(
         snapshot,
         snapshot.uiProject.screens[0]?.root.styles[0]?.props.bg_color,
@@ -124,8 +126,8 @@ describe('serene pod example projects', () => {
     expect(findNode(home.root, 'home_nav_home')?.props).toMatchObject({
       x: 8, y: 420, width: 88, height: 52,
     });
-    expect(findNode(home.root, 'home_brand_logo')?.props).toMatchObject({
-      src: 'podsc_logo', x: 18, y: 15, width: 32, height: 32,
+    expect(findNode(home.root, 'home_brand_logo')).toMatchObject({
+      type: 'label', props: { text: '\uf52b', x: 18, y: 15, width: 32, height: 32 },
     });
     expect(findNode(home.root, 'home_hero')?.props.width).toBe(444);
     expect(findNode(home.root, 'home_co2')?.props.y).toBe(276);

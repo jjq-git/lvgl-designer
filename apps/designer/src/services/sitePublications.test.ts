@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   matchingSiteFrameId,
+  parseSitePublicationError,
+  sitePublicationErrorInfo,
   siteFrameCompatibility,
   siteFrameDemoSizeLabel,
   siteFrameSpecsLabel,
@@ -44,5 +46,76 @@ describe('site publication frame compatibility', () => {
       id: 'WF2D-8630', model: 'WF2D-8630', resolution: null, shape: 'rect',
       demoLogicalSizes: [{ width: 480, height: 480, shape: 'rect' }],
     })).toBe('480×480');
+  });
+});
+
+describe('site publication error details', () => {
+  it('preserves status, backend code, paths and every validation diagnostic', () => {
+    const error = parseSitePublicationError(422, {
+      detail: {
+        code: 'podsc-static-invalid',
+        message: 'project cannot be published to ui.podsc.com',
+        detail: [
+          {
+            severity: 'error',
+            code: 'E_PODSC_RESOURCE_WIDGET_UNSUPPORTED',
+            path: 'uiProject.screens[1].root.children[1].type',
+            message: '不支持依赖素材的组件 image',
+          },
+          {
+            severity: 'error',
+            code: 'E_PODSC_ASSET_UNSUPPORTED',
+            path: 'assetManifest[0]',
+            message: '不支持素材 image:podsc_logo',
+          },
+        ],
+      },
+    });
+
+    expect(sitePublicationErrorInfo(error)).toEqual({
+      message: 'project cannot be published to ui.podsc.com',
+      status: 422,
+      code: 'podsc-static-invalid',
+      diagnostics: [
+        {
+          severity: 'error',
+          code: 'E_PODSC_RESOURCE_WIDGET_UNSUPPORTED',
+          path: 'uiProject.screens[1].root.children[1].type',
+          message: '不支持依赖素材的组件 image',
+        },
+        {
+          severity: 'error',
+          code: 'E_PODSC_ASSET_UNSUPPORTED',
+          path: 'assetManifest[0]',
+          message: '不支持素材 image:podsc_logo',
+        },
+      ],
+    });
+  });
+
+  it('keeps non-diagnostic backend detail available as formatted technical detail', () => {
+    const error = parseSitePublicationError(409, {
+      detail: { code: 'target-conflict', message: '目标分支冲突', detail: { branch: 'main' } },
+    });
+    expect(sitePublicationErrorInfo(error)).toMatchObject({
+      message: '目标分支冲突', status: 409, code: 'target-conflict', diagnostics: [],
+      detailText: '{\n  "branch": "main"\n}',
+    });
+  });
+
+  it('shows standard FastAPI validation locations and error types', () => {
+    const error = parseSitePublicationError(422, {
+      detail: [{ type: 'missing', loc: ['body', 'frameId'], msg: 'Field required' }],
+    });
+    expect(sitePublicationErrorInfo(error)).toMatchObject({
+      status: 422,
+      diagnostics: [{ code: 'missing', path: 'body.frameId', message: 'Field required' }],
+    });
+  });
+
+  it('does not discard a non-JSON server error response', () => {
+    expect(sitePublicationErrorInfo(parseSitePublicationError(502, 'upstream unavailable'))).toMatchObject({
+      message: 'upstream unavailable', status: 502,
+    });
   });
 });

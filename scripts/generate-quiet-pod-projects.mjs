@@ -5,17 +5,6 @@ import { tokenizeProjectTheme } from './theme-tokenize.mjs';
 
 const OUTPUT_DIR = resolve('examples/quiet-pod');
 const NOW = '2026-10-08T00:00:00.000Z';
-const PODSC_LOGO = {
-  id: 'image:podsc_logo',
-  codeName: 'podsc_logo',
-  displayName: 'PodsC logo',
-  file: {
-    fileName: 'podsc-logo.png',
-    sha256: '62b180096ec767434d2670cbb8eb2e8382fbfbd44c0b2f097612f2710c09c3c3',
-    byteSize: 568,
-  },
-  conv: { colorFormat: 'ARGB8888' },
-};
 
 const COLORS = {
   canvas: '#06101E',
@@ -86,6 +75,11 @@ const ICONS = {
   bell: '\uf0f3',
   wifi: '\uf1eb',
 };
+
+// LVGL's SD-card silhouette reads as a compact booth/cabin at icon size: a
+// tall rounded shell with three top ventilation slots. It is built in, so the
+// preview, firmware and ui.podsc.com renderer need no external asset.
+const QUIET_POD_ICON = '\uf52b';
 
 const PRESETS = [
   {
@@ -189,10 +183,9 @@ function label(screen, key, text, x, y, width, options = {}) {
   });
 }
 
-function image(screen, key, x, y, width = 32, height = 32) {
-  return node('image', {
-    name: `${screen}_${key}`,
-    props: { src: 'podsc_logo', x, y, width, height, inner_align: 'center' },
+function brandIcon(screen, key, x, y, width = 32, height = 32) {
+  return label(screen, key, QUIET_POD_ICON, x, y, width, {
+    height, font: 'montserrat_20', color: COLORS.cyan, align: 'center',
   });
 }
 
@@ -352,7 +345,7 @@ function addRectShell(screen, active, width, height, screenIds, options = {}) {
   const topH = options.topH ?? Math.round(height * 0.13);
   const children = [
     box(screen, 'rail', 0, 0, railW, height, { color: COLORS.rail, borderWidth: 0, radius: 0 }),
-    image(screen, 'brand_logo', Math.round((railW - 32) / 2), Math.round((topH - 32) / 2)),
+    brandIcon(screen, 'brand_logo', Math.round((railW - 32) / 2), Math.round((topH - 32) / 2)),
     label(screen, 'title', `${PAGE_ICONS[active]}  ${PAGE_LABELS[active]}`, railW + 34, Math.round(topH * 0.32), width - railW - 230, {
       font: width > 1200 ? 'montserrat_32' : 'montserrat_28',
     }),
@@ -640,7 +633,7 @@ function squareNav(screen, active, screenIds) {
 function squareHeader(screen, title) {
   const index = PAGE_KEYS.indexOf(screen);
   return [
-    image(screen, 'brand_logo', 22, 16),
+    brandIcon(screen, 'brand_logo', 22, 16),
     label(screen, 'title', `${PAGE_ICONS[index]}  ${title}`, 230, 22, 228, { color: COLORS.muted, font: 'montserrat_16', align: 'right' }),
   ];
 }
@@ -937,7 +930,7 @@ function createSnapshot(project, preset) {
     consts: [],
     assets: {
       fonts: [],
-      images: preset.layout === 'round' ? [] : [PODSC_LOGO],
+      images: [],
       icons: [],
     },
     translations: null,

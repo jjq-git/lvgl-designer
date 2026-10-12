@@ -452,7 +452,8 @@
                 "height": 132
               },
               "flags": {
-                "scrollable": false
+                "scrollable": false,
+                "clickable": true
               },
               "styleRefs": [],
               "styles": [
@@ -2851,7 +2852,7 @@
     "displayName": "WF2D-8620 设备外壳",
     "displayRef": "display:wf2d-8620-240x240-rgb565@1",
     "frame": {
-      "assetRef": "asset:controller/wf2d-8620.svg@sha256:8075730339576576a88750c143dd7568321c0545c5a8cb4701345b3b7b872cad",
+      "assetRef": "asset:controller/wf2d-8620.svg@sha256:7188631d54e2c0a7bc8a49bd169d47e6f23c1ec7679878afd78babd513810861",
       "viewBox": {
         "x": 0,
         "y": 0,

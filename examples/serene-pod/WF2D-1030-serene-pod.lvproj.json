@@ -358,18 +358,30 @@
             },
             {
               "id": "00000000-0000-4000-8000-000000000007",
-              "type": "image",
+              "type": "label",
               "codeName": "home_brand_logo",
               "props": {
-                "src": "podsc_logo",
+                "text": "",
                 "x": 108,
                 "y": 46,
                 "width": 32,
-                "height": 32,
-                "inner_align": "center"
+                "height": 32
               },
               "styleRefs": [],
-              "styles": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": {
+                      "$token": "color.palette.f0c987"
+                    },
+                    "text_font": {
+                      "$token": "font.size.20"
+                    },
+                    "text_align": "center",
+                    "text_opa": 255
+                  }
+                }
+              ],
               "events": [],
               "bindings": [],
               "children": []
@@ -1993,18 +2005,30 @@
             },
             {
               "id": "00000000-0000-4000-8000-000000000048",
-              "type": "image",
+              "type": "label",
               "codeName": "air_brand_logo",
               "props": {
-                "src": "podsc_logo",
+                "text": "",
                 "x": 108,
                 "y": 46,
                 "width": 32,
-                "height": 32,
-                "inner_align": "center"
+                "height": 32
               },
               "styleRefs": [],
-              "styles": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": {
+                      "$token": "color.palette.f0c987"
+                    },
+                    "text_font": {
+                      "$token": "font.size.20"
+                    },
+                    "text_align": "center",
+                    "text_opa": 255
+                  }
+                }
+              ],
               "events": [],
               "bindings": [],
               "children": []
@@ -3272,18 +3296,30 @@
             },
             {
               "id": "00000000-0000-4000-8000-000000000078",
-              "type": "image",
+              "type": "label",
               "codeName": "light_brand_logo",
               "props": {
-                "src": "podsc_logo",
+                "text": "",
                 "x": 108,
                 "y": 46,
                 "width": 32,
-                "height": 32,
-                "inner_align": "center"
+                "height": 32
               },
               "styleRefs": [],
-              "styles": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": {
+                      "$token": "color.palette.f0c987"
+                    },
+                    "text_font": {
+                      "$token": "font.size.20"
+                    },
+                    "text_align": "center",
+                    "text_opa": 255
+                  }
+                }
+              ],
               "events": [],
               "bindings": [],
               "children": []
@@ -4703,18 +4739,30 @@
             },
             {
               "id": "00000000-0000-4000-8000-000000000111",
-              "type": "image",
+              "type": "label",
               "codeName": "focus_brand_logo",
               "props": {
-                "src": "podsc_logo",
+                "text": "",
                 "x": 108,
                 "y": 46,
                 "width": 32,
-                "height": 32,
-                "inner_align": "center"
+                "height": 32
               },
               "styleRefs": [],
-              "styles": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": {
+                      "$token": "color.palette.f0c987"
+                    },
+                    "text_font": {
+                      "$token": "font.size.20"
+                    },
+                    "text_align": "center",
+                    "text_opa": 255
+                  }
+                }
+              ],
               "events": [],
               "bindings": [],
               "children": []
@@ -6204,18 +6252,30 @@
             },
             {
               "id": "00000000-0000-4000-8000-000000000150",
-              "type": "image",
+              "type": "label",
               "codeName": "settings_brand_logo",
               "props": {
-                "src": "podsc_logo",
+                "text": "",
                 "x": 108,
                 "y": 46,
                 "width": 32,
-                "height": 32,
-                "inner_align": "center"
+                "height": 32
               },
               "styleRefs": [],
-              "styles": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": {
+                      "$token": "color.palette.f0c987"
+                    },
+                    "text_font": {
+                      "$token": "font.size.20"
+                    },
+                    "text_align": "center",
+                    "text_opa": 255
+                  }
+                }
+              ],
               "events": [],
               "bindings": [],
               "children": []
@@ -7508,21 +7568,7 @@
     "consts": [],
     "assets": {
       "fonts": [],
-      "images": [
-        {
-          "id": "image:podsc_logo",
-          "codeName": "podsc_logo",
-          "displayName": "PodsC logo",
-          "file": {
-            "fileName": "podsc-logo.png",
-            "sha256": "62b180096ec767434d2670cbb8eb2e8382fbfbd44c0b2f097612f2710c09c3c3",
-            "byteSize": 568
-          },
-          "conv": {
-            "colorFormat": "ARGB8888"
-          }
-        }
-      ],
+      "images": [],
       "icons": []
     },
     "translations": null,

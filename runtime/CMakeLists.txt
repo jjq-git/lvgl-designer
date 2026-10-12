@@ -14,6 +14,12 @@ if(NOT EXISTS "${LVD_LVGL_DIR}/lvgl.h")
         "Run runtime/build.sh (it clones the pinned LVGL_TAG), or pass -DLVD_LVGL_DIR=<path>.")
 endif()
 
+# Product-owned extension of LVGL's built-in 20 px font.  It adds the
+# Font Awesome "door-open" glyph used by the quiet-pod brand mark while
+# keeping the project asset-free for firmware and ui.podsc.com publication.
+set(LVD_MONTSERRAT_20_OVERRIDE
+    "${CMAKE_CURRENT_SOURCE_DIR}/font-overrides/lv_font_montserrat_20.c")
+
 # LVGL consumes LV_BUILD_CONF_PATH (not the older LV_CONF_PATH).
 set(LV_BUILD_CONF_PATH ${CMAKE_CURRENT_SOURCE_DIR}/lv_conf.h CACHE PATH "" FORCE)
 set(CONFIG_LV_BUILD_DEMOS OFF CACHE BOOL "" FORCE)
@@ -25,6 +31,12 @@ set(CONFIG_LV_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(CONFIG_LV_USE_THORVG_INTERNAL OFF CACHE BOOL "" FORCE)
 
 add_subdirectory(${LVD_LVGL_DIR} lvgl_build)
+if(EXISTS "${LVD_MONTSERRAT_20_OVERRIDE}")
+    get_target_property(LVD_LVGL_SOURCES lvgl SOURCES)
+    list(FILTER LVD_LVGL_SOURCES EXCLUDE REGEX "lv_font_montserrat_20\\.c$")
+    set_property(TARGET lvgl PROPERTY SOURCES "${LVD_LVGL_SOURCES}")
+    target_sources(lvgl PRIVATE "${LVD_MONTSERRAT_20_OVERRIDE}")
+endif()
 
 # --- Bridge ------------------------------------------------------------------
 # The product baseline is LVGL 9.5, whose open-source tree no longer contains

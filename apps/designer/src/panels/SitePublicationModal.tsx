@@ -14,6 +14,8 @@ import {
   sitePublicationPreviewUrl,
   siteFrameSpecsLabel,
   siteFrameDemoSizeLabel,
+  sitePublicationErrorInfo,
+  type SitePublicationErrorInfo,
   type SitePublication,
   type SiteTargetState,
 } from '../services/sitePublications';
@@ -44,6 +46,27 @@ function stageLabel(status: string): string {
   return deliveryStatusLabel[status] ?? status;
 }
 
+function PublicationErrorDetails({ value }: { value: SitePublicationErrorInfo }): JSX.Element {
+  const metadata = [
+    value.status ? `HTTP ${value.status}` : '',
+    value.code ?? '',
+  ].filter(Boolean).join(' · ');
+  return (
+    <div className="site-publish-error-box" role="alert">
+      <strong>{value.message}</strong>
+      {metadata && <code>{metadata}</code>}
+      {value.diagnostics.length > 0 && <ul>{value.diagnostics.map((item, index) => (
+        <li key={`${item.code ?? 'diagnostic'}:${item.path ?? index}`}>
+          <span>{[item.severity, item.code].filter(Boolean).join(' · ')}</span>
+          <strong>{item.message}</strong>
+          {item.path && <code>{item.path}</code>}
+        </li>
+      ))}</ul>}
+      {value.detailText && <details><summary>技术详情</summary><pre>{value.detailText}</pre></details>}
+    </div>
+  );
+}
+
 export function SitePublicationModal({ onClose }: { onClose: () => void }): JSX.Element {
   const projectId = useProjectsStore((state) => state.currentId);
   const projectName = useProjectsStore((state) => state.currentName);
@@ -60,7 +83,7 @@ export function SitePublicationModal({ onClose }: { onClose: () => void }): JSX.
   const [publications, setPublications] = useState<SitePublication[]>([]);
   const [requestId, setRequestId] = useState(newUuid);
   const [busy, setBusy] = useState<'loading' | 'preparing' | 'publishing' | 'rolling-back' | 'refreshing' | null>('loading');
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<SitePublicationErrorInfo | null>(null);
   const dialogRef = useDialogFocus<HTMLElement>(onClose, busy === null);
 
   useEffect(() => {
@@ -71,7 +94,7 @@ export function SitePublicationModal({ onClose }: { onClose: () => void }): JSX.
         setPublications(history);
         setBusy(null);
       }).catch((reason: unknown) => {
-        setError(reason instanceof Error ? reason.message : String(reason));
+        setError(sitePublicationErrorInfo(reason));
         setBusy(null);
       });
   }, [display.height, display.shape, display.width, projectId]);
@@ -118,10 +141,10 @@ export function SitePublicationModal({ onClose }: { onClose: () => void }): JSX.
   };
 
   const prepare = async (): Promise<void> => {
-    if (!projectId) { setError('请先把工程保存到“我的工程”'); return; }
-    if (!frameId || name.trim() === '') { setError('请选择设备型号并填写 Demo 名称'); return; }
-    if (frameError) { setError(frameError); return; }
-    if (mode === 'update' && !selectedDemo) { setError('请选择要更新的 Demo UUID'); return; }
+    if (!projectId) { setError(sitePublicationErrorInfo('请先把工程保存到“我的工程”')); return; }
+    if (!frameId || name.trim() === '') { setError(sitePublicationErrorInfo('请选择设备型号并填写 Demo 名称')); return; }
+    if (frameError) { setError(sitePublicationErrorInfo(frameError)); return; }
+    if (mode === 'update' && !selectedDemo) { setError(sitePublicationErrorInfo('请选择要更新的 Demo UUID')); return; }
     setBusy('preparing');
     setError(null);
     try {
@@ -140,7 +163,7 @@ export function SitePublicationModal({ onClose }: { onClose: () => void }): JSX.
       });
       setPrepared(result);
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : String(reason));
+      setError(sitePublicationErrorInfo(reason));
     } finally {
       setBusy(null);
     }
@@ -152,7 +175,7 @@ export function SitePublicationModal({ onClose }: { onClose: () => void }): JSX.
     try {
       setPrepared(await getSitePublication(publicationId));
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : String(reason));
+      setError(sitePublicationErrorInfo(reason));
     } finally {
       setBusy(null);
     }
@@ -169,7 +192,7 @@ export function SitePublicationModal({ onClose }: { onClose: () => void }): JSX.
     try {
       setPrepared(await publishSitePublication(prepared.id));
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : String(reason));
+      setError(sitePublicationErrorInfo(reason));
     } finally {
       setBusy(null);
     }
@@ -187,7 +210,7 @@ export function SitePublicationModal({ onClose }: { onClose: () => void }): JSX.
     try {
       setPrepared(await rollbackSitePublication(prepared.id));
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : String(reason));
+      setError(sitePublicationErrorInfo(reason));
     } finally {
       setBusy(null);
     }
@@ -210,7 +233,7 @@ export function SitePublicationModal({ onClose }: { onClose: () => void }): JSX.
         <header><div><strong>发布到 ui.podsc.com</strong><small>生成 UI、缩略图并更新目标清单；设备外框保持只读</small></div><button className="icon-btn" disabled={busy !== null} onClick={onClose}>✕</button></header>
         <div className="site-publish-body">
           {!projectId && <p className="site-publish-error">当前是本地工程，请先在“我的工程”中创建或上传云端工程。</p>}
-          {error && <p className="site-publish-error" role="alert">{error}</p>}
+          {error && <PublicationErrorDetails value={error} />}
           {busy === 'loading' && <p>正在读取目标分支的 frame 清单…</p>}
           {target && !immutable && <>
             <div className="site-publish-tabs">
@@ -228,7 +251,7 @@ export function SitePublicationModal({ onClose }: { onClose: () => void }): JSX.
           </>}
           {prepared && <div className="site-publish-result">
             {artifactsAvailable && <div className="site-publish-previews"><div><strong>可交互目标预览</strong>{prepared.interactivePreviewAvailable ? <iframe src={sitePublicationPreviewUrl(prepared.id)} title="目标 Renderer 可交互预览" sandbox="allow-scripts" /> : <p className="site-publish-warning">旧任务没有保存目标 Renderer，请重新准备后查看交互预览。</p>}</div><div><strong>发布缩略图</strong><div className="site-publish-preview"><img src={sitePublicationThumbnailUrl(prepared.id)} alt="目标 Renderer 生成的 UI 缩略图" /></div></div></div>}
-            {prepared.error && <p className="site-publish-error">{prepared.error.message}</p>}
+            {prepared.error && <PublicationErrorDetails value={sitePublicationErrorInfo(prepared.error)} />}
             <dl><div><dt>Demo UUID</dt><dd>{prepared.demoId}</dd></div><div><dt>锁定版本</dt><dd>云端 v{prepared.sourceProjectVersion} / 快照 #{prepared.sourceSnapshotSeq}</dd></div><div><dt>文档哈希</dt><dd>{prepared.documentSha256?.slice(0, 20)}…</dd></div><div><dt>状态</dt><dd>{prepared.status}</dd></div>{prepared.commitSha && <div><dt>Commit</dt><dd>{prepared.commitSha}</dd></div>}</dl>
             {prepared.diagnostics?.map((item) => <p className="site-publish-warning" key={`${item.code}:${item.path}`}>{item.message}</p>)}
             {prepared.diffStat && <pre>{prepared.diffStat}</pre>}
@@ -254,7 +277,7 @@ export function SitePublicationModal({ onClose }: { onClose: () => void }): JSX.
         .site-publish-modal header div{display:flex;flex-direction:column;gap:3px}.site-publish-modal header small,.site-publish-note,.site-publish-check small{color:var(--fg-secondary)}
         .site-publish-body{padding:18px;overflow:auto;display:grid;gap:14px}.site-publish-body label{display:grid;gap:6px;font-size:13px}.site-publish-body input,.site-publish-body select,.site-publish-body textarea{width:100%;box-sizing:border-box;padding:8px;border:1px solid var(--hairline-strong);border-radius:var(--radius-s);background:var(--bg-inset);color:var(--fg);font:inherit}
         .site-publish-tabs{display:flex;gap:8px}.site-publish-tabs button{padding:7px 12px;border:1px solid var(--hairline);border-radius:999px;background:var(--bg-inset)}.site-publish-tabs button.active{background:var(--accent);color:#fff}
-        .site-publish-check{grid-template-columns:auto 1fr auto!important;align-items:center}.site-publish-check input{width:auto}.site-publish-error{color:#b42318}.site-publish-warning{color:#946200}.site-publish-success{color:#067647}.site-publish-note{margin:0;font-size:12px}
+        .site-publish-check{grid-template-columns:auto 1fr auto!important;align-items:center}.site-publish-check input{width:auto}.site-publish-error{color:#b42318}.site-publish-error-box{display:grid;gap:8px;padding:12px;border:1px solid #f0a9a2;border-radius:var(--radius-s);background:#fff4f2;color:#912018}.site-publish-error-box>code{width:max-content}.site-publish-error-box ul{display:grid;gap:10px;margin:0;padding-left:20px}.site-publish-error-box li{display:grid;gap:3px}.site-publish-error-box li>span{font-size:12px;font-weight:600}.site-publish-error-box code{overflow-wrap:anywhere;white-space:normal}.site-publish-error-box details pre{max-height:220px;overflow:auto;white-space:pre-wrap}.site-publish-warning{color:#946200}.site-publish-success{color:#067647}.site-publish-note{margin:0;font-size:12px}
         .site-publish-result{display:grid;gap:12px}.site-publish-preview{max-height:260px;display:flex;justify-content:center;background:repeating-conic-gradient(#eee 0 25%,#fff 0 50%) 50%/16px 16px;border:1px solid var(--hairline);overflow:hidden}.site-publish-preview img{max-width:100%;max-height:260px;object-fit:contain}
         .site-publish-previews,.site-publish-manifest-diff{display:grid;grid-template-columns:1fr 1fr;gap:12px}.site-publish-previews>div{display:grid;gap:6px}.site-publish-previews iframe{width:100%;height:260px;border:1px solid var(--hairline);background:#f4f5f7}.site-publish-manifest-diff pre{max-height:260px;overflow:auto}.site-publish-history{display:grid;gap:6px;padding:10px;border:1px solid var(--hairline);border-radius:var(--radius-s)}.site-publish-history .btn{text-align:left}
         .site-publish-result dl{display:grid;gap:6px;margin:0}.site-publish-result dl div{display:grid;grid-template-columns:110px 1fr;gap:8px}.site-publish-result dt{color:var(--fg-secondary)}.site-publish-result dd{margin:0;overflow-wrap:anywhere}.site-publish-result pre{white-space:pre-wrap;background:var(--bg-inset);padding:10px;border-radius:var(--radius-s)}

@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { validateProject, type LvProject } from '../index.js';
 import {
+  createPodscStaticWebUiDocument,
   isProjectSnapshotV2,
   loadStoredProjectDocument,
   validateCrossRefs,
@@ -61,6 +62,9 @@ describe('device showcase projects', () => {
       });
       expect(validateProject(project).errors).toEqual([]);
       expect(validateUiProjectV2(snapshot.uiProject, { actions: snapshot.actionRegistry }).errors).toEqual([]);
+      if (showcase.model.startsWith('WF2D-')) {
+        expect(() => createPodscStaticWebUiDocument(snapshot)).not.toThrow();
+      }
       if (snapshot.controllerProfile) {
         expect(validateCrossRefs({
           uiProject: snapshot.uiProject,
@@ -106,7 +110,7 @@ describe('device showcase projects', () => {
     ))).size).toBe(6);
   });
 
-  it('uses the PodsC image asset instead of legacy brand words', () => {
+  it('uses the quiet-pod font icon instead of image assets or legacy brand words', () => {
     const cases = [
       ['WF2D-8630-greenhouse', 1],
       ['WF2D-1050-ev-charge', 3],
@@ -117,12 +121,10 @@ describe('device showcase projects', () => {
       const { snapshot } = loadShowcase(file);
       const nodes = snapshot.uiProject.screens.flatMap((screen) => allNodes(screen.root));
       expect(nodes.filter((item) => (
-        item.type === 'image' && item.props.src === 'podsc_logo'
+        item.type === 'label' && item.props.text === '\uf52b'
+        && item.codeName?.endsWith('_brand_logo')
       ))).toHaveLength(expectedCount);
-      expect(snapshot.uiProject.assets.images).toContainEqual(expect.objectContaining({
-        codeName: 'podsc_logo',
-        file: expect.objectContaining({ fileName: 'podsc-logo.png' }),
-      }));
+      expect(snapshot.uiProject.assets.images).toEqual([]);
       expect(nodes.flatMap((item) => (
         typeof item.props.text === 'string' ? [item.props.text] : []
       )).join(' ')).not.toMatch(/BRAND A|GROVE|FORGE \/ ENERGY|HARBOR \/ NORTH|VOLT/);

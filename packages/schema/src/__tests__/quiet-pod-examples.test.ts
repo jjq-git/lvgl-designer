@@ -2,7 +2,8 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { validateProject, type LvProject } from '../index.js';
 import {
-  isProjectSnapshotV2, loadStoredProjectDocument, validateCrossRefs, validateUiProjectV2,
+  createPodscStaticWebUiDocument, isProjectSnapshotV2, loadStoredProjectDocument,
+  validateCrossRefs, validateUiProjectV2,
   type ProjectSnapshotV2, type WidgetNodeV2,
 } from '../v2/index.js';
 
@@ -151,6 +152,7 @@ describe('quiet pod example projects', () => {
       expect(snapshot.migrationNotes.filter((note) => note.severity === 'must-confirm')).toEqual([]);
       expect(snapshot.buildTarget.themeRef).toMatch(/#theme:quiet-dark$/);
       expect(snapshot.uiProject.themes.map((theme) => theme.id)).toEqual(['quiet-dark']);
+      expect(() => createPodscStaticWebUiDocument(snapshot)).not.toThrow();
       const themeValues = activeThemeValues(snapshot);
       expect(themeValues.get('color.background')).toBe('#06101E');
       expect([...themeValues.values()].some((value) => value === 'montserrat_16')).toBe(true);
@@ -183,12 +185,10 @@ describe('quiet pod example projects', () => {
       expect(allText).not.toContain('QUIET\nPOD');
       if (preset.shape !== 'round') {
         expect(allText).not.toContain('BRAND A');
-        expect(snapshot.uiProject.assets.images).toContainEqual(expect.objectContaining({
-          codeName: 'podsc_logo',
-          file: expect.objectContaining({ fileName: 'podsc-logo.png' }),
-        }));
+        expect(snapshot.uiProject.assets.images).toEqual([]);
         expect(snapshot.uiProject.screens.filter((screen) => (
-          findNode(screen.root, `${screen.codeName}_brand_logo`)?.props.src === 'podsc_logo'
+          findNode(screen.root, `${screen.codeName}_brand_logo`)?.type === 'label'
+          && findNode(screen.root, `${screen.codeName}_brand_logo`)?.props.text === '\uf52b'
         ))).toHaveLength(5);
       }
 

@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { validateProject } from '../index.js';
 import {
+  createPodscStaticWebUiDocument,
   isProjectSnapshotV2,
   loadStoredProjectDocument,
   validateCrossRefs,
@@ -10,12 +11,12 @@ import {
 } from '../v2/index.js';
 
 const CASES = [
-  { file: 'WF2D-8620-quiet-focus', width: 240, height: 240, shape: 'round', feature: 'focus', theme: 'midnight-violet' },
-  { file: 'WF2D-8630-quiet-acoustics', width: 480, height: 480, shape: 'rect', feature: 'acoustics', theme: 'glacier-blue' },
-  { file: 'WF2D-1050-quiet-lighting', width: 1024, height: 600, shape: 'rect', feature: 'lighting', theme: 'amber-studio' },
-  { file: 'WF2D-1040-quiet-air', width: 1080, height: 720, shape: 'rect', feature: 'air', theme: 'eco-mint' },
-  { file: 'WF2D-1030-quiet-booking', width: 1440, height: 720, shape: 'rect', feature: 'booking', theme: 'coral-schedule' },
-  { file: 'WF3-284x76-quiet-dnd', width: 284, height: 76, shape: 'rect', feature: 'dnd', theme: 'signal-red' },
+  { file: 'WF2D-8620-quiet-focus', width: 240, height: 240, shape: 'round', feature: 'focus', theme: 'midnight-violet', target: 'focus' },
+  { file: 'WF2D-8630-quiet-acoustics', width: 480, height: 480, shape: 'rect', feature: 'acoustics', theme: 'glacier-blue', target: 'air' },
+  { file: 'WF2D-1050-quiet-lighting', width: 1024, height: 600, shape: 'rect', feature: 'lighting', theme: 'amber-studio', target: 'light' },
+  { file: 'WF2D-1040-quiet-air', width: 1080, height: 720, shape: 'rect', feature: 'air', theme: 'eco-mint', target: 'air' },
+  { file: 'WF2D-1030-quiet-booking', width: 1440, height: 720, shape: 'rect', feature: 'booking', theme: 'coral-schedule', target: 'focus' },
+  { file: 'WF3-284x76-quiet-dnd', width: 284, height: 76, shape: 'rect', feature: 'dnd', theme: 'signal-red', target: null },
 ] as const;
 
 function load(file: string): ProjectSnapshotV2 {
@@ -40,6 +41,25 @@ describe('six differentiated quiet-pod interfaces', () => {
       });
       expect(snapshot.buildTarget.themeRef).toMatch(new RegExp(`#theme:${item.theme}$`));
       expect(snapshot.uiProject.themes.map((theme) => theme.id)).toEqual([item.theme]);
+      if (item.file.startsWith('WF2D-')) {
+        expect(() => createPodscStaticWebUiDocument(snapshot)).not.toThrow();
+      }
+
+      if (item.target) {
+        const home = snapshot.uiProject.screens.find((screen) => screen.isHome);
+        const target = snapshot.uiProject.screens.find((screen) => screen.codeName === item.target);
+        const navigation = home?.root.children.find((node) => node.events.some((event) => (
+          event.action === 'screen.open' && event.args?.screen === target?.id
+        )));
+        expect(navigation).toMatchObject({
+          type: 'button',
+          events: [{
+            on: 'clicked',
+            action: 'screen.open',
+            args: { screen: target?.id, anim: 'fade_in', duration: 180, delay: 0 },
+          }],
+        });
+      }
 
       if (item.feature === 'focus') {
         const home = snapshot.uiProject.screens.find((screen) => screen.isHome);

@@ -2,6 +2,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const OUTPUT_DIR = resolve('examples/quiet-pod-six-themes');
+const QUIET_POD_ICON = '\uf52b';
 
 const PRESETS = [
   {
@@ -80,6 +81,7 @@ function navigationOverlay(codeName, x, y, width, height, screen) {
     style({ bg_opa: 0, border_width: 0, shadow_width: 0, radius: Math.floor(Math.min(width, height) / 2), pad_all: 0 }),
     style({ bg_color: token('color.accent'), bg_opa: 24 }, { states: ['pressed'] }),
   ]);
+  node.flags = { ...node.flags, clickable: true };
   node.events = [{
     on: 'clicked',
     action: 'screen.open',
@@ -112,13 +114,37 @@ function root(children) {
   return base('obj', 'home_root', {}, [style({ bg_color: token('color.background'), bg_opa: 255, border_width: 0, pad_all: 0 })], children);
 }
 
-function focusHome({ focusScreenId }) {
+/** Keep the examples publishable by replacing the PNG brand mark with an LVGL built-in glyph. */
+function replacePodscLogoWithQuietPodIcon(project) {
+  const replaceNode = (node) => {
+    const children = (node.children ?? []).map(replaceNode);
+    if (node.type !== 'image' || node.props?.src !== 'podsc_logo') return { ...node, children };
+    const { src: _src, inner_align: _innerAlign, ...position } = node.props;
+    return {
+      ...node,
+      type: 'label',
+      props: { ...position, text: QUIET_POD_ICON },
+      styles: [style({
+        text_color: token('color.accent'),
+        text_font: token('font.size.20'),
+        text_align: 'center',
+        text_opa: 255,
+      })],
+      children,
+    };
+  };
+  project.screens = project.screens.map((screen) => ({ ...screen, root: replaceNode(screen.root) }));
+  project.components = project.components.map((component) => ({ ...component, root: replaceNode(component.root) }));
+  project.assets.images = project.assets.images.filter((asset) => asset.codeName !== 'podsc_logo');
+}
+
+function focusHome({ featureScreenId }) {
   const kicker = label('home_kicker', 'DEEP FOCUS', 58, 18, 124, 24, 'font.size.14', 'color.text.muted', 'center');
   const focusArc = arc('home_focus_arc', 40, 38, 160, 75, 13);
   const timer = label('home_timer', '25:00', 56, 82, 128, 38, 'font.size.28', 'color.text.primary', 'center');
   const cycle = label('home_cycle', 'CYCLE  3 / 4', 64, 124, 112, 20, 'font.size.14', 'color.accent.strong', 'center');
   const start = button('home_focus_start', 'START', 72, 178, 96, 42, { on: 'clicked', action: 'subject.set', args: { subject: 'subject:pod_mode', value: '2' } }, { radius: 22, shadow: 8 });
-  const card = navigationOverlay('home_focus_card', 40, 38, 160, 132, focusScreenId);
+  const card = navigationOverlay('home_focus_card', 40, 38, 160, 132, featureScreenId);
   return root([
     kicker,
     focusArc,
@@ -129,7 +155,7 @@ function focusHome({ focusScreenId }) {
   ]);
 }
 
-function acousticsHome() {
+function acousticsHome({ featureScreenId }) {
   const bars = [38, 62, 92, 128, 82, 54, 34].map((h, index) => panel(`home_wave_${index}`, 44 + index * 30, 146 - h / 2, 14, h, [], { color: index === 3 ? 'color.accent' : 'color.track', border: index === 3 ? 'color.accent' : 'color.track', borderWidth: 0, radius: 7 }));
   return root([
     label('home_title', 'ACOUSTIC SHIELD', 24, 22, 300, 30, 'font.size.20'),
@@ -149,11 +175,12 @@ function acousticsHome() {
       label('home_seal_label', 'DOOR SEAL', 18, 14, 178, 20, 'font.size.14', 'color.text.muted'),
       label('home_seal_value', 'SECURE', 18, 38, 178, 28, 'font.size.18', 'color.status.success', 'right'),
     ], { color: 'color.surface.subtle', radius: 18 }),
+    navigationOverlay('home_acoustic_card', 18, 66, 444, 222, featureScreenId),
     button('home_anc_toggle', 'BOOST NOISE CONTROL', 18, 398, 444, 58, { on: 'clicked', action: 'subject.toggle', args: { subject: 'subject:vent_enabled' } }, { radius: 18, shadow: 8 }),
   ]);
 }
 
-function lightingHome() {
+function lightingHome({ featureScreenId }) {
   return root([
     label('home_title', 'LIGHT STUDIO', 34, 24, 400, 38, 'font.size.28'),
     label('home_subtitle', 'Shape the mood inside your pod', 36, 64, 460, 24, 'font.size.16', 'color.text.muted'),
@@ -176,10 +203,11 @@ function lightingHome() {
       label('home_scene_footer_label', 'AUTO AMBIENCE', 22, 18, 298, 22, 'font.size.14', 'color.text.muted'),
       label('home_scene_footer_value', 'SUNSET SYNC', 22, 52, 298, 34, 'font.size.20', 'color.accent.strong', 'right'),
     ], { color: 'color.surface', radius: 20 }),
+    navigationOverlay('home_light_card', 28, 104, 290, 300, featureScreenId),
   ]);
 }
 
-function airHome() {
+function airHome({ featureScreenId }) {
   return root([
     label('home_title', 'AIR QUALITY', 34, 28, 360, 40, 'font.size.30'),
     label('home_status', 'OPTIMAL  /  AUTO VENTILATION', 660, 34, 386, 26, 'font.size.16', 'color.status.success', 'right'),
@@ -213,10 +241,11 @@ function airHome() {
       label('home_air_footer_data', 'CO2  -12%     VOC  LOW     PM2.5  4', 330, 18, 660, 28, 'font.size.18', 'color.text.primary', 'right'),
       ...[42, 54, 36, 68, 48, 72, 58, 44, 62, 38, 52, 34].map((h, index) => panel(`home_air_trace_${index}`, 26 + index * 80, 126 - h, 52, h, [], { color: index > 8 ? 'color.accent' : 'color.track', border: 'color.track', borderWidth: 0, radius: 8 })),
     ], { color: 'color.surface', radius: 22 }),
+    navigationOverlay('home_air_card', 352, 136, 286, 250, featureScreenId),
   ]);
 }
 
-function bookingHome() {
+function bookingHome({ featureScreenId }) {
   const slots = [
     ['09:00', 'PRODUCT SYNC', '45 MIN', 'color.accent'],
     ['10:30', 'AVAILABLE', '90 MIN', 'color.surface'],
@@ -247,6 +276,7 @@ function bookingHome() {
     panel('home_booking_footer', 308, 624, 1092, 78, [
       label('home_booking_footer_text', 'QUIET MODE AUTO-ENABLED FOR EVERY RESERVATION', 24, 25, 1044, 28, 'font.size.16', 'color.text.muted', 'center'),
     ], { color: 'color.surface.subtle', radius: 18 }),
+    navigationOverlay('home_booking_card', 308, 104, 1092, 104, featureScreenId),
   ]);
 }
 
@@ -321,17 +351,27 @@ function generate(preset) {
     name: `${preset.model} 静音舱 · ${preset.featureName}`,
     modifiedAt: '2026-10-12T00:00:00.000Z',
   };
-  const focusScreenId = snapshot.uiProject.screens.find((screen) => screen.codeName === 'focus')?.id;
-  if (preset.feature === 'focus' && !focusScreenId) {
-    throw new Error(`${preset.model} focus screen is missing`);
+  const featureTargetCodeName = {
+    focus: 'focus',
+    acoustics: 'air',
+    lighting: 'light',
+    air: 'air',
+    booking: 'focus',
+  }[preset.feature];
+  const featureScreenId = featureTargetCodeName
+    ? snapshot.uiProject.screens.find((screen) => screen.codeName === featureTargetCodeName)?.id
+    : undefined;
+  if (featureTargetCodeName && !featureScreenId) {
+    throw new Error(`${preset.model} ${featureTargetCodeName} screen is missing`);
   }
   snapshot.uiProject.screens[0] = {
     ...snapshot.uiProject.screens[0],
     displayName: preset.featureName,
     codeName: 'home',
     isHome: true,
-    root: HOME_BUILDERS[preset.feature]({ focusScreenId }),
+    root: HOME_BUILDERS[preset.feature]({ featureScreenId }),
   };
+  replacePodscLogoWithQuietPodIcon(snapshot.uiProject);
   if (preset.feature === 'dnd') {
     snapshot.uiProject.screens = [snapshot.uiProject.screens[0]];
     snapshot.uiProject.subjects = [{ id: 'subject:dnd_enabled', codeName: 'dnd_enabled', displayName: 'Do not disturb', type: 'int', initial: 1, min: 0, max: 1 }];

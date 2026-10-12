@@ -54,45 +54,60 @@ export interface DeviceFramePreview {
 }
 
 /**
+ * Frame bounds are calculated from the normalized aperture on both axes. SVG's
+ * default `xMidYMid meet` would instead keep the source drawing's aspect ratio,
+ * so a display whose pixel aspect ratio differs from the CAD aperture (notably
+ * WF2D-1040) would paint over part of the top and bottom bezel.
+ */
+function mapSvgToApertureBounds(svgMarkup: string): string {
+  return svgMarkup.replace(/<svg\b([^>]*)>/, (root) => {
+    if (/\bpreserveAspectRatio\s*=/.test(root)) {
+      return root.replace(/\bpreserveAspectRatio\s*=\s*(["'])[^"']*\1/, 'preserveAspectRatio="none"');
+    }
+    return root.replace('<svg', '<svg preserveAspectRatio="none"');
+  });
+}
+
+/**
  * Designer 内置的设备外壳快照。坐标来自 site/frames/manifest.json；SVG 在构建期
  * 以内联文本打包，避免编辑画布依赖内网站点、发布权限或静态服务器的 SVG 解码响应头。
  */
 export const DEVICE_FRAME_PREVIEWS: readonly DeviceFramePreview[] = [
   {
-    frameId: 'WF2D-8620', assetUrl: 'frames/WF2D-8620.svg', svgMarkup: frame8620Svg,
+    frameId: 'WF2D-8620', assetUrl: 'frames/WF2D-8620.svg', svgMarkup: mapSvgToApertureBounds(frame8620Svg),
     width: 240, height: 240, shape: 'round',
     // The SVG glass is larger than the active LCD. The remaining concentric
     // area is physical black glass and must never be covered by UI pixels.
     aperture: { x: 0.287442, y: 0.287442, width: 0.425116, height: 0.425116, radius: '50%' },
   },
   {
-    frameId: 'WF2D-1040', assetUrl: 'frames/WF2D-1040.svg', svgMarkup: frame1040Svg,
+    frameId: 'WF2D-1040', assetUrl: 'frames/WF2D-1040.svg', svgMarkup: mapSvgToApertureBounds(frame1040Svg),
     width: 1080, height: 720, shape: 'rect',
     aperture: {
       x: 0.086415094, y: 0.087731959, width: 0.827169811, height: 0.824536082, radius: '0.75%',
     },
   },
   {
-    frameId: 'WF2D-1030', assetUrl: 'frames/WF2D-1030.svg', svgMarkup: frame1030Svg,
+    frameId: 'WF2D-1030', assetUrl: 'frames/WF2D-1030.svg', svgMarkup: mapSvgToApertureBounds(frame1030Svg),
     width: 1440, height: 720, shape: 'rect',
     aperture: {
       x: 0.076257862, y: 0.149278351, width: 0.847484277, height: 0.701443299, radius: '0.75%',
     },
   },
   {
-    frameId: 'WF2D-1050', assetUrl: 'frames/WF2D-1050.svg', svgMarkup: frame1050Svg,
+    frameId: 'WF2D-1050', assetUrl: 'frames/WF2D-1050.svg', svgMarkup: mapSvgToApertureBounds(frame1050Svg),
     width: 1024, height: 600, shape: 'rect',
     aperture: {
       x: 0.06924581, y: 0.119823009, width: 0.86150838, height: 0.760353982, radius: '0.75%',
     },
   },
   {
-    frameId: 'WF2D-8630', assetUrl: 'frames/WF2D-8630.svg', svgMarkup: frame8630Svg,
+    frameId: 'WF2D-8630', assetUrl: 'frames/WF2D-8630.svg', svgMarkup: mapSvgToApertureBounds(frame8630Svg),
     width: 480, height: 480, shape: 'rect',
     aperture: { x: 0.0865735, y: 0.0865735, width: 0.826853, height: 0.826853, radius: '0' },
   },
   {
-    frameId: 'WF3-28476', assetUrl: 'frames/WF3_FRONT.svg', svgMarkup: wf3FrameSvg,
+    frameId: 'WF3-28476', assetUrl: 'frames/WF3_FRONT.svg', svgMarkup: mapSvgToApertureBounds(wf3FrameSvg),
     width: 284, height: 76, shape: 'rect',
     aperture: {
       x: 0.192865543, y: 0.415797915, width: 0.614660917, height: 0.16840417, radius: '0',

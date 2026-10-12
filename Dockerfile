@@ -27,6 +27,7 @@ COPY backend/ ./backend/
 COPY packages/schema/schema/ ./packages/schema/schema/
 COPY packages/lvgl-runtime/dist/build-manifest.json ./packages/lvgl-runtime/dist/build-manifest.json
 COPY vendor/lvgl/ ./lvgl-source/
+COPY runtime/font-overrides/lv_font_montserrat_20.c ./lvgl-source/src/font/lv_font_montserrat_20.c
 COPY --from=web /usr/local/bin/node /usr/local/bin/node
 COPY --from=web /workspace/apps/designer/dist/ ./apps/designer/dist/
 COPY --from=web /workspace/apps/build-worker/dist/ ./apps/build-worker/dist/

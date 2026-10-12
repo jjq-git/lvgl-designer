@@ -61,7 +61,7 @@ describe('site frame display presets', () => {
     for (const preset of FALLBACK_DISPLAY_PRESETS.fixed) {
       expect(deviceFrameForDisplay(preset)).toEqual(expect.objectContaining({
         frameId: preset.frameId,
-        svgMarkup: expect.stringContaining('<svg'),
+        svgMarkup: expect.stringContaining('<svg preserveAspectRatio="none"'),
       }));
     }
     expect(DEVICE_FRAME_PREVIEWS).toHaveLength(6);

@@ -89,6 +89,7 @@ export const LVGL_BUILTIN_SYMBOLS: readonly LvglSymbolOption[] = [
   { name: 'USB', symbol: '\uf287', keywords: 'usb device 设备 接口' },
   { name: '退格', symbol: '\uf55a', keywords: 'backspace erase delete 删除字符' },
   { name: 'SD 卡', symbol: '\uf7c2', keywords: 'sd card memory storage 存储卡 内存卡' },
+  { name: '打开舱门', symbol: '\uf52b', keywords: 'door open quiet pod cabin booth 静音舱 舱门' },
   { name: '换行', symbol: '\uf8a2', keywords: 'new line enter return 回车' },
 ];
 
@@ -98,7 +99,7 @@ export const LVGL_BUILTIN_SYMBOLS: readonly LvglSymbolOption[] = [
  * and generated firmware render the same icon without an extra font asset.
  */
 export const QUIET_POD_SYMBOLS: readonly LvglSymbolOption[] = [
-  { name: '静音仓', symbol: '\uf015', keywords: 'quiet pod cabin booth 舱体 空间' },
+  { name: '静音仓', symbol: '\uf52b', keywords: 'quiet pod cabin booth 舱体 舱门 空间' },
   { name: '安静模式', symbol: '\uf026', keywords: 'quiet silent silence mute 静音 降噪' },
   { name: '噪声', symbol: '\uf001', keywords: 'noise sound audio 声音' },
   { name: '分贝', symbol: '\uf027', keywords: 'decibel db noise level 音量 噪声值' },

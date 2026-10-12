@@ -225,18 +225,30 @@
               "children": [
                 {
                   "id": "10000000-0000-4000-9000-000000000004",
-                  "type": "image",
+                  "type": "label",
                   "codeName": "ev_charge_brand_logo",
                   "props": {
-                    "src": "podsc_logo",
+                    "text": "",
                     "x": 55,
                     "y": 28,
                     "width": 32,
-                    "height": 32,
-                    "inner_align": "center"
+                    "height": 32
                   },
                   "styleRefs": [],
-                  "styles": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.accent"
+                        },
+                        "text_font": {
+                          "$token": "font.size.20"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
                   "events": [],
                   "bindings": [],
                   "children": []
@@ -1531,18 +1543,30 @@
               "children": [
                 {
                   "id": "10000000-0000-4000-9000-000000000041",
-                  "type": "image",
+                  "type": "label",
                   "codeName": "ev_sessions_brand_logo",
                   "props": {
-                    "src": "podsc_logo",
+                    "text": "",
                     "x": 55,
                     "y": 28,
                     "width": 32,
-                    "height": 32,
-                    "inner_align": "center"
+                    "height": 32
                   },
                   "styleRefs": [],
-                  "styles": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.accent"
+                        },
+                        "text_font": {
+                          "$token": "font.size.20"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
                   "events": [],
                   "bindings": [],
                   "children": []
@@ -2663,18 +2687,30 @@
               "children": [
                 {
                   "id": "10000000-0000-4000-9000-000000000074",
-                  "type": "image",
+                  "type": "label",
                   "codeName": "ev_payment_brand_logo",
                   "props": {
-                    "src": "podsc_logo",
+                    "text": "",
                     "x": 55,
                     "y": 28,
                     "width": 32,
-                    "height": 32,
-                    "inner_align": "center"
+                    "height": 32
                   },
                   "styleRefs": [],
-                  "styles": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.accent"
+                        },
+                        "text_font": {
+                          "$token": "font.size.20"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
                   "events": [],
                   "bindings": [],
                   "children": []
@@ -3837,21 +3873,7 @@
     "consts": [],
     "assets": {
       "fonts": [],
-      "images": [
-        {
-          "id": "image:podsc_logo",
-          "codeName": "podsc_logo",
-          "displayName": "PodsC logo",
-          "file": {
-            "fileName": "podsc-logo.png",
-            "sha256": "62b180096ec767434d2670cbb8eb2e8382fbfbd44c0b2f097612f2710c09c3c3",
-            "byteSize": 568
-          },
-          "conv": {
-            "colorFormat": "ARGB8888"
-          }
-        }
-      ],
+      "images": [],
       "icons": []
     },
     "translations": null,

@@ -6,6 +6,24 @@ export interface ProjectDisplaySpec {
   height: number;
   shape: 'round' | 'rect';
 }
+
+export interface NamedProjectDisplaySpec extends ProjectDisplaySpec {
+  name: string;
+}
+
+/** Prefer persisted editable projects over their bundled fallback template. */
+export function excludePersistedBuiltIns<T extends NamedProjectDisplaySpec>(
+  builtIns: readonly T[],
+  persisted: readonly NamedProjectDisplaySpec[],
+): T[] {
+  return builtIns.filter((builtIn) => !persisted.some((candidate) => (
+    builtIn.name.trim() === candidate.name.trim()
+    && builtIn.width === candidate.width
+    && builtIn.height === candidate.height
+    && builtIn.shape === candidate.shape
+  )));
+}
+
 /** Read the project-level display without loading the document into the editor. */
 export function storedProjectDisplay(document: StoredProjectDocument): ProjectDisplaySpec {
   if (isProjectSnapshotV2(document)) {

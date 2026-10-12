@@ -11,7 +11,11 @@ import { useProjectsStore } from './stores/projectsStore';
 import { SyncBadge } from './panels/cloud/SyncBadge';
 import { hasPermission, useAuthStore } from './stores/authStore';
 import { getProject } from './services/cloudStorage';
-import { storedProjectDisplay, type ProjectDisplaySpec } from './services/projectPicker';
+import {
+  excludePersistedBuiltIns,
+  storedProjectDisplay,
+  type ProjectDisplaySpec,
+} from './services/projectPicker';
 import { FALLBACK_DISPLAY_PRESETS } from './services/displayPresets';
 import { loadLastProject } from './services/storage';
 import {
@@ -37,13 +41,6 @@ function presetMatchesDisplay(
   return preset.width === candidate.width
     && preset.height === candidate.height
     && preset.shape === candidate.shape;
-}
-
-function sameProjectOption(
-  left: Pick<ProjectPickerOption, 'name' | 'width' | 'height' | 'shape'>,
-  right: Pick<ProjectPickerOption, 'name' | 'width' | 'height' | 'shape'>,
-): boolean {
-  return left.name.trim() === right.name.trim() && presetMatchesDisplay(left, right);
 }
 
 export function Toolbar(): JSX.Element {
@@ -168,9 +165,13 @@ export function Toolbar(): JSX.Element {
     height: project.height,
     shape: project.shape,
   }));
-  const uniqueBuiltInProjectOptions = localProjectOption
-    ? builtInProjectOptions.filter((project) => !sameProjectOption(project, localProjectOption))
-    : builtInProjectOptions;
+  const persistedProjectOptions = localProjectOption
+    ? [localProjectOption, ...projectOptions]
+    : projectOptions;
+  const uniqueBuiltInProjectOptions = excludePersistedBuiltIns(
+    builtInProjectOptions,
+    persistedProjectOptions,
+  );
   const allProjectOptions = localProjectOption
     ? [localProjectOption, ...uniqueBuiltInProjectOptions, ...projectOptions]
     : [...uniqueBuiltInProjectOptions, ...projectOptions];

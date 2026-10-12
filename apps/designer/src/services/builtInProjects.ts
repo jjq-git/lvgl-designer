@@ -76,7 +76,7 @@ export const BUILT_IN_PROJECTS: readonly BuiltInProjectDescriptor[] = [
   },
   {
     id: 'builtin:wf2d-8620-quiet-focus',
-    name: '静音舱 · 专注计时 · 午夜紫罗兰',
+    name: 'WF2D-8620 静音舱 · 专注计时',
     width: 240,
     height: 240,
     shape: 'round',
@@ -89,7 +89,7 @@ export const BUILT_IN_PROJECTS: readonly BuiltInProjectDescriptor[] = [
   },
   {
     id: 'builtin:wf2d-8630-quiet-acoustics',
-    name: '静音舱 · 声学降噪 · 冰川声场',
+    name: 'WF2D-8630 静音舱 · 声学降噪',
     width: 480,
     height: 480,
     shape: 'rect',
@@ -102,7 +102,7 @@ export const BUILT_IN_PROJECTS: readonly BuiltInProjectDescriptor[] = [
   },
   {
     id: 'builtin:wf2d-1050-quiet-lighting',
-    name: '静音舱 · 灯光场景 · 琥珀光域',
+    name: 'WF2D-1050 静音舱 · 灯光场景',
     width: 1024,
     height: 600,
     shape: 'rect',
@@ -115,7 +115,7 @@ export const BUILT_IN_PROJECTS: readonly BuiltInProjectDescriptor[] = [
   },
   {
     id: 'builtin:wf2d-1040-quiet-air',
-    name: '静音舱 · 空气质量 · 生态薄荷',
+    name: 'WF2D-1040 静音舱 · 空气质量',
     width: 1080,
     height: 720,
     shape: 'rect',
@@ -128,7 +128,7 @@ export const BUILT_IN_PROJECTS: readonly BuiltInProjectDescriptor[] = [
   },
   {
     id: 'builtin:wf2d-1030-quiet-booking',
-    name: '静音舱 · 舱位预约 · 珊瑚日程',
+    name: 'WF2D-1030 静音舱 · 舱位预约',
     width: 1440,
     height: 720,
     shape: 'rect',
@@ -141,7 +141,7 @@ export const BUILT_IN_PROJECTS: readonly BuiltInProjectDescriptor[] = [
   },
   {
     id: 'builtin:wf3-284x76-quiet-dnd',
-    name: '静音舱 · 一键静音 · 信号红黑',
+    name: 'WF3-284x76 静音舱 · 一键静音',
     width: 284,
     height: 76,
     shape: 'rect',

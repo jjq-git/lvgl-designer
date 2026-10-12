@@ -50,7 +50,12 @@ describe('built-in projects', () => {
       [284, 76, 'rect'],
     ]);
     for (const descriptor of quietPods) {
-      expect(isProjectSnapshotV2(await descriptor.load()), descriptor.id).toBe(true);
+      const document = await descriptor.load();
+      expect(isProjectSnapshotV2(document), descriptor.id).toBe(true);
+      if (!isProjectSnapshotV2(document)) continue;
+      // The toolbar uses this exact identity to avoid listing the opened
+      // built-in document and its bundled descriptor as two UI choices.
+      expect(descriptor.name, descriptor.id).toBe(document.uiProject.meta.name);
     }
   });
 

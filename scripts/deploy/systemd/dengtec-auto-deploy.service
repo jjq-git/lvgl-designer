@@ -6,5 +6,8 @@ Wants=network-online.target
 [Service]
 Type=oneshot
 ExecStart=/home/jiao/.local/bin/dengtec-auto-deploy
+Environment=PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple
+Environment=COREPACK_NPM_REGISTRY=https://registry.npmmirror.com
+Environment=npm_config_registry=https://registry.npmmirror.com
 TimeoutStartSec=2h
 Nice=5

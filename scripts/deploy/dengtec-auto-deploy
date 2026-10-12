@@ -6,12 +6,56 @@ checkout_root="$state_root/checkouts"
 status_root="$state_root/status"
 lock_file="$state_root/controller.lock"
 overall_status=0
+selected_repository=all
+expected_sha=''
+
+usage() {
+    cat <<'EOF'
+Usage: dengtec-auto-deploy [--repository all|datasheets|lvgl-designer] [--expected-sha SHA]
+EOF
+}
+
+while (( $# > 0 )); do
+    case "$1" in
+        --repository)
+            [[ $# -ge 2 ]] || { usage >&2; exit 2; }
+            selected_repository=$2
+            shift 2
+            ;;
+        --expected-sha)
+            [[ $# -ge 2 ]] || { usage >&2; exit 2; }
+            expected_sha=$2
+            shift 2
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        *)
+            usage >&2
+            exit 2
+            ;;
+    esac
+done
+
+case "$selected_repository" in
+    all|datasheets|lvgl-designer) ;;
+    *) usage >&2; exit 2 ;;
+esac
+if [[ -n "$expected_sha" ]] && [[ ! "$expected_sha" =~ ^[0-9a-fA-F]{40}$ ]]; then
+    echo 'Expected SHA must be a full 40-character Git commit ID.' >&2
+    exit 2
+fi
+if [[ "$selected_repository" == all ]] && [[ -n "$expected_sha" ]]; then
+    echo '--expected-sha requires one specific repository.' >&2
+    exit 2
+fi
 
 mkdir -p "$checkout_root" "$status_root"
 exec 9>"$lock_file"
-if ! flock -n 9; then
-    echo 'Another automatic deployment check is still running; skipping.'
-    exit 0
+if ! flock -w 7200 9; then
+    echo 'Timed out waiting for another deployment to finish.' >&2
+    exit 3
 fi
 
 log() {
@@ -54,6 +98,10 @@ deploy_repository() {
         return
     fi
     sha=$(git -C "$checkout" rev-parse refs/remotes/origin/main)
+    if [[ -n "$expected_sha" ]] && [[ "$sha" != "$expected_sha" ]]; then
+        log "[$name] workflow commit ${expected_sha:0:12} was superseded by ${sha:0:12}; skipping"
+        return
+    fi
     success_sha=''
     [[ -f "$success_file" ]] && read -r success_sha <"$success_file"
     if [[ "$sha" == "$success_sha" ]]; then
@@ -105,14 +153,18 @@ deploy_repository() {
     fi
 }
 
-deploy_repository \
-    datasheets \
-    http://192.168.1.88:3000/learn_data_github/datasheets.git \
-    scripts/deploy/auto-deploy-host.sh
+if [[ "$selected_repository" == all ]] || [[ "$selected_repository" == datasheets ]]; then
+    deploy_repository \
+        datasheets \
+        http://192.168.1.88:3000/learn_data_github/datasheets.git \
+        scripts/deploy/auto-deploy-host.sh
+fi
 
-deploy_repository \
-    lvgl-designer \
-    http://192.168.1.88:3000/learn_data_github/lvgl_json_lvgl.git \
-    scripts/deploy/auto-deploy-host.sh
+if [[ "$selected_repository" == all ]] || [[ "$selected_repository" == lvgl-designer ]]; then
+    deploy_repository \
+        lvgl-designer \
+        http://192.168.1.88:3000/learn_data_github/lvgl_json_lvgl.git \
+        scripts/deploy/auto-deploy-host.sh
+fi
 
 exit "$overall_status"

@@ -1,0 +1,22 @@
+name: Deploy LVGL Designer to 192.168.1.38
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Test, build and deploy LVGL Designer
+    runs-on: deploy-38
+    timeout-minutes: 120
+    steps:
+      - name: Deploy the pushed main commit
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          /home/jiao/.local/bin/dengtec-auto-deploy \
+            --repository lvgl-designer \
+            --expected-sha "$EXPECTED_SHA"

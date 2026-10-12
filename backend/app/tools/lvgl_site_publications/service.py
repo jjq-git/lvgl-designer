@@ -42,6 +42,15 @@ def _empty_delivery() -> dict[str, dict[str, Any]]:
     return {stage: {"status": "not_started"} for stage in DELIVERY_STAGES}
 
 
+def _no_op_delivery() -> dict[str, dict[str, Any]]:
+    detail = "No deployment required: the target already matches this publication."
+    stamp = db._now()
+    return {
+        stage: {"status": "skipped", "detail": detail, "updatedAt": stamp}
+        for stage in DELIVERY_STAGES
+    }
+
+
 def _delivery(record: dict[str, Any]) -> dict[str, Any]:
     committed = bool(record.get("commitSha"))
     git_status = "rolled_back" if record["status"] == "rolled_back" else ("submitted" if committed else "not_started")
@@ -63,6 +72,8 @@ def _deployment_status(delivery: dict[str, Any]) -> str:
     statuses = [delivery[stage]["status"] for stage in DELIVERY_STAGES]
     if "failed" in statuses:
         return "deployment_failed"
+    if all(status == "skipped" for status in statuses):
+        return "deployment_skipped"
     if all(status == "succeeded" for status in statuses):
         return "deployed"
     if delivery["cdnRefresh"]["status"] == "skipped" and all(
@@ -217,14 +228,17 @@ def publish(owner_user_id: int, actor_user_id: int, publication_id: str) -> dict
              "currentVersion": None if current_project is None else current_project["version"]},
             status_code=409,
         )
+    recovering_uncertain_push = record["status"] == "publishing"
     db.transition(owner_user_id, actor_user_id, publication_id, "publishing")
     try:
         result = git_target.publish(record, db.artifact_dir(publication_id))
+        no_deployment_required = result.get("idempotent") is True and not recovering_uncertain_push
+        delivery = _no_op_delivery() if no_deployment_required else _empty_delivery()
         committed = db.transition(
             owner_user_id, actor_user_id, publication_id, "git_committed",
             fields={
                 "commit_sha": result["commitSha"], "published_at": db._now(),
-                "delivery_json": json.dumps(_empty_delivery(), separators=(",", ":")), "error_json": None,
+                "delivery_json": json.dumps(delivery, separators=(",", ":")), "error_json": None,
             },
             detail=result,
         )
@@ -247,11 +261,12 @@ def rollback(owner_user_id: int, actor_user_id: int, publication_id: str) -> dic
         raise PublicationError("publication-state-conflict", "only a Git-committed publication can be rolled back", status_code=409)
     try:
         result = git_target.rollback(record, db.artifact_dir(publication_id))
+        delivery = _no_op_delivery() if result.get("idempotent") is True else _empty_delivery()
         rolled_back = db.transition(
             owner_user_id, actor_user_id, publication_id, "rolled_back",
             fields={
                 "rollback_commit_sha": result["commitSha"],
-                "delivery_json": json.dumps(_empty_delivery(), separators=(",", ":")), "error_json": None,
+                "delivery_json": json.dumps(delivery, separators=(",", ":")), "error_json": None,
             }, detail=result,
         )
         return _decorate(rolled_back)  # type: ignore[arg-type]

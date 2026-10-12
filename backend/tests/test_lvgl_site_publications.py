@@ -172,6 +172,26 @@ def test_publish_is_idempotent_at_database_boundary(isolated_publications, monke
     assert first["delivery"]["staticUpload"]["status"] == "not_started"
 
 
+def test_no_op_publish_finishes_without_waiting_for_deployment(isolated_publications, monkeypatch):
+    install_fakes(monkeypatch)
+    project = project_db.create_project(7, "Panel", snapshot())
+    prepared = service.prepare(
+        7, 7, project_id=project["id"], frame_id="WF2D-8620", name="Unchanged",
+        description="", is_public=False, demo_id=None,
+    )
+    monkeypatch.setattr(
+        git_target, "publish",
+        lambda *_args: {"commitSha": "c" * 40, "changedPaths": [], "idempotent": True},
+    )
+
+    published = service.publish(7, 7, prepared["id"])
+
+    assert published["deploymentStatus"] == "deployment_skipped"
+    for stage in ("staticUpload", "stalePageDeletion", "cdnRefresh"):
+        assert published["delivery"][stage]["status"] == "skipped"
+        assert "target already matches" in published["delivery"][stage]["detail"]
+
+
 def test_deployment_callback_is_authenticated_and_persisted(isolated_publications, monkeypatch):
     install_fakes(monkeypatch)
     project = project_db.create_project(7, "Panel", snapshot())
@@ -241,6 +261,29 @@ def test_rollback_resets_delivery_and_rejects_superseded_commit(isolated_publica
         service.record_deployment(original_sha, "cdnRefresh", "succeeded")
     assert exc_info.value.status_code == 409
     assert service.record_deployment(rollback_sha, "staticUpload", "running")["deploymentStatus"] == "deploying"
+
+
+def test_no_op_rollback_finishes_without_waiting_for_deployment(isolated_publications, monkeypatch):
+    install_fakes(monkeypatch)
+    project = project_db.create_project(7, "Panel", snapshot())
+    prepared = service.prepare(
+        7, 7, project_id=project["id"], frame_id="WF2D-8620", name="Rollback",
+        description="", is_public=False, demo_id=None,
+    )
+    monkeypatch.setattr(
+        git_target, "publish",
+        lambda *_args: {"commitSha": "c" * 40, "changedPaths": ["site/ui_list.json"], "idempotent": False},
+    )
+    service.publish(7, 7, prepared["id"])
+    monkeypatch.setattr(
+        git_target, "rollback",
+        lambda *_args: {"commitSha": "b" * 40, "changedPaths": [], "idempotent": True},
+    )
+
+    rolled_back = service.rollback(7, 7, prepared["id"])
+
+    assert rolled_back["deploymentStatus"] == "deployment_skipped"
+    assert rolled_back["delivery"]["staticUpload"]["status"] == "skipped"
 
 
 def test_deployment_callback_rejects_unknown_commit(isolated_publications, monkeypatch):
@@ -333,6 +376,7 @@ def test_publish_recovers_after_push_succeeded_before_receipt_was_saved(isolated
     recovered = service.publish(7, 9, prepared["id"])
     assert recovered["status"] == "git_committed"
     assert recovered["commitSha"] == "c" * 40
+    assert recovered["deploymentStatus"] == "git_submitted"
     assert len(calls) == 2
 
 

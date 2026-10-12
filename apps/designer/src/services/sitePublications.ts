@@ -112,7 +112,7 @@ export interface SitePublication {
   diffStat?: string;
   changedPaths?: string[];
   previewUrl?: string;
-  deploymentStatus?: 'git_submitted' | 'deploying' | 'deployed' | 'deployment_skipped' | 'deployment_partial' | 'deployment_failed';
+  deploymentStatus?: 'git_submitted' | 'deploying' | 'deployed' | 'deployment_partial' | 'deployment_failed';
   interactivePreviewAvailable?: boolean;
   manifestChange?: { before: SiteDemo | Record<string, unknown> | null; after: SiteDemo | Record<string, unknown> };
   delivery?: {

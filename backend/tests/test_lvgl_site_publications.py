@@ -1,5 +1,7 @@
 import json
 import uuid
+from contextlib import nullcontext
+from hashlib import sha256
 
 import pytest
 from PIL import Image
@@ -172,24 +174,107 @@ def test_publish_is_idempotent_at_database_boundary(isolated_publications, monke
     assert first["delivery"]["staticUpload"]["status"] == "not_started"
 
 
-def test_no_op_publish_finishes_without_waiting_for_deployment(isolated_publications, monkeypatch):
-    install_fakes(monkeypatch)
-    project = project_db.create_project(7, "Panel", snapshot())
-    prepared = service.prepare(
-        7, 7, project_id=project["id"], frame_id="WF2D-8620", name="Unchanged",
-        description="", is_public=False, demo_id=None,
-    )
-    monkeypatch.setattr(
-        git_target, "publish",
-        lambda *_args: {"commitSha": "c" * 40, "changedPaths": [], "idempotent": True},
-    )
+def test_unchanged_target_creates_empty_commit_to_trigger_deployment(tmp_path, monkeypatch):
+    artifact_dir = tmp_path / "artifact"
+    root = tmp_path / "target"
+    document = b"{}"
+    thumbnail = b"png"
+    document_url = "site/uis/WF2D-1040-demo.json"
+    thumbnail_url = "site/uis/WF2D-1040-demo.png"
+    record = {
+        "id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        "status": "prepared",
+        "demoId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+        "frameId": "WF2D-1040", "name": "Updated UI", "description": "",
+        "isPublic": True,
+    }
+    artifact_dir.mkdir()
+    (artifact_dir / "document.json").write_bytes(document)
+    (artifact_dir / "thumbnail.png").write_bytes(thumbnail)
+    (artifact_dir / "plan.json").write_text(json.dumps({
+        "targetBaseCommit": "a" * 40,
+        "documentUrl": document_url, "thumbnailUrl": thumbnail_url,
+        "documentSha256": sha256(document).hexdigest(),
+        "thumbnailSha256": sha256(thumbnail).hexdigest(),
+    }), encoding="utf-8")
+    (root / "site" / "uis").mkdir(parents=True)
+    (root / document_url).write_bytes(document)
+    (root / thumbnail_url).write_bytes(thumbnail)
+    (root / "site" / "ui_list.json").write_text(json.dumps({
+        "schemaVersion": 1,
+        "items": [{
+            "id": record["demoId"], "frameId": record["frameId"], "name": record["name"],
+            "description": "", "documentUrl": document_url.removeprefix("site/"),
+            "thumbnailUrl": thumbnail_url.removeprefix("site/"), "isPublic": True,
+        }],
+    }), encoding="utf-8")
+    monkeypatch.setattr(git_target, "configuration", lambda: ("target", "main"))
+    monkeypatch.setattr(git_target, "Checkout", lambda *_args: nullcontext(root))
+    commands = []
+    committed = False
 
-    published = service.publish(7, 7, prepared["id"])
+    def fake_run(args, _root, timeout=git_target.GIT_TIMEOUT):
+        nonlocal committed
+        commands.append(args)
+        if args == ["git", "rev-parse", "HEAD"]:
+            return "c" * 40 if committed else "a" * 40
+        if "commit" in args:
+            committed = True
+            return ""
+        if args[:2] == ["git", "push"]:
+            return ""
+        raise AssertionError(args)
 
-    assert published["deploymentStatus"] == "deployment_skipped"
-    for stage in ("staticUpload", "stalePageDeletion", "cdnRefresh"):
-        assert published["delivery"][stage]["status"] == "skipped"
-        assert "target already matches" in published["delivery"][stage]["detail"]
+    monkeypatch.setattr(git_target, "_run", fake_run)
+
+    result = git_target.publish(record, artifact_dir)
+
+    commit_args = next(args for args in commands if "commit" in args)
+    assert "--allow-empty" in commit_args
+    assert git_target._publication_marker(record) in commit_args
+    assert result == {
+        "commitSha": "c" * 40, "changedPaths": [], "idempotent": False,
+        "deploymentTriggered": True, "forcedRedeploy": True,
+    }
+
+
+def test_publish_recovers_forced_deploy_commit_by_publication_marker(tmp_path, monkeypatch):
+    artifact_dir = tmp_path / "artifact"
+    root = tmp_path / "target"
+    document = b"{}"
+    thumbnail = b"png"
+    record = {
+        "id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        "status": "publishing", "name": "Updated UI", "demoId": "demo",
+    }
+    artifact_dir.mkdir()
+    (artifact_dir / "document.json").write_bytes(document)
+    (artifact_dir / "thumbnail.png").write_bytes(thumbnail)
+    (artifact_dir / "plan.json").write_text(json.dumps({
+        "targetBaseCommit": "a" * 40,
+        "documentSha256": sha256(document).hexdigest(),
+        "thumbnailSha256": sha256(thumbnail).hexdigest(),
+    }), encoding="utf-8")
+    monkeypatch.setattr(git_target, "configuration", lambda: ("target", "main"))
+    monkeypatch.setattr(git_target, "Checkout", lambda *_args: nullcontext(root))
+    commands = []
+
+    def fake_run(args, _root, timeout=git_target.GIT_TIMEOUT):
+        commands.append(args)
+        if args == ["git", "rev-parse", "HEAD"]:
+            return "a" * 40
+        if args[:3] == ["git", "log", "-1"]:
+            return "c" * 40
+        raise AssertionError(args)
+
+    monkeypatch.setattr(git_target, "_run", fake_run)
+
+    result = git_target.publish(record, artifact_dir)
+
+    assert result["commitSha"] == "c" * 40
+    assert result["idempotent"] is True
+    assert result["deploymentTriggered"] is True
+    assert not any("commit" in args or args[:2] == ["git", "push"] for args in commands)
 
 
 def test_deployment_callback_is_authenticated_and_persisted(isolated_publications, monkeypatch):
@@ -261,29 +346,6 @@ def test_rollback_resets_delivery_and_rejects_superseded_commit(isolated_publica
         service.record_deployment(original_sha, "cdnRefresh", "succeeded")
     assert exc_info.value.status_code == 409
     assert service.record_deployment(rollback_sha, "staticUpload", "running")["deploymentStatus"] == "deploying"
-
-
-def test_no_op_rollback_finishes_without_waiting_for_deployment(isolated_publications, monkeypatch):
-    install_fakes(monkeypatch)
-    project = project_db.create_project(7, "Panel", snapshot())
-    prepared = service.prepare(
-        7, 7, project_id=project["id"], frame_id="WF2D-8620", name="Rollback",
-        description="", is_public=False, demo_id=None,
-    )
-    monkeypatch.setattr(
-        git_target, "publish",
-        lambda *_args: {"commitSha": "c" * 40, "changedPaths": ["site/ui_list.json"], "idempotent": False},
-    )
-    service.publish(7, 7, prepared["id"])
-    monkeypatch.setattr(
-        git_target, "rollback",
-        lambda *_args: {"commitSha": "b" * 40, "changedPaths": [], "idempotent": True},
-    )
-
-    rolled_back = service.rollback(7, 7, prepared["id"])
-
-    assert rolled_back["deploymentStatus"] == "deployment_skipped"
-    assert rolled_back["delivery"]["staticUpload"]["status"] == "skipped"
 
 
 def test_deployment_callback_rejects_unknown_commit(isolated_publications, monkeypatch):

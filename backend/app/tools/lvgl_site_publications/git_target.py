@@ -477,6 +477,33 @@ def _changed_since(root: Path, base_commit: str) -> set[str]:
     return {line.strip().replace("\\", "/") for line in output.splitlines() if line.strip()}
 
 
+def _publication_marker(record: dict[str, Any]) -> str:
+    return f"lvgl-publication-id: {record['id']}"
+
+
+def _publication_commit_args(
+    record: dict[str, Any], *, action: str = "publish", allow_empty: bool = False,
+) -> list[str]:
+    args = [
+        "git", "-c", "user.name=LVGL Designer Publisher",
+        "-c", "user.email=lvgl-publisher@dengtec.local", "commit",
+    ]
+    if allow_empty:
+        args.append("--allow-empty")
+    args.extend([
+        "-m", f"{action}(ui): {record['name']} ({record['demoId']})",
+        "-m", _publication_marker(record),
+    ])
+    return args
+
+
+def _find_publication_commit(root: Path, record: dict[str, Any]) -> str:
+    return _run([
+        "git", "log", "-1", "--format=%H", "--fixed-strings",
+        f"--grep={_publication_marker(record)}",
+    ], root)
+
+
 def publish(record: dict[str, Any], artifact_dir: Path, _attempt: int = 0) -> dict[str, Any]:
     repository, branch = configuration()
     plan = _read_json(artifact_dir / "plan.json")
@@ -488,6 +515,30 @@ def publish(record: dict[str, Any], artifact_dir: Path, _attempt: int = 0) -> di
         raise TargetError("prepared-artifact-corrupt", "prepared thumbnail hash mismatch")
     with Checkout(repository, branch) as root:
         head = _run(["git", "rev-parse", "HEAD"], root)
+        if record.get("status") == "publishing":
+            recovered_commit = _find_publication_commit(root, record)
+            if recovered_commit:
+                return {
+                    "commitSha": recovered_commit, "changedPaths": [],
+                    "idempotent": True, "deploymentTriggered": True,
+                }
+
+        def commit_and_push(changed_paths: list[str], *, force_redeploy: bool = False) -> dict[str, Any]:
+            _run(_publication_commit_args(record, allow_empty=force_redeploy), root)
+            commit = _run(["git", "rev-parse", "HEAD"], root)
+            try:
+                _run(["git", "push", "origin", f"HEAD:{branch}"], root)
+            except TargetError as exc:
+                message = str(exc).lower()
+                concurrent = any(token in message for token in ("non-fast-forward", "fetch first", "rejected"))
+                if concurrent and _attempt < 2:
+                    return publish(record, artifact_dir, _attempt + 1)
+                raise
+            return {
+                "commitSha": commit, "changedPaths": changed_paths, "idempotent": False,
+                "deploymentTriggered": True, "forcedRedeploy": force_redeploy,
+            }
+
         if head != plan["targetBaseCommit"]:
             sensitive = {
                 "site/assets/renderer.js", "site/assets/styles.css", "scripts/build_seo.py",
@@ -511,8 +562,7 @@ def publish(record: dict[str, Any], artifact_dir: Path, _attempt: int = 0) -> di
             if (current_document.is_file() and current_thumbnail.is_file()
                     and hashlib.sha256(current_document.read_bytes()).hexdigest() == plan["documentSha256"]
                     and hashlib.sha256(current_thumbnail.read_bytes()).hexdigest() == plan["thumbnailSha256"]):
-                existing = _run(["git", "log", "-1", "--format=%H", "--", plan["documentUrl"]], root)
-                return {"commitSha": existing or head, "changedPaths": [], "idempotent": True}
+                return commit_and_push([], force_redeploy=True)
         _merge_item(
             listing, record, plan["documentUrl"].removeprefix("site/"),
             plan["thumbnailUrl"].removeprefix("site/"), plan.get("expectedPrevious"),
@@ -528,21 +578,9 @@ def publish(record: dict[str, Any], artifact_dir: Path, _attempt: int = 0) -> di
         _run_seo(root)
         changed = _assert_allowlist(root, record, plan["documentUrl"], plan["thumbnailUrl"], index_before)
         if not changed:
-            existing = _run(["git", "log", "-1", "--format=%H", "--", plan["documentUrl"]], root)
-            return {"commitSha": existing or head, "changedPaths": [], "idempotent": True}
+            return commit_and_push([], force_redeploy=True)
         _run(["git", "add", "--", *changed], root)
-        _run(["git", "-c", "user.name=LVGL Designer Publisher", "-c", "user.email=lvgl-publisher@dengtec.local",
-              "commit", "-m", f"publish(ui): {record['name']} ({record['demoId']})"], root)
-        commit = _run(["git", "rev-parse", "HEAD"], root)
-        try:
-            _run(["git", "push", "origin", f"HEAD:{branch}"], root)
-        except TargetError as exc:
-            message = str(exc).lower()
-            concurrent = any(token in message for token in ("non-fast-forward", "fetch first", "rejected"))
-            if concurrent and _attempt < 2:
-                return publish(record, artifact_dir, _attempt + 1)
-            raise
-        return {"commitSha": commit, "changedPaths": changed, "idempotent": False}
+        return commit_and_push(changed)
 
 
 def rollback(record: dict[str, Any], artifact_dir: Path, _attempt: int = 0) -> dict[str, Any]:

@@ -18,6 +18,14 @@ Set-Location F:\dengtec\lvgl-designer
 
 紧急情况下可以显式使用 `-SkipTests`、`-AllowDirty` 或 `-AllowNonMain`，但常规发布不应使用这些开关。
 
+项目界面保存在 `lvgl_data/` 的 SQLite 数据库中，不属于普通代码发布。需要把本机已经验收的项目界面和字体资产一并合并到 `.38` 时，显式运行：
+
+```powershell
+.\scripts\deploy-38.ps1 -SyncProjectData
+```
+
+该开关会先用 SQLite 在线备份导出本机数据，再按“用户 + 项目名称”合并到服务器：同名项目更新、新项目插入、服务器独有项目保留。远端原数据库会备份到 `.deploy-backups/lvgl-data-<时间>-<提交>`；同步或健康检查失败时自动恢复数据库。它不会直接用本机数据库覆盖服务器数据库。
+
 服务器上的 `.env`、`auth_data/`、`lvgl_data/` 和 Datasheets 站点不包含在发布包中，不会被此脚本覆盖。发布备份保存在：
 
 ```text

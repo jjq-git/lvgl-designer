@@ -74,6 +74,84 @@ export const BUILT_IN_PROJECTS: readonly BuiltInProjectDescriptor[] = [
       return document;
     },
   },
+  {
+    id: 'builtin:wf2d-8620-quiet-focus',
+    name: '静音舱 · 专注计时 · 午夜紫罗兰',
+    width: 240,
+    height: 240,
+    shape: 'round',
+    async load() {
+      const module = await import(
+        '../../../../examples/quiet-pod-six-themes/WF2D-8620-quiet-focus.lvproj.json'
+      );
+      return module.default as StoredProjectDocument;
+    },
+  },
+  {
+    id: 'builtin:wf2d-8630-quiet-acoustics',
+    name: '静音舱 · 声学降噪 · 冰川声场',
+    width: 480,
+    height: 480,
+    shape: 'rect',
+    async load() {
+      const module = await import(
+        '../../../../examples/quiet-pod-six-themes/WF2D-8630-quiet-acoustics.lvproj.json'
+      );
+      return module.default as StoredProjectDocument;
+    },
+  },
+  {
+    id: 'builtin:wf2d-1050-quiet-lighting',
+    name: '静音舱 · 灯光场景 · 琥珀光域',
+    width: 1024,
+    height: 600,
+    shape: 'rect',
+    async load() {
+      const module = await import(
+        '../../../../examples/quiet-pod-six-themes/WF2D-1050-quiet-lighting.lvproj.json'
+      );
+      return module.default as StoredProjectDocument;
+    },
+  },
+  {
+    id: 'builtin:wf2d-1040-quiet-air',
+    name: '静音舱 · 空气质量 · 生态薄荷',
+    width: 1080,
+    height: 720,
+    shape: 'rect',
+    async load() {
+      const module = await import(
+        '../../../../examples/quiet-pod-six-themes/WF2D-1040-quiet-air.lvproj.json'
+      );
+      return module.default as StoredProjectDocument;
+    },
+  },
+  {
+    id: 'builtin:wf2d-1030-quiet-booking',
+    name: '静音舱 · 舱位预约 · 珊瑚日程',
+    width: 1440,
+    height: 720,
+    shape: 'rect',
+    async load() {
+      const module = await import(
+        '../../../../examples/quiet-pod-six-themes/WF2D-1030-quiet-booking.lvproj.json'
+      );
+      return module.default as StoredProjectDocument;
+    },
+  },
+  {
+    id: 'builtin:wf3-284x76-quiet-dnd',
+    name: '静音舱 · 一键静音 · 信号红黑',
+    width: 284,
+    height: 76,
+    shape: 'rect',
+    async load() {
+      const module = await import(
+        '../../../../examples/quiet-pod-six-themes/WF3-284x76-quiet-dnd.lvproj.json'
+      );
+      return module.default as StoredProjectDocument;
+    },
+  },
 ];
 
 export function findBuiltInProject(id: string): BuiltInProjectDescriptor | undefined {

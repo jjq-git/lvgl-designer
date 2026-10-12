@@ -51,6 +51,12 @@ function label(name, text, x, y, width, height, font = 18, color = 'color.text.p
   })]);
 }
 
+function brandLogo(name, x, y) {
+  return node('image', name, {
+    src: 'podsc_logo', x, y, width: 32, height: 32, inner_align: 'center',
+  });
+}
+
 function card(name, x, y, width, height, children = [], options = {}) {
   return node('obj', name, { x, y, width, height }, [st({
     bg_color: token(options.fill ?? 'color.surface'), bg_opa: 255,
@@ -299,7 +305,7 @@ function greenhouse(screens) {
     button('green_water_now', iconText(ICON.play, 'WATER'), 296, 52, 124, 50, { font: 14, radius: 14, target: screens.water }),
   ], { radius: 20 });
   return root(480, 480, [
-    label('green_brand', 'GROVE', 22, 18, 150, 32, 24, 'color.accent'),
+    brandLogo('green_brand_logo', 22, 18),
     label('green_status', 'ZONE A  /  ONLINE', 236, 23, 222, 26, 16, 'color.text.muted', 'right'),
     health,
     compactMetric('green_temp', 'AIR TEMP', '23.8', 'C', 308, 70, 152, 'color.warning'),
@@ -387,7 +393,7 @@ function evNav(screens, active) {
     radius: 16, font: 14, target: screens[key],
   });
   return card(`ev_nav_${active}`, 0, 0, 142, 600, [
-    label(`ev_${active}_brand`, 'VOLT', 20, 28, 102, 34, 28, 'color.accent2', 'center'),
+    brandLogo(`ev_${active}_brand_logo`, 55, 28),
     label(`ev_${active}_station`, iconText(ICON.wifi, '08'), 20, 64, 102, 22, 16, 'color.text.muted', 'center'),
     navButton('charge', `ev_nav_${active}_charge`, 'CHARGE', 116, ICON.light),
     navButton('sessions', `ev_nav_${active}_sessions`, 'SESSIONS', 190, ICON.menu),
@@ -532,7 +538,7 @@ function factoryEnergy(screens) {
     button('factory_alert_ack', iconText(ICON.check, 'ACKNOWLEDGE'), 598, 42, 180, 58, { fill: 'color.surface2', border: 'color.accent2', textColor: 'color.accent2', shadow: false, radius: 12, font: 14, target: screens.alerts }),
   ], { fill: 'color.surface2', radius: 14, shadow: false });
   return root(1080, 720, [
-    label('factory_brand', iconText(ICON.light, 'FORGE / ENERGY'), 28, 24, 340, 38, 28, 'color.accent'),
+    brandLogo('factory_brand_logo', 28, 24),
     label('factory_status', iconText(ICON.wifi, 'PLANT 02  /  GRID CONNECTED  /  09:41'), 570, 30, 482, 28, 18, 'color.text.muted', 'right'),
     rail,
     metricCard('factory_grid', 'GRID LOAD', '1.18', 'MW', 250, 88, 180, 128, 'color.accent'),
@@ -671,7 +677,7 @@ function harborDispatch(screens) {
   ], { radius: 14 });
   return root(1440, 720, [
     card('harbor_header', 0, 0, 1440, 76, [
-      label('harbor_brand', iconText(ICON.home, 'HARBOR / NORTH'), 24, 20, 340, 36, 28, 'color.text.onaccent'),
+      brandLogo('harbor_brand_logo', 24, 20),
       label('harbor_header_status', iconText(ICON.check, 'TRAFFIC NORMAL  /  09:41'), 940, 24, 470, 28, 18, 'color.text.onaccent', 'right'),
     ], { fill: 'color.accent', border: 'color.accent', radius: 0, shadow: false }),
     queue, map, conditions,

@@ -3,7 +3,8 @@ param(
     [string]$DeployHost = 'ai-server',
     [switch]$SkipTests,
     [switch]$AllowDirty,
-    [switch]$AllowNonMain
+    [switch]$AllowNonMain,
+    [switch]$SyncProjectData
 )
 
 Set-StrictMode -Version Latest
@@ -36,6 +37,8 @@ $remoteRoot = '/home/jiao/lvgl-designer'
 $releaseId = $null
 $tempRoot = $null
 $remoteHelper = $null
+$remoteDataHelper = $null
+$remoteDataTool = $null
 
 Push-Location $repoRoot
 try {
@@ -96,7 +99,35 @@ try {
     Invoke-Native ssh $DeployHost "rm -f '$remoteHelper'"
     $remoteHelper = $null
 
+    if ($SyncProjectData) {
+        $python = Join-Path $repoRoot '.venv\Scripts\python.exe'
+        if (-not (Test-Path -LiteralPath $python)) {
+            throw "Python environment not found: $python"
+        }
+        $localDataRoot = Join-Path $repoRoot 'lvgl_data'
+        $dataExportRoot = Join-Path $tempRoot 'lvgl-data'
+        $dataArchive = Join-Path $tempRoot "lvgl-data-$releaseId.tar.gz"
+        $dataTool = Join-Path $PSScriptRoot 'deploy\sync-lvgl-data.py'
+        $dataHelper = Join-Path $PSScriptRoot 'deploy\remote-sync-lvgl-data.sh'
+        Invoke-Native $python $dataTool 'export' $localDataRoot $dataExportRoot
+        Invoke-Native tar.exe '-czf' $dataArchive '-C' $dataExportRoot '.'
+
+        $remoteDataArchive = "$remoteRoot/.deploy-staging/incoming-lvgl-data-$releaseId.tar.gz"
+        $remoteDataHelper = "$remoteRoot/.deploy-staging/sync-lvgl-data-$releaseId.sh"
+        $remoteDataTool = "$remoteRoot/.deploy-staging/sync-lvgl-data-$releaseId.py"
+        Invoke-Native scp $dataArchive "${DeployHost}:$remoteDataArchive"
+        Invoke-Native scp $dataHelper "${DeployHost}:$remoteDataHelper"
+        Invoke-Native scp $dataTool "${DeployHost}:$remoteDataTool"
+        Invoke-Native ssh $DeployHost "bash '$remoteDataHelper' '$remoteDataArchive' '$releaseId' '$remoteDataTool'"
+        Invoke-Native ssh $DeployHost "rm -f '$remoteDataHelper'"
+        $remoteDataHelper = $null
+        $remoteDataTool = $null
+    }
+
     Write-Host "LVGL Designer deployed successfully: $releaseId" -ForegroundColor Green
+    if ($SyncProjectData) {
+        Write-Host 'Project data and assets were merged into the remote deployment.' -ForegroundColor Green
+    }
     Write-Host 'URL: http://192.168.1.38:8003/lvgl-designer/'
 }
 finally {
@@ -106,5 +137,11 @@ finally {
     }
     if ($remoteHelper) {
         Write-Warning "Remote helper was retained for diagnostics: $remoteHelper"
+    }
+    if ($remoteDataHelper) {
+        Write-Warning "Remote data helper was retained for diagnostics: $remoteDataHelper"
+    }
+    if ($remoteDataTool) {
+        Write-Warning "Remote data tool was retained for diagnostics: $remoteDataTool"
     }
 }

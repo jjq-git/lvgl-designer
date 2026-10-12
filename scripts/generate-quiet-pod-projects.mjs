@@ -5,6 +5,17 @@ import { tokenizeProjectTheme } from './theme-tokenize.mjs';
 
 const OUTPUT_DIR = resolve('examples/quiet-pod');
 const NOW = '2026-10-08T00:00:00.000Z';
+const PODSC_LOGO = {
+  id: 'image:podsc_logo',
+  codeName: 'podsc_logo',
+  displayName: 'PodsC logo',
+  file: {
+    fileName: 'podsc-logo.png',
+    sha256: '62b180096ec767434d2670cbb8eb2e8382fbfbd44c0b2f097612f2710c09c3c3',
+    byteSize: 568,
+  },
+  conv: { colorFormat: 'ARGB8888' },
+};
 
 const COLORS = {
   canvas: '#06101E',
@@ -178,6 +189,13 @@ function label(screen, key, text, x, y, width, options = {}) {
   });
 }
 
+function image(screen, key, x, y, width = 32, height = 32) {
+  return node('image', {
+    name: `${screen}_${key}`,
+    props: { src: 'podsc_logo', x, y, width, height, inner_align: 'center' },
+  });
+}
+
 function button(screen, key, text, x, y, width, height, options = {}) {
   const btn = node('button', {
     name: `${screen}_${key}`,
@@ -334,9 +352,7 @@ function addRectShell(screen, active, width, height, screenIds, options = {}) {
   const topH = options.topH ?? Math.round(height * 0.13);
   const children = [
     box(screen, 'rail', 0, 0, railW, height, { color: COLORS.rail, borderWidth: 0, radius: 0 }),
-    label(screen, 'brand', 'BRAND A', Math.round(railW * 0.18), Math.round(topH * 0.25), Math.round(railW * 0.65), {
-      font: width > 1200 ? 'montserrat_28' : 'montserrat_24', color: COLORS.cyan, height: 70,
-    }),
+    image(screen, 'brand_logo', Math.round((railW - 32) / 2), Math.round((topH - 32) / 2)),
     label(screen, 'title', `${PAGE_ICONS[active]}  ${PAGE_LABELS[active]}`, railW + 34, Math.round(topH * 0.32), width - railW - 230, {
       font: width > 1200 ? 'montserrat_32' : 'montserrat_28',
     }),
@@ -624,7 +640,7 @@ function squareNav(screen, active, screenIds) {
 function squareHeader(screen, title) {
   const index = PAGE_KEYS.indexOf(screen);
   return [
-    label(screen, 'brand', 'BRAND A', 22, 20, 220, { color: COLORS.cyan, font: 'montserrat_20' }),
+    image(screen, 'brand_logo', 22, 16),
     label(screen, 'title', `${PAGE_ICONS[index]}  ${title}`, 230, 22, 228, { color: COLORS.muted, font: 'montserrat_16', align: 'right' }),
   ];
 }
@@ -919,7 +935,11 @@ function createSnapshot(project, preset) {
     components: [],
     styles: [],
     consts: [],
-    assets: { fonts: [], images: [], icons: [] },
+    assets: {
+      fonts: [],
+      images: preset.layout === 'round' ? [] : [PODSC_LOGO],
+      icons: [],
+    },
     translations: null,
     editor: project.editor,
   };

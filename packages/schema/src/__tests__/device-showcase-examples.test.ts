@@ -105,4 +105,27 @@ describe('device showcase projects', () => {
       snapshot.uiProject.themes[0]?.tokens.find((token) => token.id === 'color.background')?.value
     ))).size).toBe(6);
   });
+
+  it('uses the PodsC image asset instead of legacy brand words', () => {
+    const cases = [
+      ['WF2D-8630-greenhouse', 1],
+      ['WF2D-1050-ev-charge', 3],
+      ['WF2D-1040-factory-energy', 1],
+      ['WF2D-1030-harbor-dispatch', 1],
+    ] as const;
+    for (const [file, expectedCount] of cases) {
+      const { snapshot } = loadShowcase(file);
+      const nodes = snapshot.uiProject.screens.flatMap((screen) => allNodes(screen.root));
+      expect(nodes.filter((item) => (
+        item.type === 'image' && item.props.src === 'podsc_logo'
+      ))).toHaveLength(expectedCount);
+      expect(snapshot.uiProject.assets.images).toContainEqual(expect.objectContaining({
+        codeName: 'podsc_logo',
+        file: expect.objectContaining({ fileName: 'podsc-logo.png' }),
+      }));
+      expect(nodes.flatMap((item) => (
+        typeof item.props.text === 'string' ? [item.props.text] : []
+      )).join(' ')).not.toMatch(/BRAND A|GROVE|FORGE \/ ENERGY|HARBOR \/ NORTH|VOLT/);
+    }
+  });
 });

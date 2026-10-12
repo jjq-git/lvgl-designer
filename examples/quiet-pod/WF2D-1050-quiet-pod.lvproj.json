@@ -342,30 +342,18 @@
             },
             {
               "id": "00000000-0000-4000-8000-000000000007",
-              "type": "label",
-              "codeName": "home_brand",
+              "type": "image",
+              "codeName": "home_brand_logo",
               "props": {
-                "text": "BRAND A",
-                "x": 29,
-                "y": 20,
-                "width": 103,
-                "height": 70
+                "src": "podsc_logo",
+                "x": 64,
+                "y": 23,
+                "width": 32,
+                "height": 32,
+                "inner_align": "center"
               },
               "styleRefs": [],
-              "styles": [
-                {
-                  "props": {
-                    "text_color": {
-                      "$token": "color.accent"
-                    },
-                    "text_font": {
-                      "$token": "font.size.24"
-                    },
-                    "text_align": "left",
-                    "text_opa": 255
-                  }
-                }
-              ],
+              "styles": [],
               "events": [],
               "bindings": [],
               "children": []
@@ -1982,30 +1970,18 @@
             },
             {
               "id": "00000000-0000-4000-8000-000000000048",
-              "type": "label",
-              "codeName": "air_brand",
+              "type": "image",
+              "codeName": "air_brand_logo",
               "props": {
-                "text": "BRAND A",
-                "x": 29,
-                "y": 20,
-                "width": 103,
-                "height": 70
+                "src": "podsc_logo",
+                "x": 64,
+                "y": 23,
+                "width": 32,
+                "height": 32,
+                "inner_align": "center"
               },
               "styleRefs": [],
-              "styles": [
-                {
-                  "props": {
-                    "text_color": {
-                      "$token": "color.accent"
-                    },
-                    "text_font": {
-                      "$token": "font.size.24"
-                    },
-                    "text_align": "left",
-                    "text_opa": 255
-                  }
-                }
-              ],
+              "styles": [],
               "events": [],
               "bindings": [],
               "children": []
@@ -3266,30 +3242,18 @@
             },
             {
               "id": "00000000-0000-4000-8000-000000000078",
-              "type": "label",
-              "codeName": "light_brand",
+              "type": "image",
+              "codeName": "light_brand_logo",
               "props": {
-                "text": "BRAND A",
-                "x": 29,
-                "y": 20,
-                "width": 103,
-                "height": 70
+                "src": "podsc_logo",
+                "x": 64,
+                "y": 23,
+                "width": 32,
+                "height": 32,
+                "inner_align": "center"
               },
               "styleRefs": [],
-              "styles": [
-                {
-                  "props": {
-                    "text_color": {
-                      "$token": "color.accent"
-                    },
-                    "text_font": {
-                      "$token": "font.size.24"
-                    },
-                    "text_align": "left",
-                    "text_opa": 255
-                  }
-                }
-              ],
+              "styles": [],
               "events": [],
               "bindings": [],
               "children": []
@@ -4702,30 +4666,18 @@
             },
             {
               "id": "00000000-0000-4000-8000-000000000111",
-              "type": "label",
-              "codeName": "focus_brand",
+              "type": "image",
+              "codeName": "focus_brand_logo",
               "props": {
-                "text": "BRAND A",
-                "x": 29,
-                "y": 20,
-                "width": 103,
-                "height": 70
+                "src": "podsc_logo",
+                "x": 64,
+                "y": 23,
+                "width": 32,
+                "height": 32,
+                "inner_align": "center"
               },
               "styleRefs": [],
-              "styles": [
-                {
-                  "props": {
-                    "text_color": {
-                      "$token": "color.accent"
-                    },
-                    "text_font": {
-                      "$token": "font.size.24"
-                    },
-                    "text_align": "left",
-                    "text_opa": 255
-                  }
-                }
-              ],
+              "styles": [],
               "events": [],
               "bindings": [],
               "children": []
@@ -6206,30 +6158,18 @@
             },
             {
               "id": "00000000-0000-4000-8000-000000000150",
-              "type": "label",
-              "codeName": "settings_brand",
+              "type": "image",
+              "codeName": "settings_brand_logo",
               "props": {
-                "text": "BRAND A",
-                "x": 29,
-                "y": 20,
-                "width": 103,
-                "height": 70
+                "src": "podsc_logo",
+                "x": 64,
+                "y": 23,
+                "width": 32,
+                "height": 32,
+                "inner_align": "center"
               },
               "styleRefs": [],
-              "styles": [
-                {
-                  "props": {
-                    "text_color": {
-                      "$token": "color.accent"
-                    },
-                    "text_font": {
-                      "$token": "font.size.24"
-                    },
-                    "text_align": "left",
-                    "text_opa": 255
-                  }
-                }
-              ],
+              "styles": [],
               "events": [],
               "bindings": [],
               "children": []
@@ -7518,7 +7458,21 @@
     "consts": [],
     "assets": {
       "fonts": [],
-      "images": [],
+      "images": [
+        {
+          "id": "image:podsc_logo",
+          "codeName": "podsc_logo",
+          "displayName": "PodsC logo",
+          "file": {
+            "fileName": "podsc-logo.png",
+            "sha256": "62b180096ec767434d2670cbb8eb2e8382fbfbd44c0b2f097612f2710c09c3c3",
+            "byteSize": 568
+          },
+          "conv": {
+            "colorFormat": "ARGB8888"
+          }
+        }
+      ],
       "icons": []
     },
     "translations": null,

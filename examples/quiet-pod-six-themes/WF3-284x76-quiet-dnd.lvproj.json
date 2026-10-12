@@ -1,0 +1,885 @@
+{
+  "kind": "lvgl-project-snapshot",
+  "snapshotVersion": 1,
+  "uiProject": {
+    "schemaVersion": 2,
+    "kind": "lvgl-ui-project",
+    "meta": {
+      "id": "ui:wf3-284x76-quiet-dnd",
+      "revision": 1,
+      "name": "WF3-284x76 静音舱 · 一键静音",
+      "appVersion": "1.0.0",
+      "createdAt": "2026-10-09T00:00:00.000Z",
+      "modifiedAt": "2026-10-12T00:00:00.000Z"
+    },
+    "designDisplayRef": "display:wf3-284x76-rgb565@1",
+    "themes": [
+      {
+        "id": "signal-red",
+        "displayName": "WF3-284x76 · 信号红黑",
+        "tokens": [
+          {
+            "id": "color.background",
+            "type": "color",
+            "value": "#090A0C"
+          },
+          {
+            "id": "color.surface",
+            "type": "color",
+            "value": "#17191E"
+          },
+          {
+            "id": "color.surface.subtle",
+            "type": "color",
+            "value": "#23262C"
+          },
+          {
+            "id": "color.border",
+            "type": "color",
+            "value": "#353942"
+          },
+          {
+            "id": "color.outline",
+            "type": "color",
+            "value": "#353942"
+          },
+          {
+            "id": "color.text.primary",
+            "type": "color",
+            "value": "#F7F8FA"
+          },
+          {
+            "id": "color.text.muted",
+            "type": "color",
+            "value": "#9AA0AA"
+          },
+          {
+            "id": "color.text.onaccent",
+            "type": "color",
+            "value": "#FFFFFF"
+          },
+          {
+            "id": "color.accent",
+            "type": "color",
+            "value": "#FF3B4F"
+          },
+          {
+            "id": "color.accent.strong",
+            "type": "color",
+            "value": "#FF6675"
+          },
+          {
+            "id": "color.status.warning",
+            "type": "color",
+            "value": "#FFC857"
+          },
+          {
+            "id": "color.status.danger",
+            "type": "color",
+            "value": "#FF3B4F"
+          },
+          {
+            "id": "color.status.danger.surface",
+            "type": "color",
+            "value": "#FDECEC"
+          },
+          {
+            "id": "color.status.success",
+            "type": "color",
+            "value": "#3DDC97"
+          },
+          {
+            "id": "color.state.edit",
+            "type": "color",
+            "value": "#FACC15"
+          },
+          {
+            "id": "color.data.blue",
+            "type": "color",
+            "value": "#2563EB"
+          },
+          {
+            "id": "color.data.cyan",
+            "type": "color",
+            "value": "#0891B2"
+          },
+          {
+            "id": "color.data.purple",
+            "type": "color",
+            "value": "#7C3AED"
+          },
+          {
+            "id": "color.data.indigo",
+            "type": "color",
+            "value": "#4F46E5"
+          },
+          {
+            "id": "color.data.orange",
+            "type": "color",
+            "value": "#C2410C"
+          },
+          {
+            "id": "color.data.pink",
+            "type": "color",
+            "value": "#DB2777"
+          },
+          {
+            "id": "color.data.teal",
+            "type": "color",
+            "value": "#0F766E"
+          },
+          {
+            "id": "color.voltage.v3",
+            "type": "color",
+            "value": "#C65A5A"
+          },
+          {
+            "id": "color.voltage.v5",
+            "type": "color",
+            "value": "#A83E3E"
+          },
+          {
+            "id": "font.text.small",
+            "type": "fontRef",
+            "value": "wf3_cn_12"
+          },
+          {
+            "id": "font.text.body",
+            "type": "fontRef",
+            "value": "wf3_cn_14"
+          },
+          {
+            "id": "font.text.title",
+            "type": "fontRef",
+            "value": "wf3_cn_16"
+          },
+          {
+            "id": "font.value.large",
+            "type": "fontRef",
+            "value": "wf3_cn_20"
+          },
+          {
+            "id": "opacity.solid",
+            "type": "opa",
+            "value": 255
+          },
+          {
+            "id": "border.none",
+            "type": "px",
+            "value": 0
+          },
+          {
+            "id": "border.default",
+            "type": "px",
+            "value": 1
+          },
+          {
+            "id": "radius.none",
+            "type": "px",
+            "value": 0
+          },
+          {
+            "id": "radius.control",
+            "type": "px",
+            "value": 5
+          },
+          {
+            "id": "radius.dialog",
+            "type": "px",
+            "value": 10
+          },
+          {
+            "id": "spacing.none",
+            "type": "px",
+            "value": 0
+          },
+          {
+            "id": "spacing.compact",
+            "type": "px",
+            "value": 2
+          },
+          {
+            "id": "spacing.control",
+            "type": "px",
+            "value": 4
+          },
+          {
+            "id": "spacing.page",
+            "type": "px",
+            "value": 5
+          },
+          {
+            "id": "effect.shadow.none",
+            "type": "px",
+            "value": 0
+          },
+          {
+            "id": "color.track",
+            "type": "color",
+            "value": "#2B2E35"
+          },
+          {
+            "id": "color.track.strong",
+            "type": "color",
+            "value": "#353942"
+          },
+          {
+            "id": "color.shadow",
+            "type": "color",
+            "value": "#000000"
+          },
+          {
+            "id": "color.palette.263c52",
+            "type": "color",
+            "value": "#2B2E35"
+          },
+          {
+            "id": "font.size.14",
+            "type": "fontRef",
+            "value": "montserrat_14"
+          },
+          {
+            "id": "font.size.16",
+            "type": "fontRef",
+            "value": "montserrat_16"
+          },
+          {
+            "id": "font.size.20",
+            "type": "fontRef",
+            "value": "montserrat_20"
+          }
+        ]
+      }
+    ],
+    "subjects": [
+      {
+        "id": "subject:dnd_enabled",
+        "codeName": "dnd_enabled",
+        "displayName": "Do not disturb",
+        "type": "int",
+        "initial": 1,
+        "min": 0,
+        "max": 1
+      }
+    ],
+    "screens": [
+      {
+        "id": "screen:wf3:home",
+        "codeName": "home",
+        "displayName": "一键静音",
+        "isHome": true,
+        "styles": [],
+        "consts": [],
+        "root": {
+          "id": "00000000-0000-4000-8000-000000900007",
+          "type": "obj",
+          "codeName": "home_root",
+          "props": {},
+          "flags": {
+            "scrollable": false
+          },
+          "styleRefs": [],
+          "styles": [
+            {
+              "props": {
+                "bg_color": {
+                  "$token": "color.background"
+                },
+                "bg_opa": 255,
+                "border_width": 0,
+                "pad_all": 0
+              }
+            }
+          ],
+          "events": [],
+          "bindings": [],
+          "children": [
+            {
+              "id": "00000000-0000-4000-8000-000000900002",
+              "type": "obj",
+              "codeName": "home_dnd_status",
+              "props": {
+                "x": 4,
+                "y": 4,
+                "width": 56,
+                "height": 68
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.accent"
+                    },
+                    "border_width": 0,
+                    "radius": 8,
+                    "pad_all": 0,
+                    "shadow_color": {
+                      "$token": "color.shadow"
+                    },
+                    "shadow_width": 0,
+                    "shadow_opa": 0,
+                    "shadow_offset_y": 0
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000900000",
+                  "type": "label",
+                  "codeName": "home_dnd_icon",
+                  "props": {
+                    "text": "DND",
+                    "x": 0,
+                    "y": 10,
+                    "width": 56,
+                    "height": 20
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.onaccent"
+                        },
+                        "text_font": {
+                          "$token": "font.size.14"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "00000000-0000-4000-8000-000000900001",
+                  "type": "label",
+                  "codeName": "home_dnd_state",
+                  "props": {
+                    "text": "ON",
+                    "x": 0,
+                    "y": 34,
+                    "width": 56,
+                    "height": 24
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.onaccent"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000900003",
+              "type": "label",
+              "codeName": "home_dnd_title",
+              "props": {
+                "text": "QUIET MODE",
+                "x": 72,
+                "y": 10,
+                "width": 122,
+                "height": 22
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": {
+                      "$token": "color.text.primary"
+                    },
+                    "text_font": {
+                      "$token": "font.size.16"
+                    },
+                    "text_align": "left",
+                    "text_opa": 255
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000900004",
+              "type": "label",
+              "codeName": "home_dnd_timer",
+              "props": {
+                "text": "00:45",
+                "x": 72,
+                "y": 38,
+                "width": 122,
+                "height": 26
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": {
+                      "$token": "color.accent.strong"
+                    },
+                    "text_font": {
+                      "$token": "font.size.20"
+                    },
+                    "text_align": "left",
+                    "text_opa": 255
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000900006",
+              "type": "button",
+              "codeName": "home_dnd_toggle",
+              "props": {
+                "x": 204,
+                "y": 8,
+                "width": 74,
+                "height": 60
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent"
+                    },
+                    "bg_opa": 255,
+                    "border_width": 0,
+                    "border_color": {
+                      "$token": "color.accent"
+                    },
+                    "radius": 8,
+                    "shadow_width": 0,
+                    "shadow_color": {
+                      "$token": "color.accent"
+                    },
+                    "shadow_opa": 0,
+                    "pad_all": 0
+                  }
+                },
+                {
+                  "selector": {
+                    "states": [
+                      "pressed"
+                    ]
+                  },
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.accent.strong"
+                    }
+                  }
+                }
+              ],
+              "events": [
+                {
+                  "on": "clicked",
+                  "action": "subject.toggle",
+                  "args": {
+                    "subject": "subject:dnd_enabled"
+                  }
+                }
+              ],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "00000000-0000-4000-8000-000000900005",
+                  "type": "label",
+                  "codeName": "home_dnd_toggle_text",
+                  "props": {
+                    "text": "MUTE",
+                    "x": 0,
+                    "y": 0,
+                    "width": "100%",
+                    "height": "content",
+                    "align": "center"
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.onaccent"
+                        },
+                        "text_font": {
+                          "$token": "font.size.16"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "components": [],
+    "styles": [
+      {
+        "id": "style:industrial:screen",
+        "codeName": "industrial_screen",
+        "displayName": "Industrial Screen",
+        "props": {
+          "bg_color": {
+            "$token": "color.background"
+          },
+          "bg_opa": {
+            "$token": "opacity.solid"
+          },
+          "border_width": {
+            "$token": "border.none"
+          },
+          "radius": {
+            "$token": "radius.none"
+          },
+          "pad_all": {
+            "$token": "spacing.none"
+          }
+        }
+      },
+      {
+        "id": "style:industrial:surface",
+        "codeName": "industrial_surface",
+        "displayName": "Industrial Surface",
+        "props": {
+          "bg_color": {
+            "$token": "color.surface"
+          },
+          "bg_opa": {
+            "$token": "opacity.solid"
+          },
+          "border_color": {
+            "$token": "color.border"
+          },
+          "border_width": {
+            "$token": "border.default"
+          },
+          "radius": {
+            "$token": "radius.control"
+          },
+          "pad_all": {
+            "$token": "spacing.none"
+          }
+        }
+      },
+      {
+        "id": "style:industrial:control",
+        "codeName": "industrial_control",
+        "displayName": "Industrial Control",
+        "props": {
+          "bg_color": {
+            "$token": "color.surface"
+          },
+          "bg_opa": {
+            "$token": "opacity.solid"
+          },
+          "border_color": {
+            "$token": "color.border"
+          },
+          "border_width": {
+            "$token": "border.default"
+          },
+          "radius": {
+            "$token": "radius.control"
+          },
+          "pad_all": {
+            "$token": "spacing.none"
+          },
+          "shadow_width": {
+            "$token": "effect.shadow.none"
+          }
+        }
+      },
+      {
+        "id": "style:industrial:control-pressed",
+        "codeName": "industrial_control_pressed",
+        "displayName": "Industrial Control Pressed",
+        "props": {
+          "bg_color": {
+            "$token": "color.accent"
+          },
+          "bg_opa": {
+            "$token": "opacity.solid"
+          }
+        }
+      }
+    ],
+    "consts": [],
+    "assets": {
+      "fonts": [
+        {
+          "id": "font:wf3_cn_12",
+          "codeName": "wf3_cn_12",
+          "displayName": "WF3 中文 12px",
+          "file": {
+            "fileName": "NotoSansSC-WF3.ttf",
+            "sha256": "bfd22cae471a696338bb78f9703aa1911f73469c986f58dc1de435b7e1b2a1b3",
+            "byteSize": 99172
+          },
+          "conv": {
+            "loader": "tiny_ttf",
+            "sizePx": 12,
+            "bpp": 2,
+            "ranges": "0x20-0x7e,0x4e00-0x9fff",
+            "autoCollect": true,
+            "license": "OFL-1.1",
+            "licenseUrl": "https://openfontlicense.org"
+          }
+        },
+        {
+          "id": "font:wf3_cn_14",
+          "codeName": "wf3_cn_14",
+          "displayName": "WF3 中文 14px",
+          "file": {
+            "fileName": "NotoSansSC-WF3.ttf",
+            "sha256": "bfd22cae471a696338bb78f9703aa1911f73469c986f58dc1de435b7e1b2a1b3",
+            "byteSize": 99172
+          },
+          "conv": {
+            "loader": "tiny_ttf",
+            "sizePx": 14,
+            "bpp": 2,
+            "ranges": "0x20-0x7e,0x4e00-0x9fff",
+            "autoCollect": true,
+            "license": "OFL-1.1",
+            "licenseUrl": "https://openfontlicense.org"
+          }
+        },
+        {
+          "id": "font:wf3_cn_16",
+          "codeName": "wf3_cn_16",
+          "displayName": "WF3 中文 16px",
+          "file": {
+            "fileName": "NotoSansSC-WF3.ttf",
+            "sha256": "bfd22cae471a696338bb78f9703aa1911f73469c986f58dc1de435b7e1b2a1b3",
+            "byteSize": 99172
+          },
+          "conv": {
+            "loader": "tiny_ttf",
+            "sizePx": 16,
+            "bpp": 2,
+            "ranges": "0x20-0x7e,0x4e00-0x9fff",
+            "autoCollect": true,
+            "license": "OFL-1.1",
+            "licenseUrl": "https://openfontlicense.org"
+          }
+        },
+        {
+          "id": "font:wf3_cn_20",
+          "codeName": "wf3_cn_20",
+          "displayName": "WF3 中文 20px",
+          "file": {
+            "fileName": "NotoSansSC-WF3.ttf",
+            "sha256": "bfd22cae471a696338bb78f9703aa1911f73469c986f58dc1de435b7e1b2a1b3",
+            "byteSize": 99172
+          },
+          "conv": {
+            "loader": "tiny_ttf",
+            "sizePx": 20,
+            "bpp": 2,
+            "ranges": "0x20-0x7e,0x4e00-0x9fff",
+            "autoCollect": true,
+            "license": "OFL-1.1",
+            "licenseUrl": "https://openfontlicense.org"
+          }
+        },
+        {
+          "id": "font:wf3_icons_32",
+          "codeName": "wf3_icons_32",
+          "displayName": "WF3 Material Symbols Outlined 32px",
+          "file": {
+            "fileName": "MaterialSymbolsOutlined-WF3-32.ttf",
+            "sha256": "960200526c5ec30e9d330b769a59b3b7bb3ee2eab53c1c2ac146fd663383065a",
+            "byteSize": 5832
+          },
+          "conv": {
+            "loader": "tiny_ttf",
+            "sizePx": 32,
+            "bpp": 4,
+            "ranges": "0xe166,0xe1e0,0xe1ff,0xe322,0xe335,0xe5cb-0xe5cc,0xe6e1,0xe86f,0xe87b,0xe8b8,0xe915,0xeb2f,0xec1c,0xefe6,0xf102",
+            "autoCollect": true,
+            "license": "Apache-2.0",
+            "licenseUrl": "https://github.com/google/material-design-icons/blob/master/LICENSE"
+          }
+        },
+        {
+          "id": "font:wf3_icons_36",
+          "codeName": "wf3_icons_36",
+          "displayName": "WF3 Material Symbols Outlined 36px",
+          "file": {
+            "fileName": "MaterialSymbolsOutlined-WF3-36.ttf",
+            "sha256": "0efd824466bf89f31dffafa7d15cf95ea252403a31d381dff4190ea98d158379",
+            "byteSize": 5836
+          },
+          "conv": {
+            "loader": "tiny_ttf",
+            "sizePx": 36,
+            "bpp": 4,
+            "ranges": "0xe166,0xe1e0,0xe1ff,0xe322,0xe335,0xe5cb-0xe5cc,0xe6e1,0xe86f,0xe87b,0xe8b8,0xe915,0xeb2f,0xec1c,0xefe6,0xf102",
+            "autoCollect": true,
+            "license": "Apache-2.0",
+            "licenseUrl": "https://github.com/google/material-design-icons/blob/master/LICENSE"
+          }
+        }
+      ],
+      "images": [],
+      "icons": []
+    },
+    "translations": null,
+    "editor": {
+      "deviceModel": "WF3",
+      "deviceTitle": "2.25 英寸 284×76 条形屏",
+      "example": "quiet-pod-six-themes",
+      "builtInRevision": 9,
+      "source": {
+        "repository": "http://192.168.1.88:3000/wf3/firmware.git",
+        "branch": "cheng-wf3-code-cleanup-20261008",
+        "commit": "a64842b8b9ea2425f235531658e31fe48635ff62",
+        "path": "firmware/main/ui",
+        "lvglVersion": "9.4.x"
+      },
+      "homeFeature": "dnd",
+      "themeConcept": "信号红黑"
+    }
+  },
+  "displayProfile": {
+    "schemaVersion": 1,
+    "kind": "display-profile",
+    "id": "display:wf3-284x76-rgb565",
+    "revision": 1,
+    "displayName": "WF3 2.25 英寸 284×76 RGB565",
+    "logicalSize": {
+      "width": 284,
+      "height": 76
+    },
+    "shape": "rect",
+    "colorFormat": "RGB565",
+    "dpi": 160
+  },
+  "controllerProfile": null,
+  "buildTarget": {
+    "schemaVersion": 1,
+    "kind": "lvgl-build-target",
+    "id": "target:wf3-284x76-quiet-dnd",
+    "revision": 1,
+    "uiProjectRef": "ui:wf3-284x76-quiet-dnd@1",
+    "themeRef": "ui:wf3-284x76-quiet-dnd@1#theme:signal-red",
+    "lvglVersion": "9.5.0",
+    "displayName": "WF3-284x76 一键静音目标"
+  },
+  "actionRegistry": {
+    "screen.open": {
+      "id": "screen.open",
+      "displayName": "打开屏幕",
+      "params": [
+        {
+          "name": "screen",
+          "type": "screenRef",
+          "required": true
+        },
+        {
+          "name": "anim",
+          "type": "string"
+        },
+        {
+          "name": "duration",
+          "type": "int"
+        },
+        {
+          "name": "delay",
+          "type": "int"
+        }
+      ]
+    },
+    "subject.increment": {
+      "id": "subject.increment",
+      "displayName": "递增 Subject",
+      "params": [
+        {
+          "name": "subject",
+          "type": "subjectRef",
+          "required": true
+        },
+        {
+          "name": "step",
+          "type": "int"
+        },
+        {
+          "name": "min",
+          "type": "int"
+        },
+        {
+          "name": "max",
+          "type": "int"
+        },
+        {
+          "name": "rollover",
+          "type": "bool"
+        }
+      ]
+    }
+  },
+  "migrationNotes": [
+    {
+      "severity": "info",
+      "code": "wf3-source",
+      "path": "uiProject.editor.source",
+      "message": "由 http://192.168.1.88:3000/wf3/firmware.git cheng-wf3-code-cleanup-20261008@a64842b8b9ea 的 firmware/main/ui 转换。"
+    },
+    {
+      "severity": "warning",
+      "code": "lvgl-version-upgrade",
+      "path": "buildTarget.lvglVersion",
+      "message": "原固件固定使用 LVGL 9.4.x；Designer 工程以 9.5.0 编辑和导出，回接固件前需要完成版本兼容验证。"
+    },
+    {
+      "severity": "warning",
+      "code": "firmware-logic-external",
+      "path": "uiProject.screens",
+      "message": "NVS、旋钮导航和 UART/I2C/SPI/CAN/RS485 硬件回调继续由原固件维护；本工程导入可编辑视觉层和页面导航。"
+    },
+    {
+      "code": "six-quiet-pod-home",
+      "path": "uiProject.screens[0]",
+      "message": "首页突出一键静音，使用信号红黑主题。"
+    }
+  ],
+  "colorFormatConfirmed": true
+}

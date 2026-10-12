@@ -124,8 +124,9 @@ describe('serene pod example projects', () => {
     expect(findNode(home.root, 'home_nav_home')?.props).toMatchObject({
       x: 8, y: 420, width: 88, height: 52,
     });
-    expect(findNode(home.root, 'home_brand')?.props.y).toBe(14);
-    expect(findNode(home.root, 'home_brand')?.props.text).toBe('BRAND A');
+    expect(findNode(home.root, 'home_brand_logo')?.props).toMatchObject({
+      src: 'podsc_logo', x: 18, y: 15, width: 32, height: 32,
+    });
     expect(findNode(home.root, 'home_hero')?.props.width).toBe(444);
     expect(findNode(home.root, 'home_co2')?.props.y).toBe(276);
   });

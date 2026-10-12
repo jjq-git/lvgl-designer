@@ -182,7 +182,14 @@ describe('quiet pod example projects', () => {
       expect(allText).not.toContain('QUIET POD');
       expect(allText).not.toContain('QUIET\nPOD');
       if (preset.shape !== 'round') {
-        expect(allText.filter((value) => value === 'BRAND A')).toHaveLength(5);
+        expect(allText).not.toContain('BRAND A');
+        expect(snapshot.uiProject.assets.images).toContainEqual(expect.objectContaining({
+          codeName: 'podsc_logo',
+          file: expect.objectContaining({ fileName: 'podsc-logo.png' }),
+        }));
+        expect(snapshot.uiProject.screens.filter((screen) => (
+          findNode(screen.root, `${screen.codeName}_brand_logo`)?.props.src === 'podsc_logo'
+        ))).toHaveLength(5);
       }
 
       const navigation = snapshot.uiProject.screens.flatMap((screen) => (

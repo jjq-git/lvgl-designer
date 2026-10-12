@@ -186,30 +186,18 @@
           "children": [
             {
               "id": "10000000-0000-4000-9000-000000000038",
-              "type": "label",
-              "codeName": "factory_brand",
+              "type": "image",
+              "codeName": "factory_brand_logo",
               "props": {
-                "text": "  FORGE / ENERGY",
+                "src": "podsc_logo",
                 "x": 28,
                 "y": 24,
-                "width": 340,
-                "height": 38
+                "width": 32,
+                "height": 32,
+                "inner_align": "center"
               },
               "styleRefs": [],
-              "styles": [
-                {
-                  "props": {
-                    "text_color": {
-                      "$token": "color.accent"
-                    },
-                    "text_font": {
-                      "$token": "font.size.28"
-                    },
-                    "text_align": "left",
-                    "text_opa": 255
-                  }
-                }
-              ],
+              "styles": [],
               "events": [],
               "bindings": [],
               "children": []
@@ -6273,7 +6261,21 @@
     "consts": [],
     "assets": {
       "fonts": [],
-      "images": [],
+      "images": [
+        {
+          "id": "image:podsc_logo",
+          "codeName": "podsc_logo",
+          "displayName": "PodsC logo",
+          "file": {
+            "fileName": "podsc-logo.png",
+            "sha256": "62b180096ec767434d2670cbb8eb2e8382fbfbd44c0b2f097612f2710c09c3c3",
+            "byteSize": 568
+          },
+          "conv": {
+            "colorFormat": "ARGB8888"
+          }
+        }
+      ],
       "icons": []
     },
     "translations": null,

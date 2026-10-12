@@ -38,6 +38,22 @@ describe('built-in projects', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
+  it('registers all six differentiated quiet-pod interfaces', async () => {
+    const quietPods = BUILT_IN_PROJECTS.filter((project) => project.id.includes('-quiet-'));
+    expect(quietPods).toHaveLength(6);
+    expect(quietPods.map((project) => [project.width, project.height, project.shape])).toEqual([
+      [240, 240, 'round'],
+      [480, 480, 'rect'],
+      [1024, 600, 'rect'],
+      [1080, 720, 'rect'],
+      [1440, 720, 'rect'],
+      [284, 76, 'rect'],
+    ]);
+    for (const descriptor of quietPods) {
+      expect(isProjectSnapshotV2(await descriptor.load()), descriptor.id).toBe(true);
+    }
+  });
+
   it('keeps the reference navigation and upgrades the semantic menu draft', async () => {
     const document = await BUILT_IN_PROJECTS[0]!.load();
     const project = loadProjectDocument(document).project;

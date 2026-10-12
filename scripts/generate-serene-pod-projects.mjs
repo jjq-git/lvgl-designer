@@ -81,6 +81,7 @@ function baseStyle(node) {
 }
 
 function patchStyle(node, props) {
+  if (!node) return;
   const style = baseStyle(node);
   if (style?.props) Object.assign(style.props, props);
 }
@@ -123,6 +124,11 @@ function restyleNode(node) {
 
 function findNode(screen, codeName) {
   return screen.root.children.find((node) => node.codeName === codeName);
+}
+
+function findBrand(screen) {
+  return findNode(screen, `${screen.codeName}_brand_logo`)
+    ?? findNode(screen, `${screen.codeName}_brand`);
 }
 
 function setRect(node, x, y, width, height) {
@@ -181,7 +187,7 @@ function applyDeviceTheme(screen, preset) {
 
   const prefix = screen.codeName;
   const rail = findNode(screen, `${prefix}_rail`);
-  const brand = findNode(screen, `${prefix}_brand`);
+  const brand = findBrand(screen);
   if (preset.model === 'WF2D-1030') {
     patchStyle(rail, { bg_color: '#234A35', border_color: '#234A35', radius: 10, shadow_width: 0 });
     patchStyle(brand, { text_color: '#F0C987' });
@@ -265,7 +271,7 @@ function layoutDock(screen, width, height, compact = false) {
 function layoutHeader(screen, width, compact = false) {
   const prefix = screen.codeName;
   const top = compact ? 15 : 18;
-  setRect(findNode(screen, `${prefix}_brand`), compact ? 22 : 28, top, compact ? 150 : 190, 42);
+  setRect(findBrand(screen), compact ? 22 : 28, top + 5, 32, 32);
   setRect(findNode(screen, `${prefix}_title`), compact ? 184 : 238, top + 4, width - (compact ? 360 : 480), 36);
   const status = findNode(screen, `${prefix}_status`);
   if (status) {
@@ -405,7 +411,7 @@ function layoutUltrawideSideScreen(screen, preset) {
     bg_color: '#FFFFFF', border_color: '#C9DED7', border_width: 1, radius: 28,
     shadow_color: '#78908D', shadow_width: 10, shadow_opa: 22, shadow_offset_y: 4,
   });
-  setRect(findNode(screen, `${prefix}_brand`), 38, 38, 172, 48);
+  setRect(findBrand(screen), 108, 46, 32, 32);
   setRect(findNode(screen, `${prefix}_title`), 258, 26, 820, 40);
   const status = findNode(screen, `${prefix}_status`);
   setRect(status, width - 220, 30, 184, 32);
@@ -480,7 +486,7 @@ function layoutUltrawideSideScreen(screen, preset) {
 function layoutCompactTopDockScreen(screen, preset) {
   const { width } = preset;
   const prefix = screen.codeName;
-  setRect(findNode(screen, `${prefix}_brand`), 24, 14, 142, 38);
+  setRect(findBrand(screen), 24, 17, 32, 32);
   setRect(findNode(screen, `${prefix}_title`), 180, 17, 560, 34);
   const status = findNode(screen, `${prefix}_status`);
   setRect(status, width - 174, 19, 150, 30);
@@ -599,7 +605,7 @@ function layoutWideScreen(screen, preset) {
 
 function layoutSquareScreen(screen) {
   const prefix = screen.codeName;
-  setRect(findNode(screen, `${prefix}_brand`), 18, 14, 172, 34);
+  setRect(findBrand(screen), 18, 15, 32, 32);
   setRect(findNode(screen, `${prefix}_title`), 198, 16, 264, 32);
   const names = ['home', 'air', 'light', 'focus', 'settings'];
   names.forEach((name, index) => {

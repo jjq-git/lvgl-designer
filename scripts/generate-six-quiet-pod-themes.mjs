@@ -314,6 +314,13 @@ function recolorTheme(theme, preset) {
     'color.shadow': preset.palette.shadow,
     'color.palette.263c52': preset.palette.track,
   };
+  if (preset.feature === 'lighting') {
+    // The source theme's cream navigation colors must follow the dark palette
+    // too; its labels already use the recolored (light) primary text token.
+    values['color.palette.fff8ee'] = preset.palette.subtle;
+    values['color.palette.f1d8b8'] = preset.palette.surface;
+    values['color.palette.e1bd8f'] = preset.palette.border;
+  }
   const seen = new Set();
   theme.tokens = theme.tokens.map((entry) => {
     seen.add(entry.id);

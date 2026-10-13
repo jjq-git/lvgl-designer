@@ -103,4 +103,33 @@ describe('six differentiated quiet-pod interfaces', () => {
     });
     expect(new Set(backgrounds).size).toBe(CASES.length);
   });
+
+  it('keeps amber navigation labels readable on every screen', () => {
+    const snapshot = load('WF2D-1050-quiet-lighting');
+    const tokens = new Map(snapshot.uiProject.themes[0]!.tokens.map((token) => [token.id, token.value]));
+    const resolveColor = (value: unknown): string => {
+      if (typeof value === 'string') return value;
+      return String(tokens.get((value as { $token: string }).$token));
+    };
+    const luminance = (hex: string) => {
+      const rgb = [1, 3, 5].map((offset) => {
+        const channel = Number.parseInt(hex.slice(offset, offset + 2), 16) / 255;
+        return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+      });
+      return rgb[0]! * 0.2126 + rgb[1]! * 0.7152 + rgb[2]! * 0.0722;
+    };
+    let checked = 0;
+    for (const screen of snapshot.uiProject.screens.filter((screen) => !screen.isHome)) {
+      const buttons = screen.root.children.filter((node) => node.type === 'button' && node.codeName?.includes('_nav_'));
+      expect(buttons).toHaveLength(5);
+      for (const button of buttons) {
+        const label = button.children[0]!;
+        const bg = luminance(resolveColor(button.styles[0]!.props.bg_color));
+        const fg = luminance(resolveColor(label.styles[0]!.props.text_color));
+        expect((Math.max(bg, fg) + 0.05) / (Math.min(bg, fg) + 0.05), button.codeName).toBeGreaterThanOrEqual(4.5);
+        checked += 1;
+      }
+    }
+    expect(checked).toBe(20);
+  });
 });

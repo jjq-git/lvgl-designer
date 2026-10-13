@@ -66,16 +66,27 @@ export function upsertMaterialIconAdornment(
 
   if (node.type === 'label') {
     const style = mainStyle(node);
-    if (icon.editor?.materialBasePadLeft === undefined) {
+    if (icon.editor?.materialBasePadHor === undefined) {
       icon.editor = {
         ...icon.editor,
-        materialBasePadLeft: typeof style.props.pad_left === 'number' ? style.props.pad_left : null,
+        materialBasePadHor: typeof style.props.pad_hor === 'number' ? style.props.pad_hor : null,
       };
     }
-    const base = typeof icon.editor?.materialBasePadLeft === 'number'
-      ? icon.editor.materialBasePadLeft
+    // Migrate adornments created by the first implementation. Directional
+    // padding is valid schema data, but the pinned LVGL preview driver only
+    // supports pad_hor/pad_ver/pad_all.
+    if (icon.editor.materialBasePadLeft !== undefined) {
+      if (typeof icon.editor.materialBasePadLeft === 'number') {
+        style.props.pad_left = icon.editor.materialBasePadLeft;
+      } else {
+        delete style.props.pad_left;
+      }
+      delete icon.editor.materialBasePadLeft;
+    }
+    const base = typeof icon.editor?.materialBasePadHor === 'number'
+      ? icon.editor.materialBasePadHor
       : 0;
-    style.props.pad_left = base + input.sizePx + 6;
+    style.props.pad_hor = base + input.sizePx + 6;
   }
   return true;
 }
@@ -88,9 +99,15 @@ export function removeMaterialIconAdornment(node: WidgetNodeV2): boolean {
     const styleIndex = node.styles.findIndex((item) => item.selector === undefined);
     const style = styleIndex < 0 ? undefined : node.styles[styleIndex];
     if (style) {
-      const base = icon?.editor?.materialBasePadLeft;
-      if (typeof base === 'number') style.props.pad_left = base;
-      else delete style.props.pad_left;
+      const base = icon?.editor?.materialBasePadHor;
+      if (typeof base === 'number') style.props.pad_hor = base;
+      else delete style.props.pad_hor;
+
+      const legacyBase = icon?.editor?.materialBasePadLeft;
+      if (legacyBase !== undefined) {
+        if (typeof legacyBase === 'number') style.props.pad_left = legacyBase;
+        else delete style.props.pad_left;
+      }
       if (Object.keys(style.props).length === 0) node.styles.splice(styleIndex, 1);
     }
   }

@@ -259,8 +259,7 @@ function TreeNode(props: {
 }): JSX.Element {
   const { node, depth, isRoot, onMenu, filterActive, matchesQuery } = props;
   const [expanded, setExpanded] = useState(true);
-  const userChildren = node.children.filter((child) => child.editor?.generatedRole === undefined);
-  const visibleChildren = filterActive ? userChildren.filter(matchesQuery) : userChildren;
+  const visibleChildren = filterActive ? node.children.filter(matchesQuery) : node.children;
   const childrenExpanded = filterActive || expanded;
   return (
     <div role="none">
@@ -304,9 +303,10 @@ function TreeRow(props: {
   const components = useProjectStore((state) => state.uiProject.components);
   const selected = useEditorStore((s) => s.selectedIds.includes(node.id));
   const hovered = useEditorStore((s) => s.hoverId === node.id);
+  const locked = node.editor?.locked === true;
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: node.id,
-    disabled: isRoot,
+    disabled: isRoot || locked,
   });
   const spec = REGISTRY.get(node.type);
   const componentId = componentIdFromType(node.type);
@@ -315,7 +315,7 @@ function TreeRow(props: {
     ?? component?.displayName
     ?? (findChildSpec(node.type) ? node.type.split('-').slice(1).join('-') : node.type);
   const label = node.displayName ?? node.codeName ?? `${node.type}_${node.id.slice(0, 6)}`;
-  const hasChildren = node.children.some((child) => child.editor?.generatedRole === undefined);
+  const hasChildren = node.children.length > 0;
 
   const selectNode = (toggle: boolean): void => {
     const editor = useEditorStore.getState();
@@ -324,12 +324,13 @@ function TreeRow(props: {
   };
 
   const openMenu = (x: number, y: number): void => {
-    if (isRoot) return;
+    if (isRoot || locked) return;
     selectNode(false);
     onMenu({ x, y, nodeId: node.id });
   };
 
   const moveWithKeyboard = (direction: -1 | 1): void => {
+    if (locked) return;
     const current = useProjectStore.getState().uiProject;
     const hit = findNodeByIdV2(current, node.id);
     if (!hit?.parent) return;
@@ -433,7 +434,7 @@ function TreeRow(props: {
       ) : <span className="tree-expander-spacer" aria-hidden="true" />}
       <span className="tree-type">{typeLabel}</span>
       <span className="tree-name">{isRoot ? '(屏根)' : label}</span>
-      {!isRoot && (
+      {!isRoot && !locked && (
         <button
           type="button"
           className="tree-action"

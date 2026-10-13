@@ -106,10 +106,12 @@ export interface WidgetNodeV2 {
   editor?: {
     locked?: boolean;
     collapsed?: boolean;
-    /** Designer-generated implementation detail, hidden from the object tree. */
+    /** Designer-generated implementation detail, shown read-only in the object tree. */
     generatedRole?: string;
-    /** Original padding restored when a generated Material icon is removed. */
+    /** Legacy original left padding from the first Material adornment implementation. */
     materialBasePadLeft?: number | null;
+    /** Original horizontal padding restored when a generated Material icon is removed. */
+    materialBasePadHor?: number | null;
   };
   // 注意:此处刻意没有 cPatch —— 见文件头 §8
 }

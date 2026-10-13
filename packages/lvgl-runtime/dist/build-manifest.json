@@ -3,11 +3,11 @@
   "lvglVersion": "9.5.0",
   "lvglCommit": "85aa60d18b3d5e5588d7b247abf90198f07c8a63",
   "lvConfSha256": "37827f4fd2ef9316c77fdd61dd48e53b696e5c994a073276a44838c0132718e7",
-  "emcc": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 4.0.6 (1ddaae4d2d6dfbb678ecc193bc988820d1fc4633)",
+  "emcc": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.9 (4e4223852a0835923411059a3929907d7df1232e)",
   "toolchain": {
-    "emcc": {"version": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 4.0.6 (1ddaae4d2d6dfbb678ecc193bc988820d1fc4633)", "path": "/emsdk/upstream/emscripten/emcc", "sha256": "b0c9551f9155fa9c028efa24591acdfd30f02f32fb247cf9266f5f0f2ede7589"},
-    "cmake": {"version": "cmake version 3.22.1", "path": "/usr/bin/cmake", "sha256": "fd22547781b64bb2db04370970b93db1f3fada1e41e60873b015ee0747009fc0"},
-    "ninja": {"version": "unavailable", "path": "", "sha256": "unavailable"}
+    "emcc": {"version": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.9 (4e4223852a0835923411059a3929907d7df1232e)", "path": "/home/jjq/.local/emsdk/upstream/emscripten/emcc", "sha256": "498eba9b6aacffca1c358ba340fc7b37015d7867cb211c7f2d45784ee9310f03"},
+    "cmake": {"version": "cmake version 4.4.3", "path": "/home/jjq/.local/bin/cmake", "sha256": "871dbae75e8e3793e919594ee4617b2ccd9470392c39c718dcdfbda27cbf1158"},
+    "ninja": {"version": "1.13.2.git.kitware.jobserver-pipe-1", "path": "/home/jjq/.local/bin/ninja", "sha256": "08639e194fffa7f08b259fc4abfa4803aff66b64de52549cee42ec527d55cea6"}
   },
   "runtimeMode": "preview-program",
   "rendererBackend": "sw",

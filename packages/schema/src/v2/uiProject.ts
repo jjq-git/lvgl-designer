@@ -103,7 +103,14 @@ export interface WidgetNodeV2 {
   events: UiEvent[];
   bindings: BindingV2[];
   children: WidgetNodeV2[];
-  editor?: { locked?: boolean; collapsed?: boolean };
+  editor?: {
+    locked?: boolean;
+    collapsed?: boolean;
+    /** Designer-generated implementation detail, hidden from the object tree. */
+    generatedRole?: string;
+    /** Original padding restored when a generated Material icon is removed. */
+    materialBasePadLeft?: number | null;
+  };
   // 注意:此处刻意没有 cPatch —— 见文件头 §8
 }
 

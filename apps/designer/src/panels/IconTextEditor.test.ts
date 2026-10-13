@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   applyLvglSymbol,
+  filterPublishSafeSymbols,
   filterLvglSymbols,
   formatLvglSymbolText,
   IOT_SYMBOLS,
@@ -74,6 +75,11 @@ describe('LVGL symbol text helpers', () => {
     expect(WF3_MATERIAL_SYMBOLS.every((item) => item.fontFamily === 'wf3-material')).toBe(true);
     expect(filterLvglSymbols('device_hub').map((item) => item.name)).toContain('Material 设备拓扑');
     expect(filterLvglSymbols('数据线').map((item) => item.name)).toContain('Material 数据线');
+  });
+
+  it('keeps text symbols separate from image-backed Material assets', () => {
+    expect(filterPublishSafeSymbols('').some((item) => item.fontFamily === 'wf3-material')).toBe(false);
+    expect(filterPublishSafeSymbols('').length).toBeGreaterThan(0);
   });
 
   it('searches symbols by Chinese name and English keyword', () => {

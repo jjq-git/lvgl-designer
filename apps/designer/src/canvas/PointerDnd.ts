@@ -58,7 +58,10 @@ export function ascendToContainer(project: LvProject, nodeId: string | null, scr
 }
 
 /** Keyboard-accessible palette action: add the selected widget to the active screen center. */
-export function addPaletteWidgetAtCenter(widgetType: string): boolean {
+export function addPaletteWidgetAtCenter(
+  widgetType: string,
+  initialProps: Partial<WidgetNodeV2['props']> = {},
+): boolean {
   const spec = REGISTRY.get(widgetType);
   const componentId = componentIdFromType(widgetType);
   const component = componentId === null
@@ -78,6 +81,7 @@ export function addPaletteWidgetAtCenter(widgetType: string): boolean {
       ...created.props,
       x: Math.round(store.project.display.width / 2),
       y: Math.round(store.project.display.height / 2),
+      ...initialProps,
     },
     styleRefs: [], styles: [], events: [], bindings: [], children: [],
   } : {
@@ -86,6 +90,7 @@ export function addPaletteWidgetAtCenter(widgetType: string): boolean {
     props: {
       x: Math.round(store.project.display.width / 2),
       y: Math.round(store.project.display.height / 2),
+      ...initialProps,
     },
     styleRefs: [], styles: [], events: [], bindings: [], children: [],
   };

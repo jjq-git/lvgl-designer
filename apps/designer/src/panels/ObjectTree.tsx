@@ -259,7 +259,8 @@ function TreeNode(props: {
 }): JSX.Element {
   const { node, depth, isRoot, onMenu, filterActive, matchesQuery } = props;
   const [expanded, setExpanded] = useState(true);
-  const visibleChildren = filterActive ? node.children.filter(matchesQuery) : node.children;
+  const userChildren = node.children.filter((child) => child.editor?.generatedRole === undefined);
+  const visibleChildren = filterActive ? userChildren.filter(matchesQuery) : userChildren;
   const childrenExpanded = filterActive || expanded;
   return (
     <div role="none">
@@ -314,7 +315,7 @@ function TreeRow(props: {
     ?? component?.displayName
     ?? (findChildSpec(node.type) ? node.type.split('-').slice(1).join('-') : node.type);
   const label = node.displayName ?? node.codeName ?? `${node.type}_${node.id.slice(0, 6)}`;
-  const hasChildren = node.children.length > 0;
+  const hasChildren = node.children.some((child) => child.editor?.generatedRole === undefined);
 
   const selectNode = (toggle: boolean): void => {
     const editor = useEditorStore.getState();

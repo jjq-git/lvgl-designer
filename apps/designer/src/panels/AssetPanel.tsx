@@ -2,11 +2,13 @@
  * AssetPanel — 素材管理(左栏 tab):上传 png/jpg/lottie json →
  * IndexedDB 内容寻址 + runtime 注册 + 工程 assets 数组;列表带缩略图/删除。
  */
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { FontAsset, ImageAsset } from '@lvd/schema';
 import type { AssetEntry } from '@lvd/schema/v2';
 import { useProjectStore } from '../stores/projectStore';
-import { importAssetFiles, removeAsset, resyncAssets, thumbUrlFor } from '../services/assets';
+import { importAssetFiles, removeAsset, resyncAssets, thumbUrlFor, thumbUrlForEntry } from '../services/assets';
+import { addPaletteWidgetAtCenter } from '../canvas/PointerDnd';
+import { useEditorStore } from '../stores/editorStore';
 
 export function useThumb(asset: ImageAsset | null): string | null {
   const [url, setUrl] = useState<string | null>(null);
@@ -81,7 +83,15 @@ function FontOptions({ asset }: { asset: FontAsset }): JSX.Element {
   );
 }
 
-function AssetRow({ asset, type }: { asset: ImageAsset | FontAsset; type: 'image' | 'font' }): JSX.Element {
+function AssetRow({
+  asset,
+  type,
+  onUse,
+}: {
+  asset: ImageAsset | FontAsset;
+  type: 'image' | 'font';
+  onUse?(): void;
+}): JSX.Element {
   const image = type === 'image' ? asset as ImageAsset : null;
   const thumb = useThumb(image);
   const isLottie = image !== null && (image.kind ?? 'image') === 'lottie';
@@ -97,21 +107,48 @@ function AssetRow({ asset, type }: { asset: ImageAsset | FontAsset; type: 'image
         <span className="asset-sub">{type === 'font' ? 'font' : isLottie ? 'lottie' : 'image'} · {fmtSize(asset.file.byteSize)}</span>
         {type === 'font' ? <FontOptions asset={asset as FontAsset} /> : null}
       </span>
-      <button className="icon-btn" title="从工程移除" onClick={() => removeAsset(asset.name)}>✕</button>
+      <span className="asset-row-actions">
+        {onUse && !isLottie ? <button className="btn asset-use-btn" title="添加为图片控件；图片控件暂不支持网页发布" onClick={onUse}>使用</button> : null}
+        <button className="icon-btn" title="从工程移除" onClick={() => removeAsset(asset.name)}>✕</button>
+      </span>
     </div>
   );
 }
 
-function IconRow({ asset }: { asset: AssetEntry }): JSX.Element {
-  const name = asset.codeName ?? asset.displayName ?? asset.id;
+function IconAssetRow({
+  source,
+  derivative,
+  onUse,
+}: {
+  source: AssetEntry;
+  derivative: ImageAsset | null;
+  onUse?(): void;
+}): JSX.Element {
+  const name = source.displayName ?? source.codeName ?? source.id;
+  const derivativeThumb = useThumb(derivative);
+  const [sourceThumb, setSourceThumb] = useState<string | null>(null);
+  useEffect(() => {
+    let alive = true;
+    void thumbUrlForEntry(source.file).then((url) => {
+      if (alive) setSourceThumb(url);
+    });
+    return () => { alive = false; };
+  }, [source.file.sha256]);
+  const thumb = derivativeThumb ?? sourceThumb;
+  const totalBytes = source.file.byteSize + (derivative?.file.byteSize ?? 0);
   return (
-    <div className="asset-row">
-      <span className="asset-thumb"><span className="asset-thumb-icon">◆</span></span>
+    <div className="asset-row" data-asset={source.id} title={`${source.file.fileName}（SVG 源文件随工程留档）`}>
+      <span className="asset-thumb">{thumb
+        ? <img src={thumb} alt={name} />
+        : <span className="asset-thumb-icon">◆</span>}</span>
       <span className="asset-meta">
         <span className="asset-name">{name}</span>
-        <span className="asset-sub">icon · {fmtSize(asset.file.byteSize)}</span>
+        <span className="asset-sub">Material 图标 · 设备 A8 + 网页 SVG · {fmtSize(totalBytes)}</span>
       </span>
-      <button className="icon-btn" title="从工程移除" onClick={() => removeAsset(asset.id)}>✕</button>
+      <span className="asset-row-actions">
+        {onUse ? <button className="btn asset-use-btn" title="添加为图片控件；支持设备/C、网页导出和 ui.podsc.com 发布" onClick={onUse}>使用</button> : null}
+        <button className="icon-btn" title="同时移除 SVG 源文件和派生图片" onClick={() => removeAsset(source.id)}>✕</button>
+      </span>
     </div>
   );
 }
@@ -120,6 +157,19 @@ export function AssetPanel(): JSX.Element {
   const images = useProjectStore((s) => s.project.assets.images);
   const fonts = useProjectStore((s) => s.project.assets.fonts);
   const icons = useProjectStore((s) => s.uiProject.assets.icons);
+  const uiImages = useProjectStore((s) => s.uiProject.assets.images);
+  const derivativesBySource = useMemo(() => new Map(uiImages.flatMap((asset) => {
+    const sourceId = asset.conv?.sourceIconId;
+    if (typeof sourceId !== 'string' || !asset.codeName) return [];
+    return [[sourceId, images.find((image) => image.name === asset.codeName) ?? null] as const];
+  })), [images, uiImages]);
+  const iconDerivativeNames = useMemo(() => new Set([...derivativesBySource.values()]
+    .filter((asset): asset is ImageAsset => asset !== null)
+    .map((asset) => asset.name)), [derivativesBySource]);
+  const regularImages = useMemo(
+    () => images.filter((image) => !iconDerivativeNames.has(image.name)),
+    [iconDerivativeNames, images],
+  );
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
 
@@ -132,6 +182,16 @@ export function AssetPanel(): JSX.Element {
       setBusy(false);
       if (inputRef.current) inputRef.current.value = '';
     }
+  };
+
+  const useImage = (name: string, materialIcon = false): void => {
+    if (!addPaletteWidgetAtCenter('image', { src: name })) {
+      useEditorStore.getState().setBanner('请切换到设计模式后再使用图片素材');
+      return;
+    }
+    useEditorStore.getState().setBanner(materialIcon
+      ? `已将 Material 图标 ${name} 添加到当前画布；支持设备/C、网页导出和 ui.podsc.com 发布`
+      : `已将图片素材 ${name} 添加到当前画布；普通图片控件仅适用于设备/C，不能网页导出或发布`);
   };
 
   return (
@@ -153,8 +213,25 @@ export function AssetPanel(): JSX.Element {
       ) : (
         <>
           {fonts.map((a) => <AssetRow key={`font:${a.name}`} asset={a} type="font" />)}
-          {images.map((a) => <AssetRow key={`image:${a.name}`} asset={a} type="image" />)}
-          {icons.map((asset) => <IconRow key={asset.id} asset={asset} />)}
+          {regularImages.map((a) => (
+            <AssetRow
+              key={`image:${a.name}`}
+              asset={a}
+              type="image"
+              onUse={() => useImage(a.name)}
+            />
+          ))}
+          {icons.map((source) => {
+            const derivative = derivativesBySource.get(source.id) ?? null;
+            return (
+              <IconAssetRow
+                key={source.id}
+                source={source}
+                derivative={derivative}
+                onUse={derivative ? () => useImage(derivative.name, true) : undefined}
+              />
+            );
+          })}
         </>
       )}
     </div>

@@ -28,6 +28,22 @@ const IMAGE_EXTS = new Set(['png', 'jpg', 'jpeg']);
 const LOTTIE_EXTS = new Set(['json']);
 const FONT_EXTS = new Set(['ttf']);
 
+export interface MaterialSymbolsSearchResult {
+  source: 'material-symbols';
+  sourcePage: string;
+  license: 'Apache-2.0';
+  icons: string[];
+  total: number;
+  offset: number;
+  hasMore: boolean;
+}
+
+export interface MaterialSymbolImportOptions {
+  name: string;
+  sizePx: number;
+  sourcePage?: string;
+}
+
 export function extOf(fileName: string): string {
   const i = fileName.lastIndexOf('.');
   return i >= 0 ? fileName.slice(i + 1).toLowerCase() : '';
@@ -118,6 +134,12 @@ export async function sha256Hex(bytes: Uint8Array): Promise<string> {
   return sha256HexPortable(bytes);
 }
 
+function ownedArrayBuffer(bytes: Uint8Array): ArrayBuffer {
+  const buffer = new ArrayBuffer(bytes.byteLength);
+  new Uint8Array(buffer).set(bytes);
+  return buffer;
+}
+
 /* ---------------- IndexedDB 内容寻址 blob 表 ---------------- */
 
 export async function putAssetBytes(sha: string, rec: AssetBlobRecord): Promise<void> {
@@ -133,6 +155,68 @@ export async function getAssetBytes(sha: string): Promise<AssetBlobRecord | null
   const remote = await downloadAssetFromServer(sha);
   if (remote) await d.put(ASSET_STORE, remote, sha);
   return remote;
+}
+
+export async function searchMaterialSymbols(
+  query = '',
+  limit = 80,
+  offset = 0,
+): Promise<MaterialSymbolsSearchResult> {
+  const params = new URLSearchParams({ query, limit: String(limit), offset: String(offset) });
+  const response = await fetch(apiUrl(`api/lvgl/icon-library/material-symbols?${params}`), {
+    credentials: 'same-origin',
+    headers: { accept: 'application/json' },
+  });
+  if (!response.ok) throw new Error(`图标素材库请求失败（HTTP ${response.status}）`);
+  return response.json() as Promise<MaterialSymbolsSearchResult>;
+}
+
+export function materialSymbolSvgUrl(name: string): string {
+  return apiUrl(`api/lvgl/icon-library/material-symbols/${encodeURIComponent(name)}.svg`);
+}
+
+export function materialSymbolCodeName(name: string, sizePx: number): string {
+  const clean = name.toLowerCase().replace(/[^a-z0-9_]+/g, '_').replace(/^_+|_+$/g, '');
+  return `ic_${clean || 'symbol'}_${sizePx}`;
+}
+
+async function fetchMaterialSymbolSvg(name: string): Promise<string> {
+  const response = await fetch(materialSymbolSvgUrl(name), {
+    credentials: 'same-origin',
+    headers: { accept: 'image/svg+xml' },
+  });
+  if (!response.ok) throw new Error(`图标 ${name} 下载失败（HTTP ${response.status}）`);
+  const svg = await response.text();
+  if (!svg.trimStart().startsWith('<svg')) throw new Error(`图标 ${name} 返回的不是 SVG`);
+  return svg;
+}
+
+export async function rasterizeSvgToPng(svg: string, sizePx: number): Promise<Uint8Array> {
+  if (!Number.isInteger(sizePx) || sizePx < 8 || sizePx > 300) {
+    throw new Error('图标尺寸必须是 8–300 的整数');
+  }
+  const svgUrl = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+  try {
+    const image = new Image();
+    image.decoding = 'async';
+    await new Promise<void>((resolve, reject) => {
+      image.onload = () => resolve();
+      image.onerror = () => reject(new Error('浏览器无法解析图标 SVG'));
+      image.src = svgUrl;
+    });
+    const canvas = document.createElement('canvas');
+    canvas.width = sizePx;
+    canvas.height = sizePx;
+    const context = canvas.getContext('2d');
+    if (!context) throw new Error('浏览器不支持图标栅格化');
+    context.clearRect(0, 0, sizePx, sizePx);
+    context.drawImage(image, 0, 0, sizePx, sizePx);
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
+    if (!blob) throw new Error('图标 PNG 生成失败');
+    return new Uint8Array(await blob.arrayBuffer());
+  } finally {
+    URL.revokeObjectURL(svgUrl);
+  }
 }
 
 /**
@@ -186,11 +270,17 @@ async function downloadAssetFromServer(sha: string): Promise<AssetBlobRecord | n
 /** Retry uploading every locally available blob referenced by a project. */
 export async function syncProjectAssetsToCloud(
   project: LvProject,
+  iconSources: AssetEntry[] = [],
 ): Promise<{ uploaded: number; missing: string[] }> {
   let uploaded = 0;
   const missing: string[] = [];
   const d = await db();
-  for (const asset of [...project.assets.fonts, ...project.assets.images]) {
+  const assets = [
+    ...project.assets.fonts.map((asset) => ({ name: asset.name, file: asset.file })),
+    ...project.assets.images.map((asset) => ({ name: asset.name, file: asset.file })),
+    ...iconSources.map((asset) => ({ name: asset.displayName ?? asset.codeName ?? asset.id, file: asset.file })),
+  ];
+  for (const asset of assets) {
     const rec = (await d.get(ASSET_STORE, asset.file.sha256)) as AssetBlobRecord | undefined;
     if (!rec) {
       missing.push(asset.name);
@@ -319,6 +409,87 @@ function uniqueAssetName(base: string, project: LvProject): string {
 }
 
 /**
+ * Freeze one catalogue icon into the project.
+ *
+ * The original SVG is retained in assets.icons for provenance/portability;
+ * the browser-generated transparent PNG is an assets.images derivative used
+ * by the existing LVGL preview and deterministic A8 build pipeline.
+ */
+export async function importMaterialSymbol(options: MaterialSymbolImportOptions): Promise<string> {
+  const { name, sizePx } = options;
+  if (!/^[a-z0-9][a-z0-9_]*$/.test(name)) throw new Error('Material Symbols 图标名称不合法');
+  if (!Number.isInteger(sizePx) || sizePx < 8 || sizePx > 300) {
+    throw new Error('图标尺寸必须是 8–300 的整数');
+  }
+  const iconId = `icon:material-symbols:${name}:${sizePx}`;
+  const state = useProjectStore.getState();
+  const existingIcon = state.uiProject.assets.icons.find((item) => item.id === iconId);
+  if (existingIcon) {
+    const derivative = state.uiProject.assets.images.find((item) => item.conv?.sourceIconId === iconId);
+    return derivative?.codeName ?? materialSymbolCodeName(name, sizePx);
+  }
+
+  const svg = await fetchMaterialSymbolSvg(name);
+  const sourceBytes = new TextEncoder().encode(svg);
+  const pngBytes = await rasterizeSvgToPng(svg, sizePx);
+  const sourceSha = await sha256Hex(sourceBytes);
+  const pngSha = await sha256Hex(pngBytes);
+  const sourceFileName = `material-${name}.svg`;
+  const pngFileName = `material-${name}-${sizePx}.png`;
+  await putAssetBytes(sourceSha, {
+    bytes: ownedArrayBuffer(sourceBytes),
+    mime: 'image/svg+xml',
+    fileName: sourceFileName,
+  });
+  await putAssetBytes(pngSha, {
+    bytes: ownedArrayBuffer(pngBytes),
+    mime: 'image/png',
+    fileName: pngFileName,
+  });
+
+  const project = useProjectStore.getState().project;
+  const codeName = uniqueAssetName(materialSymbolCodeName(name, sizePx), project);
+  const imageAsset: ImageAsset = {
+    name: codeName,
+    kind: 'image',
+    file: { fileName: pngFileName, sha256: pngSha, byteSize: pngBytes.byteLength },
+    conv: { colorFormat: 'A8' },
+  };
+  const pipeline = getPipeline();
+  if (pipeline) registerAssetToRuntime(pipeline.runtime, imageAsset, pngBytes);
+
+  useProjectStore.getState().mutateV2(`导入 Material Symbols ${name}`, (draft) => {
+    draft.assets.icons.push({
+      id: iconId,
+      displayName: name,
+      file: { fileName: sourceFileName, sha256: sourceSha, byteSize: sourceBytes.byteLength },
+      conv: {
+        source: 'material-symbols',
+        sourcePage: options.sourcePage ?? 'http://192.168.1.38/pages/tools/material-symbols/',
+        iconName: name,
+        sizePx,
+        colorFormat: 'A8',
+        license: 'Apache-2.0',
+      },
+    });
+    draft.assets.images.push({
+      id: `image:${codeName}`,
+      codeName,
+      displayName: `${name} ${sizePx}px`,
+      file: imageAsset.file,
+      conv: {
+        colorFormat: 'A8',
+        kind: 'image',
+        sourceIconId: iconId,
+        sourceSha256: sourceSha,
+      },
+    });
+  });
+  if (pipeline) pipeline.reloadAllNow();
+  return codeName;
+}
+
+/**
  * 导入素材文件(png/jpg → image,json → lottie,ttf → font)。
  * 先注册 runtime,再 mutate 工程(L4 reloadAll 时 imageRef 已可解析)。
  * @returns 实际导入的素材名列表
@@ -414,7 +585,13 @@ export async function importAssetFiles(files: Iterable<File>): Promise<string[]>
 /** 从工程移除素材(blob 留在内容寻址库,可被其它工程/再次导入复用) */
 export function removeAsset(name: string): void {
   useProjectStore.getState().mutateV2(`删除素材 ${name}`, (draft) => {
-    draft.assets.images = draft.assets.images.filter((asset) => asset.codeName !== name);
+    const removedIconIds = new Set(draft.assets.icons
+      .filter((asset) => asset.codeName === name || asset.id === name)
+      .map((asset) => asset.id));
+    draft.assets.images = draft.assets.images.filter((asset) =>
+      asset.codeName !== name
+      && asset.id !== name
+      && !(typeof asset.conv?.sourceIconId === 'string' && removedIconIds.has(asset.conv.sourceIconId)));
     draft.assets.fonts = draft.assets.fonts.filter((asset) => asset.codeName !== name);
     draft.assets.icons = draft.assets.icons.filter((asset) => asset.codeName !== name && asset.id !== name);
   });
@@ -424,13 +601,19 @@ export function removeAsset(name: string): void {
 
 const thumbCache = new Map<string, string>();
 
-export async function thumbUrlFor(asset: ImageAsset): Promise<string | null> {
-  if ((asset.kind ?? 'image') !== 'image') return null;
-  const cached = thumbCache.get(asset.file.sha256);
+export async function thumbUrlForEntry(
+  file: { sha256: string },
+): Promise<string | null> {
+  const cached = thumbCache.get(file.sha256);
   if (cached) return cached;
-  const rec = await getAssetBytes(asset.file.sha256);
+  const rec = await getAssetBytes(file.sha256);
   if (!rec) return null;
   const url = URL.createObjectURL(new Blob([rec.bytes], { type: rec.mime }));
-  thumbCache.set(asset.file.sha256, url);
+  thumbCache.set(file.sha256, url);
   return url;
+}
+
+export async function thumbUrlFor(asset: ImageAsset): Promise<string | null> {
+  if ((asset.kind ?? 'image') !== 'image') return null;
+  return thumbUrlForEntry(asset.file);
 }

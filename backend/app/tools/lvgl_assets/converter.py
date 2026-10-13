@@ -226,6 +226,11 @@ def convert_locked_assets(owner_user_id: int, locks: list[dict[str, Any]]) -> tu
             # Font C sources are produced inside the fixed Node worker by the
             # bundled lv_font_conv/FreeType pipeline.
             continue
+        if category == "icons":
+            # Icon entries preserve immutable SVG source/provenance.  Their
+            # runtime-ready A8 PNG derivative is stored in images and is the
+            # artifact converted below.
+            continue
         if category != "images":
             raise AssetConversionError(
                 "asset-category-unimplemented",

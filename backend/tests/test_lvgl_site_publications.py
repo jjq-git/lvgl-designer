@@ -53,7 +53,7 @@ def install_fakes(monkeypatch):
         "json": "{}", "sha256": "2" * 64, "diagnostics": [], "document": {},
     })
 
-    def fake_prepare(record, _document, artifact_dir):
+    def fake_prepare(record, _document, artifact_dir, *, asset_payloads=None):
         artifact_dir.mkdir(parents=True)
         (artifact_dir / "document.json").write_text("{}", encoding="utf-8")
         (artifact_dir / "thumbnail.png").write_bytes(b"png")
@@ -65,6 +65,48 @@ def install_fakes(monkeypatch):
         }
 
     monkeypatch.setattr(git_target, "prepare", fake_prepare)
+
+
+def test_material_svg_publication_assets_are_resolved_and_sanitized(monkeypatch):
+    payload = b'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M1 1h22v22H1z"/></svg>'
+    digest = sha256(payload).hexdigest()
+    document = {
+        "uiProject": {"assets": {"icons": [{
+            "id": "icon:material-symbols:home:32",
+            "file": {"fileName": "material-home.svg", "sha256": digest, "byteSize": len(payload)},
+            "conv": {"source": "material-symbols", "iconName": "home"},
+        }]}},
+        "assetManifest": [{
+            "assetId": "icon:material-symbols:home:32", "kind": "icon",
+            "fileName": "material-home.svg", "mediaType": "image/svg+xml",
+            "sha256": digest, "byteSize": len(payload),
+        }],
+    }
+    monkeypatch.setattr(service.asset_store, "read_verified", lambda *_args: ({
+        "fileName": "material-home.svg",
+    }, payload))
+
+    assets = service._publication_assets(7, document)
+
+    assert assets == [{**document["assetManifest"][0], "fileName": "material-home.svg", "payload": payload}]
+
+
+def test_material_svg_assets_are_staged_by_content_hash(tmp_path):
+    payload = b'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z"/></svg>'
+    digest = sha256(payload).hexdigest()
+    root = tmp_path / "target"
+    artifact = tmp_path / "artifact"
+    root.mkdir()
+    artifact.mkdir()
+    records = git_target._stage_publication_assets(root, artifact, [{
+        "assetId": "icon:material-symbols:home:32", "kind": "icon",
+        "mediaType": "image/svg+xml", "sha256": digest, "byteSize": len(payload),
+        "payload": payload,
+    }])
+
+    assert records[0]["path"] == f"site/uis/assets/{digest}.svg"
+    assert (root / records[0]["path"]).read_bytes() == payload
+    assert (artifact / records[0]["artifactFile"]).read_bytes() == payload
 
 
 def test_prepare_locks_cloud_revision_and_defaults_new_demo_hidden(isolated_publications, monkeypatch):
@@ -386,7 +428,7 @@ def test_failed_prepare_retry_preserves_original_error(isolated_publications, mo
     monkeypatch.setattr(
         git_target,
         "prepare",
-        lambda *_args: (_ for _ in ()).throw(
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(
             git_target.TargetError("frame-incompatible", "frame mismatch", [{"code": "bad-frame"}]),
         ),
     )
@@ -528,7 +570,7 @@ def test_site_publication_api_requires_publish_permission(monkeypatch, tmp_path)
     document.write_text('{"kind":"wf2-web-ui"}', encoding="utf-8")
     renderer.write_text("export const createWebUiRenderer=()=>({});", encoding="utf-8")
     styles.write_text("body{color:#000}", encoding="utf-8")
-    monkeypatch.setattr(service, "preview", lambda *_args: (document, renderer, styles))
+    monkeypatch.setattr(service, "preview", lambda *_args: (document, renderer, styles, []))
     preview = client.get("/api/lvgl/site-publications/00000000-0000-4000-8000-000000000000/preview")
     assert preview.status_code == 200
     assert "sandbox allow-scripts" in preview.headers["content-security-policy"]

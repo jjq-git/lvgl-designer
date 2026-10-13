@@ -1265,6 +1265,30 @@ input::placeholder { color: var(--fg-hint); }
 .lvgl-symbol-head strong { font-size: 13px; color: var(--fg); }
 .lvgl-symbol-head span { font-size: 10px; color: var(--fg-hint); }
 .lvgl-symbol-search { width: 100%; min-height: 30px; flex: 0 0 auto; }
+.lvgl-symbol-source {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px;
+  padding: 3px;
+  border-radius: 8px;
+  background: var(--bg-inset);
+}
+.lvgl-symbol-source button {
+  min-height: 29px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--fg-secondary);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+.lvgl-symbol-source button.active {
+  background: var(--bg-panel);
+  color: var(--accent);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .1);
+}
+.lvgl-symbol-source button.material-source.active { color: #16794a; }
 .lvgl-symbol-mode {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1349,6 +1373,50 @@ input::placeholder { color: var(--fg-hint); }
   color: var(--fg-hint);
   font-size: 11px;
 }
+.lvgl-material-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--fg-hint);
+  font-size: 10px;
+}
+.lvgl-material-toolbar label { display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+.lvgl-material-toolbar .ed-num { width: 58px; }
+.lvgl-material-warning { color: #16794a; font-size: 10px; }
+.lvgl-material-error { color: #ad6800; font-size: 10px; }
+.lvgl-material-error { padding: 4px 6px; border-radius: 6px; background: rgba(173,104,0,.09); }
+.lvgl-material-grid {
+  overflow: auto;
+  overscroll-behavior: contain;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 5px;
+  min-height: 0;
+}
+.lvgl-material-grid > button {
+  display: flex;
+  min-width: 0;
+  min-height: 86px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 3px;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  background: var(--bg-inset);
+  color: var(--fg-secondary);
+  font: inherit;
+  font-size: 10px;
+  cursor: pointer;
+}
+.lvgl-material-grid > button:hover:not(:disabled) { border-color: #ad6800; background: rgba(173,104,0,.07); }
+.lvgl-material-grid > button:disabled { opacity: .55; cursor: wait; }
+.lvgl-material-grid img { width: 32px; height: 32px; object-fit: contain; }
+.lvgl-material-grid span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lvgl-material-grid small { color: #ad6800; font-size: 9px; }
+.lvgl-material-grid > .lvgl-material-more { grid-column: 1 / -1; min-height: 34px; }
 
 .flags-grid { display: flex; flex-direction: column; gap: 2px; }
 .flag-item {
@@ -1449,6 +1517,8 @@ input::placeholder { color: var(--fg-hint); }
 .asset-meta { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
 .asset-name { font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .asset-sub { font-size: 10px; color: var(--fg-hint); }
+.asset-row-actions { display: flex; flex: 0 0 auto; align-items: center; gap: 3px; }
+.asset-use-btn { min-height: 24px; padding: 2px 7px; font-size: 11px; }
 .asset-font-config {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1476,7 +1546,6 @@ input::placeholder { color: var(--fg-hint); }
   gap: 4px;
 }
 .asset-font-config .asset-font-check input { width: auto; margin: 0; }
-
 /* ---------- 素材选择器(检查器 imageRef) ---------- */
 .asset-picker { position: relative; flex: 1 1 auto; min-width: 0; }
 .asset-picker-btn {
@@ -1505,6 +1574,25 @@ input::placeholder { color: var(--fg-hint); }
   box-shadow: var(--shadow-menu);
   padding: 4px;
 }
+.asset-picker-material-pop { display: flex; flex-direction: column; gap: 6px; overflow: hidden; padding: 8px; }
+.asset-picker-material-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.asset-picker-material-head > div { display: flex; min-width: 0; flex-direction: column; gap: 2px; }
+.asset-picker-material-head strong { font-size: 12px; }
+.asset-picker-material-head span { color: var(--fg-hint); font-size: 10px; }
+.asset-picker-material-entry {
+  width: 100%;
+  min-height: 30px;
+  margin-bottom: 3px;
+  border: 1px solid rgba(22,121,74,.35);
+  border-radius: var(--radius-s);
+  background: rgba(22,121,74,.08);
+  color: #16794a;
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+}
+.asset-picker-material-entry:hover { border-color: #16794a; background: rgba(22,121,74,.13); }
+.asset-picker-material-pop .lvgl-material-grid { min-height: 0; }
 .asset-picker-item {
   display: flex;
   align-items: center;

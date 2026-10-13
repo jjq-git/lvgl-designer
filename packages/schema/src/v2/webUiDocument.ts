@@ -91,6 +91,10 @@ export interface WebUiDocumentV1 {
 export interface WebUiDocumentOptions {
   /** ui.podsc.com 的静态网页契约固定使用 RGB565，与设备驱动字节序解耦。 */
   podscRgb565?: boolean;
+  /** 发布目标只携带实际被节点、样式或 Theme Token 引用的素材。 */
+  pruneUnusedAssets?: boolean;
+  /** 将 Material Symbols 的设备 A8 派生图切换为网页端 SVG 源素材。 */
+  podscMaterialIcons?: boolean;
 }
 
 export interface WebUiExportV1 {
@@ -230,6 +234,118 @@ function publishedProject(project: UiProject): WebUiProjectV1 {
       ...jsonClone({ ...component, root: undefined }),
       root: publishedNode(component.root, usedIds),
     })),
+  };
+}
+
+const MATERIAL_ICON_NAME_RE = /^[a-z0-9][a-z0-9_]*$/;
+
+function isMaterialIconAsset(asset: AssetEntry): boolean {
+  return asset.id.startsWith('icon:material-symbols:')
+    && asset.file.fileName.toLowerCase().endsWith('.svg')
+    && asset.conv?.source === 'material-symbols'
+    && typeof asset.conv.iconName === 'string'
+    && MATERIAL_ICON_NAME_RE.test(asset.conv.iconName);
+}
+
+/**
+ * Material 图标在设备工程中仍引用 A8 PNG；podsc-static 投影只把对应 image.src
+ * 改写为已经随工程留档的安全 SVG。普通图片和其它图片型控件完全不受影响。
+ */
+function withPodscMaterialIcons(project: WebUiProjectV1): WebUiProjectV1 {
+  const icons = new Map(project.assets.icons.filter(isMaterialIconAsset).map((asset) => [asset.id, asset]));
+  const sourceByImageRef = new Map<string, string>();
+  project.assets.images.forEach((asset) => {
+    const sourceId = asset.conv?.sourceIconId;
+    if (typeof sourceId !== 'string' || !icons.has(sourceId)) return;
+    sourceByImageRef.set(asset.id, sourceId);
+    if (asset.codeName) sourceByImageRef.set(asset.codeName, sourceId);
+  });
+  const rewrite = (node: WebUiWidgetNodeV1): WebUiWidgetNodeV1 => {
+    const src = node.type === 'image' ? node.props.src : undefined;
+    const sourceId = typeof src === 'string' ? sourceByImageRef.get(src) : undefined;
+    return {
+      ...node,
+      props: sourceId === undefined ? node.props : { ...node.props, src: sourceId },
+      children: node.children.map(rewrite),
+    };
+  };
+  return {
+    ...project,
+    screens: project.screens.map((screen) => ({ ...screen, root: rewrite(screen.root) })),
+    components: project.components.map((component) => ({ ...component, root: rewrite(component.root) })),
+    assets: {
+      ...project.assets,
+      icons: project.assets.icons.map((asset) => {
+        if (!isMaterialIconAsset(asset) || asset.conv === undefined) return asset;
+        const { sourcePage: _sourcePage, ...conv } = asset.conv;
+        return { ...asset, conv };
+      }),
+    },
+  };
+}
+
+function projectAssetReferences(project: WebUiProjectV1): { images: Set<string>; fonts: Set<string> } {
+  const images = new Set<string>();
+  const fonts = new Set<string>();
+  const tokenRefs = new Set<string>();
+  const styleIds = new Set<string>();
+
+  const collectValue = (value: unknown, type: 'imageRef' | 'fontRef'): void => {
+    if (typeof value === 'string' && value !== '') {
+      (type === 'imageRef' ? images : fonts).add(value);
+    } else if (value !== null && typeof value === 'object'
+      && typeof (value as { $token?: unknown }).$token === 'string') {
+      tokenRefs.add((value as { $token: string }).$token);
+    }
+  };
+  const collectStyleProps = (props: Record<string, unknown>): void => {
+    for (const [key, value] of Object.entries(props)) {
+      const type = STYLE_PROPS[key]?.type;
+      if (type === 'imageRef' || type === 'fontRef') collectValue(value, type);
+    }
+  };
+  const walk = (node: WebUiWidgetNodeV1): void => {
+    const spec = REGISTRY.get(node.type);
+    const child = findChildSpec(node.type)?.child;
+    const propSpecs = [
+      ...(spec === undefined && child?.isObj !== true ? [] : OBJ_BASE.props),
+      ...(spec?.props ?? child?.props ?? []),
+      ...(child?.createProps ?? []),
+    ];
+    for (const prop of propSpecs) {
+      if (prop.type === 'imageRef' || prop.type === 'fontRef') collectValue(node.props[prop.key], prop.type);
+    }
+    if (node.type === 'animimage' && typeof node.props.srcs === 'string') {
+      node.props.srcs.split(/\s+/).filter(Boolean).forEach((name) => images.add(name));
+    }
+    node.styles.forEach((style) => collectStyleProps(style.props));
+    node.styleRefs.forEach((style) => styleIds.add(style.styleId));
+    node.children.forEach(walk);
+  };
+  project.screens.forEach((screen) => {
+    walk(screen.root);
+    screen.styles.filter((style) => styleIds.has(style.id)).forEach((style) => collectStyleProps(style.props));
+  });
+  project.styles.filter((style) => styleIds.has(style.id)).forEach((style) => collectStyleProps(style.props));
+  project.themes.forEach((theme) => theme.tokens.forEach((token) => {
+    if (!tokenRefs.has(token.id)) return;
+    if (token.type === 'imageRef') collectValue(token.value, 'imageRef');
+    if (token.type === 'fontRef') collectValue(token.value, 'fontRef');
+  }));
+  return { images, fonts };
+}
+
+function withoutUnusedAssets(project: WebUiProjectV1): WebUiProjectV1 {
+  const referenced = projectAssetReferences(project);
+  const used = (asset: AssetEntry, names: Set<string>): boolean =>
+    names.has(asset.id) || (asset.codeName !== undefined && names.has(asset.codeName));
+  return {
+    ...project,
+    assets: {
+      fonts: project.assets.fonts.filter((asset) => used(asset, referenced.fonts)),
+      images: project.assets.images.filter((asset) => used(asset, referenced.images)),
+      icons: project.assets.icons.filter((asset) => used(asset, referenced.images)),
+    },
   };
 }
 
@@ -522,7 +638,9 @@ export function createWebUiDocument(
   snapshot: ProjectSnapshotV2,
   options: WebUiDocumentOptions = {},
 ): WebUiDocumentV1 {
-  const uiProject = publishedProject(snapshot.uiProject);
+  let uiProject = publishedProject(snapshot.uiProject);
+  if (options.podscMaterialIcons) uiProject = withPodscMaterialIcons(uiProject);
+  if (options.pruneUnusedAssets) uiProject = withoutUnusedAssets(uiProject);
   const displayProfile = jsonClone(snapshot.displayProfile);
   if (options.podscRgb565) {
     const { width, height } = displayProfile.logicalSize;
@@ -550,9 +668,12 @@ export function createWebUiDocument(
   return document;
 }
 
-/** ui.podsc.com 当前静态站契约：不携带素材、不引用远程资源、不发布依赖素材的组件。 */
+/** ui.podsc.com 静态站契约：只允许随工程冻结的 Material SVG，拒绝其它资源与外部引用。 */
 export function podscStaticIssues(document: WebUiDocumentV1): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
+  const materialIconIds = new Set(document.uiProject.assets.icons
+    .filter(isMaterialIconAsset)
+    .map((asset) => asset.id));
   const scan = (value: unknown, path: string): void => {
     if (typeof value === 'string') {
       if (PODSC_REMOTE_REFERENCE_RE.test(value.trim())) issues.push({
@@ -568,24 +689,42 @@ export function podscStaticIssues(document: WebUiDocumentV1): ValidationIssue[] 
     }
     if (value === null || typeof value !== 'object') return;
     const record = value as Record<string, unknown>;
-    if (typeof record.type === 'string' && PODSC_RESOURCE_WIDGETS.has(record.type)) issues.push({
-      path: `${path}.type`,
-      code: 'E_PODSC_RESOURCE_WIDGET_UNSUPPORTED',
-      message: `ui.podsc.com 首期不支持依赖素材的组件 ${record.type}；请移除组件或等待目标站支持素材发布`,
-    });
+    if (typeof record.type === 'string' && PODSC_RESOURCE_WIDGETS.has(record.type)) {
+      const props = record.props;
+      const imageSrc = props !== null && typeof props === 'object'
+        ? (props as Record<string, unknown>).src
+        : undefined;
+      const materialImage = record.type === 'image'
+        && typeof imageSrc === 'string'
+        && materialIconIds.has(imageSrc);
+      if (!materialImage) issues.push({
+        path: `${path}.type`,
+        code: 'E_PODSC_RESOURCE_WIDGET_UNSUPPORTED',
+        message: `ui.podsc.com 暂不支持依赖普通素材的组件 ${record.type}；Material SVG 图标除外`,
+      });
+    }
     Object.entries(record).forEach(([key, child]) => scan(child, path ? `${path}.${key}` : key));
   };
   scan(document.uiProject, 'uiProject');
-  document.assetManifest.forEach((asset, index) => issues.push({
-    path: `assetManifest[${index}]`,
-    code: 'E_PODSC_ASSET_UNSUPPORTED',
-    message: `ui.podsc.com 首期不支持素材：${asset.assetId}`,
-  }));
+  document.assetManifest.forEach((asset, index) => {
+    const allowed = asset.kind === 'icon'
+      && asset.mediaType === 'image/svg+xml'
+      && materialIconIds.has(asset.assetId);
+    if (!allowed) issues.push({
+      path: `assetManifest[${index}]`,
+      code: 'E_PODSC_ASSET_UNSUPPORTED',
+      message: `ui.podsc.com 暂不支持该素材：${asset.assetId}`,
+    });
+  });
   return issues;
 }
 
 export function createPodscStaticWebUiDocument(snapshot: ProjectSnapshotV2): WebUiDocumentV1 {
-  const document = createWebUiDocument(snapshot, { podscRgb565: true });
+  const document = createWebUiDocument(snapshot, {
+    podscRgb565: true,
+    podscMaterialIcons: true,
+    pruneUnusedAssets: true,
+  });
   const issues = podscStaticIssues(document);
   if (issues.length > 0) throw new WebUiDocumentError(issues);
   return document;

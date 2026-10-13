@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import base64
 import hmac
+import json
 import os
 import uuid
 from typing import Literal
@@ -135,17 +136,26 @@ async def get_preview(publication_id: str,
     files = service.preview(user["id"], publication_id)
     if files is None:
         raise HTTPException(status_code=404, detail="prepared preview not found")
-    document_path, renderer_path, styles_path = files
+    document_path, renderer_path, styles_path, assets = files
     document_b64 = base64.b64encode(document_path.read_bytes()).decode("ascii")
     renderer_b64 = base64.b64encode(renderer_path.read_bytes()).decode("ascii")
     styles_b64 = base64.b64encode(styles_path.read_bytes()).decode("ascii")
+    assets_b64 = base64.b64encode(json.dumps({
+        asset["assetId"]: {
+            "mime": asset["mediaType"],
+            "data": base64.b64encode(asset["path"].read_bytes()).decode("ascii"),
+        }
+        for asset in assets
+    }, separators=(",", ":")).encode("utf-8")).decode("ascii")
     html = f"""<!doctype html><html><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">
 <style>html,body,#root{{margin:0;width:100%;height:100%;overflow:hidden;background:#f4f5f7}}</style></head><body><div id=\"root\"></div>
 <script type=\"module\">const decode=value=>new TextDecoder().decode(Uint8Array.from(atob(value),c=>c.charCodeAt(0)));
 const style=document.createElement('style');style.textContent=decode('{styles_b64}');document.head.append(style);
 const source=decode('{renderer_b64}');const moduleUrl=URL.createObjectURL(new Blob([source],{{type:'text/javascript'}}));
 const {{createWebUiRenderer}}=await import(moduleUrl);const ui=JSON.parse(decode('{document_b64}'));
-globalThis.__renderer=createWebUiRenderer(document.querySelector('#root'),ui,{{interactive:true,deviceFrames:[],fitPadding:0,maxScale:2}});</script></body></html>"""
+const payloads=JSON.parse(decode('{assets_b64}'));const assetUrls={{}};
+for(const [id,asset] of Object.entries(payloads)){{const bytes=Uint8Array.from(atob(asset.data),c=>c.charCodeAt(0));assetUrls[id]=URL.createObjectURL(new Blob([bytes],{{type:asset.mime}}));}}
+globalThis.__renderer=createWebUiRenderer(document.querySelector('#root'),ui,{{interactive:true,deviceFrames:[],fitPadding:0,maxScale:2,assetUrls}});</script></body></html>"""
     return HTMLResponse(
         html,
         headers={

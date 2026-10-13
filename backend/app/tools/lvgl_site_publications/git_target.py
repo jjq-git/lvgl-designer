@@ -23,6 +23,7 @@ GIT_TIMEOUT = int(os.environ.get("LVGL_SITE_PUBLICATION_GIT_TIMEOUT", "90"))
 COMMAND_TIMEOUT = int(os.environ.get("LVGL_SITE_PUBLICATION_COMMAND_TIMEOUT", "120"))
 SEO_BLOCK_RE = re.compile(r"<!-- SEO:HEAD:START -->.*?<!-- SEO:HEAD:END -->", re.DOTALL)
 SAFE_FRAME_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$")
+SAFE_ASSET_SHA_RE = re.compile(r"^[0-9a-f]{64}$")
 
 
 class TargetError(RuntimeError):
@@ -110,7 +111,7 @@ def _assert_safe_target(root: Path) -> None:
     expected = (
         "site", "site/uis", "site/frames", "site/assets", "scripts",
         "site/ui_list.json", "site/index.html", "site/frames/manifest.json",
-        "site/assets/renderer.js", "site/assets/styles.css", "scripts/build_seo.py",
+        "site/assets/app.js", "site/assets/renderer.js", "site/assets/styles.css", "scripts/build_seo.py",
     )
     resolved_root = root.resolve()
     for relative in expected:
@@ -391,10 +392,13 @@ def _run_seo(root: Path) -> None:
     _run([python, "-B", wrapper, "--module", "unittest", "discover", "-s", "tests", "-p", "test_*.py"], root, COMMAND_TIMEOUT)
 
 
-def _assert_allowlist(root: Path, record: dict[str, Any], document_url: str, thumbnail_url: str, index_before: str) -> list[str]:
+def _assert_allowlist(
+    root: Path, record: dict[str, Any], document_url: str, thumbnail_url: str,
+    index_before: str, asset_paths: Iterator[str] | tuple[str, ...] | list[str] = (),
+) -> list[str]:
     allowed = {
         "site/ui_list.json", document_url, thumbnail_url, "site/index.html", "site/sitemap.xml",
-        "site/robots.txt", f"site/demos/{record['demoId']}.html",
+        "site/robots.txt", f"site/demos/{record['demoId']}.html", *asset_paths,
     }
     changed = _git_paths(root)
     rejected = sorted(changed - allowed)
@@ -412,7 +416,46 @@ def _assert_allowlist(root: Path, record: dict[str, Any], document_url: str, thu
     return sorted(changed)
 
 
-def prepare(record: dict[str, Any], document_json: str, artifact_dir: Path) -> dict[str, Any]:
+def _publication_asset_path(asset: dict[str, Any]) -> str:
+    sha256 = asset.get("sha256")
+    if (asset.get("kind") != "icon" or asset.get("mediaType") != "image/svg+xml"
+            or not isinstance(sha256, str) or not SAFE_ASSET_SHA_RE.fullmatch(sha256)):
+        raise TargetError("publication-asset-invalid", "发布器只接受内容寻址的 Material SVG 图标")
+    return f"site/uis/assets/{sha256}.svg"
+
+
+def _stage_publication_assets(
+    root: Path, artifact_dir: Path, assets: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    records: list[dict[str, Any]] = []
+    artifact_assets = artifact_dir / "assets"
+    for asset in assets:
+        payload = asset.get("payload")
+        sha256 = asset.get("sha256")
+        byte_size = asset.get("byteSize")
+        if not isinstance(payload, bytes) or len(payload) != byte_size or hashlib.sha256(payload).hexdigest() != sha256:
+            raise TargetError("publication-asset-invalid", f"发布素材完整性校验失败：{asset.get('assetId')}")
+        relative = _publication_asset_path(asset)
+        target = root / relative
+        if target.is_file() and target.read_bytes() != payload:
+            raise TargetError("publication-asset-collision", f"内容寻址素材发生冲突：{sha256}")
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(payload)
+        artifact_assets.mkdir(parents=True, exist_ok=True)
+        artifact_name = f"{sha256}.svg"
+        (artifact_assets / artifact_name).write_bytes(payload)
+        records.append({
+            "assetId": asset.get("assetId"), "kind": "icon", "mediaType": "image/svg+xml",
+            "sha256": sha256, "byteSize": byte_size, "path": relative,
+            "artifactFile": f"assets/{artifact_name}",
+        })
+    return records
+
+
+def prepare(
+    record: dict[str, Any], document_json: str, artifact_dir: Path,
+    *, asset_payloads: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
     repository, branch = configuration()
     with Checkout(repository, branch) as root:
         base_commit = _run(["git", "rev-parse", "HEAD"], root)
@@ -432,11 +475,13 @@ def prepare(record: dict[str, Any], document_json: str, artifact_dir: Path) -> d
         artifact_dir.mkdir(parents=True, exist_ok=False)
         document_path = artifact_dir / "document.json"
         document_path.write_text(document_json, encoding="utf-8", newline="\n")
+        asset_records = _stage_publication_assets(root, artifact_dir, asset_payloads or [])
         validate_with_target(root, document_path)
         thumbnail_path = artifact_dir / "thumbnail.png"
         render_thumbnail(root, document_path, thumbnail_path, document)
         renderer_path = root / "site" / "assets" / "renderer.js"
         styles_path = root / "site" / "assets" / "styles.css"
+        app_path = root / "site" / "assets" / "app.js"
         shutil.copyfile(renderer_path, artifact_dir / "renderer.js")
         shutil.copyfile(styles_path, artifact_dir / "styles.css")
         thumbnail_sha = hashlib.sha256(thumbnail_path.read_bytes()).hexdigest()
@@ -454,7 +499,10 @@ def prepare(record: dict[str, Any], document_json: str, artifact_dir: Path) -> d
         _write_json(root / "site" / "ui_list.json", listing)
         index_before = (root / "site" / "index.html").read_text(encoding="utf-8")
         _run_seo(root)
-        changed = _assert_allowlist(root, record, document_url, thumbnail_url, index_before)
+        asset_paths = [asset["path"] for asset in asset_records]
+        changed = _assert_allowlist(
+            root, record, document_url, thumbnail_url, index_before, asset_paths,
+        )
         diff = _run(["git", "diff", "--stat", "--", *changed], root) if changed else ""
         plan = {
             "schemaVersion": 1, "targetBaseCommit": base_commit, "expectedPrevious": expected_previous,
@@ -462,6 +510,8 @@ def prepare(record: dict[str, Any], document_json: str, artifact_dir: Path) -> d
             "documentSha256": document_sha, "thumbnailSha256": thumbnail_sha,
             "consumerRendererSha256": hashlib.sha256(renderer_path.read_bytes()).hexdigest(),
             "consumerStylesSha256": hashlib.sha256(styles_path.read_bytes()).hexdigest(),
+            "consumerAppSha256": hashlib.sha256(app_path.read_bytes()).hexdigest(),
+            "assets": asset_records,
             "changedPaths": changed, "diagnostics": diagnostics, "diffStat": diff,
             "manifestChange": {"before": expected_previous, "after": next_item},
         }
@@ -504,6 +554,25 @@ def _find_publication_commit(root: Path, record: dict[str, Any]) -> str:
     ], root)
 
 
+def _prepared_assets(artifact_dir: Path, plan: dict[str, Any]) -> list[tuple[dict[str, Any], bytes]]:
+    prepared: list[tuple[dict[str, Any], bytes]] = []
+    for asset in plan.get("assets", []):
+        if not isinstance(asset, dict):
+            raise TargetError("prepared-artifact-corrupt", "prepared asset record is invalid")
+        relative = _publication_asset_path(asset)
+        expected_artifact = f"assets/{asset['sha256']}.svg"
+        if asset.get("path") != relative or asset.get("artifactFile") != expected_artifact:
+            raise TargetError("prepared-artifact-corrupt", "prepared asset path mismatch")
+        path = artifact_dir / "assets" / f"{asset['sha256']}.svg"
+        if not path.is_file():
+            raise TargetError("prepared-artifact-corrupt", "prepared asset blob is missing")
+        payload = path.read_bytes()
+        if len(payload) != asset.get("byteSize") or hashlib.sha256(payload).hexdigest() != asset.get("sha256"):
+            raise TargetError("prepared-artifact-corrupt", "prepared asset hash mismatch")
+        prepared.append((asset, payload))
+    return prepared
+
+
 def publish(record: dict[str, Any], artifact_dir: Path, _attempt: int = 0) -> dict[str, Any]:
     repository, branch = configuration()
     plan = _read_json(artifact_dir / "plan.json")
@@ -513,6 +582,8 @@ def publish(record: dict[str, Any], artifact_dir: Path, _attempt: int = 0) -> di
     thumbnail = (artifact_dir / "thumbnail.png").read_bytes()
     if hashlib.sha256(thumbnail).hexdigest() != plan.get("thumbnailSha256"):
         raise TargetError("prepared-artifact-corrupt", "prepared thumbnail hash mismatch")
+    prepared_assets = _prepared_assets(artifact_dir, plan)
+    asset_paths = [asset["path"] for asset, _payload in prepared_assets]
     with Checkout(repository, branch) as root:
         head = _run(["git", "rev-parse", "HEAD"], root)
         if record.get("status") == "publishing":
@@ -541,7 +612,7 @@ def publish(record: dict[str, Any], artifact_dir: Path, _attempt: int = 0) -> di
 
         if head != plan["targetBaseCommit"]:
             sensitive = {
-                "site/assets/renderer.js", "site/assets/styles.css", "scripts/build_seo.py",
+                "site/assets/app.js", "site/assets/renderer.js", "site/assets/styles.css", "scripts/build_seo.py",
                 "site/frames/manifest.json",
             }
             changed_since = _changed_since(root, plan["targetBaseCommit"])
@@ -559,9 +630,15 @@ def publish(record: dict[str, Any], artifact_dir: Path, _attempt: int = 0) -> di
         if already_written:
             current_document = root / plan["documentUrl"]
             current_thumbnail = root / plan["thumbnailUrl"]
+            assets_match = all(
+                (root / asset["path"]).is_file()
+                and hashlib.sha256((root / asset["path"]).read_bytes()).hexdigest() == asset["sha256"]
+                for asset, _payload in prepared_assets
+            )
             if (current_document.is_file() and current_thumbnail.is_file()
                     and hashlib.sha256(current_document.read_bytes()).hexdigest() == plan["documentSha256"]
-                    and hashlib.sha256(current_thumbnail.read_bytes()).hexdigest() == plan["thumbnailSha256"]):
+                    and hashlib.sha256(current_thumbnail.read_bytes()).hexdigest() == plan["thumbnailSha256"]
+                    and assets_match):
                 return commit_and_push([], force_redeploy=True)
         _merge_item(
             listing, record, plan["documentUrl"].removeprefix("site/"),
@@ -572,11 +649,19 @@ def publish(record: dict[str, Any], artifact_dir: Path, _attempt: int = 0) -> di
         document_path.parent.mkdir(parents=True, exist_ok=True)
         document_path.write_text(document_json, encoding="utf-8", newline="\n")
         thumbnail_path.write_bytes(thumbnail)
+        for asset, payload in prepared_assets:
+            asset_path = root / asset["path"]
+            if asset_path.is_file() and asset_path.read_bytes() != payload:
+                raise TargetError("publication-asset-collision", f"内容寻址素材发生冲突：{asset['sha256']}")
+            asset_path.parent.mkdir(parents=True, exist_ok=True)
+            asset_path.write_bytes(payload)
         validate_with_target(root, document_path)
         _write_json(root / "site" / "ui_list.json", listing)
         index_before = (root / "site" / "index.html").read_text(encoding="utf-8")
         _run_seo(root)
-        changed = _assert_allowlist(root, record, plan["documentUrl"], plan["thumbnailUrl"], index_before)
+        changed = _assert_allowlist(
+            root, record, plan["documentUrl"], plan["thumbnailUrl"], index_before, asset_paths,
+        )
         if not changed:
             return commit_and_push([], force_redeploy=True)
         _run(["git", "add", "--", *changed], root)

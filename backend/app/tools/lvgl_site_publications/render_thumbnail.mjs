@@ -14,13 +14,22 @@ if (!Number.isInteger(width) || !Number.isInteger(height) || width < 1 || height
   throw new Error('invalid logical size')
 }
 
-const mime = path => ({ '.js': 'text/javascript', '.css': 'text/css' }[extname(path)] || 'application/octet-stream')
+const mime = path => ({
+  '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml'
+}[extname(path)] || 'application/octet-stream')
 const pageHtml = `<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="/assets/styles.css">
 <style>html,body{margin:0;width:${width}px;height:${height}px;background:transparent;overflow:hidden}*{animation-play-state:paused!important;transition:none!important}#root{width:${width}px;height:${height}px}</style>
 </head><body><div id="root"></div><script type="module">
 import { createWebUiRenderer } from '/assets/renderer.js';
 const doc=await (await fetch('/document.json')).json();
-const renderer=createWebUiRenderer(document.querySelector('#root'),doc,{interactive:false,deviceFrames:[]});
+const assetUrls={};
+await Promise.all((doc.assetManifest||[]).map(async asset=>{
+  if(asset.kind!=='icon'||asset.mediaType!=='image/svg+xml')throw new Error('unsupported publication asset');
+  const response=await fetch('/uis/assets/'+asset.sha256+'.svg');
+  if(!response.ok)throw new Error('publication asset missing');
+  assetUrls[asset.assetId]=URL.createObjectURL(await response.blob());
+}));
+const renderer=createWebUiRenderer(document.querySelector('#root'),doc,{interactive:false,deviceFrames:[],assetUrls});
 renderer.actualSize(); await document.fonts.ready; await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))); window.__thumbnailReady=true;
 </script></body></html>`
 

@@ -12,6 +12,7 @@ import {
   createPodscStaticWebUiDocument,
   createWebUiDocument,
   createWebUiExport,
+  podscStaticIssues,
   sha256Utf8,
   validateWebUiDocument,
   verifyWebUiAssets,
@@ -135,9 +136,84 @@ describe('WebUiDocumentV1 冻结契约', () => {
       issues: expect.arrayContaining([
         expect.objectContaining({ code: 'E_PODSC_EXTERNAL_REFERENCE' }),
         expect.objectContaining({ code: 'E_PODSC_RESOURCE_WIDGET_UNSUPPORTED' }),
+      ]),
+    }));
+  });
+
+  it('podsc-static 裁剪未引用素材，历史素材不会单独阻止发布', () => {
+    const input = snapshot('web-podsc-unused-assets');
+    input.uiProject.assets.images.push({
+      id: 'image:unused', codeName: 'unused',
+      file: { fileName: 'unused.png', sha256: 'a'.repeat(64), byteSize: 10 },
+    });
+    input.uiProject.assets.icons.push({
+      id: 'icon:unused', codeName: 'unused_icon',
+      file: { fileName: 'unused.svg', sha256: 'b'.repeat(64), byteSize: 12 },
+    });
+
+    const document = createPodscStaticWebUiDocument(input);
+    expect(document.assetManifest).toEqual([]);
+    expect(document.uiProject.assets).toEqual({ fonts: [], images: [], icons: [] });
+  });
+
+  it('podsc-static 仍拒绝实际被 image 控件引用的本地素材', () => {
+    const input = snapshot('web-podsc-used-asset');
+    input.uiProject.assets.images.push({
+      id: 'image:logo', codeName: 'logo',
+      file: { fileName: 'logo.png', sha256: 'a'.repeat(64), byteSize: 10 },
+    });
+    input.uiProject.screens[0]!.root.children.push(node('node:logo', 'image', { src: 'logo' }));
+
+    expect(() => createPodscStaticWebUiDocument(input)).toThrowError(expect.objectContaining({
+      issues: expect.arrayContaining([
+        expect.objectContaining({ code: 'E_PODSC_RESOURCE_WIDGET_UNSUPPORTED' }),
         expect.objectContaining({ code: 'E_PODSC_ASSET_UNSUPPORTED' }),
       ]),
     }));
+  });
+
+  it('podsc-static 将 Material A8 图片节点投影为随工程发布的 SVG 图标', () => {
+    const input = snapshot('web-podsc-material-icon');
+    const sourceId = 'icon:material-symbols:home:32';
+    input.uiProject.assets.icons.push({
+      id: sourceId,
+      displayName: 'home',
+      file: { fileName: 'material-home.svg', sha256: 'b'.repeat(64), byteSize: 123 },
+      conv: {
+        source: 'material-symbols',
+        sourcePage: 'http://192.168.1.38/pages/tools/material-symbols/',
+        iconName: 'home',
+        sizePx: 32,
+        colorFormat: 'A8',
+        license: 'Apache-2.0',
+      },
+    });
+    input.uiProject.assets.images.push({
+      id: 'image:ic_home_32',
+      codeName: 'ic_home_32',
+      file: { fileName: 'material-home-32.png', sha256: 'a'.repeat(64), byteSize: 80 },
+      conv: { colorFormat: 'A8', kind: 'image', sourceIconId: sourceId },
+    });
+    const title = node('node:title', 'label', { text: 'HOME' });
+    const icon = node('node:home-icon', 'image', { src: 'ic_home_32', width: 32, height: 32 });
+    icon.editor = { locked: true, generatedRole: 'material-icon-adornment' };
+    title.children.push(icon);
+    input.uiProject.screens[0]!.root.children.push(title);
+
+    const document = createPodscStaticWebUiDocument(input);
+    const publishedTitle = document.uiProject.screens[0]!.root.children.at(-1);
+    expect(publishedTitle?.children[0]?.props.src).toBe(sourceId);
+    expect(publishedTitle?.children[0]).not.toHaveProperty('editor');
+    expect(document.uiProject.assets.images).toEqual([]);
+    expect(document.uiProject.assets.icons).toHaveLength(1);
+    expect(document.uiProject.assets.icons[0]?.conv).not.toHaveProperty('sourcePage');
+    expect(document.assetManifest).toEqual([expect.objectContaining({
+      assetId: sourceId,
+      kind: 'icon',
+      mediaType: 'image/svg+xml',
+      sha256: 'b'.repeat(64),
+    })]);
+    expect(podscStaticIssues(document)).toEqual([]);
   });
 
   it('从 ProjectSnapshotV2 裁剪私有字段、未引用 Action，并生成稳定摘要', async () => {

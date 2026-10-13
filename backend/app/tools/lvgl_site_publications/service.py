@@ -7,7 +7,9 @@ import json
 from pathlib import Path
 from typing import Any
 
+from ..lvgl_assets import store as asset_store
 from ..lvgl_projects import db as project_db
+from ..material_symbols import MaterialSymbolsError, sanitize_svg
 from . import db, git_target, worker
 
 
@@ -17,6 +19,51 @@ class PublicationError(RuntimeError):
         self.code = code
         self.detail = detail
         self.status_code = status_code
+
+
+def _publication_assets(owner_user_id: int, document: dict[str, Any]) -> list[dict[str, Any]]:
+    """Resolve only the sanitized Material SVGs admitted by the podsc projection."""
+
+    project = document.get("uiProject") if isinstance(document.get("uiProject"), dict) else {}
+    assets = project.get("assets") if isinstance(project.get("assets"), dict) else {}
+    icons = assets.get("icons") if isinstance(assets.get("icons"), list) else []
+    icon_by_id = {
+        icon.get("id"): icon
+        for icon in icons
+        if isinstance(icon, dict) and isinstance(icon.get("id"), str)
+    }
+    manifest = document.get("assetManifest") if isinstance(document.get("assetManifest"), list) else []
+    payloads: list[dict[str, Any]] = []
+    for entry in manifest:
+        if not isinstance(entry, dict):
+            raise git_target.TargetError("publication-asset-invalid", "发布素材清单格式无效")
+        asset_id = entry.get("assetId")
+        icon = icon_by_id.get(asset_id)
+        conv = icon.get("conv") if isinstance(icon, dict) and isinstance(icon.get("conv"), dict) else {}
+        if (entry.get("kind") != "icon" or entry.get("mediaType") != "image/svg+xml"
+                or conv.get("source") != "material-symbols"):
+            raise git_target.TargetError(
+                "publication-asset-unsupported", f"只允许发布 Material SVG 图标：{asset_id}"
+            )
+        try:
+            metadata, payload = asset_store.read_verified(
+                owner_user_id, str(entry.get("sha256", "")), entry.get("byteSize")
+            )
+            sanitized = sanitize_svg(payload.decode("utf-8")).encode("utf-8")
+        except (asset_store.AssetStoreError, UnicodeDecodeError, MaterialSymbolsError) as exc:
+            raise git_target.TargetError(
+                "publication-asset-invalid", f"Material SVG 图标不可发布：{asset_id}", str(exc)
+            ) from exc
+        if sanitized != payload:
+            raise git_target.TargetError(
+                "publication-asset-invalid", f"Material SVG 图标规范化结果不一致：{asset_id}"
+            )
+        payloads.append({
+            **entry,
+            "fileName": metadata["fileName"],
+            "payload": payload,
+        })
+    return payloads
 
 
 def _plan_fields(record: dict[str, Any]) -> dict[str, Any]:
@@ -175,7 +222,10 @@ def prepare(
     try:
         projection = worker.project(snapshot)
         execution_record = {**record, "boundExisting": demo_id is not None}
-        plan = git_target.prepare(execution_record, projection["json"], artifact_dir)
+        asset_payloads = _publication_assets(owner_user_id, projection["document"])
+        plan = git_target.prepare(
+            execution_record, projection["json"], artifact_dir, asset_payloads=asset_payloads,
+        )
         prepared = db.transition(
             owner_user_id, actor_user_id, record["id"], "prepared",
             fields={
@@ -306,10 +356,33 @@ def thumbnail(owner_user_id: int, publication_id: str) -> tuple[Path, str] | Non
     return (path, record["thumbnailSha256"]) if path.is_file() else None
 
 
-def preview(owner_user_id: int, publication_id: str) -> tuple[Path, Path, Path] | None:
+def preview(owner_user_id: int, publication_id: str) -> tuple[Path, Path, Path, list[dict[str, Any]]] | None:
     record = db.get(owner_user_id, publication_id)
     if record is None or record["status"] not in {"prepared", "publishing", "git_committed", "conflict"}:
         return None
     artifact = db.artifact_dir(publication_id)
     files = artifact / "document.json", artifact / "renderer.js", artifact / "styles.css"
-    return files if all(path.is_file() for path in files) else None
+    if not all(path.is_file() for path in files):
+        return None
+    plan_path = artifact / "plan.json"
+    try:
+        plan = json.loads(plan_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    assets: list[dict[str, Any]] = []
+    for asset in plan.get("assets", []):
+        if not isinstance(asset, dict) or not isinstance(asset.get("artifactFile"), str):
+            return None
+        try:
+            git_target._publication_asset_path(asset)
+        except git_target.TargetError:
+            return None
+        expected_artifact = f"assets/{asset['sha256']}.svg"
+        if asset["artifactFile"] != expected_artifact:
+            return None
+        expected = artifact / expected_artifact
+        path = artifact / asset["artifactFile"]
+        if path.resolve() != expected.resolve() or not path.is_file():
+            return None
+        assets.append({**asset, "path": path})
+    return (*files, assets)

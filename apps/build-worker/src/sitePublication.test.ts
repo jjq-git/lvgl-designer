@@ -55,4 +55,31 @@ describe('podsc-static publication worker', () => {
       path: 'uiProject.screens[0].root.children[0].type',
     }));
   });
+
+  it('projects Material image derivatives to their publishable SVG source', async () => {
+    const input = snapshot();
+    const sourceId = 'icon:material-symbols:home:32';
+    input.uiProject.assets.icons.push({
+      id: sourceId,
+      file: { fileName: 'material-home.svg', sha256: 'b'.repeat(64), byteSize: 120 },
+      conv: { source: 'material-symbols', iconName: 'home', sizePx: 32, license: 'Apache-2.0' },
+    });
+    input.uiProject.assets.images.push({
+      id: 'image:ic_home_32', codeName: 'ic_home_32',
+      file: { fileName: 'material-home-32.png', sha256: 'a'.repeat(64), byteSize: 80 },
+      conv: { sourceIconId: sourceId, colorFormat: 'A8' },
+    });
+    input.uiProject.screens[0]!.root.children.push({
+      id: 'node:material-home', type: 'image', props: { src: 'ic_home_32', width: 32, height: 32 },
+      styleRefs: [], styles: [], events: [], bindings: [], children: [],
+    });
+
+    const result = await executeSitePublication({ protocolVersion: 1, command: 'project-podsc-static', snapshot: input });
+
+    expect(result.diagnostics).toEqual([]);
+    expect(result.document?.assetManifest).toEqual([expect.objectContaining({
+      assetId: sourceId, kind: 'icon', mediaType: 'image/svg+xml',
+    })]);
+    expect(result.document?.uiProject.screens[0]?.root.children[0]?.props.src).toBe(sourceId);
+  });
 });

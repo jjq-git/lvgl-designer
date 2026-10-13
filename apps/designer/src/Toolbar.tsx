@@ -361,8 +361,8 @@ export function Toolbar(): JSX.Element {
       <button
         type="button"
         className="btn toolbar-icon-btn"
-        aria-label="导出网页 UI JSON"
-        title="导出冻结的 WebUiDocumentV1 JSON；不包含 Build URL、编辑状态或后端主键"
+        aria-label="导出网页 UI"
+        title="导出冻结的 WebUiDocumentV1；使用 Material 图标时自动包含安全 SVG 素材包"
         onClick={() => { void exportWebUiJson(useProjectStore.getState().project); }}
       >
         <svg viewBox="0 0 24 24" aria-hidden="true">

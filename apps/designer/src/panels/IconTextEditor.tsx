@@ -1,5 +1,12 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useEditorStore } from '../stores/editorStore';
+import {
+  importMaterialSymbol,
+  materialSymbolSvgUrl,
+  searchMaterialSymbols,
+  type MaterialSymbolsSearchResult,
+} from '../services/assets';
 
 export interface LvglSymbolOption {
   name: string;
@@ -280,6 +287,14 @@ export function filterLvglSymbols(query: string): readonly LvglSymbolOption[] {
     `${option.name} ${option.keywords}`.toLowerCase().includes(normalized));
 }
 
+export function filterPublishSafeSymbols(query: string): readonly LvglSymbolOption[] {
+  const normalized = query.trim().toLowerCase();
+  const options = [...IOT_SYMBOLS, ...QUIET_POD_SYMBOLS, ...LVGL_BUILTIN_SYMBOLS];
+  if (normalized === '') return options;
+  return options.filter((option) =>
+    `${option.name} ${option.keywords}`.toLowerCase().includes(normalized));
+}
+
 interface PickerPosition {
   left: number;
   top: number;
@@ -299,19 +314,27 @@ export function IconTextEditor(props: {
   value: string;
   placeholder?: string;
   onCommit: (value: string) => void;
+  onMaterialCommit?: (choice: { codeName: string; iconName: string; sizePx: number }) => void;
+  onTextIconCommit?: () => void;
 }): JSX.Element {
   const [draft, setDraft] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const [source, setSource] = useState<'platform' | 'material'>('platform');
   const [mode, setMode] = useState<'insert' | 'replace'>('insert');
-  const [position, setPosition] = useState<PickerPosition>({ left: 0, top: 0, width: 320, maxHeight: 360 });
+  const [materialResult, setMaterialResult] = useState<MaterialSymbolsSearchResult | null>(null);
+  const [materialLoading, setMaterialLoading] = useState(false);
+  const [materialBusy, setMaterialBusy] = useState('');
+  const [materialError, setMaterialError] = useState('');
+  const [materialSize, setMaterialSize] = useState(32);
+  const [position, setPosition] = useState<PickerPosition>({ left: 0, top: 0, width: 440, maxHeight: 460 });
   const rootRef = useRef<HTMLDivElement>(null);
   const popupRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const formattedValue = formatLvglSymbolText(props.value);
   const textRef = useRef(formattedValue);
   const selectionRef = useRef({ start: formattedValue.length, end: formattedValue.length });
-  const options = useMemo(() => filterLvglSymbols(query), [query]);
+  const options = useMemo(() => filterPublishSafeSymbols(query), [query]);
 
   const current = draft ?? formattedValue;
   textRef.current = current;
@@ -323,11 +346,11 @@ export function IconTextEditor(props: {
     const trigger = root.getBoundingClientRect();
     const margin = 8;
     const gap = 4;
-    const maxHeight = Math.min(360, window.innerHeight - margin * 2);
+    const maxHeight = Math.min(460, window.innerHeight - margin * 2);
     const height = Math.min(popup.scrollHeight, maxHeight);
     const below = trigger.bottom + gap + height <= window.innerHeight - margin;
     const top = below ? trigger.bottom + gap : Math.max(margin, trigger.top - gap - height);
-    const width = Math.min(340, window.innerWidth - margin * 2);
+    const width = Math.min(460, window.innerWidth - margin * 2);
     const left = Math.max(margin, Math.min(trigger.right - width, window.innerWidth - width - margin));
     setPosition({ left, top, width, maxHeight });
   }, []);
@@ -351,12 +374,12 @@ export function IconTextEditor(props: {
     setMode(LVGL_SYMBOLS.some((option) => trimmed === symbolToken(option)) ? 'replace' : 'insert');
     const rect = rootRef.current?.getBoundingClientRect();
     if (rect) {
-      const width = Math.min(340, window.innerWidth - 16);
+      const width = Math.min(460, window.innerWidth - 16);
       setPosition({
         left: Math.max(8, Math.min(rect.right - width, window.innerWidth - width - 8)),
         top: rect.bottom + 4,
         width,
-        maxHeight: 360,
+        maxHeight: 460,
       });
     }
     setOpen((value) => !value);
@@ -393,17 +416,79 @@ export function IconTextEditor(props: {
     };
   }, [open, updatePickerPosition]);
 
+  useEffect(() => {
+    if (!open || source !== 'material' || !props.onMaterialCommit) return;
+    let alive = true;
+    const timer = window.setTimeout(() => {
+      setMaterialError('');
+      setMaterialLoading(true);
+      void searchMaterialSymbols(query, 80, 0).then((next) => {
+        if (!alive) return;
+        setMaterialResult(next);
+        setMaterialLoading(false);
+      }).catch((reason: unknown) => {
+        if (!alive) return;
+        setMaterialError(reason instanceof Error ? reason.message : String(reason));
+        setMaterialLoading(false);
+      });
+    }, query ? 180 : 0);
+    return () => {
+      alive = false;
+      window.clearTimeout(timer);
+    };
+  }, [open, props.onMaterialCommit, query, source]);
+
   useLayoutEffect(() => {
     if (!open) return;
     updatePickerPosition();
-  }, [open, options.length, updatePickerPosition]);
+  }, [materialResult?.icons.length, open, options.length, source, updatePickerPosition]);
 
   const choose = (option: LvglSymbolOption): void => {
     const { start, end } = selectionRef.current;
     const next = applyLvglSymbol(textRef.current, symbolToken(option), mode, start, end);
     props.onCommit(parseLvglSymbolText(next));
+    props.onTextIconCommit?.();
     setDraft(null);
     setOpen(false);
+  };
+
+  const loadMoreMaterial = async (): Promise<void> => {
+    if (!materialResult?.hasMore || materialLoading) return;
+    setMaterialLoading(true);
+    setMaterialError('');
+    try {
+      const next = await searchMaterialSymbols(query, 80, materialResult.icons.length);
+      setMaterialResult({ ...next, offset: 0, icons: [...materialResult.icons, ...next.icons] });
+    } catch (reason) {
+      setMaterialError(reason instanceof Error ? reason.message : String(reason));
+    } finally {
+      setMaterialLoading(false);
+    }
+  };
+
+  const chooseMaterial = async (iconName: string): Promise<void> => {
+    if (!props.onMaterialCommit) return;
+    setMaterialBusy(iconName);
+    setMaterialError('');
+    try {
+      const codeName = await importMaterialSymbol({
+        name: iconName,
+        sizePx: materialSize,
+        sourcePage: materialResult?.sourcePage,
+      });
+      const withoutOldTextIcon = textRef.current.replace(/^\[图标:[^\]]+\]\s*/, '');
+      props.onCommit(parseLvglSymbolText(mode === 'replace' ? '' : withoutOldTextIcon));
+      props.onMaterialCommit({ codeName, iconName, sizePx: materialSize });
+      useEditorStore.getState().setBanner(
+        `已在当前组件中应用 Material 图标 ${iconName}；设备使用 A8，网页导出和发布使用 SVG`,
+      );
+      setDraft(null);
+      setOpen(false);
+    } catch (reason) {
+      setMaterialError(reason instanceof Error ? reason.message : String(reason));
+    } finally {
+      setMaterialBusy('');
+    }
   };
 
   const currentSymbols = EDITOR_SYMBOLS.filter((option) =>
@@ -431,12 +516,12 @@ export function IconTextEditor(props: {
       <button
         type="button"
         className="icon-text-picker-btn"
-        aria-label="选择 LVGL 图标"
+        aria-label="选择图标"
         aria-haspopup="dialog"
         aria-expanded={open}
         title={currentSymbols.length > 0
           ? `已使用：${currentSymbols.map((option) => option.name).join('、')}`
-          : '选择 LVGL 内置图标'}
+          : '打开统一图标选择器'}
         onMouseDown={(event) => event.preventDefault()}
         onClick={openPicker}
       >
@@ -445,43 +530,87 @@ export function IconTextEditor(props: {
           : '图标'}
       </button>
       {open && createPortal(
-        <div ref={popupRef} className="lvgl-symbol-pop" role="dialog" aria-label="LVGL 图标选择器" style={position}>
+        <div ref={popupRef} className="lvgl-symbol-pop" role="dialog" aria-label="统一图标选择器" style={position}>
           <div className="lvgl-symbol-head">
-            <strong>LVGL 与物联网图标</strong>
-            <span>{IOT_SYMBOLS.length} 个物联网 · {QUIET_POD_SYMBOLS.length} 个静音仓 · {LVGL_BUILTIN_SYMBOLS.length} 个内置，固件可直接使用</span>
+            <strong>统一图标选择器</strong>
+            <span>选择后直接修改当前组件，不会在画布上新建组件</span>
           </div>
+          {props.onMaterialCommit && (
+            <div className="lvgl-symbol-source" role="tablist" aria-label="图标来源">
+              <button type="button" role="tab" aria-selected={source === 'platform'}
+                className={source === 'platform' ? 'active' : ''}
+                onClick={() => { setSource('platform'); setQuery(''); }}>全平台图标</button>
+              <button type="button" role="tab" aria-selected={source === 'material'}
+                className={`material-source ${source === 'material' ? 'active' : ''}`}
+                onClick={() => { setSource('material'); setQuery(''); setMaterialResult(null); setMaterialError(''); }}>
+                Material（设备 + 网页）
+              </button>
+            </div>
+          )}
           <input
             className="ed-text lvgl-symbol-search"
-            aria-label="搜索 LVGL 图标"
+            aria-label="搜索图标"
             value={query}
-            placeholder="搜索：网关、传感器、MQTT、灯光…"
+            placeholder={source === 'material' ? '搜索英文名称：home、settings、wifi…' : '搜索：网关、传感器、MQTT、灯光…'}
             autoFocus
             onChange={(event) => setQuery(event.target.value)}
           />
           <div className="lvgl-symbol-mode" role="group" aria-label="图标插入方式">
-            <button type="button" className={mode === 'insert' ? 'active' : ''} onClick={() => setMode('insert')}>插入到光标</button>
+            <button type="button" className={mode === 'insert' ? 'active' : ''} onClick={() => setMode('insert')}>
+              {source === 'material' ? '图标 + 保留文本' : '插入到光标'}
+            </button>
             <button type="button" className={mode === 'replace' ? 'active' : ''} onClick={() => setMode('replace')}>仅使用图标</button>
           </div>
-          <div className="lvgl-symbol-grid" role="listbox" aria-label="可用的 LVGL 图标">
-            {options.map((option) => {
-              const preview = symbolPreview(option);
-              return (
-                <button
-                  key={option.name}
-                  type="button"
-                  role="option"
-                  aria-selected={false}
-                  aria-label={`${mode === 'replace' ? '仅使用' : '插入'}图标 ${option.name}`}
-                  title={`${option.name} · U+${option.symbol.codePointAt(0)!.toString(16).toUpperCase()}`}
-                  onClick={() => choose(option)}
-                >
-                  <span className={symbolClassName(option)} aria-hidden="true">{preview}</span>
-                  <span>{option.name}</span>
-                </button>
-              );
-            })}
-            {options.length === 0 && <div className="lvgl-symbol-empty">没有匹配的图标</div>}
-          </div>
+          {source === 'material' && props.onMaterialCommit ? (
+            <>
+              <div className="lvgl-material-toolbar">
+                <span className="lvgl-material-warning">当前组件内使用 · 可导出设备和网页</span>
+                <label>尺寸 <input className="ed-num" type="number" min={8} max={300} value={materialSize}
+                  onChange={(event) => setMaterialSize(Math.max(8, Math.min(300, Number(event.target.value) || 8)))} /> px</label>
+              </div>
+              {materialError && <div className="lvgl-material-error">{materialError}</div>}
+              <div className="lvgl-material-grid" role="listbox" aria-label="Material Symbols 图标">
+                {materialResult?.icons.map((name) => (
+                  <button key={name} type="button" role="option" aria-selected={false}
+                    disabled={materialBusy !== ''} title={`应用到当前组件：${name}`}
+                    onClick={() => void chooseMaterial(name)}>
+                    <img src={materialSymbolSvgUrl(name)} alt="" loading="lazy" />
+                    <span>{materialBusy === name ? '应用中…' : name}</span>
+                    <small>当前组件</small>
+                  </button>
+                ))}
+                {materialResult && materialResult.icons.length === 0 && <div className="lvgl-symbol-empty">没有匹配的图标</div>}
+                {materialResult?.hasMore && (
+                  <button type="button" className="lvgl-material-more" disabled={materialLoading || materialBusy !== ''}
+                    onClick={() => void loadMoreMaterial()}>
+                    {materialLoading ? '加载中…' : `加载更多（剩余 ${materialResult.total - materialResult.icons.length} 个）`}
+                  </button>
+                )}
+                {!materialResult && !materialError && <div className="lvgl-symbol-empty">正在读取 Material Symbols…</div>}
+              </div>
+            </>
+          ) : (
+            <div className="lvgl-symbol-grid" role="listbox" aria-label="全平台图标">
+              {options.map((option) => {
+                const preview = symbolPreview(option);
+                return (
+                  <button
+                    key={option.name}
+                    type="button"
+                    role="option"
+                    aria-selected={false}
+                    aria-label={`${mode === 'replace' ? '仅使用' : '插入'}图标 ${option.name}`}
+                    title={`${option.name} · U+${option.symbol.codePointAt(0)!.toString(16).toUpperCase()}`}
+                    onClick={() => choose(option)}
+                  >
+                    <span className={symbolClassName(option)} aria-hidden="true">{preview}</span>
+                    <span>{option.name}</span>
+                  </button>
+                );
+              })}
+              {options.length === 0 && <div className="lvgl-symbol-empty">没有匹配的图标</div>}
+            </div>
+          )}
         </div>,
         document.body,
       )}

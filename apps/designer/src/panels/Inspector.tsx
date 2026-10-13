@@ -55,6 +55,11 @@ import {
 } from '../stores/projectStore';
 import { useEditorStore } from '../stores/editorStore';
 import { useBuildTargetStore } from '../stores/buildTargetStore';
+import {
+  removeMaterialIconAdornment,
+  upsertMaterialIconAdornment,
+  type MaterialIconAdornmentInput,
+} from '../services/materialIconAdornment';
 import { AssetMultiPicker, AssetPicker } from './AssetPicker';
 import { IconTextEditor } from './IconTextEditor';
 
@@ -249,6 +254,20 @@ function ButtonTextRow({ node }: { node: WidgetNodeV2 }): JSX.Element {
     );
   };
 
+  const setMaterialIcon = (choice: MaterialIconAdornmentInput): void => {
+    useProjectStore.getState().mutateV2('修改按钮图标', (draft) => {
+      const current = findNodeByIdV2(draft, node.id)?.node;
+      if (current) upsertMaterialIconAdornment(current, choice);
+    });
+  };
+
+  const clearMaterialIcon = (): void => {
+    useProjectStore.getState().mutateV2('切换按钮图标', (draft) => {
+      const current = findNodeByIdV2(draft, node.id)?.node;
+      if (current) removeMaterialIconAdornment(current);
+    });
+  };
+
   return (
     <div className="prop-row">
       <label title="内部自动创建或更新居中的 Label">按钮文本 / 图标</label>
@@ -257,6 +276,8 @@ function ButtonTextRow({ node }: { node: WidgetNodeV2 }): JSX.Element {
         value={value}
         placeholder="输入文本或选择图标"
         onCommit={setText}
+        onMaterialCommit={setMaterialIcon}
+        onTextIconCommit={clearMaterialIcon}
       />
     </div>
   );
@@ -2041,12 +2062,25 @@ function ValueEditor(props: {
     default:
       // string / subject / styleRef / 其它 → 文本
       if (propKey === 'text') {
+        const supportsMaterialIcon = node?.type === 'label';
         return (
           <IconTextEditor
             ariaLabel={ariaLabel}
             value={typeof value === 'string' ? value : value !== undefined ? String(value) : ''}
             placeholder={ph}
             onCommit={(v) => onChange(v === '' ? undefined : v)}
+            onMaterialCommit={supportsMaterialIcon ? (choice) => {
+              useProjectStore.getState().mutateV2('修改组件图标', (draft) => {
+                const current = node ? findNodeByIdV2(draft, node.id)?.node : undefined;
+                if (current) upsertMaterialIconAdornment(current, choice);
+              });
+            } : undefined}
+            onTextIconCommit={supportsMaterialIcon ? () => {
+              useProjectStore.getState().mutateV2('切换组件图标', (draft) => {
+                const current = node ? findNodeByIdV2(draft, node.id)?.node : undefined;
+                if (current) removeMaterialIconAdornment(current);
+              });
+            } : undefined}
           />
         );
       }

@@ -45,7 +45,7 @@ def create_app() -> FastAPI:
     # before StaticFiles asks mimetypes to build its Content-Type header.
     mimetypes.add_type("image/svg+xml", ".svg")
 
-    from .routes import auth, lvgl, lvgl_assets, lvgl_builds, lvgl_catalog, lvgl_iot, lvgl_projects, lvgl_site_publications
+    from .routes import auth, lvgl, lvgl_assets, lvgl_builds, lvgl_catalog, lvgl_icon_library, lvgl_iot, lvgl_projects, lvgl_site_publications
     from .tools.auth import db as auth_db
     from .tools.auth.security import AuthUser, require_login
 
@@ -61,6 +61,7 @@ def create_app() -> FastAPI:
     app.include_router(lvgl.router, prefix="/api/lvgl", tags=["LVGL AI"])
     app.include_router(lvgl_projects.router, prefix="/api/lvgl/projects", tags=["Projects"])
     app.include_router(lvgl_assets.router, prefix="/api/lvgl/assets", tags=["Assets"])
+    app.include_router(lvgl_icon_library.router, prefix="/api/lvgl/icon-library", tags=["Icon Library"])
     app.include_router(lvgl_catalog.router, prefix="/api/lvgl/catalog", tags=["Catalog"])
     app.include_router(lvgl_builds.router, prefix="/api/lvgl/builds", tags=["Builds"])
     app.include_router(lvgl_site_publications.router, prefix="/api/lvgl/site-publications", tags=["Site Publications"])

@@ -138,8 +138,27 @@ export async function exportWebUiJson(project: LvProject): Promise<boolean> {
   const ed = useEditorStore.getState();
   try {
     const result = await createPodscStaticWebUiExport(createStoredProjectDocument(project));
-    download(result.fileName, new Blob([result.json], { type: 'application/json;charset=utf-8' }));
-    ed.setBanner(`网页 UI JSON 已导出；SHA-256: ${result.sha256}`);
+    if (result.document.assetManifest.length === 0) {
+      download(result.fileName, new Blob([result.json], { type: 'application/json;charset=utf-8' }));
+      ed.setBanner(`网页 UI JSON 已导出；SHA-256: ${result.sha256}`);
+      return true;
+    }
+    const files: Record<string, Uint8Array> = {
+      [result.fileName]: strToU8(result.json),
+    };
+    for (const asset of result.document.assetManifest) {
+      if (asset.kind !== 'icon' || asset.mediaType !== 'image/svg+xml') {
+        throw new Error(`网页素材类型暂不支持：${asset.assetId}`);
+      }
+      const record = await getAssetBytes(asset.sha256);
+      if (!record) throw new Error(`网页图标素材缺失：${asset.assetId}`);
+      files[`assets/${asset.sha256}.svg`] = new Uint8Array(record.bytes);
+    }
+    const zipped = zipSync(files);
+    const buffer = new Uint8Array(zipped.length);
+    buffer.set(zipped);
+    download(result.fileName.replace(/\.json$/, '.zip'), new Blob([buffer.buffer], { type: 'application/zip' }));
+    ed.setBanner(`网页 UI 素材包已导出（${result.document.assetManifest.length} 个 Material SVG）；SHA-256: ${result.sha256}`);
     return true;
   } catch (error) {
     const detail = error instanceof WebUiDocumentError

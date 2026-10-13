@@ -56,6 +56,16 @@ def test_locked_conversion_reads_owner_scoped_cas(tmp_path, monkeypatch):
     assert other_owner.value.code == "asset-not-found"
 
 
+def test_locked_conversion_keeps_icon_svg_as_source_only():
+    files, manifest = converter.convert_locked_assets(7, [{
+        "category": "icons", "id": "icon:material-symbols:home:32", "codeName": None,
+        "sha256": "0" * 64, "byteSize": 99,
+        "conv": {"source": "material-symbols", "colorFormat": "A8"},
+    }])
+    assert files == {}
+    assert manifest == []
+
+
 def test_unimplemented_resource_kinds_fail_explicitly():
     with pytest.raises(converter.AssetConversionError) as unsupported:
         converter.convert_raster(_png(), "logo", {"colorFormat": "L8"})

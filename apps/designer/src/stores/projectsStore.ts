@@ -358,7 +358,7 @@ export const useProjectsStore = create<ProjectsStoreState>()((set, get) => ({
 
     // 2) 云端 PUT(乐观锁)。force → 用后端回传的 current 作基线覆盖
     set({ syncState: 'saving' });
-    await syncProjectAssetsToCloud(doc);
+    await syncProjectAssetsToCloud(doc, projectState.uiProject.assets.icons);
     const base = force && get().conflictCurrent != null ? (get().conflictCurrent as number) : currentVersion;
     const r = await cloud.saveProject(currentId, stored, base, currentName);
     if (r.ok) {
@@ -430,7 +430,7 @@ export const useProjectsStore = create<ProjectsStoreState>()((set, get) => ({
     if (!get().cloudEnabled) {
       return { ok: false, kind: 'disabled', message: '未启用云存储', status: 503 };
     }
-    await syncProjectAssetsToCloud(doc);
+    await syncProjectAssetsToCloud(doc, useProjectStore.getState().uiProject.assets.icons);
     const stored = createStoredProjectDocument(doc);
     const r = await cloud.createProject(name, stored);
     if (r.ok) {

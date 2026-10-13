@@ -4102,4 +4102,3 @@ lv_font_t lv_font_montserrat_24 = {
 
 
 #endif /*#if LV_FONT_MONTSERRAT_24*/
-

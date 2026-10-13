@@ -2493,4 +2493,3 @@ lv_font_t lv_font_montserrat_16 = {
 
 
 #endif /*#if LV_FONT_MONTSERRAT_16*/
-

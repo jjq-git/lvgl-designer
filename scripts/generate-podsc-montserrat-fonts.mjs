@@ -1,6 +1,6 @@
 // Rebuild every enabled built-in size with the same product-owned symbol.
 // Usage: node scripts/generate-podsc-montserrat-fonts.mjs <lv_font_conv.js>
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
@@ -23,5 +23,7 @@ for (const size of sizes) {
     '--font', '../../../../runtime/font-overrides/PodscSymbols.ttf', '-r', '62763',
     '--format', 'lvgl', '-o', output, '--force-fast-kern-format',
   ], { cwd: resolve(root, 'vendor/lvgl/scripts/built_in_font'), stdio: 'inherit' });
+  const outputPath = resolve(root, `runtime/font-overrides/lv_font_montserrat_${size}.c`);
+  writeFileSync(outputPath, `${readFileSync(outputPath, 'utf8').trimEnd()}\n`);
   console.log(`Generated Montserrat ${size}px with U+F52B`);
 }

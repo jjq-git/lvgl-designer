@@ -37,6 +37,7 @@ C_KEYWORDS = {
 BUILTIN_ACTIONS = {
     "screen.open", "screen.create", "screen.back",
     "subject.set", "subject.toggle", "subject.increment",
+    "timer.start", "timer.pause", "timer.reset",
 }
 ACTION_REQUIRED_ARGS = {
     "screen.open": {"screen"},
@@ -45,6 +46,9 @@ ACTION_REQUIRED_ARGS = {
     "subject.set": {"subject", "value"},
     "subject.toggle": {"subject"},
     "subject.increment": {"subject"},
+    "timer.start": {"subject"},
+    "timer.pause": {"subject"},
+    "timer.reset": {"subject", "value"},
 }
 FORBIDDEN_KEYS = {"cPatch", "trustedExtension", "trustedExtensions"}
 CATALOG_SCHEMAS = {
@@ -317,6 +321,11 @@ def _validate_v2_semantics(
             if subject is not None and subject not in subject_ids:
                 _issue(issues, "subject-not-found", f"{event_path}.args.subject",
                        f"引用了不存在的 subject {subject!r}")
+            for optional_subject in ("displaySubject", "runningSubject"):
+                subject_ref = args.get(optional_subject)
+                if subject_ref is not None and subject_ref not in subject_ids:
+                    _issue(issues, "subject-not-found", f"{event_path}.args.{optional_subject}",
+                           f"引用了不存在的 subject {subject_ref!r}")
         for index, child in enumerate(node["children"]):
             visit(child, f"{path}.children[{index}]", depth + 1)
 

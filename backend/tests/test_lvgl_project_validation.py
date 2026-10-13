@@ -174,6 +174,49 @@ def test_snapshot_uses_its_action_registry_for_project_callbacks():
     assert validate_project_document(snapshot)["kind"] == "lvgl-project-snapshot"
 
 
+def test_accepts_builtin_timer_actions_and_validates_their_subjects():
+    project = v2_project()
+    project["subjects"].append({
+        "id": "subject:time_text",
+        "codeName": "time_text",
+        "type": "string",
+        "initial": "25:00",
+    })
+    child = project["screens"][0]["root"]["children"][0]
+    child["events"] = [{
+        "on": "clicked",
+        "action": "timer.start",
+        "args": {
+            "subject": "subject:level",
+            "displaySubject": "subject:time_text",
+            "step": -1,
+            "min": 0,
+            "period": 1000,
+        },
+    }]
+
+    assert validate_project_document(project)["schemaVersion"] == 2
+
+    child["events"][0]["args"]["displaySubject"] = "subject:missing"
+    with pytest.raises(ProjectDocumentValidationError) as error:
+        validate_project_document(project)
+    assert "subject-not-found" in issue_codes(error)
+
+
+def test_timer_reset_requires_a_value():
+    project = v2_project()
+    child = project["screens"][0]["root"]["children"][0]
+    child["events"] = [{
+        "on": "clicked",
+        "action": "timer.reset",
+        "args": {"subject": "subject:level"},
+    }]
+
+    with pytest.raises(ProjectDocumentValidationError) as error:
+        validate_project_document(project)
+    assert "missing-action-arg" in issue_codes(error)
+
+
 def test_rejects_v2_structural_and_semantic_errors():
     bad = v2_project()
     bad["screens"][0]["root"]["children"][0]["id"] = "node:root"

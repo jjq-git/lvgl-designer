@@ -233,7 +233,7 @@ function toggle(screen, key, subject, x, y, width = 58, height = 30) {
       style({ bg_color: COLORS.cyan, bg_opa: 255, radius: 20 }, { part: 'indicator', states: ['checked'] }),
       style({ bg_color: '#FFFFFF', bg_opa: 255, radius: 20 }, { part: 'knob' }),
     ],
-    events: [{ kind: 'subject_toggle', trigger: 'value_changed', subject }],
+    // bind_checked is two-way; an additional toggle would undo each click.
     bindings: [{ kind: 'prop', prop: 'checked', subject }],
   });
 }

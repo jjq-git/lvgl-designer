@@ -242,6 +242,16 @@ function normalizeNode(
   const events: IREvent[] = [];
   for (const e of node.events) {
     const ire = normalizeEvent(e, node, ctx);
+    // bind_checked is two-way in LVGL: its VALUE_CHANGED handler has already
+    // written the new checked value before user handlers run. Legacy demos
+    // added a second toggle, immediately reverting the user's click.
+    if (ire?.kind === 'subject_toggle' && ire.trigger === 'value_changed'
+      && (node.type === 'switch' || node.type === 'checkbox')
+      && bindings.some(b => b.kind === 'prop' && b.prop === 'checked' && b.subject === ire.subject)) {
+      warn(ctx, 'W_REDUNDANT_CHECKED_TOGGLE',
+        `已忽略 ${ire.subject} 的重复切换事件：checked 双向绑定已自动同步开关状态`, node.id);
+      continue;
+    }
     if (ire) events.push(ire);
   }
 

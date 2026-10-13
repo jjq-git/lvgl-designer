@@ -3,6 +3,38 @@ import { createEmptyProject, createNode } from '@lvd/schema';
 import { normalizeProject } from './index.js';
 
 describe('@lvd/compiler-core', () => {
+  it.each(['switch', 'checkbox'])('修复 %s checked 双向绑定后的重复切换，且不修改源项目', (type) => {
+    const project = createEmptyProject('checked-binding');
+    project.subjects.push({ name: 'power', type: 'int', initial: 1 }, { name: 'other', type: 'int', initial: 0 });
+    const toggle = createNode(type);
+    toggle.bindings.push({ kind: 'prop', prop: 'checked', subject: 'power' });
+    toggle.events.push(
+      { kind: 'subject_toggle', trigger: 'value_changed', subject: 'power' },
+      { kind: 'subject_toggle', trigger: 'clicked', subject: 'power' },
+      { kind: 'subject_toggle', trigger: 'value_changed', subject: 'other' },
+    );
+    project.screens[0]!.root.children.push(toggle);
+    const result = normalizeProject(project);
+    expect(result.ir.screens[0]!.root.children[0]!.events).toEqual(toggle.events.slice(1));
+    expect(result.ir.screens[0]!.root.children[0]!.bindings).toHaveLength(1);
+    expect(result.diagnostics).toContainEqual(expect.objectContaining({ code: 'W_REDUNDANT_CHECKED_TOGGLE', severity: 'warning' }));
+    expect(toggle.events).toHaveLength(3);
+  });
+
+  it('保留未绑定或单向 state 绑定开关的切换事件', () => {
+    const project = createEmptyProject('one-way-checked');
+    project.subjects.push({ name: 'power', type: 'int', initial: 0 });
+    for (const bound of [false, true]) {
+      const toggle = createNode('switch');
+      if (bound) toggle.bindings.push({ kind: 'state', state: 'checked', op: 'eq', subject: 'power', refValue: 1 });
+      toggle.events.push({ kind: 'subject_toggle', trigger: 'value_changed', subject: 'power' });
+      project.screens[0]!.root.children.push(toggle);
+    }
+    const result = normalizeProject(project);
+    expect(result.diagnostics).toEqual([]);
+    for (const node of result.ir.screens[0]!.root.children) expect(node.events).toHaveLength(1);
+  });
+
   it('只依赖 Schema/Registry 即可生成稳定 IR', () => {
     const project = createEmptyProject('core-smoke');
     const first = normalizeProject(project);

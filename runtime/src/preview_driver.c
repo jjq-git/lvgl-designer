@@ -11,6 +11,7 @@
 #include <errno.h>
 #include <float.h>
 #include <math.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <emscripten.h>
@@ -71,6 +72,9 @@ typedef struct lvd_preview_subject_rec {
 typedef enum {
     LVD_PREVIEW_EVENT_CALLBACK,
     LVD_PREVIEW_EVENT_SCREEN,
+    LVD_PREVIEW_EVENT_TIMER_START,
+    LVD_PREVIEW_EVENT_TIMER_PAUSE,
+    LVD_PREVIEW_EVENT_TIMER_RESET,
 } lvd_preview_event_kind_t;
 
 typedef struct lvd_preview_event_rec {
@@ -82,6 +86,14 @@ typedef struct lvd_preview_event_rec {
     lv_screen_load_anim_t anim;
     uint32_t duration;
     uint32_t delay;
+    lvd_preview_subject_rec_t * timer_subject;
+    lvd_preview_subject_rec_t * timer_display_subject;
+    lvd_preview_subject_rec_t * timer_running_subject;
+    lv_timer_t * timer;
+    int32_t timer_step;
+    int32_t timer_min;
+    int32_t timer_reset_value;
+    uint32_t timer_period;
     struct lvd_preview_event_rec * next;
 } lvd_preview_event_rec_t;
 
@@ -289,6 +301,7 @@ static void clear_events(void)
     while(g_events) {
         lvd_preview_event_rec_t * dead = g_events;
         g_events = dead->next;
+        if(dead->timer) lv_timer_delete(dead->timer);
         free(dead->callback);
         free(dead->user_data);
         free(dead->screen_name);
@@ -2567,6 +2580,57 @@ static int screen_anim_from_name(const char * name, lv_screen_load_anim_t * valu
     return -4;
 }
 
+static void timer_update_display(lvd_preview_event_rec_t * event)
+{
+    if(!event || !event->timer_subject || !event->timer_display_subject) return;
+    int32_t value = lv_subject_get_int(&event->timer_subject->subject);
+    int64_t magnitude = value < 0 ? -(int64_t)value : value;
+    int64_t minutes = magnitude / 60;
+    int32_t seconds = (int32_t)(magnitude % 60);
+    char text[32];
+    snprintf(text, sizeof(text), "%s%02lld:%02ld", value < 0 ? "-" : "",
+             (long long)minutes, (long)seconds);
+    lv_subject_copy_string(&event->timer_display_subject->subject, text);
+}
+
+static void timer_set_running(lvd_preview_event_rec_t * event, int running)
+{
+    if(event && event->timer_running_subject)
+        lv_subject_set_int(&event->timer_running_subject->subject, running ? 1 : 0);
+}
+
+static void preview_timer_tick(lv_timer_t * timer)
+{
+    lvd_preview_event_rec_t * event = lv_timer_get_user_data(timer);
+    if(!event || !event->timer_subject) return;
+    int32_t current = lv_subject_get_int(&event->timer_subject->subject);
+    int64_t next64 = (int64_t)current + event->timer_step;
+    int32_t next;
+    int complete = 0;
+    if(event->timer_step < 0 && next64 <= event->timer_min) {
+        next = event->timer_min;
+        complete = 1;
+    }
+    else if(next64 < INT32_MIN) next = INT32_MIN;
+    else if(next64 > INT32_MAX) next = INT32_MAX;
+    else next = (int32_t)next64;
+    lv_subject_set_int(&event->timer_subject->subject, next);
+    timer_update_display(event);
+    if(complete) {
+        lv_timer_pause(timer);
+        timer_set_running(event, 0);
+    }
+}
+
+static lvd_preview_event_rec_t * find_timer_start(lvd_preview_subject_rec_t * subject)
+{
+    for(lvd_preview_event_rec_t * event = g_events; event; event = event->next) {
+        if(event->kind == LVD_PREVIEW_EVENT_TIMER_START && event->timer_subject == subject)
+            return event;
+    }
+    return NULL;
+}
+
 static void preview_custom_event_cb(lv_event_t * e)
 {
     if(g_clearing) return;
@@ -2575,6 +2639,31 @@ static void preview_custom_event_cb(lv_event_t * e)
     if(event->kind == LVD_PREVIEW_EVENT_CALLBACK) {
         lvd_preview_js_event_stub(event->callback, (int)lv_event_get_code(e),
                                   event->user_data, event->has_user_data);
+        return;
+    }
+    if(event->kind == LVD_PREVIEW_EVENT_TIMER_START) {
+        if(!event->timer) {
+            event->timer = lv_timer_create(preview_timer_tick, event->timer_period, event);
+            if(!event->timer) return;
+        }
+        else {
+            lv_timer_set_period(event->timer, event->timer_period);
+            lv_timer_resume(event->timer);
+        }
+        timer_set_running(event, 1);
+        /* Immediate feedback: update once on click instead of waiting one period. */
+        preview_timer_tick(event->timer);
+        return;
+    }
+    if(event->kind == LVD_PREVIEW_EVENT_TIMER_PAUSE
+       || event->kind == LVD_PREVIEW_EVENT_TIMER_RESET) {
+        lvd_preview_event_rec_t * owner = find_timer_start(event->timer_subject);
+        if(owner && owner->timer) lv_timer_pause(owner->timer);
+        timer_set_running(owner ? owner : event, 0);
+        if(event->kind == LVD_PREVIEW_EVENT_TIMER_RESET) {
+            lv_subject_set_int(&event->timer_subject->subject, event->timer_reset_value);
+            timer_update_display(event);
+        }
         return;
     }
     lvd_preview_node_rec_t * target = find_rec(event->screen_name);
@@ -2705,6 +2794,55 @@ int lvd_preview_add_subject_increment_event(
 #else
     return -4;
 #endif
+}
+
+EMSCRIPTEN_KEEPALIVE
+int lvd_preview_add_timer_event(
+    const char * name, const char * trigger, const char * action,
+    const char * subject_name, const char * display_subject_name,
+    const char * running_subject_name, int32_t step, int32_t min_value,
+    uint32_t period, int32_t reset_value)
+{
+    if(!name || !trigger || !action || !subject_name
+       || !display_subject_name || !running_subject_name) return -3;
+    lvd_preview_node_rec_t * node = find_rec(name);
+    lvd_preview_subject_rec_t * subject = find_subject(subject_name);
+    if(!node || !node->obj || !subject) return -2;
+    if(subject->type != LVD_SUBJECT_INT || period < 16) return -4;
+
+    lvd_preview_subject_rec_t * display = NULL;
+    if(display_subject_name[0]) {
+        display = find_subject(display_subject_name);
+        if(!display) return -2;
+        if(display->type != LVD_SUBJECT_STRING) return -4;
+    }
+    lvd_preview_subject_rec_t * running = NULL;
+    if(running_subject_name[0]) {
+        running = find_subject(running_subject_name);
+        if(!running) return -2;
+        if(running->type != LVD_SUBJECT_INT) return -4;
+    }
+
+    lvd_preview_event_kind_t kind;
+    if(strcmp(action, "timer_start") == 0) kind = LVD_PREVIEW_EVENT_TIMER_START;
+    else if(strcmp(action, "timer_pause") == 0) kind = LVD_PREVIEW_EVENT_TIMER_PAUSE;
+    else if(strcmp(action, "timer_reset") == 0) kind = LVD_PREVIEW_EVENT_TIMER_RESET;
+    else return -4;
+
+    lv_event_code_t code;
+    if(event_from_name(trigger, &code) != 0) return -4;
+    lvd_preview_event_rec_t * event = calloc(1, sizeof(*event));
+    if(!event) return -1;
+    event->kind = kind;
+    event->timer_subject = subject;
+    event->timer_display_subject = display;
+    event->timer_running_subject = running;
+    event->timer_step = step;
+    event->timer_min = min_value;
+    event->timer_period = period;
+    event->timer_reset_value = reset_value;
+    timer_update_display(event);
+    return attach_custom_event(node, code, event);
 }
 
 EMSCRIPTEN_KEEPALIVE

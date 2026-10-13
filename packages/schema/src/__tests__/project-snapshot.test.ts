@@ -53,6 +53,27 @@ describe('ProjectSnapshot v2 persistence', () => {
     expect(loaded.snapshot).toBeNull();
   });
 
+  it('lowers built-in countdown timer actions to the preview model', () => {
+    const { snapshot } = snapshotOf('timer');
+    snapshot.uiProject.subjects.push(
+      { id: 'remaining-id', codeName: 'remaining', type: 'int', initial: 1500, min: 0, max: 1500 },
+      { id: 'display-id', codeName: 'time_text', type: 'string', initial: '25:00' },
+      { id: 'running-id', codeName: 'running', type: 'int', initial: 0, min: 0, max: 1 },
+    );
+    snapshot.uiProject.screens[0]!.root.events.push({
+      on: 'clicked', action: 'timer.start',
+      args: {
+        subject: 'remaining-id', displaySubject: 'display-id', runningSubject: 'running-id',
+        step: -1, min: 0, period: 1000,
+      },
+    });
+
+    expect(snapshotToEditorProject(snapshot).screens[0]!.root.events[0]).toEqual({
+      kind: 'timer_start', trigger: 'clicked', subject: 'remaining',
+      displaySubject: 'time_text', runningSubject: 'running', step: -1, min: 0, period: 1000,
+    });
+  });
+
   it('rejects malformed snapshot envelopes before dereferencing nested fields', () => {
     expect(() => loadStoredProjectDocument({
       kind: 'lvgl-project-snapshot', snapshotVersion: 1,

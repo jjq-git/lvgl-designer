@@ -227,6 +227,47 @@ export function migrateV1ToV2(v1: LvProject, opts: MigrateOptions = {}): Migrate
         if (e.rollover !== undefined) args.rollover = e.rollover;
         return { on: e.trigger, action: 'subject.increment', args };
       }
+      case 'timer_start': {
+        const s = subjectIdByName.get(e.subject);
+        if (s === undefined) { noteMissingSubject(e.subject, path); return null; }
+        const args: Record<string, string | number> = { subject: s };
+        if (e.displaySubject !== undefined) {
+          const id = subjectIdByName.get(e.displaySubject);
+          if (id !== undefined) args.displaySubject = id;
+        }
+        if (e.runningSubject !== undefined) {
+          const id = subjectIdByName.get(e.runningSubject);
+          if (id !== undefined) args.runningSubject = id;
+        }
+        if (e.step !== undefined) args.step = e.step;
+        if (e.min !== undefined) args.min = e.min;
+        if (e.period !== undefined) args.period = e.period;
+        return { on: e.trigger, action: 'timer.start', args };
+      }
+      case 'timer_pause': {
+        const s = subjectIdByName.get(e.subject);
+        if (s === undefined) { noteMissingSubject(e.subject, path); return null; }
+        const args: Record<string, string> = { subject: s };
+        if (e.runningSubject !== undefined) {
+          const id = subjectIdByName.get(e.runningSubject);
+          if (id !== undefined) args.runningSubject = id;
+        }
+        return { on: e.trigger, action: 'timer.pause', args };
+      }
+      case 'timer_reset': {
+        const s = subjectIdByName.get(e.subject);
+        if (s === undefined) { noteMissingSubject(e.subject, path); return null; }
+        const args: Record<string, string | number> = { subject: s, value: e.value };
+        if (e.displaySubject !== undefined) {
+          const id = subjectIdByName.get(e.displaySubject);
+          if (id !== undefined) args.displaySubject = id;
+        }
+        if (e.runningSubject !== undefined) {
+          const id = subjectIdByName.get(e.runningSubject);
+          if (id !== undefined) args.runningSubject = id;
+        }
+        return { on: e.trigger, action: 'timer.reset', args };
+      }
       case 'screen_load':
       case 'screen_create': {
         const args: Record<string, string | number> = { screen: e.screenId };

@@ -295,6 +295,11 @@ export interface PreviewBridge {
     min: number, hasMin: boolean, max: number, hasMax: boolean,
     rollover: boolean, hasRollover: boolean,
   ): number;
+  addTimerEvent(
+    runtimeName: string, trigger: string, action: 'timer_start' | 'timer_pause' | 'timer_reset',
+    subjectName: string, displaySubjectName: string, runningSubjectName: string,
+    step: number, min: number, period: number, resetValue: number,
+  ): number;
   addScreenEvent(
     runtimeName: string, trigger: string, action: 'screen_load' | 'screen_create', screenName: string,
     animType: string, duration: number, delay: number,
@@ -673,6 +678,37 @@ function validateEvents(
         if (event.min !== undefined && event.max !== undefined && event.min > event.max) {
           issue(out, 'E_PREVIEW_EVENT_RANGE_INVALID', eventPath, 'subject_increment 的 min 大于 max');
         }
+      }
+      continue;
+    }
+
+    if (event.kind === 'timer_start' || event.kind === 'timer_pause' || event.kind === 'timer_reset') {
+      const subject = subjects.get(event.subject);
+      if (subject?.type !== 'int') {
+        issue(out, 'E_PREVIEW_EVENT_SUBJECT_TYPE_MISMATCH', `${eventPath}.subject`,
+          `timer 仅支持 int subject:${event.subject}`);
+      }
+      const displaySubject = 'displaySubject' in event ? event.displaySubject : undefined;
+      if (displaySubject !== undefined && subjects.get(displaySubject)?.type !== 'string') {
+        issue(out, 'E_PREVIEW_EVENT_SUBJECT_TYPE_MISMATCH', `${eventPath}.displaySubject`,
+          `timer displaySubject 必须是 string:${displaySubject}`);
+      }
+      if (event.runningSubject !== undefined && subjects.get(event.runningSubject)?.type !== 'int') {
+        issue(out, 'E_PREVIEW_EVENT_SUBJECT_TYPE_MISMATCH', `${eventPath}.runningSubject`,
+          `timer runningSubject 必须是 int:${event.runningSubject}`);
+      }
+      if (event.kind === 'timer_start') {
+        for (const key of ['step', 'min', 'period'] as const) {
+          const value = event[key];
+          if (value !== undefined && !validI32(value)) {
+            issue(out, 'E_PREVIEW_EVENT_VALUE_INVALID', `${eventPath}.${key}`, `${key} 必须是 int32`);
+          }
+        }
+        if (event.period !== undefined && event.period < 16) {
+          issue(out, 'E_PREVIEW_EVENT_TIME_INVALID', `${eventPath}.period`, 'period 不得小于 16ms');
+        }
+      } else if (event.kind === 'timer_reset' && !validI32(event.value)) {
+        issue(out, 'E_PREVIEW_EVENT_VALUE_INVALID', `${eventPath}.value`, 'reset value 必须是 int32');
       }
       continue;
     }
@@ -1547,6 +1583,15 @@ function applyNode(
         event.max ?? 0, event.max !== undefined,
         event.rollover ?? false, event.rollover !== undefined,
       ), `preview.addSubjectIncrementEvent(${node.runtimeName}:${event.trigger}:${event.subject})`);
+    } else if (event.kind === 'timer_start' || event.kind === 'timer_pause' || event.kind === 'timer_reset') {
+      check(bridge.addTimerEvent(
+        node.runtimeName, event.trigger, event.kind, event.subject,
+        ('displaySubject' in event ? event.displaySubject : undefined) ?? '', event.runningSubject ?? '',
+        event.kind === 'timer_start' ? event.step ?? -1 : 0,
+        event.kind === 'timer_start' ? event.min ?? 0 : 0,
+        event.kind === 'timer_start' ? event.period ?? 1000 : 1000,
+        event.kind === 'timer_reset' ? event.value : 0,
+      ), `preview.addTimerEvent(${node.runtimeName}:${event.trigger}:${event.subject})`);
     } else {
       check(bridge.addScreenEvent(
         node.runtimeName, event.trigger, event.kind, event.screenName,

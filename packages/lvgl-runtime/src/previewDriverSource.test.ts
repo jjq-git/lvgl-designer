@@ -86,6 +86,9 @@ describe('preview_driver.c 协议边界', () => {
       "addEventListener('pointerdown'",
       "addEventListener('wheel'",
     ]) expect(hostSource).toContain(api);
+    expect(hostSource).toContain('pointerReleaseQueued');
+    expect(hostSource).toContain('if(state.pointerReleaseQueued) return;');
+    expect(hostSource).toContain("addEventListener('lostpointercapture', onLostPointerCapture)");
     for (const format of [
       'LV_COLOR_FORMAT_RGB565',
       'LV_COLOR_FORMAT_RGB565_SWAPPED',

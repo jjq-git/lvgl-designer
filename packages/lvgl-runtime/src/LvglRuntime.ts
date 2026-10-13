@@ -89,6 +89,10 @@ const SIGS: Record<string, [string | null, string[]]> = {
   lvd_preview_add_subject_increment_event: [
     'number', ['string', 'string', 'string', 'number', 'number', 'number', 'number', 'number', 'number', 'number'],
   ],
+  lvd_preview_add_timer_event: [
+    'number', ['string', 'string', 'string', 'string', 'string', 'string',
+      'number', 'number', 'number', 'number'],
+  ],
   lvd_preview_add_screen_event: [
     'number', ['string', 'string', 'string', 'string', 'string', 'number', 'number'],
   ],
@@ -112,6 +116,7 @@ const PREVIEW_EXPORTS = [
   'lvd_preview_bind_state', 'lvd_preview_bind_style', 'lvd_preview_add_callback_event',
   'lvd_preview_add_subject_set_event', 'lvd_preview_add_subject_toggle_event',
   'lvd_preview_add_subject_increment_event', 'lvd_preview_add_screen_event',
+  'lvd_preview_add_timer_event',
   'lvd_preview_finish',
 ] as const;
 
@@ -498,6 +503,13 @@ export class LvglRuntime implements LvglRuntimeApi {
       ) => call(
         'lvd_preview_add_subject_increment_event', name, trigger, subjectName, step,
         min, Number(hasMin), max, Number(hasMax), Number(rollover), Number(hasRollover),
+      ),
+      addTimerEvent: (
+        name, trigger, action, subjectName, displaySubjectName, runningSubjectName,
+        step, min, period, resetValue,
+      ) => call(
+        'lvd_preview_add_timer_event', name, trigger, action, subjectName,
+        displaySubjectName, runningSubjectName, step, min, period, resetValue,
       ),
       addScreenEvent: (name, trigger, action, screenName, animType, duration, delay) =>
         call('lvd_preview_add_screen_event', name, trigger, action, screenName, animType, duration, delay),

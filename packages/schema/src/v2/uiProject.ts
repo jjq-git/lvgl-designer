@@ -229,6 +229,37 @@ export const BUILTIN_ACTIONS: ActionRegistry = {
       { name: 'rollover', type: 'bool' },
     ],
   },
+  'timer.start': {
+    id: 'timer.start',
+    displayName: '启动倒计时',
+    description: '按周期更新整数数据源，可同步 MM:SS 文本和运行状态。',
+    params: [
+      { name: 'subject', type: 'subjectRef', required: true },
+      { name: 'displaySubject', type: 'subjectRef' },
+      { name: 'runningSubject', type: 'subjectRef' },
+      { name: 'step', type: 'int', default: -1 },
+      { name: 'min', type: 'int', default: 0 },
+      { name: 'period', type: 'int', default: 1000, min: 16, max: 86400000 },
+    ],
+  },
+  'timer.pause': {
+    id: 'timer.pause',
+    displayName: '暂停计时',
+    params: [
+      { name: 'subject', type: 'subjectRef', required: true },
+      { name: 'runningSubject', type: 'subjectRef' },
+    ],
+  },
+  'timer.reset': {
+    id: 'timer.reset',
+    displayName: '重置计时',
+    params: [
+      { name: 'subject', type: 'subjectRef', required: true },
+      { name: 'value', type: 'int', required: true, min: 0 },
+      { name: 'displaySubject', type: 'subjectRef' },
+      { name: 'runningSubject', type: 'subjectRef' },
+    ],
+  },
 };
 
 /* ---------------------------------------------------------------- Subject */

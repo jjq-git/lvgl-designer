@@ -163,6 +163,49 @@ function eventV1(
         ...(typeof args.max === 'number' ? { max: args.max } : {}),
         ...(typeof args.rollover === 'boolean' ? { rollover: args.rollover } : {}),
       };
+    case 'timer.start': {
+      const display = typeof args.displaySubject === 'string' ? subjects.get(args.displaySubject) : undefined;
+      const running = typeof args.runningSubject === 'string' ? subjects.get(args.runningSubject) : undefined;
+      if (subject?.type !== 'int' || (display !== undefined && display.type !== 'string')
+        || (running !== undefined && running.type !== 'int')) {
+        issues.push(`${path} 的 timer.start 参数无效`);
+        return null;
+      }
+      return {
+        kind: 'timer_start', trigger: event.on, subject: subject.name,
+        ...(display ? { displaySubject: display.name } : {}),
+        ...(running ? { runningSubject: running.name } : {}),
+        ...(typeof args.step === 'number' ? { step: args.step } : {}),
+        ...(typeof args.min === 'number' ? { min: args.min } : {}),
+        ...(typeof args.period === 'number' ? { period: args.period } : {}),
+      };
+    }
+    case 'timer.pause': {
+      const running = typeof args.runningSubject === 'string' ? subjects.get(args.runningSubject) : undefined;
+      if (subject?.type !== 'int' || (running !== undefined && running.type !== 'int')) {
+        issues.push(`${path} 的 timer.pause 参数无效`);
+        return null;
+      }
+      return {
+        kind: 'timer_pause', trigger: event.on, subject: subject.name,
+        ...(running ? { runningSubject: running.name } : {}),
+      };
+    }
+    case 'timer.reset': {
+      const display = typeof args.displaySubject === 'string' ? subjects.get(args.displaySubject) : undefined;
+      const running = typeof args.runningSubject === 'string' ? subjects.get(args.runningSubject) : undefined;
+      if (subject?.type !== 'int' || typeof args.value !== 'number'
+        || (display !== undefined && display.type !== 'string')
+        || (running !== undefined && running.type !== 'int')) {
+        issues.push(`${path} 的 timer.reset 参数无效`);
+        return null;
+      }
+      return {
+        kind: 'timer_reset', trigger: event.on, subject: subject.name, value: args.value,
+        ...(display ? { displaySubject: display.name } : {}),
+        ...(running ? { runningSubject: running.name } : {}),
+      };
+    }
     default:
       if (event.action.startsWith('custom.') && /^custom\.[a-z][a-z0-9_]*$/.test(event.action)) {
         const userData = args.userData;

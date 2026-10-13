@@ -72,5 +72,10 @@ export type IREvent =
   | { kind: 'subject_toggle'; trigger: string; subject: CName }
   | { kind: 'subject_increment'; trigger: string; subject: CName;
       step?: number; min?: number; max?: number; rollover?: boolean }
+  | { kind: 'timer_start'; trigger: string; subject: CName;
+      displaySubject?: CName; runningSubject?: CName; step?: number; min?: number; period?: number }
+  | { kind: 'timer_pause'; trigger: string; subject: CName; runningSubject?: CName }
+  | { kind: 'timer_reset'; trigger: string; subject: CName; value: number;
+      displaySubject?: CName; runningSubject?: CName }
   | { kind: 'screen_load' | 'screen_create'; trigger: string; screenName: CName;
       animType?: string; duration?: number; delay?: number };

@@ -81,6 +81,8 @@ function fakeBridge(calls: string[]): PreviewBridge {
     ) => (calls.push(
       `event-inc:${name}:${trigger}:${subject}:${step}:${min}:${hasMin}:${max}:${hasMax}:${rollover}:${hasRollover}`,
     ), 0),
+    addTimerEvent: (name, trigger, action, subject, display, running, step, min, period, value) =>
+      (calls.push(`event-timer:${name}:${trigger}:${action}:${subject}:${display}:${running}:${step}:${min}:${period}:${value}`), 0),
     addScreenEvent: (name, trigger, action, screen, anim, duration, delay) =>
       (calls.push(`event-screen:${name}:${trigger}:${action}:${screen}:${anim}:${duration}:${delay}`), 0),
     finish: (home) => (calls.push(`finish:${home}`), 0),
@@ -101,6 +103,29 @@ describe('PreviewProgram runtime executor', () => {
     expect(calls).toContain('node:panel:title:label');
     expect(calls).toContain('str:title:text:Hello');
     expect(calls.at(-1)).toBe('finish:main');
+  });
+
+  it('executes timer actions with countdown, formatted display and running subjects', () => {
+    const project = createEmptyProject('timer');
+    project.display.colorDepth = 32;
+    project.subjects.push(
+      { name: 'remaining', type: 'int', initial: 1500, min: 0, max: 1500 },
+      { name: 'time_text', type: 'string', initial: '25:00' },
+      { name: 'running', type: 'int', initial: 0, min: 0, max: 1 },
+    );
+    const button = createNode('button');
+    button.name = 'start';
+    button.events.push({
+      kind: 'timer_start', trigger: 'clicked', subject: 'remaining',
+      displaySubject: 'time_text', runningSubject: 'running', step: -1, min: 0, period: 1000,
+    });
+    project.screens[0]!.root.children.push(button);
+    const compiled = compilePreview(project).program!;
+    const calls: string[] = [];
+
+    expect(validatePreviewProgramSupport(compiled)).toEqual([]);
+    executePreviewProgram(compiled, fakeBridge(calls));
+    expect(calls).toContain('event-timer:start:clicked:timer_start:remaining:time_text:running:-1:0:1000:0');
   });
 
   it('通用 align 属性通过现有 style bridge 预览并校验枚举', () => {

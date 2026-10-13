@@ -714,6 +714,9 @@ const ACTION_PARAM_LABELS: Record<string, string> = {
   min: '下限',
   max: '上限',
   rollover: '循环',
+  displaySubject: '时间文本数据源',
+  runningSubject: '运行状态数据源',
+  period: '更新周期 (ms)',
   userData: '附加数据',
 };
 

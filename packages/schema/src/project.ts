@@ -113,6 +113,11 @@ export type EventAction =
   | { kind: 'subject_toggle'; trigger: TriggerToken; subject: CName }
   | { kind: 'subject_increment'; trigger: TriggerToken; subject: CName;
       step?: number; min?: number; max?: number; rollover?: boolean }
+  | { kind: 'timer_start'; trigger: TriggerToken; subject: CName;
+      displaySubject?: CName; runningSubject?: CName; step?: number; min?: number; period?: number }
+  | { kind: 'timer_pause'; trigger: TriggerToken; subject: CName; runningSubject?: CName }
+  | { kind: 'timer_reset'; trigger: TriggerToken; subject: CName; value: number;
+      displaySubject?: CName; runningSubject?: CName }
   | { kind: 'screen_load'; trigger: TriggerToken; screenId: Uuid;
       animType?: ScreenLoadAnim; duration?: number; delay?: number }
   | { kind: 'screen_create'; trigger: TriggerToken; screenId: Uuid;

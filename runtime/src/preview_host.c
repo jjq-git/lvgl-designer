@@ -97,7 +97,10 @@ EM_JS(void, lvd_canvas_input_init, (), {
     const canvas = Module.canvas;
     if(!canvas) return;
     if(canvas.__lvdInputCleanup) canvas.__lvdInputCleanup();
-    const state = { x: 0, y: 0, down: 0, wheel: 0, middle: 0 };
+    const state = {
+        x: 0, y: 0, down: 0, wheel: 0, middle: 0,
+        pointerPressReported: 0, pointerReleaseQueued: 0,
+    };
     Module.__lvdInputState = state;
     const updatePoint = (event) => {
         const rect = canvas.getBoundingClientRect();
@@ -109,7 +112,11 @@ EM_JS(void, lvd_canvas_input_init, (), {
     };
     const onPointerDown = (event) => {
         updatePoint(event);
-        if(event.button === 0) state.down = 1;
+        if(event.button === 0) {
+            state.down = 1;
+            state.pointerPressReported = 0;
+            state.pointerReleaseQueued = 0;
+        }
         if(event.button === 1) state.middle = 1;
         if(canvas.setPointerCapture) {
             try { canvas.setPointerCapture(event.pointerId); }
@@ -119,10 +126,24 @@ EM_JS(void, lvd_canvas_input_init, (), {
     const onPointerMove = (event) => updatePoint(event);
     const onPointerUp = (event) => {
         updatePoint(event);
-        if(event.button === 0) state.down = 0;
+        if(event.button === 0) {
+            if(state.pointerPressReported) state.down = 0;
+            else state.pointerReleaseQueued = 1;
+        }
         if(event.button === 1) state.middle = 0;
     };
-    const onPointerCancel = () => { state.down = 0; state.middle = 0; };
+    const onPointerCancel = () => {
+        state.down = 0;
+        state.middle = 0;
+        state.pointerPressReported = 0;
+        state.pointerReleaseQueued = 0;
+    };
+    const onLostPointerCapture = () => {
+        /* A normal fast click releases capture immediately after pointerup.
+         * Keep its queued release until LVGL has observed one pressed sample. */
+        if(state.pointerReleaseQueued) return;
+        onPointerCancel();
+    };
     const onWheel = (event) => {
         state.wheel += event.deltaY < 0 ? -1 : event.deltaY > 0 ? 1 : 0;
         event.preventDefault();
@@ -131,14 +152,14 @@ EM_JS(void, lvd_canvas_input_init, (), {
     canvas.addEventListener('pointermove', onPointerMove);
     canvas.addEventListener('pointerup', onPointerUp);
     canvas.addEventListener('pointercancel', onPointerCancel);
-    canvas.addEventListener('lostpointercapture', onPointerCancel);
+    canvas.addEventListener('lostpointercapture', onLostPointerCapture);
     canvas.addEventListener('wheel', onWheel, { passive: false });
     canvas.__lvdInputCleanup = () => {
         canvas.removeEventListener('pointerdown', onPointerDown);
         canvas.removeEventListener('pointermove', onPointerMove);
         canvas.removeEventListener('pointerup', onPointerUp);
         canvas.removeEventListener('pointercancel', onPointerCancel);
-        canvas.removeEventListener('lostpointercapture', onPointerCancel);
+        canvas.removeEventListener('lostpointercapture', onLostPointerCapture);
         canvas.removeEventListener('wheel', onWheel);
         delete canvas.__lvdInputCleanup;
         delete Module.__lvdInputState;
@@ -155,6 +176,13 @@ EM_JS(void, lvd_canvas_pointer_read, (int32_t * x, int32_t * y, int32_t * down),
     HEAP32[x >> 2] = state.x;
     HEAP32[y >> 2] = state.y;
     HEAP32[down >> 2] = state.down;
+    if(state.down) {
+        state.pointerPressReported = 1;
+        if(state.pointerReleaseQueued) {
+            state.down = 0;
+            state.pointerReleaseQueued = 0;
+        }
+    }
 });
 
 EM_JS(void, lvd_canvas_encoder_read, (int32_t * diff, int32_t * down), {

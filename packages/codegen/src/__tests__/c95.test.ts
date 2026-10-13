@@ -79,6 +79,30 @@ describe('LVGL 9.5 C emitter', () => {
     expect(emitC94(caseTargets()).files.some((f) => f.path === 'build-manifest.json')).toBe(false);
   });
 
+  it('exports timer actions as device-side timers', () => {
+    const project = caseTargets();
+    project.subjects.push(
+      { name: 'remaining', type: 'int', initial: 1500, min: 0, max: 1500 },
+      { name: 'time_text', type: 'string', initial: '25:00' },
+    );
+    const button = project.screens[0]!.root.children[0]!;
+    button.events.push({
+      kind: 'timer_start', trigger: 'clicked', subject: 'remaining',
+      displaySubject: 'time_text', step: -1, min: 0, period: 1000,
+    });
+
+    const result = emitC95(project, { colorFormat: 'RGB565' });
+    const screen = result.files.find((file) => file.path === 'screens/main.c')!.content;
+    const subjects = result.files.find((file) => file.path === 'subjects.c')!.content;
+    const ui = result.files.find((file) => file.path === 'ui.c')!.content;
+
+    expect(result.diagnostics.filter((item) => item.severity === 'error')).toEqual([]);
+    expect(screen).toContain('ui_timer_start(&subject_remaining, &subject_time_text, NULL, -1, 0, 1000);');
+    expect(subjects).toContain('static void ui_timer_tick(lv_timer_t * timer)');
+    expect(subjects).toContain('lv_subject_snprintf(state->display, "%s%02lld:%02ld"');
+    expect(ui).toContain('ui_timers_deinit();');
+  });
+
   it('16bpp 发布必须确认 RGB565 字节序，且拒绝与 colorDepth 不匹配的格式', () => {
     const project = caseTargets();
     expect(emitC95(project).diagnostics).toContainEqual(expect.objectContaining({

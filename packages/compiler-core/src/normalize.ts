@@ -359,6 +359,24 @@ function normalizeEvent(e: EventAction, node: WidgetNode, ctx: Ctx): IREvent | n
         step: e.step, min: e.min, max: e.max, rollover: e.rollover,
       };
     }
+    case 'timer_start':
+    case 'timer_pause':
+    case 'timer_reset': {
+      if (!ctx.subjectTypes.has(e.subject)) {
+        err(ctx, 'E_DANGLING_SUBJECT', `事件引用不存在的 subject:${e.subject}`, node.id);
+        return null;
+      }
+      const displaySubject = 'displaySubject' in e ? e.displaySubject : undefined;
+      if (displaySubject !== undefined && !ctx.subjectTypes.has(displaySubject)) {
+        err(ctx, 'E_DANGLING_SUBJECT', `计时显示引用不存在的 subject:${displaySubject}`, node.id);
+        return null;
+      }
+      if (e.runningSubject !== undefined && !ctx.subjectTypes.has(e.runningSubject)) {
+        err(ctx, 'E_DANGLING_SUBJECT', `计时状态引用不存在的 subject:${e.runningSubject}`, node.id);
+        return null;
+      }
+      return { ...e };
+    }
     case 'screen_load':
     case 'screen_create': {
       const screenName = ctx.screenIdToName.get(e.screenId);

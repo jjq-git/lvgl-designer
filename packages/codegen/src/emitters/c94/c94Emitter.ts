@@ -560,6 +560,26 @@ function emitEvent(
       }
       break;
     }
+    case 'timer_start':
+    case 'timer_pause':
+    case 'timer_reset': {
+      const fnName = `timer_evt_${++ctx.trampolineN}_cb`;
+      const tw = new CWriter();
+      tw.push(`static void ${fnName}(lv_event_t * e)`);
+      tw.push('{');
+      tw.push('    LV_UNUSED(e);');
+      if (e.kind === 'timer_start') {
+        tw.push(`    ui_timer_start(&subject_${e.subject}, ${e.displaySubject ? `&subject_${e.displaySubject}` : 'NULL'}, ${e.runningSubject ? `&subject_${e.runningSubject}` : 'NULL'}, ${e.step ?? -1}, ${e.min ?? 0}, ${e.period ?? 1000});`);
+      } else if (e.kind === 'timer_pause') {
+        tw.push(`    ui_timer_pause(&subject_${e.subject}, ${e.runningSubject ? `&subject_${e.runningSubject}` : 'NULL'});`);
+      } else {
+        tw.push(`    ui_timer_reset(&subject_${e.subject}, ${e.displaySubject ? `&subject_${e.displaySubject}` : 'NULL'}, ${e.runningSubject ? `&subject_${e.runningSubject}` : 'NULL'}, ${e.value});`);
+      }
+      tw.push('}');
+      ctx.trampolines.push(tw.toString());
+      w.push(`lv_obj_add_event_cb(${objExpr}, ${fnName}, ${trig}, NULL);`);
+      break;
+    }
     case 'screen_load':
     case 'screen_create': {
       // 目标屏可能尚未创建 → 生成惰性跳板(ui_<name>_create 可重入),等价 XML 的按名延迟解析
@@ -748,6 +768,7 @@ function stylesFiles(ir: IRProject): { h: string; c: string } {
 }
 
 function subjectsFiles(ir: IRProject): { h: string; c: string } {
+  const timers = ir.screens.some((screen) => nodeHasTimerEvent(screen.root));
   const h = new CWriter();
   h.push(`/* subjects.h — ${GEN_HEADER.slice(3, -3).trim()} */`);
   h.push('#pragma once');
@@ -756,6 +777,12 @@ function subjectsFiles(ir: IRProject): { h: string; c: string } {
   for (const s of ir.subjects) h.push(`extern lv_subject_t subject_${s.name};`);
   if (ir.subjects.length > 0) h.push('');
   h.push('void ui_subjects_init(void);');
+  if (timers) {
+    h.push('void ui_timer_start(lv_subject_t * value, lv_subject_t * display, lv_subject_t * running, int32_t step, int32_t min_value, uint32_t period);');
+    h.push('void ui_timer_pause(lv_subject_t * value, lv_subject_t * running);');
+    h.push('void ui_timer_reset(lv_subject_t * value, lv_subject_t * display, lv_subject_t * running, int32_t reset_value);');
+    h.push('void ui_timers_deinit(void);');
+  }
 
   const c = new CWriter();
   c.push(`/* subjects.c — ${GEN_HEADER.slice(3, -3).trim()} */`);
@@ -796,7 +823,98 @@ function subjectsFiles(ir: IRProject): { h: string; c: string } {
     }
   }
   c.push('}');
+  if (timers) {
+    c.push('');
+    c.push('typedef struct {');
+    c.push('    lv_timer_t * timer;');
+    c.push('    lv_subject_t * value;');
+    c.push('    lv_subject_t * display;');
+    c.push('    lv_subject_t * running;');
+    c.push('    int32_t step;');
+    c.push('    int32_t min_value;');
+    c.push('} ui_timer_state_t;');
+    c.push(`static ui_timer_state_t ui_timers[${Math.max(1, ir.subjects.length)}];`);
+    c.push('');
+    c.push('static ui_timer_state_t * ui_timer_find(lv_subject_t * value, bool create)');
+    c.push('{');
+    c.push('    ui_timer_state_t * empty = NULL;');
+    c.push('    for(uint32_t i = 0; i < sizeof(ui_timers) / sizeof(ui_timers[0]); i++) {');
+    c.push('        if(ui_timers[i].value == value) return &ui_timers[i];');
+    c.push('        if(!empty && !ui_timers[i].value) empty = &ui_timers[i];');
+    c.push('    }');
+    c.push('    if(create && empty) empty->value = value;');
+    c.push('    return create ? empty : NULL;');
+    c.push('}');
+    c.push('');
+    c.push('static void ui_timer_format(ui_timer_state_t * state)');
+    c.push('{');
+    c.push('    if(!state || !state->display) return;');
+    c.push('    int32_t value = lv_subject_get_int(state->value);');
+    c.push('    int64_t magnitude = value < 0 ? -(int64_t)value : value;');
+    c.push('    lv_subject_snprintf(state->display, "%s%02lld:%02ld", value < 0 ? "-" : "", (long long)(magnitude / 60), (long)(magnitude % 60));');
+    c.push('}');
+    c.push('');
+    c.push('static void ui_timer_tick(lv_timer_t * timer)');
+    c.push('{');
+    c.push('    ui_timer_state_t * state = lv_timer_get_user_data(timer);');
+    c.push('    int32_t current = lv_subject_get_int(state->value);');
+    c.push('    int64_t next = (int64_t)current + state->step;');
+    c.push('    bool complete = state->step < 0 && next <= state->min_value;');
+    c.push('    if(complete) next = state->min_value;');
+    c.push('    if(next < INT32_MIN) next = INT32_MIN;');
+    c.push('    if(next > INT32_MAX) next = INT32_MAX;');
+    c.push('    lv_subject_set_int(state->value, (int32_t)next);');
+    c.push('    ui_timer_format(state);');
+    c.push('    if(complete) {');
+    c.push('        lv_timer_pause(timer);');
+    c.push('        if(state->running) lv_subject_set_int(state->running, 0);');
+    c.push('    }');
+    c.push('}');
+    c.push('');
+    c.push('void ui_timer_start(lv_subject_t * value, lv_subject_t * display, lv_subject_t * running, int32_t step, int32_t min_value, uint32_t period)');
+    c.push('{');
+    c.push('    ui_timer_state_t * state = ui_timer_find(value, true);');
+    c.push('    if(!state) return;');
+    c.push('    state->display = display; state->running = running; state->step = step; state->min_value = min_value;');
+    c.push('    if(!state->timer) state->timer = lv_timer_create(ui_timer_tick, period, state);');
+    c.push('    else { lv_timer_set_period(state->timer, period); lv_timer_resume(state->timer); }');
+    c.push('    if(running) lv_subject_set_int(running, 1);');
+    c.push('    if(state->timer) ui_timer_tick(state->timer);');
+    c.push('}');
+    c.push('');
+    c.push('void ui_timer_pause(lv_subject_t * value, lv_subject_t * running)');
+    c.push('{');
+    c.push('    ui_timer_state_t * state = ui_timer_find(value, false);');
+    c.push('    if(state && state->timer) lv_timer_pause(state->timer);');
+    c.push('    if(running) lv_subject_set_int(running, 0);');
+    c.push('}');
+    c.push('');
+    c.push('void ui_timer_reset(lv_subject_t * value, lv_subject_t * display, lv_subject_t * running, int32_t reset_value)');
+    c.push('{');
+    c.push('    ui_timer_state_t * state = ui_timer_find(value, true);');
+    c.push('    if(!state) return;');
+    c.push('    if(state->timer) lv_timer_pause(state->timer);');
+    c.push('    state->display = display; state->running = running;');
+    c.push('    lv_subject_set_int(value, reset_value);');
+    c.push('    ui_timer_format(state);');
+    c.push('    if(running) lv_subject_set_int(running, 0);');
+    c.push('}');
+    c.push('');
+    c.push('void ui_timers_deinit(void)');
+    c.push('{');
+    c.push('    for(uint32_t i = 0; i < sizeof(ui_timers) / sizeof(ui_timers[0]); i++) {');
+    c.push('        if(ui_timers[i].timer) lv_timer_delete(ui_timers[i].timer);');
+    c.push('        lv_memzero(&ui_timers[i], sizeof(ui_timers[i]));');
+    c.push('    }');
+    c.push('}');
+  }
   return { h: h.toString(), c: c.toString() };
+}
+
+function nodeHasTimerEvent(node: IRNode): boolean {
+  return node.events.some((event) => event.kind === 'timer_start'
+    || event.kind === 'timer_pause' || event.kind === 'timer_reset')
+    || node.children.some(nodeHasTimerEvent);
 }
 
 function strBufLen(s: SubjectDef & { type: 'string' }): number {
@@ -856,6 +974,7 @@ function uiH(ir: IRProject): string {
 }
 
 function uiC(ir: IRProject): string {
+  const timers = ir.screens.some((screen) => nodeHasTimerEvent(screen.root));
   const w = new CWriter();
   w.push(`/* ui.c — ${GEN_HEADER.slice(3, -3).trim()} */`);
   w.push('#include "ui.h"');
@@ -869,6 +988,7 @@ function uiC(ir: IRProject): string {
   w.push('');
   w.push('void ui_deinit(void)');
   w.push('{');
+  if (timers) w.push('    ui_timers_deinit();');
   for (const s of ir.screens) w.push(`    ui_${s.name}_destroy();`);
   w.push('}');
   return w.toString();

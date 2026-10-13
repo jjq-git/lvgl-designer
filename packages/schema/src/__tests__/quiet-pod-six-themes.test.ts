@@ -104,6 +104,17 @@ describe('six differentiated quiet-pod interfaces', () => {
     expect(new Set(backgrounds).size).toBe(CASES.length);
   });
 
+  it('keeps every secondary WF2D-1040 page title beside its brand icon', () => {
+    const snapshot = load('WF2D-1040-quiet-air');
+    for (const screen of snapshot.uiProject.screens.filter((candidate) => !candidate.isHome)) {
+      const brand = screen.root.children.find((node) => node.codeName === `${screen.codeName}_brand_logo`)!;
+      const title = screen.root.children.find((node) => node.codeName === `${screen.codeName}_title`)!;
+      expect(brand.props, screen.codeName).toMatchObject({ x: 28, y: 23, width: 32, height: 32 });
+      expect(title.props, screen.codeName).toMatchObject({ x: 78, y: 22, height: 36 });
+      expect(Number(title.props.x) - (Number(brand.props.x) + Number(brand.props.width))).toBe(18);
+    }
+  });
+
   it('keeps amber navigation labels readable on every screen', () => {
     const snapshot = load('WF2D-1050-quiet-lighting');
     const tokens = new Map(snapshot.uiProject.themes[0]!.tokens.map((token) => [token.id, token.value]));

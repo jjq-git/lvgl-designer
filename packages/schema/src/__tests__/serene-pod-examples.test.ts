@@ -133,6 +133,17 @@ describe('serene pod example projects', () => {
     expect(findNode(home.root, 'home_co2')?.props.y).toBe(276);
   });
 
+  it('keeps every WF2D-1040 page title grouped with its brand icon', () => {
+    const { snapshot } = loadExample('WF2D-1040');
+    for (const screen of snapshot.uiProject.screens) {
+      const brand = findNode(screen.root, `${screen.codeName}_brand_logo`)!;
+      const title = findNode(screen.root, `${screen.codeName}_title`)!;
+      expect(brand.props, screen.codeName).toMatchObject({ x: 28, y: 23, width: 32, height: 32 });
+      expect(title.props, screen.codeName).toMatchObject({ x: 78, y: 22, height: 36 });
+      expect(Number(title.props.x) - (Number(brand.props.x) + Number(brand.props.width))).toBe(18);
+    }
+  });
+
   it('keeps five independent visual systems instead of recoloring one shared theme', () => {
     const themeCases = [
       ['WF2D-1030', 'home_rail', '#234A35', 'home_nav_home', '#F0C987', 8],

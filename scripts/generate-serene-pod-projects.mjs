@@ -271,11 +271,16 @@ function layoutDock(screen, width, height, compact = false) {
 function layoutHeader(screen, width, compact = false) {
   const prefix = screen.codeName;
   const top = compact ? 15 : 18;
-  setRect(findBrand(screen), compact ? 22 : 28, top + 5, 32, 32);
-  setRect(findNode(screen, `${prefix}_title`), compact ? 184 : 238, top + 4, width - (compact ? 360 : 480), 36);
+  const brandX = compact ? 22 : 28;
+  const brandSize = 32;
+  const titleGap = compact ? 14 : 18;
+  const titleX = brandX + brandSize + titleGap;
+  const statusX = width - (compact ? 172 : 210);
+  setRect(findBrand(screen), brandX, top + 5, brandSize, brandSize);
+  setRect(findNode(screen, `${prefix}_title`), titleX, top + 4, statusX - titleX - 24, 36);
   const status = findNode(screen, `${prefix}_status`);
   if (status) {
-    setRect(status, width - (compact ? 172 : 210), top + 7, compact ? 148 : 180, 30);
+    setRect(status, statusX, top + 7, compact ? 148 : 180, 30);
     patchStyle(status, { text_align: 'right' });
   }
 }

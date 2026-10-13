@@ -1954,9 +1954,9 @@
               "codeName": "air_title",
               "props": {
                 "text": "  AIR",
-                "x": 238,
+                "x": 78,
                 "y": 22,
-                "width": 600,
+                "width": 768,
                 "height": 36
               },
               "styleRefs": [],
@@ -3244,9 +3244,9 @@
               "codeName": "light_title",
               "props": {
                 "text": "  LIGHT",
-                "x": 238,
+                "x": 78,
                 "y": 22,
-                "width": 600,
+                "width": 768,
                 "height": 36
               },
               "styleRefs": [],
@@ -4686,9 +4686,9 @@
               "codeName": "focus_title",
               "props": {
                 "text": "  FOCUS",
-                "x": 238,
+                "x": 78,
                 "y": 22,
-                "width": 600,
+                "width": 768,
                 "height": 36
               },
               "styleRefs": [],
@@ -6196,9 +6196,9 @@
               "codeName": "settings_title",
               "props": {
                 "text": "  SET",
-                "x": 238,
+                "x": 78,
                 "y": 22,
-                "width": 600,
+                "width": 768,
                 "height": 36
               },
               "styleRefs": [],

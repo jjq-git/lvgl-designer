@@ -38,6 +38,26 @@ describe('built-in projects', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
+  it('bundles the three interactive climate interfaces for their device presets', async () => {
+    const cases = [
+      ['builtin:wf2d-1030-climate-control', 1440, 720, 'climate_home'],
+      ['builtin:wf2d-1050-air-comfort', 1024, 600, 'air1050_home'],
+      ['builtin:wf2d-8630-room-climate', 480, 480, 'room8630_home'],
+    ] as const;
+    for (const [id, width, height, homeName] of cases) {
+      const descriptor = findBuiltInProject(id);
+      expect(descriptor, id).toMatchObject({ width, height, shape: 'rect' });
+      const document = await descriptor!.load();
+      expect(isProjectSnapshotV2(document), id).toBe(true);
+      if (!isProjectSnapshotV2(document)) continue;
+      expect(descriptor!.name, id).toBe(document.uiProject.meta.name);
+      expect(document.displayProfile.logicalSize).toEqual({ width, height });
+      const loaded = loadProjectDocument(document);
+      expect(loaded.project.screens).toHaveLength(3);
+      expect(loaded.project.screens.find((screen) => screen.isHome)?.name).toBe(homeName);
+    }
+  });
+
   it('registers all six differentiated quiet-pod interfaces', async () => {
     const quietPods = BUILT_IN_PROJECTS.filter((project) => project.id.includes('-quiet-'));
     expect(quietPods).toHaveLength(6);

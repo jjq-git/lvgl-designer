@@ -21,7 +21,10 @@ DEFAULT_REPOSITORY = "http://192.168.1.88:3000/wf2/ui.podsc.com.git"
 DEFAULT_BRANCH = "main"
 GIT_TIMEOUT = int(os.environ.get("LVGL_SITE_PUBLICATION_GIT_TIMEOUT", "90"))
 COMMAND_TIMEOUT = int(os.environ.get("LVGL_SITE_PUBLICATION_COMMAND_TIMEOUT", "120"))
-SEO_BLOCK_RE = re.compile(r"<!-- SEO:HEAD:START -->.*?<!-- SEO:HEAD:END -->", re.DOTALL)
+SEO_BLOCK_RE = re.compile(
+    r"<!-- SEO:(?P<key>HEAD|BOOTSTRAP):START -->.*?<!-- SEO:(?P=key):END -->",
+    re.DOTALL,
+)
 SAFE_FRAME_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$")
 SAFE_ASSET_SHA_RE = re.compile(r"^[0-9a-f]{64}$")
 
@@ -406,8 +409,10 @@ def _assert_allowlist(
         raise TargetError("write-allowlist-violation", "目标脚本修改了禁止路径", rejected)
     index_path = root / "site" / "index.html"
     if index_path.read_text(encoding="utf-8") != index_before:
-        before = SEO_BLOCK_RE.sub("<SEO-BLOCK>", index_before)
-        after = SEO_BLOCK_RE.sub("<SEO-BLOCK>", index_path.read_text(encoding="utf-8"))
+        before = SEO_BLOCK_RE.sub(lambda match: f"<SEO-BLOCK:{match['key']}>", index_before)
+        after = SEO_BLOCK_RE.sub(
+            lambda match: f"<SEO-BLOCK:{match['key']}>", index_path.read_text(encoding="utf-8")
+        )
         if before != after:
             raise TargetError("write-allowlist-violation", "SEO 脚本修改了 index.html 的手写区块")
     frames_changed = [path for path in changed if path.startswith("site/frames/")]

@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { snapshotToEditorProject, type ProjectSnapshotV2 } from '@lvd/schema/v2';
+import { formatThemeRef, snapshotToEditorProject, type ProjectSnapshotV2 } from '@lvd/schema/v2';
 import { emitC95 } from '../index.js';
 
 describe('climate control C export', () => {
@@ -10,10 +10,14 @@ describe('climate control C export', () => {
       import.meta.url,
     );
     const snapshot = JSON.parse(readFileSync(path, 'utf8')) as ProjectSnapshotV2;
+    const controllerProfileRef = snapshot.buildTarget.controllerProfileRef;
+    if (!controllerProfileRef) throw new Error('The ESP-IDF example must include a controller profile');
+    const themeRef = formatThemeRef(snapshot.buildTarget.uiProjectRef, snapshot.uiProject.themes[0]!.id);
+    expect(snapshot.buildTarget.themeRef).toBe(themeRef);
     const result = emitC95(snapshotToEditorProject(snapshot), {
       target: 'esp-idf',
       colorFormat: snapshot.displayProfile.colorFormat,
-      buildTarget: snapshot.buildTarget,
+      buildTarget: { ...snapshot.buildTarget, controllerProfileRef, themeRef },
       displayProfileRef: snapshot.uiProject.designDisplayRef,
     });
 

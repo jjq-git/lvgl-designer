@@ -152,6 +152,45 @@ export const BUILT_IN_PROJECTS: readonly BuiltInProjectDescriptor[] = [
       return module.default as StoredProjectDocument;
     },
   },
+  {
+    id: 'builtin:wf2d-1030-climate-control',
+    name: 'WF2D-1030 Climate Control',
+    width: 1440,
+    height: 720,
+    shape: 'rect',
+    async load() {
+      const module = await import(
+        '../../../../examples/climate-control/WF2D-1030-climate-control.lvproj.json'
+      );
+      return module.default as StoredProjectDocument;
+    },
+  },
+  {
+    id: 'builtin:wf2d-1050-air-comfort',
+    name: 'WF2D-1050 Air & Comfort',
+    width: 1024,
+    height: 600,
+    shape: 'rect',
+    async load() {
+      const module = await import(
+        '../../../../examples/air-comfort/WF2D-1050-air-comfort.lvproj.json'
+      );
+      return module.default as StoredProjectDocument;
+    },
+  },
+  {
+    id: 'builtin:wf2d-8630-room-climate',
+    name: 'WF2D-8630 Room Climate',
+    width: 480,
+    height: 480,
+    shape: 'rect',
+    async load() {
+      const module = await import(
+        '../../../../examples/air-comfort/WF2D-8630-room-climate.lvproj.json'
+      );
+      return module.default as StoredProjectDocument;
+    },
+  },
 ];
 
 export function findBuiltInProject(id: string): BuiltInProjectDescriptor | undefined {

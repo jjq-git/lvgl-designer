@@ -44,6 +44,7 @@ typedef struct lvd_preview_node_rec {
     int32_t canvas_width;
     int32_t canvas_height;
     lv_color_t canvas_fill_color;
+    char * binding_format;
     struct lvd_preview_node_rec * next;
 } lvd_preview_node_rec_t;
 
@@ -267,6 +268,7 @@ static void clear_tracked(void)
         free(dead->roller_options);
         free_buttonmatrix_map(dead);
         free(dead->animimage_srcs);
+        free(dead->binding_format);
         if(dead->canvas_buf) lv_draw_buf_destroy(dead->canvas_buf);
         free(dead);
     }
@@ -2302,10 +2304,18 @@ int lvd_preview_bind_prop(const char * name, const char * prop,
     if(strcmp(prop, "span_text") == 0 && strcmp(node->type, "spangroup-span") == 0
        && node->structural_handle) {
         if(!label_format_valid(format, subject->type)) return -4;
+        if(node->binding_format) return -4;
+        char * owned_format = format[0] ? strdup(format) : NULL;
+        if(format[0] && !owned_format) return -1;
         observer = lv_spangroup_bind_span_text(
             node->obj, (lv_span_t *)node->structural_handle,
-            &subject->subject, format[0] ? format : NULL
+            &subject->subject, owned_format
         );
+        if(!observer) {
+            free(owned_format);
+            return -4;
+        }
+        node->binding_format = owned_format;
     }
     else
 #endif
@@ -2340,7 +2350,15 @@ int lvd_preview_bind_prop(const char * name, const char * prop,
 #if LV_USE_LABEL
     else if(strcmp(prop, "text") == 0 && strcmp(node->type, "label") == 0) {
         if(!label_format_valid(format, subject->type)) return -4;
-        observer = lv_label_bind_text(node->obj, &subject->subject, format[0] ? format : NULL);
+        if(node->binding_format) return -4;
+        char * owned_format = format[0] ? strdup(format) : NULL;
+        if(format[0] && !owned_format) return -1;
+        observer = lv_label_bind_text(node->obj, &subject->subject, owned_format);
+        if(!observer) {
+            free(owned_format);
+            return -4;
+        }
+        node->binding_format = owned_format;
     }
 #endif
     else return -4;

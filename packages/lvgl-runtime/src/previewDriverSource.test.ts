@@ -231,6 +231,14 @@ describe('preview_driver.c 协议边界', () => {
     expect(source).toContain('Module.__lvEventStub(');
   });
 
+  it('owns observer format strings for the full object lifetime', () => {
+    expect(source).toContain('char * binding_format;');
+    expect(source).toContain('char * owned_format = format[0] ? strdup(format) : NULL;');
+    expect(source).toContain('node->binding_format = owned_format;');
+    expect(source).toContain('free(dead->binding_format);');
+    expect(source).not.toContain('&subject->subject, format[0] ? format : NULL');
+  });
+
   it.skipIf(symbols === null)('调用的每个 LVGL 符号都存在于 9.5.0 实测符号表', () => {
     const calls = [...source.matchAll(/\b(lv_[a-zA-Z0-9_]+)\s*\(/g)]
       .map((match) => match[1]!);

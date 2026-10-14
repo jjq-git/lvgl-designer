@@ -156,6 +156,63 @@ def test_semantic_merge_preserves_order_and_unknown_fields():
     assert listing["future"] == {"keep": True}
 
 
+def test_allowlist_accepts_generated_head_and_bootstrap_updates(tmp_path, monkeypatch):
+    site = tmp_path / "site"
+    site.mkdir()
+    before = (
+        '<html><head><!-- SEO:HEAD:START --><title>Old</title><!-- SEO:HEAD:END --></head>'
+        '<body><main id="gallery"></main><!-- SEO:BOOTSTRAP:START -->'
+        '<script id="site-bootstrap" type="application/json">{"items":[]}</script>'
+        '<!-- SEO:BOOTSTRAP:END --></body></html>'
+    )
+    after = before.replace('<title>Old</title>', '<title>New</title>').replace(
+        '{"items":[]}', '{"items":[{"name":"Climate Control"}]}',
+    )
+    (site / "index.html").write_text(after, encoding="utf-8")
+    monkeypatch.setattr(git_target, "_git_paths", lambda _root: {"site/index.html", "site/ui_list.json"})
+
+    assert git_target._assert_allowlist(
+        tmp_path, {"demoId": "demo"}, "site/uis/demo.json", "site/uis/demo.png", before,
+    ) == ["site/index.html", "site/ui_list.json"]
+
+
+@pytest.mark.parametrize("change", ["body", "unknown-block", "mismatched-marker", "swapped-blocks"])
+def test_allowlist_rejects_handwritten_changes_beside_generated_blocks(tmp_path, monkeypatch, change):
+    site = tmp_path / "site"
+    site.mkdir()
+    head = '<!-- SEO:HEAD:START --><title>Old</title><!-- SEO:HEAD:END -->'
+    bootstrap = '<!-- SEO:BOOTSTRAP:START -->{"items":[]}<!-- SEO:BOOTSTRAP:END -->'
+    handwritten = '<main id="gallery">Original</main>'
+    before = f'{head}{handwritten}{bootstrap}'
+    if change == "body":
+        after = before.replace('Original', 'Overwritten').replace('"items":[]', '"items":[1]')
+    elif change == "unknown-block":
+        before += '<!-- SEO:OTHER:START -->Protected<!-- SEO:OTHER:END -->'
+        after = before.replace('Protected', 'Overwritten')
+    elif change == "mismatched-marker":
+        after = before.replace('SEO:HEAD:END', 'SEO:BOOTSTRAP:END').replace('Original', 'Overwritten')
+    else:
+        after = f'{bootstrap}{handwritten}{head}'
+    (site / "index.html").write_text(after, encoding="utf-8")
+    monkeypatch.setattr(git_target, "_git_paths", lambda _root: {"site/index.html"})
+
+    with pytest.raises(git_target.TargetError) as error:
+        git_target._assert_allowlist(
+            tmp_path, {"demoId": "demo"}, "site/uis/demo.json", "site/uis/demo.png", before,
+        )
+    assert error.value.code == "write-allowlist-violation"
+
+
+def test_allowlist_still_rejects_changes_to_target_assets_and_frames(tmp_path, monkeypatch):
+    monkeypatch.setattr(git_target, "_git_paths", lambda _root: {"site/assets/app.js", "site/frames/manifest.json"})
+    with pytest.raises(git_target.TargetError) as error:
+        git_target._assert_allowlist(
+            tmp_path, {"demoId": "demo"}, "site/uis/demo.json", "site/uis/demo.png", "unchanged",
+        )
+    assert error.value.code == "write-allowlist-violation"
+    assert error.value.detail == ["site/assets/app.js", "site/frames/manifest.json"]
+
+
 def test_existing_demo_can_supply_a_canvas_without_inventing_hardware_resolution(tmp_path):
     ui_dir = tmp_path / "site" / "uis"
     ui_dir.mkdir(parents=True)

@@ -1,0 +1,5616 @@
+{
+  "kind": "lvgl-project-snapshot",
+  "snapshotVersion": 1,
+  "uiProject": {
+    "schemaVersion": 2,
+    "kind": "lvgl-ui-project",
+    "meta": {
+      "id": "ui:wf2d-1050-air-comfort",
+      "revision": 1,
+      "name": "WF2D-1050 Air & Comfort",
+      "appVersion": "1.0.0",
+      "createdAt": "2026-10-14T00:00:00.000Z",
+      "modifiedAt": "2026-10-14T00:00:00.000Z"
+    },
+    "designDisplayRef": "display:wf2d-1050-1024x600-rgb565@1",
+    "themes": [
+      {
+        "id": "air1050-midnight",
+        "displayName": "Air Comfort Midnight",
+        "tokens": [
+          {
+            "id": "color.background",
+            "type": "color",
+            "value": "#071522"
+          },
+          {
+            "id": "color.header",
+            "type": "color",
+            "value": "#0A1B2A"
+          },
+          {
+            "id": "color.header.border",
+            "type": "color",
+            "value": "#23445E"
+          },
+          {
+            "id": "color.nav",
+            "type": "color",
+            "value": "#0C2131"
+          },
+          {
+            "id": "color.surface",
+            "type": "color",
+            "value": "#10263A"
+          },
+          {
+            "id": "color.surface2",
+            "type": "color",
+            "value": "#162E45"
+          },
+          {
+            "id": "color.control",
+            "type": "color",
+            "value": "#1A3852"
+          },
+          {
+            "id": "color.border",
+            "type": "color",
+            "value": "#294B65"
+          },
+          {
+            "id": "color.track",
+            "type": "color",
+            "value": "#1E3B50"
+          },
+          {
+            "id": "color.text.primary",
+            "type": "color",
+            "value": "#ECF5F8"
+          },
+          {
+            "id": "color.text.secondary",
+            "type": "color",
+            "value": "#BCD0DA"
+          },
+          {
+            "id": "color.text.muted",
+            "type": "color",
+            "value": "#7898A8"
+          },
+          {
+            "id": "color.text.onaccent",
+            "type": "color",
+            "value": "#F8FFFF"
+          },
+          {
+            "id": "color.accent",
+            "type": "color",
+            "value": "#237FC1"
+          },
+          {
+            "id": "color.accent2",
+            "type": "color",
+            "value": "#61B9F2"
+          },
+          {
+            "id": "color.success",
+            "type": "color",
+            "value": "#53D69B"
+          },
+          {
+            "id": "color.warning",
+            "type": "color",
+            "value": "#F2B95F"
+          },
+          {
+            "id": "color.danger",
+            "type": "color",
+            "value": "#EF6E78"
+          },
+          {
+            "id": "color.shadow",
+            "type": "color",
+            "value": "#02080E"
+          },
+          {
+            "id": "font.size.8",
+            "type": "fontRef",
+            "value": "montserrat_8"
+          },
+          {
+            "id": "font.size.10",
+            "type": "fontRef",
+            "value": "montserrat_10"
+          },
+          {
+            "id": "font.size.12",
+            "type": "fontRef",
+            "value": "montserrat_12"
+          },
+          {
+            "id": "font.size.14",
+            "type": "fontRef",
+            "value": "montserrat_14"
+          },
+          {
+            "id": "font.size.16",
+            "type": "fontRef",
+            "value": "montserrat_16"
+          },
+          {
+            "id": "font.size.18",
+            "type": "fontRef",
+            "value": "montserrat_18"
+          },
+          {
+            "id": "font.size.20",
+            "type": "fontRef",
+            "value": "montserrat_20"
+          },
+          {
+            "id": "font.size.22",
+            "type": "fontRef",
+            "value": "montserrat_22"
+          },
+          {
+            "id": "font.size.24",
+            "type": "fontRef",
+            "value": "montserrat_24"
+          },
+          {
+            "id": "font.size.26",
+            "type": "fontRef",
+            "value": "montserrat_26"
+          },
+          {
+            "id": "font.size.28",
+            "type": "fontRef",
+            "value": "montserrat_28"
+          },
+          {
+            "id": "font.size.30",
+            "type": "fontRef",
+            "value": "montserrat_30"
+          },
+          {
+            "id": "font.size.32",
+            "type": "fontRef",
+            "value": "montserrat_32"
+          },
+          {
+            "id": "font.size.34",
+            "type": "fontRef",
+            "value": "montserrat_34"
+          },
+          {
+            "id": "font.size.36",
+            "type": "fontRef",
+            "value": "montserrat_36"
+          },
+          {
+            "id": "font.size.38",
+            "type": "fontRef",
+            "value": "montserrat_38"
+          },
+          {
+            "id": "font.size.40",
+            "type": "fontRef",
+            "value": "montserrat_40"
+          },
+          {
+            "id": "font.size.42",
+            "type": "fontRef",
+            "value": "montserrat_42"
+          },
+          {
+            "id": "font.size.44",
+            "type": "fontRef",
+            "value": "montserrat_44"
+          },
+          {
+            "id": "font.size.46",
+            "type": "fontRef",
+            "value": "montserrat_46"
+          },
+          {
+            "id": "font.size.48",
+            "type": "fontRef",
+            "value": "montserrat_48"
+          }
+        ]
+      }
+    ],
+    "subjects": [
+      {
+        "id": "subject:air1050-fan-speed",
+        "codeName": "air1050_fan_speed",
+        "displayName": "Fan speed",
+        "type": "int",
+        "initial": 60,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "id": "subject:air1050-scene",
+        "codeName": "air1050_scene_mode",
+        "displayName": "Comfort scene",
+        "type": "int",
+        "initial": 0,
+        "min": 0,
+        "max": 2
+      }
+    ],
+    "screens": [
+      {
+        "id": "a1050000-0000-4000-9000-000000000001",
+        "codeName": "air1050_home",
+        "displayName": "Air Comfort Overview",
+        "isHome": true,
+        "styles": [],
+        "consts": [],
+        "root": {
+          "id": "a1050000-0000-4000-9000-000000000053",
+          "type": "obj",
+          "codeName": "air1050_home_root",
+          "props": {},
+          "flags": {
+            "scrollable": false
+          },
+          "styleRefs": [],
+          "styles": [
+            {
+              "props": {
+                "bg_color": {
+                  "$token": "color.background"
+                },
+                "bg_opa": 255,
+                "border_width": 0,
+                "pad_all": 0
+              }
+            }
+          ],
+          "events": [],
+          "bindings": [],
+          "children": [
+            {
+              "id": "a1050000-0000-4000-9000-000000000016",
+              "type": "obj",
+              "codeName": "air1050_home_header",
+              "props": {
+                "x": 0,
+                "y": 0,
+                "width": 1024,
+                "height": 76
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.header"
+                    },
+                    "bg_opa": 255,
+                    "border_width": 0,
+                    "radius": 0,
+                    "pad_all": 0
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "a1050000-0000-4000-9000-000000000006",
+                  "type": "label",
+                  "codeName": "air1050_home_mark",
+                  "props": {
+                    "text": "A",
+                    "x": 26,
+                    "y": 16,
+                    "width": 42,
+                    "height": 42
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.onaccent"
+                        },
+                        "text_font": {
+                          "$token": "font.size.24"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000007",
+                  "type": "label",
+                  "codeName": "air1050_home_title",
+                  "props": {
+                    "text": "AIR / COMFORT",
+                    "x": 78,
+                    "y": 13,
+                    "width": 330,
+                    "height": 28
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.onaccent"
+                        },
+                        "text_font": {
+                          "$token": "font.size.22"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000008",
+                  "type": "label",
+                  "codeName": "air1050_home_subtitle",
+                  "props": {
+                    "text": "WEST WING  •  AUTO  •  09:41",
+                    "x": 78,
+                    "y": 41,
+                    "width": 380,
+                    "height": 20
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000015",
+                  "type": "obj",
+                  "codeName": "air1050_home_nav",
+                  "props": {
+                    "x": 548,
+                    "y": 12,
+                    "width": 452,
+                    "height": 52
+                  },
+                  "flags": {
+                    "scrollable": false
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.nav"
+                        },
+                        "bg_opa": 255,
+                        "border_color": {
+                          "$token": "color.header.border"
+                        },
+                        "border_width": 1,
+                        "radius": 13,
+                        "pad_all": 0,
+                        "shadow_color": {
+                          "$token": "color.shadow"
+                        },
+                        "shadow_width": 0,
+                        "shadow_opa": 0,
+                        "shadow_offset_y": 0
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": [
+                    {
+                      "id": "a1050000-0000-4000-9000-000000000010",
+                      "type": "button",
+                      "codeName": "air1050_home_nav_home",
+                      "props": {
+                        "x": 6,
+                        "y": 6,
+                        "width": 142,
+                        "height": 40
+                      },
+                      "flags": {
+                        "scrollable": false
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "bg_color": {
+                              "$token": "color.accent"
+                            },
+                            "bg_opa": 255,
+                            "border_color": {
+                              "$token": "color.accent"
+                            },
+                            "border_width": 1,
+                            "radius": 10,
+                            "pad_all": 0,
+                            "shadow_width": 0
+                          }
+                        },
+                        {
+                          "selector": {
+                            "states": [
+                              "pressed"
+                            ]
+                          },
+                          "props": {
+                            "bg_color": {
+                              "$token": "color.accent2"
+                            }
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": [
+                        {
+                          "id": "a1050000-0000-4000-9000-000000000009",
+                          "type": "label",
+                          "codeName": "air1050_home_nav_home_text",
+                          "props": {
+                            "text": "OVERVIEW",
+                            "x": 0,
+                            "y": 9,
+                            "width": 142,
+                            "height": 22
+                          },
+                          "styleRefs": [],
+                          "styles": [
+                            {
+                              "props": {
+                                "text_color": {
+                                  "$token": "color.text.onaccent"
+                                },
+                                "text_font": {
+                                  "$token": "font.size.12"
+                                },
+                                "text_align": "center",
+                                "text_opa": 255
+                              }
+                            }
+                          ],
+                          "events": [],
+                          "bindings": [],
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "id": "a1050000-0000-4000-9000-000000000012",
+                      "type": "button",
+                      "codeName": "air1050_home_nav_air",
+                      "props": {
+                        "x": 154,
+                        "y": 6,
+                        "width": 142,
+                        "height": 40
+                      },
+                      "flags": {
+                        "scrollable": false
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "bg_color": {
+                              "$token": "color.nav"
+                            },
+                            "bg_opa": 255,
+                            "border_color": {
+                              "$token": "color.header.border"
+                            },
+                            "border_width": 1,
+                            "radius": 10,
+                            "pad_all": 0,
+                            "shadow_width": 0
+                          }
+                        },
+                        {
+                          "selector": {
+                            "states": [
+                              "pressed"
+                            ]
+                          },
+                          "props": {
+                            "bg_color": {
+                              "$token": "color.accent2"
+                            }
+                          }
+                        }
+                      ],
+                      "events": [
+                        {
+                          "on": "clicked",
+                          "action": "screen.open",
+                          "args": {
+                            "screen": "a1050000-0000-4000-9000-000000000002",
+                            "anim": "fade_in",
+                            "duration": 140,
+                            "delay": 0
+                          }
+                        }
+                      ],
+                      "bindings": [],
+                      "children": [
+                        {
+                          "id": "a1050000-0000-4000-9000-000000000011",
+                          "type": "label",
+                          "codeName": "air1050_home_nav_air_text",
+                          "props": {
+                            "text": "AIR DATA",
+                            "x": 0,
+                            "y": 9,
+                            "width": 142,
+                            "height": 22
+                          },
+                          "styleRefs": [],
+                          "styles": [
+                            {
+                              "props": {
+                                "text_color": {
+                                  "$token": "color.text.muted"
+                                },
+                                "text_font": {
+                                  "$token": "font.size.12"
+                                },
+                                "text_align": "center",
+                                "text_opa": 255
+                              }
+                            }
+                          ],
+                          "events": [],
+                          "bindings": [],
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "id": "a1050000-0000-4000-9000-000000000014",
+                      "type": "button",
+                      "codeName": "air1050_home_nav_scenes",
+                      "props": {
+                        "x": 302,
+                        "y": 6,
+                        "width": 142,
+                        "height": 40
+                      },
+                      "flags": {
+                        "scrollable": false
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "bg_color": {
+                              "$token": "color.nav"
+                            },
+                            "bg_opa": 255,
+                            "border_color": {
+                              "$token": "color.header.border"
+                            },
+                            "border_width": 1,
+                            "radius": 10,
+                            "pad_all": 0,
+                            "shadow_width": 0
+                          }
+                        },
+                        {
+                          "selector": {
+                            "states": [
+                              "pressed"
+                            ]
+                          },
+                          "props": {
+                            "bg_color": {
+                              "$token": "color.accent2"
+                            }
+                          }
+                        }
+                      ],
+                      "events": [
+                        {
+                          "on": "clicked",
+                          "action": "screen.open",
+                          "args": {
+                            "screen": "a1050000-0000-4000-9000-000000000003",
+                            "anim": "fade_in",
+                            "duration": 140,
+                            "delay": 0
+                          }
+                        }
+                      ],
+                      "bindings": [],
+                      "children": [
+                        {
+                          "id": "a1050000-0000-4000-9000-000000000013",
+                          "type": "label",
+                          "codeName": "air1050_home_nav_scenes_text",
+                          "props": {
+                            "text": "SCENES",
+                            "x": 0,
+                            "y": 9,
+                            "width": 142,
+                            "height": 22
+                          },
+                          "styleRefs": [],
+                          "styles": [
+                            {
+                              "props": {
+                                "text_color": {
+                                  "$token": "color.text.muted"
+                                },
+                                "text_font": {
+                                  "$token": "font.size.12"
+                                },
+                                "text_align": "center",
+                                "text_opa": 255
+                              }
+                            }
+                          ],
+                          "events": [],
+                          "bindings": [],
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "a1050000-0000-4000-9000-000000000034",
+              "type": "obj",
+              "codeName": "air1050_fan_panel",
+              "props": {
+                "x": 24,
+                "y": 96,
+                "width": 590,
+                "height": 478
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 16,
+                    "pad_all": 0,
+                    "shadow_color": {
+                      "$token": "color.shadow"
+                    },
+                    "shadow_width": 0,
+                    "shadow_opa": 0,
+                    "shadow_offset_y": 0
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "a1050000-0000-4000-9000-000000000017",
+                  "type": "label",
+                  "codeName": "air1050_fan_eyebrow",
+                  "props": {
+                    "text": "FAN SPEED",
+                    "x": 24,
+                    "y": 22,
+                    "width": 180,
+                    "height": 22
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.accent2"
+                        },
+                        "text_font": {
+                          "$token": "font.size.14"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000018",
+                  "type": "label",
+                  "codeName": "air1050_fan_mode",
+                  "props": {
+                    "text": "AUTO BALANCE",
+                    "x": 352,
+                    "y": 22,
+                    "width": 210,
+                    "height": 22
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.success"
+                        },
+                        "text_font": {
+                          "$token": "font.size.14"
+                        },
+                        "text_align": "right",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000005",
+                  "type": "arc",
+                  "codeName": "air1050_fan_arc",
+                  "props": {
+                    "x": 100,
+                    "y": 54,
+                    "width": 250,
+                    "height": 250,
+                    "min_value": 0,
+                    "max_value": 100,
+                    "value": 60,
+                    "bg_start_angle": 140,
+                    "bg_end_angle": 40,
+                    "start_angle": 140,
+                    "end_angle": 40,
+                    "knob_offset": -4
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "selector": {
+                        "part": "main"
+                      },
+                      "props": {
+                        "arc_color": {
+                          "$token": "color.track"
+                        },
+                        "arc_width": 18
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "indicator"
+                      },
+                      "props": {
+                        "arc_color": {
+                          "$token": "color.accent"
+                        },
+                        "arc_width": 18
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "knob"
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.accent2"
+                        },
+                        "bg_opa": 255,
+                        "radius": 32767,
+                        "pad_all": 11,
+                        "border_color": {
+                          "$token": "color.surface"
+                        },
+                        "border_opa": 255,
+                        "border_width": 7
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [
+                    {
+                      "kind": "prop",
+                      "prop": "value",
+                      "subject": "subject:air1050-fan-speed"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000004",
+                  "type": "label",
+                  "codeName": "air1050_fan_value",
+                  "props": {
+                    "text": "60",
+                    "x": 162,
+                    "y": 112,
+                    "width": 120,
+                    "height": 58
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.48"
+                        },
+                        "text_align": "right",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [
+                    {
+                      "kind": "prop",
+                      "prop": "text",
+                      "subject": "subject:air1050-fan-speed",
+                      "fmt": "%d"
+                    }
+                  ],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000019",
+                  "type": "label",
+                  "codeName": "air1050_fan_percent",
+                  "props": {
+                    "text": "%",
+                    "x": 288,
+                    "y": 130,
+                    "width": 40,
+                    "height": 32
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.secondary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.24"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000020",
+                  "type": "label",
+                  "codeName": "air1050_fan_caption",
+                  "props": {
+                    "text": "SUPPLY AIR",
+                    "x": 175,
+                    "y": 177,
+                    "width": 110,
+                    "height": 18
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000021",
+                  "type": "label",
+                  "codeName": "air1050_fan_airflow",
+                  "props": {
+                    "text": "428 m3/h",
+                    "x": 152,
+                    "y": 200,
+                    "width": 156,
+                    "height": 28
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.secondary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.20"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000022",
+                  "type": "label",
+                  "codeName": "air1050_manual",
+                  "props": {
+                    "text": "MANUAL CONTROL",
+                    "x": 24,
+                    "y": 298,
+                    "width": 220,
+                    "height": 18
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000024",
+                  "type": "button",
+                  "codeName": "air1050_fan_down",
+                  "props": {
+                    "x": 24,
+                    "y": 324,
+                    "width": 146,
+                    "height": 52
+                  },
+                  "flags": {
+                    "scrollable": false
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.control"
+                        },
+                        "bg_opa": 255,
+                        "border_color": {
+                          "$token": "color.border"
+                        },
+                        "border_width": 1,
+                        "radius": 12,
+                        "pad_all": 0,
+                        "shadow_width": 0
+                      }
+                    },
+                    {
+                      "selector": {
+                        "states": [
+                          "pressed"
+                        ]
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.accent2"
+                        }
+                      }
+                    }
+                  ],
+                  "events": [
+                    {
+                      "on": "clicked",
+                      "action": "subject.increment",
+                      "args": {
+                        "subject": "subject:air1050-fan-speed",
+                        "step": -5,
+                        "min": 0,
+                        "max": 100,
+                        "rollover": false
+                      }
+                    }
+                  ],
+                  "bindings": [],
+                  "children": [
+                    {
+                      "id": "a1050000-0000-4000-9000-000000000023",
+                      "type": "label",
+                      "codeName": "air1050_fan_down_text",
+                      "props": {
+                        "text": "- 5",
+                        "x": 0,
+                        "y": 15,
+                        "width": 146,
+                        "height": 22
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "text_color": {
+                              "$token": "color.text.primary"
+                            },
+                            "text_font": {
+                              "$token": "font.size.20"
+                            },
+                            "text_align": "center",
+                            "text_opa": 255
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000026",
+                  "type": "button",
+                  "codeName": "air1050_fan_up",
+                  "props": {
+                    "x": 186,
+                    "y": 324,
+                    "width": 146,
+                    "height": 52
+                  },
+                  "flags": {
+                    "scrollable": false
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.control"
+                        },
+                        "bg_opa": 255,
+                        "border_color": {
+                          "$token": "color.border"
+                        },
+                        "border_width": 1,
+                        "radius": 12,
+                        "pad_all": 0,
+                        "shadow_width": 0
+                      }
+                    },
+                    {
+                      "selector": {
+                        "states": [
+                          "pressed"
+                        ]
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.accent2"
+                        }
+                      }
+                    }
+                  ],
+                  "events": [
+                    {
+                      "on": "clicked",
+                      "action": "subject.increment",
+                      "args": {
+                        "subject": "subject:air1050-fan-speed",
+                        "step": 5,
+                        "min": 0,
+                        "max": 100,
+                        "rollover": false
+                      }
+                    }
+                  ],
+                  "bindings": [],
+                  "children": [
+                    {
+                      "id": "a1050000-0000-4000-9000-000000000025",
+                      "type": "label",
+                      "codeName": "air1050_fan_up_text",
+                      "props": {
+                        "text": "+ 5",
+                        "x": 0,
+                        "y": 15,
+                        "width": 146,
+                        "height": 22
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "text_color": {
+                              "$token": "color.accent2"
+                            },
+                            "text_font": {
+                              "$token": "font.size.20"
+                            },
+                            "text_align": "center",
+                            "text_opa": 255
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000030",
+                  "type": "obj",
+                  "codeName": "air1050_energy_badge",
+                  "props": {
+                    "x": 358,
+                    "y": 324,
+                    "width": 204,
+                    "height": 52
+                  },
+                  "flags": {
+                    "scrollable": false
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.surface2"
+                        },
+                        "bg_opa": 255,
+                        "border_color": {
+                          "$token": "color.border"
+                        },
+                        "border_width": 1,
+                        "radius": 10,
+                        "pad_all": 0,
+                        "shadow_color": {
+                          "$token": "color.shadow"
+                        },
+                        "shadow_width": 0,
+                        "shadow_opa": 0,
+                        "shadow_offset_y": 0
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": [
+                    {
+                      "id": "a1050000-0000-4000-9000-000000000027",
+                      "type": "label",
+                      "codeName": "air1050_energy_icon",
+                      "props": {
+                        "text": "ECO",
+                        "x": 14,
+                        "y": 8,
+                        "width": 52,
+                        "height": 20
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "text_color": {
+                              "$token": "color.success"
+                            },
+                            "text_font": {
+                              "$token": "font.size.12"
+                            },
+                            "text_align": "left",
+                            "text_opa": 255
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": []
+                    },
+                    {
+                      "id": "a1050000-0000-4000-9000-000000000028",
+                      "type": "label",
+                      "codeName": "air1050_energy_value",
+                      "props": {
+                        "text": "1.2 kW",
+                        "x": 72,
+                        "y": 8,
+                        "width": 116,
+                        "height": 22
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "text_color": {
+                              "$token": "color.text.primary"
+                            },
+                            "text_font": {
+                              "$token": "font.size.16"
+                            },
+                            "text_align": "right",
+                            "text_opa": 255
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": []
+                    },
+                    {
+                      "id": "a1050000-0000-4000-9000-000000000029",
+                      "type": "label",
+                      "codeName": "air1050_energy_note",
+                      "props": {
+                        "text": "CURRENT DRAW",
+                        "x": 72,
+                        "y": 29,
+                        "width": 116,
+                        "height": 16
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "text_color": {
+                              "$token": "color.text.muted"
+                            },
+                            "text_font": {
+                              "$token": "font.size.10"
+                            },
+                            "text_align": "right",
+                            "text_opa": 255
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000031",
+                  "type": "bar",
+                  "codeName": "air1050_output",
+                  "props": {
+                    "x": 24,
+                    "y": 406,
+                    "width": 538,
+                    "height": 12,
+                    "min_value": 0,
+                    "max_value": 100,
+                    "value": 60
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "selector": {
+                        "part": "main"
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.track"
+                        },
+                        "bg_opa": 255,
+                        "radius": 32767
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "indicator"
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.accent"
+                        },
+                        "bg_opa": 255,
+                        "radius": 32767
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000032",
+                  "type": "label",
+                  "codeName": "air1050_output_label",
+                  "props": {
+                    "text": "AIRFLOW OUTPUT",
+                    "x": 24,
+                    "y": 429,
+                    "width": 220,
+                    "height": 18
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000033",
+                  "type": "label",
+                  "codeName": "air1050_output_value",
+                  "props": {
+                    "text": "60%",
+                    "x": 482,
+                    "y": 429,
+                    "width": 80,
+                    "height": 18
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.accent2"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "right",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "a1050000-0000-4000-9000-000000000041",
+              "type": "obj",
+              "codeName": "air1050_quality_panel",
+              "props": {
+                "x": 634,
+                "y": 96,
+                "width": 366,
+                "height": 222
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 16,
+                    "pad_all": 0,
+                    "shadow_color": {
+                      "$token": "color.shadow"
+                    },
+                    "shadow_width": 0,
+                    "shadow_opa": 0,
+                    "shadow_offset_y": 0
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "a1050000-0000-4000-9000-000000000035",
+                  "type": "label",
+                  "codeName": "air1050_quality_title",
+                  "props": {
+                    "text": "INDOOR AIR QUALITY",
+                    "x": 22,
+                    "y": 20,
+                    "width": 260,
+                    "height": 20
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.accent2"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000036",
+                  "type": "label",
+                  "codeName": "air1050_quality_value",
+                  "props": {
+                    "text": "GOOD",
+                    "x": 22,
+                    "y": 52,
+                    "width": 190,
+                    "height": 38
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.success"
+                        },
+                        "text_font": {
+                          "$token": "font.size.30"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000037",
+                  "type": "label",
+                  "codeName": "air1050_co2",
+                  "props": {
+                    "text": "CO2  612 ppm",
+                    "x": 22,
+                    "y": 100,
+                    "width": 150,
+                    "height": 22
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.secondary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.14"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000038",
+                  "type": "label",
+                  "codeName": "air1050_humidity",
+                  "props": {
+                    "text": "46% RH",
+                    "x": 210,
+                    "y": 100,
+                    "width": 134,
+                    "height": 22
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.secondary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.14"
+                        },
+                        "text_align": "right",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000039",
+                  "type": "bar",
+                  "codeName": "air1050_quality_score",
+                  "props": {
+                    "x": 22,
+                    "y": 140,
+                    "width": 322,
+                    "height": 12,
+                    "min_value": 0,
+                    "max_value": 100,
+                    "value": 78
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "selector": {
+                        "part": "main"
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.track"
+                        },
+                        "bg_opa": 255,
+                        "radius": 32767
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "indicator"
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.success"
+                        },
+                        "bg_opa": 255,
+                        "radius": 32767
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000040",
+                  "type": "label",
+                  "codeName": "air1050_quality_note",
+                  "props": {
+                    "text": "Fresh-air loop is operating normally",
+                    "x": 22,
+                    "y": 170,
+                    "width": 322,
+                    "height": 20
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "a1050000-0000-4000-9000-000000000051",
+              "type": "obj",
+              "codeName": "air1050_scene_panel",
+              "props": {
+                "x": 634,
+                "y": 338,
+                "width": 366,
+                "height": 188
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 16,
+                    "pad_all": 0,
+                    "shadow_color": {
+                      "$token": "color.shadow"
+                    },
+                    "shadow_width": 0,
+                    "shadow_opa": 0,
+                    "shadow_offset_y": 0
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "a1050000-0000-4000-9000-000000000042",
+                  "type": "label",
+                  "codeName": "air1050_scene_title",
+                  "props": {
+                    "text": "ACTIVE SCENE",
+                    "x": 22,
+                    "y": 18,
+                    "width": 180,
+                    "height": 20
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.accent2"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000043",
+                  "type": "label",
+                  "codeName": "air1050_scene_value",
+                  "props": {
+                    "text": "COMFORT",
+                    "x": 22,
+                    "y": 46,
+                    "width": 210,
+                    "height": 34
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.24"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000044",
+                  "type": "label",
+                  "codeName": "air1050_scene_note",
+                  "props": {
+                    "text": "Balanced temperature and fresh air",
+                    "x": 22,
+                    "y": 80,
+                    "width": 322,
+                    "height": 20
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000046",
+                  "type": "button",
+                  "codeName": "air1050_scene_comfort",
+                  "props": {
+                    "x": 14,
+                    "y": 118,
+                    "width": 110,
+                    "height": 44
+                  },
+                  "flags": {
+                    "scrollable": false
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.control"
+                        },
+                        "bg_opa": 255,
+                        "border_color": {
+                          "$token": "color.border"
+                        },
+                        "border_width": 1,
+                        "radius": 10,
+                        "pad_all": 0,
+                        "shadow_width": 0
+                      }
+                    },
+                    {
+                      "selector": {
+                        "states": [
+                          "pressed"
+                        ]
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.accent2"
+                        }
+                      }
+                    },
+                    {
+                      "selector": {
+                        "states": [
+                          "checked"
+                        ]
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.accent"
+                        },
+                        "border_color": {
+                          "$token": "color.accent"
+                        }
+                      }
+                    }
+                  ],
+                  "events": [
+                    {
+                      "on": "clicked",
+                      "action": "subject.set",
+                      "args": {
+                        "subject": "subject:air1050-scene",
+                        "value": "0"
+                      }
+                    }
+                  ],
+                  "bindings": [
+                    {
+                      "kind": "state",
+                      "state": "checked",
+                      "op": "eq",
+                      "subject": "subject:air1050-scene",
+                      "refValue": 0
+                    }
+                  ],
+                  "children": [
+                    {
+                      "id": "a1050000-0000-4000-9000-000000000045",
+                      "type": "label",
+                      "codeName": "air1050_scene_comfort_text",
+                      "props": {
+                        "text": "COMFORT",
+                        "x": 0,
+                        "y": 11,
+                        "width": 110,
+                        "height": 22
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "text_color": {
+                              "$token": "color.text.secondary"
+                            },
+                            "text_font": {
+                              "$token": "font.size.14"
+                            },
+                            "text_align": "center",
+                            "text_opa": 255
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000048",
+                  "type": "button",
+                  "codeName": "air1050_scene_eco",
+                  "props": {
+                    "x": 128,
+                    "y": 118,
+                    "width": 110,
+                    "height": 44
+                  },
+                  "flags": {
+                    "scrollable": false
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.control"
+                        },
+                        "bg_opa": 255,
+                        "border_color": {
+                          "$token": "color.border"
+                        },
+                        "border_width": 1,
+                        "radius": 10,
+                        "pad_all": 0,
+                        "shadow_width": 0
+                      }
+                    },
+                    {
+                      "selector": {
+                        "states": [
+                          "pressed"
+                        ]
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.accent2"
+                        }
+                      }
+                    },
+                    {
+                      "selector": {
+                        "states": [
+                          "checked"
+                        ]
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.accent"
+                        },
+                        "border_color": {
+                          "$token": "color.accent"
+                        }
+                      }
+                    }
+                  ],
+                  "events": [
+                    {
+                      "on": "clicked",
+                      "action": "subject.set",
+                      "args": {
+                        "subject": "subject:air1050-scene",
+                        "value": "1"
+                      }
+                    }
+                  ],
+                  "bindings": [
+                    {
+                      "kind": "state",
+                      "state": "checked",
+                      "op": "eq",
+                      "subject": "subject:air1050-scene",
+                      "refValue": 1
+                    }
+                  ],
+                  "children": [
+                    {
+                      "id": "a1050000-0000-4000-9000-000000000047",
+                      "type": "label",
+                      "codeName": "air1050_scene_eco_text",
+                      "props": {
+                        "text": "ECO",
+                        "x": 0,
+                        "y": 11,
+                        "width": 110,
+                        "height": 22
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "text_color": {
+                              "$token": "color.text.secondary"
+                            },
+                            "text_font": {
+                              "$token": "font.size.14"
+                            },
+                            "text_align": "center",
+                            "text_opa": 255
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000050",
+                  "type": "button",
+                  "codeName": "air1050_scene_boost",
+                  "props": {
+                    "x": 242,
+                    "y": 118,
+                    "width": 110,
+                    "height": 44
+                  },
+                  "flags": {
+                    "scrollable": false
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.control"
+                        },
+                        "bg_opa": 255,
+                        "border_color": {
+                          "$token": "color.border"
+                        },
+                        "border_width": 1,
+                        "radius": 10,
+                        "pad_all": 0,
+                        "shadow_width": 0
+                      }
+                    },
+                    {
+                      "selector": {
+                        "states": [
+                          "pressed"
+                        ]
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.accent2"
+                        }
+                      }
+                    },
+                    {
+                      "selector": {
+                        "states": [
+                          "checked"
+                        ]
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.accent"
+                        },
+                        "border_color": {
+                          "$token": "color.accent"
+                        }
+                      }
+                    }
+                  ],
+                  "events": [
+                    {
+                      "on": "clicked",
+                      "action": "subject.set",
+                      "args": {
+                        "subject": "subject:air1050-scene",
+                        "value": "2"
+                      }
+                    }
+                  ],
+                  "bindings": [
+                    {
+                      "kind": "state",
+                      "state": "checked",
+                      "op": "eq",
+                      "subject": "subject:air1050-scene",
+                      "refValue": 2
+                    }
+                  ],
+                  "children": [
+                    {
+                      "id": "a1050000-0000-4000-9000-000000000049",
+                      "type": "label",
+                      "codeName": "air1050_scene_boost_text",
+                      "props": {
+                        "text": "BOOST",
+                        "x": 0,
+                        "y": 11,
+                        "width": 110,
+                        "height": 22
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "text_color": {
+                              "$token": "color.text.secondary"
+                            },
+                            "text_font": {
+                              "$token": "font.size.14"
+                            },
+                            "text_align": "center",
+                            "text_opa": 255
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "a1050000-0000-4000-9000-000000000052",
+              "type": "label",
+              "codeName": "air1050_footer",
+              "props": {
+                "text": "SYSTEM NOMINAL  •  LOCAL CONTROL",
+                "x": 634,
+                "y": 548,
+                "width": 366,
+                "height": 18
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": {
+                      "$token": "color.text.muted"
+                    },
+                    "text_font": {
+                      "$token": "font.size.12"
+                    },
+                    "text_align": "right",
+                    "text_opa": 255
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": []
+            }
+          ]
+        }
+      },
+      {
+        "id": "a1050000-0000-4000-9000-000000000002",
+        "codeName": "air1050_air_data",
+        "displayName": "Air Data",
+        "styles": [],
+        "consts": [],
+        "root": {
+          "id": "a1050000-0000-4000-9000-000000000101",
+          "type": "obj",
+          "codeName": "air1050_air_root",
+          "props": {},
+          "flags": {
+            "scrollable": false
+          },
+          "styleRefs": [],
+          "styles": [
+            {
+              "props": {
+                "bg_color": {
+                  "$token": "color.background"
+                },
+                "bg_opa": 255,
+                "border_width": 0,
+                "pad_all": 0
+              }
+            }
+          ],
+          "events": [],
+          "bindings": [],
+          "children": [
+            {
+              "id": "a1050000-0000-4000-9000-000000000064",
+              "type": "obj",
+              "codeName": "air1050_air_header",
+              "props": {
+                "x": 0,
+                "y": 0,
+                "width": 1024,
+                "height": 76
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.header"
+                    },
+                    "bg_opa": 255,
+                    "border_width": 0,
+                    "radius": 0,
+                    "pad_all": 0
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "a1050000-0000-4000-9000-000000000054",
+                  "type": "label",
+                  "codeName": "air1050_air_mark",
+                  "props": {
+                    "text": "A",
+                    "x": 26,
+                    "y": 16,
+                    "width": 42,
+                    "height": 42
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.onaccent"
+                        },
+                        "text_font": {
+                          "$token": "font.size.24"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000055",
+                  "type": "label",
+                  "codeName": "air1050_air_title",
+                  "props": {
+                    "text": "AIR / DATA",
+                    "x": 78,
+                    "y": 13,
+                    "width": 330,
+                    "height": 28
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.onaccent"
+                        },
+                        "text_font": {
+                          "$token": "font.size.22"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000056",
+                  "type": "label",
+                  "codeName": "air1050_air_subtitle",
+                  "props": {
+                    "text": "LIVE SENSOR NETWORK  •  09:41:26",
+                    "x": 78,
+                    "y": 41,
+                    "width": 380,
+                    "height": 20
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000063",
+                  "type": "obj",
+                  "codeName": "air1050_air_nav",
+                  "props": {
+                    "x": 548,
+                    "y": 12,
+                    "width": 452,
+                    "height": 52
+                  },
+                  "flags": {
+                    "scrollable": false
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.nav"
+                        },
+                        "bg_opa": 255,
+                        "border_color": {
+                          "$token": "color.header.border"
+                        },
+                        "border_width": 1,
+                        "radius": 13,
+                        "pad_all": 0,
+                        "shadow_color": {
+                          "$token": "color.shadow"
+                        },
+                        "shadow_width": 0,
+                        "shadow_opa": 0,
+                        "shadow_offset_y": 0
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": [
+                    {
+                      "id": "a1050000-0000-4000-9000-000000000058",
+                      "type": "button",
+                      "codeName": "air1050_air_nav_home",
+                      "props": {
+                        "x": 6,
+                        "y": 6,
+                        "width": 142,
+                        "height": 40
+                      },
+                      "flags": {
+                        "scrollable": false
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "bg_color": {
+                              "$token": "color.nav"
+                            },
+                            "bg_opa": 255,
+                            "border_color": {
+                              "$token": "color.header.border"
+                            },
+                            "border_width": 1,
+                            "radius": 10,
+                            "pad_all": 0,
+                            "shadow_width": 0
+                          }
+                        },
+                        {
+                          "selector": {
+                            "states": [
+                              "pressed"
+                            ]
+                          },
+                          "props": {
+                            "bg_color": {
+                              "$token": "color.accent2"
+                            }
+                          }
+                        }
+                      ],
+                      "events": [
+                        {
+                          "on": "clicked",
+                          "action": "screen.open",
+                          "args": {
+                            "screen": "a1050000-0000-4000-9000-000000000001",
+                            "anim": "fade_in",
+                            "duration": 140,
+                            "delay": 0
+                          }
+                        }
+                      ],
+                      "bindings": [],
+                      "children": [
+                        {
+                          "id": "a1050000-0000-4000-9000-000000000057",
+                          "type": "label",
+                          "codeName": "air1050_air_nav_home_text",
+                          "props": {
+                            "text": "OVERVIEW",
+                            "x": 0,
+                            "y": 9,
+                            "width": 142,
+                            "height": 22
+                          },
+                          "styleRefs": [],
+                          "styles": [
+                            {
+                              "props": {
+                                "text_color": {
+                                  "$token": "color.text.muted"
+                                },
+                                "text_font": {
+                                  "$token": "font.size.12"
+                                },
+                                "text_align": "center",
+                                "text_opa": 255
+                              }
+                            }
+                          ],
+                          "events": [],
+                          "bindings": [],
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "id": "a1050000-0000-4000-9000-000000000060",
+                      "type": "button",
+                      "codeName": "air1050_air_nav_air",
+                      "props": {
+                        "x": 154,
+                        "y": 6,
+                        "width": 142,
+                        "height": 40
+                      },
+                      "flags": {
+                        "scrollable": false
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "bg_color": {
+                              "$token": "color.accent"
+                            },
+                            "bg_opa": 255,
+                            "border_color": {
+                              "$token": "color.accent"
+                            },
+                            "border_width": 1,
+                            "radius": 10,
+                            "pad_all": 0,
+                            "shadow_width": 0
+                          }
+                        },
+                        {
+                          "selector": {
+                            "states": [
+                              "pressed"
+                            ]
+                          },
+                          "props": {
+                            "bg_color": {
+                              "$token": "color.accent2"
+                            }
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": [
+                        {
+                          "id": "a1050000-0000-4000-9000-000000000059",
+                          "type": "label",
+                          "codeName": "air1050_air_nav_air_text",
+                          "props": {
+                            "text": "AIR DATA",
+                            "x": 0,
+                            "y": 9,
+                            "width": 142,
+                            "height": 22
+                          },
+                          "styleRefs": [],
+                          "styles": [
+                            {
+                              "props": {
+                                "text_color": {
+                                  "$token": "color.text.onaccent"
+                                },
+                                "text_font": {
+                                  "$token": "font.size.12"
+                                },
+                                "text_align": "center",
+                                "text_opa": 255
+                              }
+                            }
+                          ],
+                          "events": [],
+                          "bindings": [],
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "id": "a1050000-0000-4000-9000-000000000062",
+                      "type": "button",
+                      "codeName": "air1050_air_nav_scenes",
+                      "props": {
+                        "x": 302,
+                        "y": 6,
+                        "width": 142,
+                        "height": 40
+                      },
+                      "flags": {
+                        "scrollable": false
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "bg_color": {
+                              "$token": "color.nav"
+                            },
+                            "bg_opa": 255,
+                            "border_color": {
+                              "$token": "color.header.border"
+                            },
+                            "border_width": 1,
+                            "radius": 10,
+                            "pad_all": 0,
+                            "shadow_width": 0
+                          }
+                        },
+                        {
+                          "selector": {
+                            "states": [
+                              "pressed"
+                            ]
+                          },
+                          "props": {
+                            "bg_color": {
+                              "$token": "color.accent2"
+                            }
+                          }
+                        }
+                      ],
+                      "events": [
+                        {
+                          "on": "clicked",
+                          "action": "screen.open",
+                          "args": {
+                            "screen": "a1050000-0000-4000-9000-000000000003",
+                            "anim": "fade_in",
+                            "duration": 140,
+                            "delay": 0
+                          }
+                        }
+                      ],
+                      "bindings": [],
+                      "children": [
+                        {
+                          "id": "a1050000-0000-4000-9000-000000000061",
+                          "type": "label",
+                          "codeName": "air1050_air_nav_scenes_text",
+                          "props": {
+                            "text": "SCENES",
+                            "x": 0,
+                            "y": 9,
+                            "width": 142,
+                            "height": 22
+                          },
+                          "styleRefs": [],
+                          "styles": [
+                            {
+                              "props": {
+                                "text_color": {
+                                  "$token": "color.text.muted"
+                                },
+                                "text_font": {
+                                  "$token": "font.size.12"
+                                },
+                                "text_align": "center",
+                                "text_opa": 255
+                              }
+                            }
+                          ],
+                          "events": [],
+                          "bindings": [],
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "a1050000-0000-4000-9000-000000000065",
+              "type": "label",
+              "codeName": "air1050_air_heading",
+              "props": {
+                "text": "Indoor air at a glance",
+                "x": 28,
+                "y": 96,
+                "width": 520,
+                "height": 32
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": {
+                      "$token": "color.text.primary"
+                    },
+                    "text_font": {
+                      "$token": "font.size.26"
+                    },
+                    "text_align": "left",
+                    "text_opa": 255
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "a1050000-0000-4000-9000-000000000066",
+              "type": "label",
+              "codeName": "air1050_air_intro",
+              "props": {
+                "text": "All monitored values remain inside the comfort envelope",
+                "x": 28,
+                "y": 132,
+                "width": 620,
+                "height": 22
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": {
+                      "$token": "color.text.muted"
+                    },
+                    "text_font": {
+                      "$token": "font.size.14"
+                    },
+                    "text_align": "left",
+                    "text_opa": 255
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "a1050000-0000-4000-9000-000000000070",
+              "type": "obj",
+              "codeName": "air1050_metric_co2",
+              "props": {
+                "x": 28,
+                "y": 174,
+                "width": 224,
+                "height": 150
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 16,
+                    "pad_all": 0,
+                    "shadow_color": {
+                      "$token": "color.shadow"
+                    },
+                    "shadow_width": 0,
+                    "shadow_opa": 0,
+                    "shadow_offset_y": 0
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "a1050000-0000-4000-9000-000000000067",
+                  "type": "label",
+                  "codeName": "air1050_metric_co2_title",
+                  "props": {
+                    "text": "CARBON DIOXIDE",
+                    "x": 18,
+                    "y": 16,
+                    "width": 188,
+                    "height": 20
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000068",
+                  "type": "label",
+                  "codeName": "air1050_metric_co2_value",
+                  "props": {
+                    "text": "612 ppm",
+                    "x": 18,
+                    "y": 47,
+                    "width": 188,
+                    "height": 38
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.success"
+                        },
+                        "text_font": {
+                          "$token": "font.size.28"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000069",
+                  "type": "label",
+                  "codeName": "air1050_metric_co2_note",
+                  "props": {
+                    "text": "Target below 800 ppm",
+                    "x": 18,
+                    "y": 104,
+                    "width": 188,
+                    "height": 22
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.secondary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "a1050000-0000-4000-9000-000000000074",
+              "type": "obj",
+              "codeName": "air1050_metric_pm",
+              "props": {
+                "x": 268,
+                "y": 174,
+                "width": 224,
+                "height": 150
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 16,
+                    "pad_all": 0,
+                    "shadow_color": {
+                      "$token": "color.shadow"
+                    },
+                    "shadow_width": 0,
+                    "shadow_opa": 0,
+                    "shadow_offset_y": 0
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "a1050000-0000-4000-9000-000000000071",
+                  "type": "label",
+                  "codeName": "air1050_metric_pm_title",
+                  "props": {
+                    "text": "PM2.5",
+                    "x": 18,
+                    "y": 16,
+                    "width": 188,
+                    "height": 20
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000072",
+                  "type": "label",
+                  "codeName": "air1050_metric_pm_value",
+                  "props": {
+                    "text": "7 ug/m3",
+                    "x": 18,
+                    "y": 47,
+                    "width": 188,
+                    "height": 38
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.accent2"
+                        },
+                        "text_font": {
+                          "$token": "font.size.28"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000073",
+                  "type": "label",
+                  "codeName": "air1050_metric_pm_note",
+                  "props": {
+                    "text": "Clean indoor air",
+                    "x": 18,
+                    "y": 104,
+                    "width": 188,
+                    "height": 22
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.secondary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "a1050000-0000-4000-9000-000000000078",
+              "type": "obj",
+              "codeName": "air1050_metric_rh",
+              "props": {
+                "x": 508,
+                "y": 174,
+                "width": 224,
+                "height": 150
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 16,
+                    "pad_all": 0,
+                    "shadow_color": {
+                      "$token": "color.shadow"
+                    },
+                    "shadow_width": 0,
+                    "shadow_opa": 0,
+                    "shadow_offset_y": 0
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "a1050000-0000-4000-9000-000000000075",
+                  "type": "label",
+                  "codeName": "air1050_metric_rh_title",
+                  "props": {
+                    "text": "HUMIDITY",
+                    "x": 18,
+                    "y": 16,
+                    "width": 188,
+                    "height": 20
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000076",
+                  "type": "label",
+                  "codeName": "air1050_metric_rh_value",
+                  "props": {
+                    "text": "46%",
+                    "x": 18,
+                    "y": 47,
+                    "width": 188,
+                    "height": 38
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.accent"
+                        },
+                        "text_font": {
+                          "$token": "font.size.28"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000077",
+                  "type": "label",
+                  "codeName": "air1050_metric_rh_note",
+                  "props": {
+                    "text": "Comfort band 40-60%",
+                    "x": 18,
+                    "y": 104,
+                    "width": 188,
+                    "height": 22
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.secondary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "a1050000-0000-4000-9000-000000000082",
+              "type": "obj",
+              "codeName": "air1050_metric_voc",
+              "props": {
+                "x": 748,
+                "y": 174,
+                "width": 248,
+                "height": 150
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 16,
+                    "pad_all": 0,
+                    "shadow_color": {
+                      "$token": "color.shadow"
+                    },
+                    "shadow_width": 0,
+                    "shadow_opa": 0,
+                    "shadow_offset_y": 0
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "a1050000-0000-4000-9000-000000000079",
+                  "type": "label",
+                  "codeName": "air1050_metric_voc_title",
+                  "props": {
+                    "text": "VOC INDEX",
+                    "x": 18,
+                    "y": 16,
+                    "width": 212,
+                    "height": 20
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000080",
+                  "type": "label",
+                  "codeName": "air1050_metric_voc_value",
+                  "props": {
+                    "text": "82",
+                    "x": 18,
+                    "y": 47,
+                    "width": 212,
+                    "height": 38
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.success"
+                        },
+                        "text_font": {
+                          "$token": "font.size.28"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000081",
+                  "type": "label",
+                  "codeName": "air1050_metric_voc_note",
+                  "props": {
+                    "text": "Low emissions",
+                    "x": 18,
+                    "y": 104,
+                    "width": 212,
+                    "height": 22
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.secondary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "a1050000-0000-4000-9000-000000000093",
+              "type": "obj",
+              "codeName": "air1050_ventilation",
+              "props": {
+                "x": 28,
+                "y": 344,
+                "width": 704,
+                "height": 216
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 16,
+                    "pad_all": 0,
+                    "shadow_color": {
+                      "$token": "color.shadow"
+                    },
+                    "shadow_width": 0,
+                    "shadow_opa": 0,
+                    "shadow_offset_y": 0
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "a1050000-0000-4000-9000-000000000083",
+                  "type": "label",
+                  "codeName": "air1050_vent_title",
+                  "props": {
+                    "text": "VENTILATION DISTRIBUTION",
+                    "x": 20,
+                    "y": 18,
+                    "width": 360,
+                    "height": 22
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.14"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000084",
+                  "type": "label",
+                  "codeName": "air1050_vent_total",
+                  "props": {
+                    "text": "428 m3/h TOTAL",
+                    "x": 470,
+                    "y": 18,
+                    "width": 210,
+                    "height": 22
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.accent2"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "right",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000085",
+                  "type": "label",
+                  "codeName": "air1050_zone_lounge",
+                  "props": {
+                    "text": "LOUNGE",
+                    "x": 20,
+                    "y": 62,
+                    "width": 120,
+                    "height": 18
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000086",
+                  "type": "bar",
+                  "codeName": "air1050_zone_lounge_bar",
+                  "props": {
+                    "x": 132,
+                    "y": 65,
+                    "width": 526,
+                    "height": 10,
+                    "min_value": 0,
+                    "max_value": 100,
+                    "value": 72
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "selector": {
+                        "part": "main"
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.track"
+                        },
+                        "bg_opa": 255,
+                        "radius": 32767
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "indicator"
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.accent"
+                        },
+                        "bg_opa": 255,
+                        "radius": 32767
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000087",
+                  "type": "label",
+                  "codeName": "air1050_zone_meeting",
+                  "props": {
+                    "text": "MEETING",
+                    "x": 20,
+                    "y": 100,
+                    "width": 120,
+                    "height": 18
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000088",
+                  "type": "bar",
+                  "codeName": "air1050_zone_meeting_bar",
+                  "props": {
+                    "x": 132,
+                    "y": 103,
+                    "width": 526,
+                    "height": 10,
+                    "min_value": 0,
+                    "max_value": 100,
+                    "value": 48
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "selector": {
+                        "part": "main"
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.track"
+                        },
+                        "bg_opa": 255,
+                        "radius": 32767
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "indicator"
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.accent2"
+                        },
+                        "bg_opa": 255,
+                        "radius": 32767
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000089",
+                  "type": "label",
+                  "codeName": "air1050_zone_focus",
+                  "props": {
+                    "text": "FOCUS",
+                    "x": 20,
+                    "y": 138,
+                    "width": 120,
+                    "height": 18
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000090",
+                  "type": "bar",
+                  "codeName": "air1050_zone_focus_bar",
+                  "props": {
+                    "x": 132,
+                    "y": 141,
+                    "width": 526,
+                    "height": 10,
+                    "min_value": 0,
+                    "max_value": 100,
+                    "value": 61
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "selector": {
+                        "part": "main"
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.track"
+                        },
+                        "bg_opa": 255,
+                        "radius": 32767
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "indicator"
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.success"
+                        },
+                        "bg_opa": 255,
+                        "radius": 32767
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000091",
+                  "type": "label",
+                  "codeName": "air1050_zone_cafe",
+                  "props": {
+                    "text": "CAFE",
+                    "x": 20,
+                    "y": 176,
+                    "width": 120,
+                    "height": 18
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000092",
+                  "type": "bar",
+                  "codeName": "air1050_zone_cafe_bar",
+                  "props": {
+                    "x": 132,
+                    "y": 179,
+                    "width": 526,
+                    "height": 10,
+                    "min_value": 0,
+                    "max_value": 100,
+                    "value": 35
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "selector": {
+                        "part": "main"
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.track"
+                        },
+                        "bg_opa": 255,
+                        "radius": 32767
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "indicator"
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.warning"
+                        },
+                        "bg_opa": 255,
+                        "radius": 32767
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "a1050000-0000-4000-9000-000000000100",
+              "type": "obj",
+              "codeName": "air1050_filter",
+              "props": {
+                "x": 748,
+                "y": 344,
+                "width": 248,
+                "height": 216
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 16,
+                    "pad_all": 0,
+                    "shadow_color": {
+                      "$token": "color.shadow"
+                    },
+                    "shadow_width": 0,
+                    "shadow_opa": 0,
+                    "shadow_offset_y": 0
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "a1050000-0000-4000-9000-000000000094",
+                  "type": "label",
+                  "codeName": "air1050_filter_title",
+                  "props": {
+                    "text": "FILTER HEALTH",
+                    "x": 18,
+                    "y": 18,
+                    "width": 212,
+                    "height": 22
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.14"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000095",
+                  "type": "label",
+                  "codeName": "air1050_filter_value",
+                  "props": {
+                    "text": "82%",
+                    "x": 18,
+                    "y": 54,
+                    "width": 212,
+                    "height": 46
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.success"
+                        },
+                        "text_font": {
+                          "$token": "font.size.36"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000096",
+                  "type": "bar",
+                  "codeName": "air1050_filter_bar",
+                  "props": {
+                    "x": 18,
+                    "y": 112,
+                    "width": 212,
+                    "height": 12,
+                    "min_value": 0,
+                    "max_value": 100,
+                    "value": 82
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "selector": {
+                        "part": "main"
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.track"
+                        },
+                        "bg_opa": 255,
+                        "radius": 32767
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "indicator"
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.success"
+                        },
+                        "bg_opa": 255,
+                        "radius": 32767
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000097",
+                  "type": "label",
+                  "codeName": "air1050_filter_note",
+                  "props": {
+                    "text": "Estimated 74 days remaining",
+                    "x": 18,
+                    "y": 142,
+                    "width": 212,
+                    "height": 20
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000099",
+                  "type": "button",
+                  "codeName": "air1050_filter_details",
+                  "props": {
+                    "x": 18,
+                    "y": 174,
+                    "width": 212,
+                    "height": 30
+                  },
+                  "flags": {
+                    "scrollable": false
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.control"
+                        },
+                        "bg_opa": 255,
+                        "border_color": {
+                          "$token": "color.border"
+                        },
+                        "border_width": 1,
+                        "radius": 8,
+                        "pad_all": 0,
+                        "shadow_width": 0
+                      }
+                    },
+                    {
+                      "selector": {
+                        "states": [
+                          "pressed"
+                        ]
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.accent2"
+                        }
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": [
+                    {
+                      "id": "a1050000-0000-4000-9000-000000000098",
+                      "type": "label",
+                      "codeName": "air1050_filter_details_text",
+                      "props": {
+                        "text": "VIEW DETAILS",
+                        "x": 0,
+                        "y": 4,
+                        "width": 212,
+                        "height": 22
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "text_color": {
+                              "$token": "color.text.secondary"
+                            },
+                            "text_font": {
+                              "$token": "font.size.12"
+                            },
+                            "text_align": "center",
+                            "text_opa": 255
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "a1050000-0000-4000-9000-000000000003",
+        "codeName": "air1050_scenes",
+        "displayName": "Comfort Scenes",
+        "styles": [
+          {
+            "id": "style:air1050-scene-comfort-selected",
+            "codeName": "air1050_scene_comfort_selected",
+            "displayName": "Comfort selected",
+            "props": {
+              "border_color": {
+                "$token": "color.accent"
+              },
+              "border_width": 2
+            }
+          },
+          {
+            "id": "style:air1050-scene-eco-selected",
+            "codeName": "air1050_scene_eco_selected",
+            "displayName": "Eco selected",
+            "props": {
+              "border_color": {
+                "$token": "color.success"
+              },
+              "border_width": 2
+            }
+          },
+          {
+            "id": "style:air1050-scene-boost-selected",
+            "codeName": "air1050_scene_boost_selected",
+            "displayName": "Boost selected",
+            "props": {
+              "border_color": {
+                "$token": "color.warning"
+              },
+              "border_width": 2
+            }
+          }
+        ],
+        "consts": [],
+        "root": {
+          "id": "a1050000-0000-4000-9000-000000000142",
+          "type": "obj",
+          "codeName": "air1050_scenes_root",
+          "props": {},
+          "flags": {
+            "scrollable": false
+          },
+          "styleRefs": [],
+          "styles": [
+            {
+              "props": {
+                "bg_color": {
+                  "$token": "color.background"
+                },
+                "bg_opa": 255,
+                "border_width": 0,
+                "pad_all": 0
+              }
+            }
+          ],
+          "events": [],
+          "bindings": [],
+          "children": [
+            {
+              "id": "a1050000-0000-4000-9000-000000000112",
+              "type": "obj",
+              "codeName": "air1050_scenes_header",
+              "props": {
+                "x": 0,
+                "y": 0,
+                "width": 1024,
+                "height": 76
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.header"
+                    },
+                    "bg_opa": 255,
+                    "border_width": 0,
+                    "radius": 0,
+                    "pad_all": 0
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "a1050000-0000-4000-9000-000000000102",
+                  "type": "label",
+                  "codeName": "air1050_scenes_mark",
+                  "props": {
+                    "text": "A",
+                    "x": 26,
+                    "y": 16,
+                    "width": 42,
+                    "height": 42
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.onaccent"
+                        },
+                        "text_font": {
+                          "$token": "font.size.24"
+                        },
+                        "text_align": "center",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000103",
+                  "type": "label",
+                  "codeName": "air1050_scenes_title",
+                  "props": {
+                    "text": "COMFORT / SCENES",
+                    "x": 78,
+                    "y": 13,
+                    "width": 330,
+                    "height": 28
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.onaccent"
+                        },
+                        "text_font": {
+                          "$token": "font.size.22"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000104",
+                  "type": "label",
+                  "codeName": "air1050_scenes_subtitle",
+                  "props": {
+                    "text": "ONE-TOUCH ENVIRONMENT PRESETS",
+                    "x": 78,
+                    "y": 41,
+                    "width": 380,
+                    "height": 20
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000111",
+                  "type": "obj",
+                  "codeName": "air1050_scenes_nav",
+                  "props": {
+                    "x": 548,
+                    "y": 12,
+                    "width": 452,
+                    "height": 52
+                  },
+                  "flags": {
+                    "scrollable": false
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.nav"
+                        },
+                        "bg_opa": 255,
+                        "border_color": {
+                          "$token": "color.header.border"
+                        },
+                        "border_width": 1,
+                        "radius": 13,
+                        "pad_all": 0,
+                        "shadow_color": {
+                          "$token": "color.shadow"
+                        },
+                        "shadow_width": 0,
+                        "shadow_opa": 0,
+                        "shadow_offset_y": 0
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": [
+                    {
+                      "id": "a1050000-0000-4000-9000-000000000106",
+                      "type": "button",
+                      "codeName": "air1050_scenes_nav_home",
+                      "props": {
+                        "x": 6,
+                        "y": 6,
+                        "width": 142,
+                        "height": 40
+                      },
+                      "flags": {
+                        "scrollable": false
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "bg_color": {
+                              "$token": "color.nav"
+                            },
+                            "bg_opa": 255,
+                            "border_color": {
+                              "$token": "color.header.border"
+                            },
+                            "border_width": 1,
+                            "radius": 10,
+                            "pad_all": 0,
+                            "shadow_width": 0
+                          }
+                        },
+                        {
+                          "selector": {
+                            "states": [
+                              "pressed"
+                            ]
+                          },
+                          "props": {
+                            "bg_color": {
+                              "$token": "color.accent2"
+                            }
+                          }
+                        }
+                      ],
+                      "events": [
+                        {
+                          "on": "clicked",
+                          "action": "screen.open",
+                          "args": {
+                            "screen": "a1050000-0000-4000-9000-000000000001",
+                            "anim": "fade_in",
+                            "duration": 140,
+                            "delay": 0
+                          }
+                        }
+                      ],
+                      "bindings": [],
+                      "children": [
+                        {
+                          "id": "a1050000-0000-4000-9000-000000000105",
+                          "type": "label",
+                          "codeName": "air1050_scenes_nav_home_text",
+                          "props": {
+                            "text": "OVERVIEW",
+                            "x": 0,
+                            "y": 9,
+                            "width": 142,
+                            "height": 22
+                          },
+                          "styleRefs": [],
+                          "styles": [
+                            {
+                              "props": {
+                                "text_color": {
+                                  "$token": "color.text.muted"
+                                },
+                                "text_font": {
+                                  "$token": "font.size.12"
+                                },
+                                "text_align": "center",
+                                "text_opa": 255
+                              }
+                            }
+                          ],
+                          "events": [],
+                          "bindings": [],
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "id": "a1050000-0000-4000-9000-000000000108",
+                      "type": "button",
+                      "codeName": "air1050_scenes_nav_air",
+                      "props": {
+                        "x": 154,
+                        "y": 6,
+                        "width": 142,
+                        "height": 40
+                      },
+                      "flags": {
+                        "scrollable": false
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "bg_color": {
+                              "$token": "color.nav"
+                            },
+                            "bg_opa": 255,
+                            "border_color": {
+                              "$token": "color.header.border"
+                            },
+                            "border_width": 1,
+                            "radius": 10,
+                            "pad_all": 0,
+                            "shadow_width": 0
+                          }
+                        },
+                        {
+                          "selector": {
+                            "states": [
+                              "pressed"
+                            ]
+                          },
+                          "props": {
+                            "bg_color": {
+                              "$token": "color.accent2"
+                            }
+                          }
+                        }
+                      ],
+                      "events": [
+                        {
+                          "on": "clicked",
+                          "action": "screen.open",
+                          "args": {
+                            "screen": "a1050000-0000-4000-9000-000000000002",
+                            "anim": "fade_in",
+                            "duration": 140,
+                            "delay": 0
+                          }
+                        }
+                      ],
+                      "bindings": [],
+                      "children": [
+                        {
+                          "id": "a1050000-0000-4000-9000-000000000107",
+                          "type": "label",
+                          "codeName": "air1050_scenes_nav_air_text",
+                          "props": {
+                            "text": "AIR DATA",
+                            "x": 0,
+                            "y": 9,
+                            "width": 142,
+                            "height": 22
+                          },
+                          "styleRefs": [],
+                          "styles": [
+                            {
+                              "props": {
+                                "text_color": {
+                                  "$token": "color.text.muted"
+                                },
+                                "text_font": {
+                                  "$token": "font.size.12"
+                                },
+                                "text_align": "center",
+                                "text_opa": 255
+                              }
+                            }
+                          ],
+                          "events": [],
+                          "bindings": [],
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "id": "a1050000-0000-4000-9000-000000000110",
+                      "type": "button",
+                      "codeName": "air1050_scenes_nav_scenes",
+                      "props": {
+                        "x": 302,
+                        "y": 6,
+                        "width": 142,
+                        "height": 40
+                      },
+                      "flags": {
+                        "scrollable": false
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "bg_color": {
+                              "$token": "color.accent"
+                            },
+                            "bg_opa": 255,
+                            "border_color": {
+                              "$token": "color.accent"
+                            },
+                            "border_width": 1,
+                            "radius": 10,
+                            "pad_all": 0,
+                            "shadow_width": 0
+                          }
+                        },
+                        {
+                          "selector": {
+                            "states": [
+                              "pressed"
+                            ]
+                          },
+                          "props": {
+                            "bg_color": {
+                              "$token": "color.accent2"
+                            }
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": [
+                        {
+                          "id": "a1050000-0000-4000-9000-000000000109",
+                          "type": "label",
+                          "codeName": "air1050_scenes_nav_scenes_text",
+                          "props": {
+                            "text": "SCENES",
+                            "x": 0,
+                            "y": 9,
+                            "width": 142,
+                            "height": 22
+                          },
+                          "styleRefs": [],
+                          "styles": [
+                            {
+                              "props": {
+                                "text_color": {
+                                  "$token": "color.text.onaccent"
+                                },
+                                "text_font": {
+                                  "$token": "font.size.12"
+                                },
+                                "text_align": "center",
+                                "text_opa": 255
+                              }
+                            }
+                          ],
+                          "events": [],
+                          "bindings": [],
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "a1050000-0000-4000-9000-000000000113",
+              "type": "label",
+              "codeName": "air1050_scenes_heading",
+              "props": {
+                "text": "Choose how the room should feel",
+                "x": 40,
+                "y": 108,
+                "width": 720,
+                "height": 38
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": {
+                      "$token": "color.text.primary"
+                    },
+                    "text_font": {
+                      "$token": "font.size.28"
+                    },
+                    "text_align": "left",
+                    "text_opa": 255
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "a1050000-0000-4000-9000-000000000114",
+              "type": "label",
+              "codeName": "air1050_scenes_intro",
+              "props": {
+                "text": "Each scene coordinates fan speed, fresh air and target temperature.",
+                "x": 40,
+                "y": 148,
+                "width": 760,
+                "height": 22
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "text_color": {
+                      "$token": "color.text.muted"
+                    },
+                    "text_font": {
+                      "$token": "font.size.14"
+                    },
+                    "text_align": "left",
+                    "text_opa": 255
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": []
+            },
+            {
+              "id": "a1050000-0000-4000-9000-000000000121",
+              "type": "obj",
+              "codeName": "air1050_scene_comfort_card",
+              "props": {
+                "x": 40,
+                "y": 188,
+                "width": 298,
+                "height": 244
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.accent"
+                    },
+                    "border_width": 1,
+                    "radius": 16,
+                    "pad_all": 0,
+                    "shadow_color": {
+                      "$token": "color.shadow"
+                    },
+                    "shadow_width": 0,
+                    "shadow_opa": 0,
+                    "shadow_offset_y": 0
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [
+                {
+                  "kind": "style",
+                  "styleId": "style:air1050-scene-comfort-selected",
+                  "subject": "subject:air1050-scene",
+                  "refValue": 0
+                }
+              ],
+              "children": [
+                {
+                  "id": "a1050000-0000-4000-9000-000000000115",
+                  "type": "label",
+                  "codeName": "air1050_scene_comfort_card_tag",
+                  "props": {
+                    "text": "ACTIVE",
+                    "x": 20,
+                    "y": 18,
+                    "width": 120,
+                    "height": 20
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.accent2"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000116",
+                  "type": "label",
+                  "codeName": "air1050_scene_comfort_card_title",
+                  "props": {
+                    "text": "COMFORT",
+                    "x": 20,
+                    "y": 54,
+                    "width": 258,
+                    "height": 34
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.26"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000117",
+                  "type": "label",
+                  "codeName": "air1050_scene_comfort_card_detail",
+                  "props": {
+                    "text": "Balanced airflow\n22°C target • quiet response",
+                    "x": 20,
+                    "y": 98,
+                    "width": 258,
+                    "height": 42
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000118",
+                  "type": "bar",
+                  "codeName": "air1050_scene_comfort_card_bar",
+                  "props": {
+                    "x": 20,
+                    "y": 156,
+                    "width": 258,
+                    "height": 10,
+                    "min_value": 0,
+                    "max_value": 100,
+                    "value": 58
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "selector": {
+                        "part": "main"
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.track"
+                        },
+                        "bg_opa": 255,
+                        "radius": 32767
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "indicator"
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.accent2"
+                        },
+                        "bg_opa": 255,
+                        "radius": 32767
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000120",
+                  "type": "button",
+                  "codeName": "air1050_scene_comfort_card_apply",
+                  "props": {
+                    "x": 20,
+                    "y": 184,
+                    "width": 258,
+                    "height": 42
+                  },
+                  "flags": {
+                    "scrollable": false
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.accent"
+                        },
+                        "bg_opa": 255,
+                        "border_color": {
+                          "$token": "color.accent"
+                        },
+                        "border_width": 1,
+                        "radius": 10,
+                        "pad_all": 0,
+                        "shadow_width": 0
+                      }
+                    },
+                    {
+                      "selector": {
+                        "states": [
+                          "pressed"
+                        ]
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.accent2"
+                        }
+                      }
+                    }
+                  ],
+                  "events": [
+                    {
+                      "on": "clicked",
+                      "action": "subject.set",
+                      "args": {
+                        "subject": "subject:air1050-scene",
+                        "value": "0"
+                      }
+                    }
+                  ],
+                  "bindings": [],
+                  "children": [
+                    {
+                      "id": "a1050000-0000-4000-9000-000000000119",
+                      "type": "label",
+                      "codeName": "air1050_scene_comfort_card_apply_text",
+                      "props": {
+                        "text": "SELECTED",
+                        "x": 0,
+                        "y": 10,
+                        "width": 258,
+                        "height": 22
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "text_color": {
+                              "$token": "color.text.onaccent"
+                            },
+                            "text_font": {
+                              "$token": "font.size.14"
+                            },
+                            "text_align": "center",
+                            "text_opa": 255
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "a1050000-0000-4000-9000-000000000128",
+              "type": "obj",
+              "codeName": "air1050_scene_eco_card",
+              "props": {
+                "x": 363,
+                "y": 188,
+                "width": 298,
+                "height": 244
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 16,
+                    "pad_all": 0,
+                    "shadow_color": {
+                      "$token": "color.shadow"
+                    },
+                    "shadow_width": 0,
+                    "shadow_opa": 0,
+                    "shadow_offset_y": 0
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [
+                {
+                  "kind": "style",
+                  "styleId": "style:air1050-scene-eco-selected",
+                  "subject": "subject:air1050-scene",
+                  "refValue": 1
+                }
+              ],
+              "children": [
+                {
+                  "id": "a1050000-0000-4000-9000-000000000122",
+                  "type": "label",
+                  "codeName": "air1050_scene_eco_card_tag",
+                  "props": {
+                    "text": "PRESET",
+                    "x": 20,
+                    "y": 18,
+                    "width": 120,
+                    "height": 20
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.success"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000123",
+                  "type": "label",
+                  "codeName": "air1050_scene_eco_card_title",
+                  "props": {
+                    "text": "ECO",
+                    "x": 20,
+                    "y": 54,
+                    "width": 258,
+                    "height": 34
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.26"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000124",
+                  "type": "label",
+                  "codeName": "air1050_scene_eco_card_detail",
+                  "props": {
+                    "text": "Energy-aware operation\nReduced airflow • 24°C target",
+                    "x": 20,
+                    "y": 98,
+                    "width": 258,
+                    "height": 42
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000125",
+                  "type": "bar",
+                  "codeName": "air1050_scene_eco_card_bar",
+                  "props": {
+                    "x": 20,
+                    "y": 156,
+                    "width": 258,
+                    "height": 10,
+                    "min_value": 0,
+                    "max_value": 100,
+                    "value": 34
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "selector": {
+                        "part": "main"
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.track"
+                        },
+                        "bg_opa": 255,
+                        "radius": 32767
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "indicator"
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.success"
+                        },
+                        "bg_opa": 255,
+                        "radius": 32767
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000127",
+                  "type": "button",
+                  "codeName": "air1050_scene_eco_card_apply",
+                  "props": {
+                    "x": 20,
+                    "y": 184,
+                    "width": 258,
+                    "height": 42
+                  },
+                  "flags": {
+                    "scrollable": false
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.control"
+                        },
+                        "bg_opa": 255,
+                        "border_color": {
+                          "$token": "color.border"
+                        },
+                        "border_width": 1,
+                        "radius": 10,
+                        "pad_all": 0,
+                        "shadow_width": 0
+                      }
+                    },
+                    {
+                      "selector": {
+                        "states": [
+                          "pressed"
+                        ]
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.accent2"
+                        }
+                      }
+                    }
+                  ],
+                  "events": [
+                    {
+                      "on": "clicked",
+                      "action": "subject.set",
+                      "args": {
+                        "subject": "subject:air1050-scene",
+                        "value": "1"
+                      }
+                    }
+                  ],
+                  "bindings": [],
+                  "children": [
+                    {
+                      "id": "a1050000-0000-4000-9000-000000000126",
+                      "type": "label",
+                      "codeName": "air1050_scene_eco_card_apply_text",
+                      "props": {
+                        "text": "APPLY SCENE",
+                        "x": 0,
+                        "y": 10,
+                        "width": 258,
+                        "height": 22
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "text_color": {
+                              "$token": "color.text.secondary"
+                            },
+                            "text_font": {
+                              "$token": "font.size.14"
+                            },
+                            "text_align": "center",
+                            "text_opa": 255
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "a1050000-0000-4000-9000-000000000135",
+              "type": "obj",
+              "codeName": "air1050_scene_boost_card",
+              "props": {
+                "x": 686,
+                "y": 188,
+                "width": 298,
+                "height": 244
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 16,
+                    "pad_all": 0,
+                    "shadow_color": {
+                      "$token": "color.shadow"
+                    },
+                    "shadow_width": 0,
+                    "shadow_opa": 0,
+                    "shadow_offset_y": 0
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [
+                {
+                  "kind": "style",
+                  "styleId": "style:air1050-scene-boost-selected",
+                  "subject": "subject:air1050-scene",
+                  "refValue": 2
+                }
+              ],
+              "children": [
+                {
+                  "id": "a1050000-0000-4000-9000-000000000129",
+                  "type": "label",
+                  "codeName": "air1050_scene_boost_card_tag",
+                  "props": {
+                    "text": "PRESET",
+                    "x": 20,
+                    "y": 18,
+                    "width": 120,
+                    "height": 20
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.warning"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000130",
+                  "type": "label",
+                  "codeName": "air1050_scene_boost_card_title",
+                  "props": {
+                    "text": "BOOST",
+                    "x": 20,
+                    "y": 54,
+                    "width": 258,
+                    "height": 34
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.26"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000131",
+                  "type": "label",
+                  "codeName": "air1050_scene_boost_card_detail",
+                  "props": {
+                    "text": "Rapid fresh-air exchange\nMaximum airflow • 20 minutes",
+                    "x": 20,
+                    "y": 98,
+                    "width": 258,
+                    "height": 42
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000132",
+                  "type": "bar",
+                  "codeName": "air1050_scene_boost_card_bar",
+                  "props": {
+                    "x": 20,
+                    "y": 156,
+                    "width": 258,
+                    "height": 10,
+                    "min_value": 0,
+                    "max_value": 100,
+                    "value": 92
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "selector": {
+                        "part": "main"
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.track"
+                        },
+                        "bg_opa": 255,
+                        "radius": 32767
+                      }
+                    },
+                    {
+                      "selector": {
+                        "part": "indicator"
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.warning"
+                        },
+                        "bg_opa": 255,
+                        "radius": 32767
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000134",
+                  "type": "button",
+                  "codeName": "air1050_scene_boost_card_apply",
+                  "props": {
+                    "x": 20,
+                    "y": 184,
+                    "width": 258,
+                    "height": 42
+                  },
+                  "flags": {
+                    "scrollable": false
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.control"
+                        },
+                        "bg_opa": 255,
+                        "border_color": {
+                          "$token": "color.border"
+                        },
+                        "border_width": 1,
+                        "radius": 10,
+                        "pad_all": 0,
+                        "shadow_width": 0
+                      }
+                    },
+                    {
+                      "selector": {
+                        "states": [
+                          "pressed"
+                        ]
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.accent2"
+                        }
+                      }
+                    }
+                  ],
+                  "events": [
+                    {
+                      "on": "clicked",
+                      "action": "subject.set",
+                      "args": {
+                        "subject": "subject:air1050-scene",
+                        "value": "2"
+                      }
+                    }
+                  ],
+                  "bindings": [],
+                  "children": [
+                    {
+                      "id": "a1050000-0000-4000-9000-000000000133",
+                      "type": "label",
+                      "codeName": "air1050_scene_boost_card_apply_text",
+                      "props": {
+                        "text": "APPLY SCENE",
+                        "x": 0,
+                        "y": 10,
+                        "width": 258,
+                        "height": 22
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "text_color": {
+                              "$token": "color.text.secondary"
+                            },
+                            "text_font": {
+                              "$token": "font.size.14"
+                            },
+                            "text_align": "center",
+                            "text_opa": 255
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "a1050000-0000-4000-9000-000000000141",
+              "type": "obj",
+              "codeName": "air1050_schedule_strip",
+              "props": {
+                "x": 40,
+                "y": 454,
+                "width": 944,
+                "height": 94
+              },
+              "flags": {
+                "scrollable": false
+              },
+              "styleRefs": [],
+              "styles": [
+                {
+                  "props": {
+                    "bg_color": {
+                      "$token": "color.surface"
+                    },
+                    "bg_opa": 255,
+                    "border_color": {
+                      "$token": "color.border"
+                    },
+                    "border_width": 1,
+                    "radius": 16,
+                    "pad_all": 0,
+                    "shadow_color": {
+                      "$token": "color.shadow"
+                    },
+                    "shadow_width": 0,
+                    "shadow_opa": 0,
+                    "shadow_offset_y": 0
+                  }
+                }
+              ],
+              "events": [],
+              "bindings": [],
+              "children": [
+                {
+                  "id": "a1050000-0000-4000-9000-000000000136",
+                  "type": "label",
+                  "codeName": "air1050_schedule_title",
+                  "props": {
+                    "text": "NEXT AUTOMATION",
+                    "x": 18,
+                    "y": 16,
+                    "width": 190,
+                    "height": 18
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.muted"
+                        },
+                        "text_font": {
+                          "$token": "font.size.12"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000137",
+                  "type": "label",
+                  "codeName": "air1050_schedule_time",
+                  "props": {
+                    "text": "18:30",
+                    "x": 18,
+                    "y": 42,
+                    "width": 110,
+                    "height": 30
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.primary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.22"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000138",
+                  "type": "label",
+                  "codeName": "air1050_schedule_action",
+                  "props": {
+                    "text": "ECO scene  •  End of occupied hours",
+                    "x": 146,
+                    "y": 44,
+                    "width": 480,
+                    "height": 24
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "text_color": {
+                          "$token": "color.text.secondary"
+                        },
+                        "text_font": {
+                          "$token": "font.size.14"
+                        },
+                        "text_align": "left",
+                        "text_opa": 255
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": []
+                },
+                {
+                  "id": "a1050000-0000-4000-9000-000000000140",
+                  "type": "button",
+                  "codeName": "air1050_schedule_edit",
+                  "props": {
+                    "x": 744,
+                    "y": 24,
+                    "width": 180,
+                    "height": 46
+                  },
+                  "flags": {
+                    "scrollable": false
+                  },
+                  "styleRefs": [],
+                  "styles": [
+                    {
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.control"
+                        },
+                        "bg_opa": 255,
+                        "border_color": {
+                          "$token": "color.border"
+                        },
+                        "border_width": 1,
+                        "radius": 10,
+                        "pad_all": 0,
+                        "shadow_width": 0
+                      }
+                    },
+                    {
+                      "selector": {
+                        "states": [
+                          "pressed"
+                        ]
+                      },
+                      "props": {
+                        "bg_color": {
+                          "$token": "color.accent2"
+                        }
+                      }
+                    }
+                  ],
+                  "events": [],
+                  "bindings": [],
+                  "children": [
+                    {
+                      "id": "a1050000-0000-4000-9000-000000000139",
+                      "type": "label",
+                      "codeName": "air1050_schedule_edit_text",
+                      "props": {
+                        "text": "EDIT SCHEDULE",
+                        "x": 0,
+                        "y": 12,
+                        "width": 180,
+                        "height": 22
+                      },
+                      "styleRefs": [],
+                      "styles": [
+                        {
+                          "props": {
+                            "text_color": {
+                              "$token": "color.text.secondary"
+                            },
+                            "text_font": {
+                              "$token": "font.size.14"
+                            },
+                            "text_align": "center",
+                            "text_opa": 255
+                          }
+                        }
+                      ],
+                      "events": [],
+                      "bindings": [],
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "components": [],
+    "styles": [],
+    "consts": [],
+    "assets": {
+      "fonts": [],
+      "images": [],
+      "icons": []
+    },
+    "translations": null,
+    "editor": {
+      "deviceModel": "WF2D-1050",
+      "deviceTitle": "7 inch 1024×600",
+      "example": "air-comfort-v1",
+      "showcase": "air-comfort"
+    }
+  },
+  "displayProfile": {
+    "schemaVersion": 1,
+    "kind": "display-profile",
+    "id": "display:wf2d-1050-1024x600-rgb565",
+    "revision": 1,
+    "displayName": "WF2D-1050 1024×600 矩形屏 RGB565",
+    "logicalSize": {
+      "width": 1024,
+      "height": 600
+    },
+    "shape": "rect",
+    "colorFormat": "RGB565",
+    "dpi": 130
+  },
+  "controllerProfile": {
+    "schemaVersion": 1,
+    "kind": "controller-profile",
+    "id": "controller:wf2d-1050",
+    "revision": 1,
+    "model": "WF2D-1050",
+    "displayName": "WF2D-1050 设备外壳",
+    "displayRef": "display:wf2d-1050-1024x600-rgb565@1",
+    "frame": {
+      "assetRef": "asset:controller/wf2d-1050.svg@sha256:dc9a43833bd064850ad558447d07b431417394b9c6ebe58bb51f4a42ad07f8a8",
+      "viewBox": {
+        "x": 0,
+        "y": 0,
+        "width": 179,
+        "height": 113
+      },
+      "screenViewport": {
+        "x": 12.39499999,
+        "y": 13.540000016999999,
+        "width": 154.21000002,
+        "height": 85.919999966,
+        "rotation": 0,
+        "clip": {
+          "type": "roundedRect",
+          "radius": 0.75
+        }
+      }
+    }
+  },
+  "buildTarget": {
+    "schemaVersion": 1,
+    "kind": "lvgl-build-target",
+    "id": "target:wf2d-1050-air-comfort",
+    "revision": 1,
+    "displayName": "WF2D-1050 Air & Comfort Target",
+    "uiProjectRef": "ui:wf2d-1050-air-comfort@1",
+    "controllerProfileRef": "controller:wf2d-1050@1",
+    "themeRef": "ui:wf2d-1050-air-comfort@1#theme:air1050-midnight",
+    "lvglVersion": "9.5.0"
+  },
+  "actionRegistry": {
+    "screen.open": {
+      "id": "screen.open",
+      "displayName": "打开屏幕",
+      "params": [
+        {
+          "name": "screen",
+          "type": "screenRef",
+          "required": true
+        },
+        {
+          "name": "anim",
+          "type": "string"
+        },
+        {
+          "name": "duration",
+          "type": "int"
+        },
+        {
+          "name": "delay",
+          "type": "int"
+        }
+      ]
+    },
+    "screen.create": {
+      "id": "screen.create",
+      "displayName": "创建并打开屏幕",
+      "description": "目标屏未创建时先创建再加载",
+      "params": [
+        {
+          "name": "screen",
+          "type": "screenRef",
+          "required": true
+        },
+        {
+          "name": "anim",
+          "type": "string"
+        },
+        {
+          "name": "duration",
+          "type": "int"
+        },
+        {
+          "name": "delay",
+          "type": "int"
+        }
+      ]
+    },
+    "screen.back": {
+      "id": "screen.back",
+      "displayName": "返回上一屏",
+      "params": []
+    },
+    "subject.set": {
+      "id": "subject.set",
+      "displayName": "设置 Subject",
+      "params": [
+        {
+          "name": "subject",
+          "type": "subjectRef",
+          "required": true
+        },
+        {
+          "name": "value",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    "subject.toggle": {
+      "id": "subject.toggle",
+      "displayName": "翻转 Subject",
+      "params": [
+        {
+          "name": "subject",
+          "type": "subjectRef",
+          "required": true
+        }
+      ]
+    },
+    "subject.increment": {
+      "id": "subject.increment",
+      "displayName": "递增 Subject",
+      "params": [
+        {
+          "name": "subject",
+          "type": "subjectRef",
+          "required": true
+        },
+        {
+          "name": "step",
+          "type": "int"
+        },
+        {
+          "name": "min",
+          "type": "int"
+        },
+        {
+          "name": "max",
+          "type": "int"
+        },
+        {
+          "name": "rollover",
+          "type": "bool"
+        }
+      ]
+    }
+  },
+  "migrationNotes": [
+    {
+      "severity": "info",
+      "code": "color-format-confirmed",
+      "path": "display.colorFormat",
+      "message": "WF2D-1050 示例已确认使用 RGB565。"
+    },
+    {
+      "severity": "info",
+      "code": "controller-profile-selected",
+      "path": "buildTarget.controllerProfileRef",
+      "message": "已绑定 WF2D-1050 设备外壳。"
+    },
+    {
+      "severity": "info",
+      "code": "device-showcase-layout-v1",
+      "path": "uiProject.screens",
+      "message": "WF2D-1050 使用独立的 电动车充电终端 场景、视觉系统与触控布局，并包含 3 个可导航页面。"
+    }
+  ],
+  "colorFormatConfirmed": true
+}

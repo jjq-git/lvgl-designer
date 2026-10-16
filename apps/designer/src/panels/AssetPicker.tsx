@@ -28,6 +28,16 @@ interface PickerPosition {
   maxHeight: number;
 }
 
+export function isScrollInsideAssetPicker(
+  popup: Pick<Node, 'contains'> | null,
+  target: EventTarget | null,
+): boolean {
+  if (popup === null || target === null || typeof (target as Node).nodeType !== 'number') {
+    return false;
+  }
+  return popup.contains(target as Node);
+}
+
 function Thumb({ asset }: { asset: ImageAsset | null }): JSX.Element {
   const url = useThumb(asset);
   if (!asset) return <span className="asset-thumb asset-thumb-sm asset-thumb-icon">—</span>;
@@ -89,15 +99,19 @@ export function AssetPicker(props: {
       if (e.key === 'Escape') setOpen(false);
     };
     const close = (): void => setOpen(false);
+    const onScroll = (event: Event): void => {
+      if (isScrollInsideAssetPicker(popupRef.current, event.target)) return;
+      close();
+    };
     window.addEventListener('pointerdown', onDown);
     window.addEventListener('keydown', onKey);
     window.addEventListener('resize', close);
-    window.addEventListener('scroll', close, true);
+    window.addEventListener('scroll', onScroll, true);
     return () => {
       window.removeEventListener('pointerdown', onDown);
       window.removeEventListener('keydown', onKey);
       window.removeEventListener('resize', close);
-      window.removeEventListener('scroll', close, true);
+      window.removeEventListener('scroll', onScroll, true);
     };
   }, [open]);
 
@@ -204,7 +218,7 @@ export function AssetPicker(props: {
           ref={popupRef}
           className={`asset-picker-pop ${panel === 'material' ? 'asset-picker-material-pop' : ''}`}
           role={panel === 'material' ? 'dialog' : 'listbox'}
-          aria-label={panel === 'material' ? '统一图标选择器' : accept === 'lottie' ? '选择 Lottie 素材' : '选择图片素材'}
+          aria-label={panel === 'material' ? '统一图标选择器' : accept === 'lottie' ? '选择 Lottie 素材' : '选择图片或图标素材'}
           style={position}
         >
           {panel === 'material' ? (
@@ -212,7 +226,7 @@ export function AssetPicker(props: {
               <div className="asset-picker-material-head">
                 <div>
                   <strong>统一图标选择器</strong>
-                  <span>应用到当前图片 · 设备 A8 + 网页 SVG</span>
+                  <span>应用到当前图片 / 图标 · 设备 A8 + 网页 SVG</span>
                 </div>
                 <button type="button" className="btn btn-sm" onClick={() => setPanel('assets')}>返回素材</button>
               </div>

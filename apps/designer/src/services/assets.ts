@@ -381,6 +381,71 @@ export async function resyncAssets(): Promise<void> {
   }
 }
 
+/**
+ * Resolve or create the size-specific LVGL font object behind the editor's
+ * family + size controls. Instances reuse the original TTF bytes and are
+ * de-duplicated by content hash and pixel size.
+ */
+export async function ensureFontInstance(sourceCodeName: string, sizePx: number): Promise<string> {
+  const normalizedSize = Math.max(4, Math.min(256, Math.round(sizePx)));
+  const initial = useProjectStore.getState();
+  const source = initial.uiProject.assets.fonts.find((asset) => asset.codeName === sourceCodeName);
+  if (!source) throw new Error(`字体家族 ${sourceCodeName} 不存在`);
+  if (source.conv?.loader !== 'tiny_ttf') {
+    throw new Error(`字体 ${source.file.fileName} 不是可调整字号的 TTF 字体`);
+  }
+
+  const existing = initial.uiProject.assets.fonts.find((asset) => (
+    asset.file.sha256 === source.file.sha256 && asset.conv?.sizePx === normalizedSize
+  ));
+  if (existing?.codeName) return existing.codeName;
+
+  const record = await getAssetBytes(source.file.sha256);
+  if (!record) throw new Error(`字体文件 ${source.file.fileName} 在本地缓存和平台素材库中均不存在`);
+
+  // Recheck after the asynchronous asset read, so rapid UI changes cannot
+  // create duplicate instances for the same family and size.
+  const latest = useProjectStore.getState();
+  const raced = latest.uiProject.assets.fonts.find((asset) => (
+    asset.file.sha256 === source.file.sha256 && asset.conv?.sizePx === normalizedSize
+  ));
+  if (raced?.codeName) return raced.codeName;
+
+  const familyCodeName = typeof source.conv?.familyCodeName === 'string'
+    ? source.conv.familyCodeName
+    : sourceCodeName;
+  const name = uniqueAssetName(`${familyCodeName}_${normalizedSize}`, latest.project);
+  const familyName = typeof source.conv?.familyName === 'string' && source.conv.familyName.trim()
+    ? source.conv.familyName.trim()
+    : source.file.fileName.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ').trim();
+  const pipeline = getPipeline();
+  if (pipeline) {
+    pipeline.runtime.registerFontTinyTtf(name, new Uint8Array(record.bytes), normalizedSize);
+  }
+
+  useProjectStore.getState().mutateV2(`创建字体 ${familyName} ${normalizedSize}px`, (draft) => {
+    const alreadyExists = draft.assets.fonts.some((asset) => (
+      asset.file.sha256 === source.file.sha256 && asset.conv?.sizePx === normalizedSize
+    ));
+    if (alreadyExists) return;
+    draft.assets.fonts.push({
+      id: `font:${name}`,
+      codeName: name,
+      displayName: `${familyName} ${normalizedSize}px`,
+      file: source.file,
+      conv: {
+        ...source.conv,
+        loader: 'tiny_ttf',
+        sizePx: normalizedSize,
+        familyName,
+        familyCodeName,
+        generatedFontInstance: true,
+      },
+    });
+  });
+  return name;
+}
+
 /* ---------------- 上传 ---------------- */
 
 /** 文件名 → 合法 CName 素材名(小写、[a-z0-9_]、字母开头) */
@@ -525,6 +590,7 @@ export async function importAssetFiles(files: Iterable<File>): Promise<string[]>
     const project = useProjectStore.getState().project;
     const name = uniqueAssetName(sanitizeAssetName(file.name, kind), project);
     const fileRef = { fileName: file.name, sha256: sha, byteSize: bytes.byteLength };
+    const fontFamilyName = file.name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ').trim();
     const asset: ImageAsset | FontAsset = kind === 'font'
       ? {
           name,
@@ -558,10 +624,13 @@ export async function importAssetFiles(files: Iterable<File>): Promise<string[]>
         ? {
             id: `font:${name}`,
             codeName: name,
+            displayName: fontFamilyName,
             file: fileRef,
             conv: {
               loader: (asset as FontAsset).loader,
               sizePx: (asset as FontAsset).sizePx ?? 16,
+              familyName: fontFamilyName,
+              familyCodeName: name,
               ...((asset as FontAsset).conv ?? {}),
             },
           }

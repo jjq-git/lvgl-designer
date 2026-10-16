@@ -171,7 +171,10 @@ describe('PreviewProgram runtime executor', () => {
     const p = program();
     p.screens[0]!.root.inlineStyles.push({
       selector: { part: 'main', states: ['pressed'] },
-      props: { bg_color: '#112233', radius: 8, bg_opa: '50%', text_letter_space: 2 },
+      props: {
+        bg_color: '#112233', radius: 8, bg_opa: '50%', text_letter_space: 2,
+        image_recolor: '#abcdef', image_recolor_opa: 255, image_opa: '75%',
+      },
     });
     const calls: string[] = [];
     executePreviewProgram(p, fakeBridge(calls));
@@ -179,6 +182,9 @@ describe('PreviewProgram runtime executor', () => {
     expect(calls).toContain('style-i32:main:radius:8:main:pressed');
     expect(calls).toContain('style-str:main:bg_opa:50%:main:pressed');
     expect(calls).toContain('style-i32:main:text_letter_space:2:main:pressed');
+    expect(calls).toContain('style-str:main:image_recolor:#abcdef:main:pressed');
+    expect(calls).toContain('style-i32:main:image_recolor_opa:255:main:pressed');
+    expect(calls).toContain('style-str:main:image_opa:75%:main:pressed');
   });
 
   it('rejects built-in font sizes that are absent from the WASM runtime', () => {
@@ -197,7 +203,10 @@ describe('PreviewProgram runtime executor', () => {
     const p = program();
     p.globals.styles.push({
       name: 'card',
-      props: { bg_color: '#223344', radius: 12, bg_opa: '80%', text_letter_space: 2 },
+      props: {
+        bg_color: '#223344', radius: 12, bg_opa: '80%', text_letter_space: 2,
+        image_recolor: '#aabbcc', image_recolor_opa: 200,
+      },
     });
     p.screens[0]!.root.styleUses.push({
       styleName: 'card', selector: { part: 'main', states: ['pressed'] },
@@ -209,6 +218,8 @@ describe('PreviewProgram runtime executor', () => {
     expect(calls).toContain('named-style-i32:card:radius:12');
     expect(calls).toContain('named-style-str:card:bg_opa:80%');
     expect(calls).toContain('named-style-i32:card:text_letter_space:2');
+    expect(calls).toContain('named-style-str:card:image_recolor:#aabbcc');
+    expect(calls).toContain('named-style-i32:card:image_recolor_opa:200');
     expect(calls).toContain('add-style:main:card:main:pressed');
     expect(calls.indexOf('create-style:card')).toBeLessThan(calls.indexOf('screen:main'));
   });

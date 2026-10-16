@@ -104,6 +104,37 @@ describe('six differentiated quiet-pod interfaces', () => {
     expect(new Set(backgrounds).size).toBe(CASES.length);
   });
 
+  it('uses readable coral navigation on every booking screen', () => {
+    const snapshot = load('WF2D-1030-quiet-booking');
+    const tokens = new Map(snapshot.uiProject.themes[0]!.tokens.map((entry) => [entry.id, String(entry.value)]));
+    const color = (value: unknown): string => tokens.get((value as { $token: string }).$token)!;
+    const luminance = (hex: string): number => {
+      const rgb = [1, 3, 5].map((offset) => {
+        const channel = Number.parseInt(hex.slice(offset, offset + 2), 16) / 255;
+        return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+      });
+      return rgb[0]! * 0.2126 + rgb[1]! * 0.7152 + rgb[2]! * 0.0722;
+    };
+    const contrast = (foreground: string, background: string): number => {
+      const values = [luminance(foreground), luminance(background)].sort((a, b) => b - a);
+      return (values[0]! + 0.05) / (values[1]! + 0.05);
+    };
+
+    expect(contrast(tokens.get('color.text.onaccent')!, tokens.get('color.accent')!)).toBeGreaterThanOrEqual(4.5);
+    for (const screen of snapshot.uiProject.screens.filter((candidate) => !candidate.isHome)) {
+      const rail = screen.root.children.find((node) => node.codeName === `${screen.codeName}_rail`)!;
+      expect(color(rail.styles[0]!.props.bg_color)).toBe(tokens.get('color.surface.subtle'));
+      for (const name of ['home', 'air', 'light', 'focus', 'settings']) {
+        const button = screen.root.children.find((node) => node.codeName === `${screen.codeName}_nav_${name}`)!;
+        const background = color(button.styles[0]!.props.bg_color);
+        const foreground = color(button.children[0]!.styles[0]!.props.text_color);
+        expect(contrast(foreground, background), button.codeName).toBeGreaterThanOrEqual(4.5);
+        expect(background, button.codeName).toBe(name === screen.codeName
+          ? tokens.get('color.accent') : tokens.get('color.surface'));
+      }
+    }
+  });
+
   it('keeps every secondary WF2D-1040 page title beside its brand icon', () => {
     const snapshot = load('WF2D-1040-quiet-air');
     for (const screen of snapshot.uiProject.screens.filter((candidate) => !candidate.isHome)) {

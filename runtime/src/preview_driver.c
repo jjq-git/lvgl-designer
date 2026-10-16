@@ -1941,7 +1941,8 @@ int lvd_preview_set_style_i32(const char * name, const char * key, int32_t value
     if(selector_from(part, states, &selector) != 0) return -4;
     if((strcmp(key, "bg_opa") == 0 || strcmp(key, "border_opa") == 0
         || strcmp(key, "outline_opa") == 0 || strcmp(key, "shadow_opa") == 0
-        || strcmp(key, "text_opa") == 0 || strcmp(key, "opa") == 0)
+        || strcmp(key, "text_opa") == 0 || strcmp(key, "image_opa") == 0
+        || strcmp(key, "image_recolor_opa") == 0 || strcmp(key, "opa") == 0)
        && (value < 0 || value > 255)) return -4;
 
     if(strcmp(key, "radius") == 0) lv_obj_set_style_radius(r->obj, value, selector);
@@ -1961,6 +1962,8 @@ int lvd_preview_set_style_i32(const char * name, const char * key, int32_t value
     else if(strcmp(key, "shadow_opa") == 0) lv_obj_set_style_shadow_opa(r->obj, value, selector);
     else if(strcmp(key, "text_opa") == 0) lv_obj_set_style_text_opa(r->obj, value, selector);
     else if(strcmp(key, "text_letter_space") == 0) lv_obj_set_style_text_letter_space(r->obj, value, selector);
+    else if(strcmp(key, "image_opa") == 0) lv_obj_set_style_image_opa(r->obj, value, selector);
+    else if(strcmp(key, "image_recolor_opa") == 0) lv_obj_set_style_image_recolor_opa(r->obj, value, selector);
     else if(strcmp(key, "line_width") == 0) lv_obj_set_style_line_width(r->obj, value, selector);
     else if(strcmp(key, "arc_width") == 0) lv_obj_set_style_arc_width(r->obj, value, selector);
     else if(strcmp(key, "opa") == 0) lv_obj_set_style_opa(r->obj, value, selector);
@@ -2121,7 +2124,8 @@ int lvd_preview_set_named_style_i32(const char * name, const char * key, int32_t
     if(!r) return -2;
     if((strcmp(key, "bg_opa") == 0 || strcmp(key, "border_opa") == 0
         || strcmp(key, "outline_opa") == 0 || strcmp(key, "shadow_opa") == 0
-        || strcmp(key, "text_opa") == 0 || strcmp(key, "opa") == 0)
+        || strcmp(key, "text_opa") == 0 || strcmp(key, "image_opa") == 0
+        || strcmp(key, "image_recolor_opa") == 0 || strcmp(key, "opa") == 0)
        && (value < 0 || value > 255)) return -4;
 
     if(strcmp(key, "radius") == 0) lv_style_set_radius(&r->style, value);
@@ -2141,6 +2145,8 @@ int lvd_preview_set_named_style_i32(const char * name, const char * key, int32_t
     else if(strcmp(key, "shadow_opa") == 0) lv_style_set_shadow_opa(&r->style, value);
     else if(strcmp(key, "text_opa") == 0) lv_style_set_text_opa(&r->style, value);
     else if(strcmp(key, "text_letter_space") == 0) lv_style_set_text_letter_space(&r->style, value);
+    else if(strcmp(key, "image_opa") == 0) lv_style_set_image_opa(&r->style, value);
+    else if(strcmp(key, "image_recolor_opa") == 0) lv_style_set_image_recolor_opa(&r->style, value);
     else if(strcmp(key, "line_width") == 0) lv_style_set_line_width(&r->style, value);
     else if(strcmp(key, "arc_width") == 0) lv_style_set_arc_width(&r->style, value);
     else if(strcmp(key, "opa") == 0) lv_style_set_opa(&r->style, value);
@@ -2156,7 +2162,8 @@ int lvd_preview_set_named_style_string(const char * name, const char * key, cons
     if(!r) return -2;
     if(strcmp(key, "bg_color") == 0 || strcmp(key, "border_color") == 0
        || strcmp(key, "outline_color") == 0 || strcmp(key, "shadow_color") == 0
-       || strcmp(key, "text_color") == 0 || strcmp(key, "line_color") == 0
+       || strcmp(key, "text_color") == 0 || strcmp(key, "image_recolor") == 0
+       || strcmp(key, "line_color") == 0
        || strcmp(key, "arc_color") == 0) {
         lv_color_t color;
         if(color_from_hex(value, &color) != 0) return -4;
@@ -2165,6 +2172,7 @@ int lvd_preview_set_named_style_string(const char * name, const char * key, cons
         else if(strcmp(key, "outline_color") == 0) lv_style_set_outline_color(&r->style, color);
         else if(strcmp(key, "shadow_color") == 0) lv_style_set_shadow_color(&r->style, color);
         else if(strcmp(key, "text_color") == 0) lv_style_set_text_color(&r->style, color);
+        else if(strcmp(key, "image_recolor") == 0) lv_style_set_image_recolor(&r->style, color);
         else if(strcmp(key, "line_color") == 0) lv_style_set_line_color(&r->style, color);
         else lv_style_set_arc_color(&r->style, color);
         return 0;
@@ -2437,7 +2445,8 @@ int lvd_preview_set_style_string(const char * name, const char * key, const char
 
     if(strcmp(key, "bg_color") == 0 || strcmp(key, "border_color") == 0
        || strcmp(key, "outline_color") == 0 || strcmp(key, "shadow_color") == 0
-       || strcmp(key, "text_color") == 0 || strcmp(key, "line_color") == 0
+       || strcmp(key, "text_color") == 0 || strcmp(key, "image_recolor") == 0
+       || strcmp(key, "line_color") == 0
        || strcmp(key, "arc_color") == 0) {
         lv_color_t color;
         if(color_from_hex(value, &color) != 0) return -4;
@@ -2446,6 +2455,7 @@ int lvd_preview_set_style_string(const char * name, const char * key, const char
         else if(strcmp(key, "outline_color") == 0) lv_obj_set_style_outline_color(r->obj, color, selector);
         else if(strcmp(key, "shadow_color") == 0) lv_obj_set_style_shadow_color(r->obj, color, selector);
         else if(strcmp(key, "text_color") == 0) lv_obj_set_style_text_color(r->obj, color, selector);
+        else if(strcmp(key, "image_recolor") == 0) lv_obj_set_style_image_recolor(r->obj, color, selector);
         else if(strcmp(key, "line_color") == 0) lv_obj_set_style_line_color(r->obj, color, selector);
         else lv_obj_set_style_arc_color(r->obj, color, selector);
         return 0;
@@ -2488,7 +2498,8 @@ int lvd_preview_set_style_string(const char * name, const char * key, const char
     }
     if(strcmp(key, "bg_opa") == 0 || strcmp(key, "border_opa") == 0
        || strcmp(key, "outline_opa") == 0 || strcmp(key, "shadow_opa") == 0
-       || strcmp(key, "text_opa") == 0 || strcmp(key, "opa") == 0) {
+       || strcmp(key, "text_opa") == 0 || strcmp(key, "image_opa") == 0
+       || strcmp(key, "image_recolor_opa") == 0 || strcmp(key, "opa") == 0) {
         size_t n = strlen(value);
         if(n < 2 || value[n - 1] != '%') return -4;
         char * end = NULL;

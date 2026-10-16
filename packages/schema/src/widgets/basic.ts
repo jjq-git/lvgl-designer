@@ -65,7 +65,7 @@ export const imageSpec: WidgetSpec = {
     {
       key: 'src', type: 'imageRef', channel: 'both',
       c: { setter: 'lv_image_set_src($obj, $v)' },
-      ui: { group: 'content', label: '图片源', control: 'asset-picker' },
+      ui: { group: 'content', label: '图片 / 图标', control: 'asset-picker' },
     },
     {
       key: 'inner_align', type: 'enum', default: 'center', channel: 'both',

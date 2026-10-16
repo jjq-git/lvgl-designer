@@ -14,6 +14,7 @@ import {
   useBuildTargetStore,
   type ControllerPreset,
 } from '../stores/buildTargetStore';
+import { MATERIAL_ICON_ADORNMENT_ROLE } from './materialIconAdornment';
 import { generateThemeFromCurrentStyles } from './themeBinding';
 
 export type { StoredProjectDocument } from '@lvd/schema/v2';
@@ -23,6 +24,7 @@ export interface ProjectStructureRepair {
     | 'binding-comparison-operator-repaired'
     | 'snapshot-references-repaired'
     | 'editable-theme-generated'
+    | 'material-icon-empty-label-repaired'
     | 'serene-brand-repaired';
   path: string;
   count: number;
@@ -86,6 +88,23 @@ function repairBindingComparisonOperators(node: WidgetNodeV2): number {
   }
   return count + node.children.reduce(
     (total, child) => total + repairBindingComparisonOperators(child),
+    0,
+  );
+}
+
+function repairMaterialIconEmptyLabels(node: WidgetNodeV2): number {
+  let count = 0;
+  const hasMaterialIcon = node.children.some(
+    (child) => child.editor?.generatedRole === MATERIAL_ICON_ADORNMENT_ROLE,
+  );
+  if (node.type === 'label' && node.props.text === undefined && hasMaterialIcon) {
+    // An omitted label text leaves LVGL's built-in "Text" visible. Preserve an
+    // explicit empty value for icon-only labels created by older builds.
+    node.props.text = '';
+    count += 1;
+  }
+  return count + node.children.reduce(
+    (total, child) => total + repairMaterialIconEmptyLabels(child),
     0,
   );
 }
@@ -176,6 +195,20 @@ export function repairStoredProjectDocument(raw: unknown): {
       count: repairedBindingCount,
     });
   }
+  const repairedMaterialIconLabelCount = [
+    ...document.uiProject.screens.map((screen) => screen.root),
+    ...document.uiProject.components.map((component) => component.root),
+  ].reduce(
+    (count, root) => count + repairMaterialIconEmptyLabels(root),
+    0,
+  );
+  if (repairedMaterialIconLabelCount > 0) {
+    repairs.push({
+      code: 'material-icon-empty-label-repaired',
+      path: 'uiProject',
+      count: repairedMaterialIconLabelCount,
+    });
+  }
   const repairedBrandCount = repairSereneBrand(document.uiProject);
   if (repairedBrandCount > 0) {
     repairs.push({
@@ -210,11 +243,13 @@ export function repairStoredProjectDocument(raw: unknown): {
         ? `已将 tileview 下的 ${repair.count} 个直属组件移入 tileview-tile`
         : repair.code === 'binding-comparison-operator-repaired'
           ? `已将 ${repair.count} 处旧版 ne 比较条件迁移为 not_eq`
-          : repair.code === 'editable-theme-generated'
-            ? `已将 ${repair.count} 处现有颜色和字体转换为可编辑主题 Token`
-            : repair.code === 'serene-brand-repaired'
-              ? `已将 ${repair.count} 处 SERENE 品牌文字更新为 BRAND A`
-              : `已修复 ${repair.count} 处工程显示、控制器或主题引用`,
+          : repair.code === 'material-icon-empty-label-repaired'
+            ? `已修复 ${repair.count} 个纯图标标签的默认 Text 文字`
+            : repair.code === 'editable-theme-generated'
+              ? `已将 ${repair.count} 处现有颜色和字体转换为可编辑主题 Token`
+              : repair.code === 'serene-brand-repaired'
+                ? `已将 ${repair.count} 处 SERENE 品牌文字更新为 BRAND A`
+                : `已修复 ${repair.count} 处工程显示、控制器或主题引用`,
     });
   }
   return { document, repairs };

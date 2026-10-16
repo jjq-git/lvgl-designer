@@ -2,7 +2,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const OUTPUT_DIR = resolve('examples/quiet-pod-six-themes');
-const QUIET_POD_ICON = '\uf52b';
+const QUIET_POD_ICON = '\uf52a';
 
 const PRESETS = [
   {
@@ -33,7 +33,7 @@ const PRESETS = [
     model: 'WF2D-1030', width: 1440, height: 720, feature: 'booking', featureName: '舱位预约',
     themeId: 'coral-schedule', themeName: '珊瑚日程',
     source: 'examples/serene-pod/WF2D-1030-serene-pod.lvproj.json',
-    palette: { bg: '#FFF6F1', surface: '#FFFFFF', subtle: '#FFE7DD', border: '#F0C6B7', text: '#472B2A', muted: '#94726C', accent: '#ED6A5A', strong: '#FF9B7D', success: '#42A982', warning: '#E7A33E', danger: '#D94B58', track: '#F4D8CE', shadow: '#B78A7E' },
+    palette: { bg: '#FFF6F1', surface: '#FFFFFF', subtle: '#FFE7DD', border: '#F0C6B7', text: '#472B2A', muted: '#94726C', accent: '#C04E3E', strong: '#FF9B7D', success: '#42A982', warning: '#E7A33E', danger: '#D94B58', track: '#F4D8CE', shadow: '#B78A7E' },
   },
   {
     model: 'WF3-284x76', width: 284, height: 76, feature: 'dnd', featureName: '一键静音',
@@ -118,6 +118,9 @@ function root(children) {
 function replacePodscLogoWithQuietPodIcon(project) {
   const replaceNode = (node) => {
     const children = (node.children ?? []).map(replaceNode);
+    if (node.type === 'label' && node.codeName?.endsWith('_brand_logo') && node.props?.text === '\uf52b') {
+      return { ...node, props: { ...node.props, text: QUIET_POD_ICON }, children };
+    }
     if (node.type !== 'image' || node.props?.src !== 'podsc_logo') return { ...node, children };
     const { src: _src, inner_align: _innerAlign, ...position } = node.props;
     return {
@@ -321,6 +324,14 @@ function recolorTheme(theme, preset) {
     values['color.palette.f1d8b8'] = preset.palette.surface;
     values['color.palette.e1bd8f'] = preset.palette.border;
   }
+  if (preset.feature === 'booking') {
+    // The source's forest-green sidebar uses palette tokens instead of the
+    // semantic theme colors. Give it the same warm palette as the content.
+    values['color.palette.234a35'] = preset.palette.subtle;
+    values['color.palette.315c43'] = preset.palette.surface;
+    values['color.palette.4f765e'] = preset.palette.border;
+    values['color.palette.f0c987'] = preset.palette.accent;
+  }
   const seen = new Set();
   theme.tokens = theme.tokens.map((entry) => {
     seen.add(entry.id);
@@ -336,6 +347,22 @@ function recolorTheme(theme, preset) {
     if (!theme.tokens.some((entry) => entry.id === tokenId)) theme.tokens.push({ id: tokenId, type: 'fontRef', value });
   }
   return theme;
+}
+
+function recolorBookingNavigation(project) {
+  for (const screen of project.screens.filter((candidate) => !candidate.isHome)) {
+    const prefix = screen.codeName;
+    const nodes = screen.root.children;
+    const brand = nodes.find((node) => node.codeName === `${prefix}_brand_logo`);
+    if (brand) brand.styles[0].props.text_color = token('color.accent');
+    for (const name of ['home', 'air', 'light', 'focus', 'settings']) {
+      const button = nodes.find((node) => node.codeName === `${prefix}_nav_${name}`);
+      if (!button) continue;
+      const pressed = button.styles.find((entry) => entry.selector?.states?.includes('pressed'));
+      if (pressed) pressed.props.bg_color = token(name === prefix ? 'color.accent' : 'color.surface.subtle');
+      button.children[0].styles[0].props.text_color = token(name === prefix ? 'color.text.onaccent' : 'color.text.primary');
+    }
+  }
 }
 
 function generate(preset) {
@@ -379,6 +406,7 @@ function generate(preset) {
     root: HOME_BUILDERS[preset.feature]({ featureScreenId }),
   };
   replacePodscLogoWithQuietPodIcon(snapshot.uiProject);
+  if (preset.feature === 'booking') recolorBookingNavigation(snapshot.uiProject);
   if (preset.feature === 'dnd') {
     snapshot.uiProject.screens = [snapshot.uiProject.screens[0]];
     snapshot.uiProject.subjects = [{ id: 'subject:dnd_enabled', codeName: 'dnd_enabled', displayName: 'Do not disturb', type: 'int', initial: 1, min: 0, max: 1 }];
@@ -401,4 +429,7 @@ function generate(preset) {
 }
 
 mkdirSync(OUTPUT_DIR, { recursive: true });
-for (const preset of PRESETS) generate(preset);
+const requestedModels = new Set(process.argv.slice(2));
+for (const preset of PRESETS) {
+  if (requestedModels.size === 0 || requestedModels.has(preset.model)) generate(preset);
+}

@@ -12,9 +12,14 @@ import { createPodscStaticWebUiExport, WebUiDocumentError } from '@lvd/schema/v2
 import { emitC95 } from './codegen/adapter';
 import { getAssetBytes } from './assets';
 import { useEditorStore } from '../stores/editorStore';
-import { useBuildTargetStore, validateReleaseTarget } from '../stores/buildTargetStore';
+import {
+  ensureControllerForExport,
+  useBuildTargetStore,
+  validateReleaseTarget,
+} from '../stores/buildTargetStore';
 import { useProjectsStore } from '../stores/projectsStore';
 import { createStoredProjectDocument, loadProjectDocument } from './projectPersistence';
+import { convertImageAssetToLvglC } from './lvglImageExport';
 
 function download(name: string, blob: Blob): void {
   const url = URL.createObjectURL(blob);
@@ -82,12 +87,49 @@ async function exportFontFiles(project: LvProject): Promise<{
   return { files, warnings };
 }
 
+/** 把工程图片和 Material 图标派生图转换为可直接参与编译的 LVGL C 文件。 */
+async function exportImageFiles(project: LvProject): Promise<Record<string, Uint8Array>> {
+  const files: Record<string, Uint8Array> = {};
+  const uiProject = useBuildTargetStore.getState().uiProject;
+  for (const image of project.assets.images) {
+    const record = await getAssetBytes(image.file.sha256);
+    if (!record) throw new Error(`图片 ${image.name} 的文件内容缺失`);
+    const cSource = await convertImageAssetToLvglC(
+      image,
+      new Uint8Array(record.bytes),
+      record.mime,
+    );
+    files[`images/${image.name}.c`] = strToU8(cSource);
+
+    const currentImage = uiProject.assets.images.find((entry) => entry.codeName === image.name);
+    const sourceIconId = currentImage?.conv?.sourceIconId;
+    if (typeof sourceIconId !== 'string') continue;
+    const sourceIcon = uiProject.assets.icons.find((entry) => entry.id === sourceIconId);
+    const license = sourceIcon?.conv?.license;
+    if (typeof license !== 'string' || license.trim() === '') continue;
+    const sourcePage = sourceIcon?.conv?.sourcePage;
+    files[`licenses/${image.name}.txt`] = strToU8([
+      `Asset: ${image.name}`,
+      `SPDX-License-Identifier: ${license.trim()}`,
+      ...(typeof sourcePage === 'string' && sourcePage.trim() !== ''
+        ? [`Source: ${sourcePage.trim()}`]
+        : []),
+      '',
+    ].join('\n'));
+  }
+  return files;
+}
+
 /** 导出精确面向 LVGL 9.5.0 的 C 代码 zip。 */
 export async function exportUiZip(project: LvProject): Promise<boolean> {
   const ed = useEditorStore.getState();
   const target = useBuildTargetStore.getState();
   target.syncProject(project);
-  const currentTarget = useBuildTargetStore.getState();
+  let currentTarget = useBuildTargetStore.getState();
+  // 旧云端工程可能创建于 ControllerProfile 成为必填项之前。当前产品唯一的
+  // 本地预设是裸屏；导出时补齐它，避免同一工程仅因换浏览器就无法导出。
+  const defaultedController = ensureControllerForExport();
+  if (defaultedController) currentTarget = useBuildTargetStore.getState();
   const readiness = validateReleaseTarget(currentTarget);
   if (!readiness.ready || readiness.buildTarget === null) {
     ed.setBanner(`导出失败：${readiness.errors.map((issue) => issue.message).join('；')}`);
@@ -116,11 +158,17 @@ export async function exportUiZip(project: LvProject): Promise<boolean> {
   try {
     const fonts = await exportFontFiles(project);
     Object.assign(files, fonts.files);
+    Object.assign(files, await exportImageFiles(project));
     const zipped = zipSync(files);
     const buf = new Uint8Array(zipped.length);
     buf.set(zipped);
     download('ui-lvgl-9.5.0.zip', new Blob([buf.buffer], { type: 'application/zip' }));
-    ed.setBanner(fonts.warnings.length > 0 ? `导出完成；${fonts.warnings.join('；')}` : null);
+    const exportedAssets = project.assets.images.length > 0
+      ? `已包含 ${project.assets.images.length} 个图片/图标 C 文件`
+      : '';
+    const controllerNotice = defaultedController ? '已自动使用裸屏控制器配置' : '';
+    const details = [controllerNotice, exportedAssets, ...fonts.warnings].filter(Boolean);
+    ed.setBanner(details.length > 0 ? `导出完成：${details.join('；')}` : null);
     return true;
   } catch (error) {
     ed.setBanner(`导出失败：${error instanceof Error ? error.message : String(error)}`);

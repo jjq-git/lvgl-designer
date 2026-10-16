@@ -56,7 +56,7 @@
           {
             "id": "color.accent",
             "type": "color",
-            "value": "#ED6A5A"
+            "value": "#C04E3E"
           },
           {
             "id": "color.accent.strong",
@@ -91,7 +91,7 @@
           {
             "id": "color.palette.234a35",
             "type": "color",
-            "value": "#234A35"
+            "value": "#FFE7DD"
           },
           {
             "id": "color.palette.263c52",
@@ -101,17 +101,17 @@
           {
             "id": "color.palette.315c43",
             "type": "color",
-            "value": "#315C43"
+            "value": "#FFFFFF"
           },
           {
             "id": "color.palette.4f765e",
             "type": "color",
-            "value": "#4F765E"
+            "value": "#F0C6B7"
           },
           {
             "id": "color.palette.f0c987",
             "type": "color",
-            "value": "#F0C987"
+            "value": "#C04E3E"
           },
           {
             "id": "font.size.16",
@@ -1643,7 +1643,7 @@
                 {
                   "props": {
                     "text_color": {
-                      "$token": "color.palette.f0c987"
+                      "$token": "color.accent"
                     },
                     "text_font": {
                       "$token": "font.size.20"
@@ -1759,7 +1759,7 @@
                   },
                   "props": {
                     "bg_color": {
-                      "$token": "color.accent.strong"
+                      "$token": "color.surface.subtle"
                     }
                   }
                 }
@@ -1793,7 +1793,7 @@
                     {
                       "props": {
                         "text_color": {
-                          "$token": "color.surface"
+                          "$token": "color.text.primary"
                         },
                         "text_font": {
                           "$token": "font.size.18"
@@ -1850,7 +1850,7 @@
                   },
                   "props": {
                     "bg_color": {
-                      "$token": "color.accent.strong"
+                      "$token": "color.accent"
                     }
                   }
                 }
@@ -1884,7 +1884,7 @@
                     {
                       "props": {
                         "text_color": {
-                          "$token": "color.text.primary"
+                          "$token": "color.text.onaccent"
                         },
                         "text_font": {
                           "$token": "font.size.18"
@@ -1941,7 +1941,7 @@
                   },
                   "props": {
                     "bg_color": {
-                      "$token": "color.accent.strong"
+                      "$token": "color.surface.subtle"
                     }
                   }
                 }
@@ -1975,7 +1975,7 @@
                     {
                       "props": {
                         "text_color": {
-                          "$token": "color.surface"
+                          "$token": "color.text.primary"
                         },
                         "text_font": {
                           "$token": "font.size.18"
@@ -2032,7 +2032,7 @@
                   },
                   "props": {
                     "bg_color": {
-                      "$token": "color.accent.strong"
+                      "$token": "color.surface.subtle"
                     }
                   }
                 }
@@ -2066,7 +2066,7 @@
                     {
                       "props": {
                         "text_color": {
-                          "$token": "color.surface"
+                          "$token": "color.text.primary"
                         },
                         "text_font": {
                           "$token": "font.size.18"
@@ -2123,7 +2123,7 @@
                   },
                   "props": {
                     "bg_color": {
-                      "$token": "color.accent.strong"
+                      "$token": "color.surface.subtle"
                     }
                   }
                 }
@@ -2157,7 +2157,7 @@
                     {
                       "props": {
                         "text_color": {
-                          "$token": "color.surface"
+                          "$token": "color.text.primary"
                         },
                         "text_font": {
                           "$token": "font.size.18"
@@ -2934,7 +2934,7 @@
                 {
                   "props": {
                     "text_color": {
-                      "$token": "color.palette.f0c987"
+                      "$token": "color.accent"
                     },
                     "text_font": {
                       "$token": "font.size.20"
@@ -3050,7 +3050,7 @@
                   },
                   "props": {
                     "bg_color": {
-                      "$token": "color.accent.strong"
+                      "$token": "color.surface.subtle"
                     }
                   }
                 }
@@ -3084,7 +3084,7 @@
                     {
                       "props": {
                         "text_color": {
-                          "$token": "color.surface"
+                          "$token": "color.text.primary"
                         },
                         "text_font": {
                           "$token": "font.size.18"
@@ -3141,7 +3141,7 @@
                   },
                   "props": {
                     "bg_color": {
-                      "$token": "color.accent.strong"
+                      "$token": "color.surface.subtle"
                     }
                   }
                 }
@@ -3175,7 +3175,7 @@
                     {
                       "props": {
                         "text_color": {
-                          "$token": "color.surface"
+                          "$token": "color.text.primary"
                         },
                         "text_font": {
                           "$token": "font.size.18"
@@ -3232,7 +3232,7 @@
                   },
                   "props": {
                     "bg_color": {
-                      "$token": "color.accent.strong"
+                      "$token": "color.accent"
                     }
                   }
                 }
@@ -3266,7 +3266,7 @@
                     {
                       "props": {
                         "text_color": {
-                          "$token": "color.text.primary"
+                          "$token": "color.text.onaccent"
                         },
                         "text_font": {
                           "$token": "font.size.18"
@@ -3323,7 +3323,7 @@
                   },
                   "props": {
                     "bg_color": {
-                      "$token": "color.accent.strong"
+                      "$token": "color.surface.subtle"
                     }
                   }
                 }
@@ -3357,7 +3357,7 @@
                     {
                       "props": {
                         "text_color": {
-                          "$token": "color.surface"
+                          "$token": "color.text.primary"
                         },
                         "text_font": {
                           "$token": "font.size.18"
@@ -3414,7 +3414,7 @@
                   },
                   "props": {
                     "bg_color": {
-                      "$token": "color.accent.strong"
+                      "$token": "color.surface.subtle"
                     }
                   }
                 }
@@ -3448,7 +3448,7 @@
                     {
                       "props": {
                         "text_color": {
-                          "$token": "color.surface"
+                          "$token": "color.text.primary"
                         },
                         "text_font": {
                           "$token": "font.size.18"
@@ -4377,7 +4377,7 @@
                 {
                   "props": {
                     "text_color": {
-                      "$token": "color.palette.f0c987"
+                      "$token": "color.accent"
                     },
                     "text_font": {
                       "$token": "font.size.20"
@@ -4493,7 +4493,7 @@
                   },
                   "props": {
                     "bg_color": {
-                      "$token": "color.accent.strong"
+                      "$token": "color.surface.subtle"
                     }
                   }
                 }
@@ -4527,7 +4527,7 @@
                     {
                       "props": {
                         "text_color": {
-                          "$token": "color.surface"
+                          "$token": "color.text.primary"
                         },
                         "text_font": {
                           "$token": "font.size.18"
@@ -4584,7 +4584,7 @@
                   },
                   "props": {
                     "bg_color": {
-                      "$token": "color.accent.strong"
+                      "$token": "color.surface.subtle"
                     }
                   }
                 }
@@ -4618,7 +4618,7 @@
                     {
                       "props": {
                         "text_color": {
-                          "$token": "color.surface"
+                          "$token": "color.text.primary"
                         },
                         "text_font": {
                           "$token": "font.size.18"
@@ -4675,7 +4675,7 @@
                   },
                   "props": {
                     "bg_color": {
-                      "$token": "color.accent.strong"
+                      "$token": "color.surface.subtle"
                     }
                   }
                 }
@@ -4709,7 +4709,7 @@
                     {
                       "props": {
                         "text_color": {
-                          "$token": "color.surface"
+                          "$token": "color.text.primary"
                         },
                         "text_font": {
                           "$token": "font.size.18"
@@ -4766,7 +4766,7 @@
                   },
                   "props": {
                     "bg_color": {
-                      "$token": "color.accent.strong"
+                      "$token": "color.accent"
                     }
                   }
                 }
@@ -4800,7 +4800,7 @@
                     {
                       "props": {
                         "text_color": {
-                          "$token": "color.text.primary"
+                          "$token": "color.text.onaccent"
                         },
                         "text_font": {
                           "$token": "font.size.18"
@@ -4857,7 +4857,7 @@
                   },
                   "props": {
                     "bg_color": {
-                      "$token": "color.accent.strong"
+                      "$token": "color.surface.subtle"
                     }
                   }
                 }
@@ -4891,7 +4891,7 @@
                     {
                       "props": {
                         "text_color": {
-                          "$token": "color.surface"
+                          "$token": "color.text.primary"
                         },
                         "text_font": {
                           "$token": "font.size.18"
@@ -5890,7 +5890,7 @@
                 {
                   "props": {
                     "text_color": {
-                      "$token": "color.palette.f0c987"
+                      "$token": "color.accent"
                     },
                     "text_font": {
                       "$token": "font.size.20"
@@ -6006,7 +6006,7 @@
                   },
                   "props": {
                     "bg_color": {
-                      "$token": "color.accent.strong"
+                      "$token": "color.surface.subtle"
                     }
                   }
                 }
@@ -6040,7 +6040,7 @@
                     {
                       "props": {
                         "text_color": {
-                          "$token": "color.surface"
+                          "$token": "color.text.primary"
                         },
                         "text_font": {
                           "$token": "font.size.18"
@@ -6097,7 +6097,7 @@
                   },
                   "props": {
                     "bg_color": {
-                      "$token": "color.accent.strong"
+                      "$token": "color.surface.subtle"
                     }
                   }
                 }
@@ -6131,7 +6131,7 @@
                     {
                       "props": {
                         "text_color": {
-                          "$token": "color.surface"
+                          "$token": "color.text.primary"
                         },
                         "text_font": {
                           "$token": "font.size.18"
@@ -6188,7 +6188,7 @@
                   },
                   "props": {
                     "bg_color": {
-                      "$token": "color.accent.strong"
+                      "$token": "color.surface.subtle"
                     }
                   }
                 }
@@ -6222,7 +6222,7 @@
                     {
                       "props": {
                         "text_color": {
-                          "$token": "color.surface"
+                          "$token": "color.text.primary"
                         },
                         "text_font": {
                           "$token": "font.size.18"
@@ -6279,7 +6279,7 @@
                   },
                   "props": {
                     "bg_color": {
-                      "$token": "color.accent.strong"
+                      "$token": "color.surface.subtle"
                     }
                   }
                 }
@@ -6313,7 +6313,7 @@
                     {
                       "props": {
                         "text_color": {
-                          "$token": "color.surface"
+                          "$token": "color.text.primary"
                         },
                         "text_font": {
                           "$token": "font.size.18"
@@ -6370,7 +6370,7 @@
                   },
                   "props": {
                     "bg_color": {
-                      "$token": "color.accent.strong"
+                      "$token": "color.accent"
                     }
                   }
                 }
@@ -6404,7 +6404,7 @@
                     {
                       "props": {
                         "text_color": {
-                          "$token": "color.text.primary"
+                          "$token": "color.text.onaccent"
                         },
                         "text_font": {
                           "$token": "font.size.18"

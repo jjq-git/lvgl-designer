@@ -152,16 +152,20 @@ const STYLE_I32 = new Set([
   'radius', 'pad_hor', 'pad_ver', 'pad_all', 'bg_opa',
   'border_width', 'border_opa', 'outline_width', 'outline_opa', 'outline_pad',
   'shadow_width', 'shadow_offset_x', 'shadow_offset_y', 'shadow_spread', 'shadow_opa',
-  'text_opa', 'text_letter_space', 'line_width', 'arc_width', 'opa',
+  'text_opa', 'text_letter_space', 'image_opa', 'image_recolor_opa',
+  'line_width', 'arc_width', 'opa',
 ]);
 const STYLE_COLOR = new Set([
   'bg_color', 'border_color', 'outline_color', 'shadow_color', 'text_color',
-  'line_color', 'arc_color',
+  'image_recolor', 'line_color', 'arc_color',
 ]);
 const STYLE_ENUM = new Set(['align', 'text_align']);
 const STYLE_FONT = new Set(['text_font']);
 const STYLE_STRING = new Set([...STYLE_COLOR, ...STYLE_ENUM, ...STYLE_FONT]);
-const OPA_STYLES = new Set(['bg_opa', 'border_opa', 'outline_opa', 'shadow_opa', 'text_opa', 'opa']);
+const OPA_STYLES = new Set([
+  'bg_opa', 'border_opa', 'outline_opa', 'shadow_opa', 'text_opa',
+  'image_opa', 'image_recolor_opa', 'opa',
+]);
 const STYLE_ENUM_VALUES: Record<string, ReadonlySet<string>> = {
   align: new Set([
     'top_left', 'top_mid', 'top_right', 'bottom_left', 'bottom_mid',

@@ -65,6 +65,17 @@ describe('preview_driver.c 协议边界', () => {
     expect(source).not.toMatch(/\bdlsym\b|\beval\b|cPatch|\bc_create\b|setter_template/i);
   });
 
+  it('图片颜色和透明度通过受控 LVGL 样式接口应用', () => {
+    for (const api of [
+      'lv_obj_set_style_image_recolor(',
+      'lv_obj_set_style_image_recolor_opa(',
+      'lv_obj_set_style_image_opa(',
+      'lv_style_set_image_recolor(',
+      'lv_style_set_image_recolor_opa(',
+      'lv_style_set_image_opa(',
+    ]) expect(source).toContain(api);
+  });
+
   it('9.5 host 与 legacy XML bridge 在 CMake 中严格二选一', () => {
     expect(hostSource).not.toMatch(/\blv_xml_/);
     expect(cmakeSource).toContain('option(LVD_LEGACY_XML_BRIDGE');

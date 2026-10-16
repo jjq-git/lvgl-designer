@@ -79,6 +79,40 @@ describe('projectPersistence structure repair', () => {
     expect((stored.uiProject.screens[0]!.root.bindings[0] as { op?: string }).op).toBe('ne');
   });
 
+  it('stores explicit empty text for legacy icon-only labels', () => {
+    const stored = createFreshProjectSnapshot(createEmptyProject('repair-icon-only-label'));
+    stored.uiProject.screens[0]!.root.children.push({
+      id: 'icon-only-label',
+      type: 'label',
+      props: {},
+      styleRefs: [],
+      styles: [],
+      events: [],
+      bindings: [],
+      children: [{
+        id: 'material-icon',
+        type: 'image',
+        props: { src: 'home_24' },
+        flags: { clickable: false },
+        styleRefs: [],
+        styles: [],
+        events: [],
+        bindings: [],
+        children: [],
+        editor: { generatedRole: 'material-icon-adornment' },
+      }],
+    });
+
+    const repaired = repairStoredProjectDocument(stored);
+    const snapshot = repaired.document as typeof stored;
+
+    expect(repaired.repairs).toContainEqual({
+      code: 'material-icon-empty-label-repaired', path: 'uiProject', count: 1,
+    });
+    expect(snapshot.uiProject.screens[0]!.root.children[0]!.props.text).toBe('');
+    expect(stored.uiProject.screens[0]!.root.children[0]!.props.text).toBeUndefined();
+  });
+
   it('repairs stale display references and generates a theme for existing projects', () => {
     const stored = createFreshProjectSnapshot(createEmptyProject('WF2D-8630 自然舒适舱界面'));
     stored.uiProject.designDisplayRef = 'display:obsolete-480x480@1';

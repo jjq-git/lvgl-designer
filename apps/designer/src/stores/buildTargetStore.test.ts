@@ -7,6 +7,7 @@ import {
 } from '@lvd/schema/v2';
 import {
   compatiblePreviewFormats,
+  ensureControllerForExport,
   runtimeColorFormat,
   useBuildTargetStore,
   validateReleaseTarget,
@@ -80,6 +81,13 @@ describe('BuildTarget/DisplayProfile preview sidecar', () => {
     expect(readiness.errors).toEqual([]);
     expect(readiness.ready).toBe(true);
     expect(readiness.buildTarget?.controllerProfileRef).toBe(controllerRef);
+  });
+
+  it('旧工程导出时自动补裸屏 Controller，且不会重复覆盖已有选择', () => {
+    expect(useBuildTargetStore.getState().controllerProfile).toBeNull();
+    expect(ensureControllerForExport()).toBe(true);
+    expect(useBuildTargetStore.getState().controllerProfile?.model).toBe('SCREEN-ONLY');
+    expect(ensureControllerForExport()).toBe(false);
   });
 
   it('Display 格式变化时重建 Controller 快照和全部引用', () => {

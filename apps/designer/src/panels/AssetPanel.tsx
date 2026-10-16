@@ -6,9 +6,10 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type { FontAsset, ImageAsset } from '@lvd/schema';
 import type { AssetEntry } from '@lvd/schema/v2';
 import { useProjectStore } from '../stores/projectStore';
-import { importAssetFiles, removeAsset, resyncAssets, thumbUrlFor, thumbUrlForEntry } from '../services/assets';
+import { importAssetFiles, removeAsset, thumbUrlFor, thumbUrlForEntry } from '../services/assets';
 import { addPaletteWidgetAtCenter } from '../canvas/PointerDnd';
 import { useEditorStore } from '../stores/editorStore';
+import { fontFamilyOptions } from '../services/fontFamilies';
 
 export function useThumb(asset: ImageAsset | null): string | null {
   const [url, setUrl] = useState<string | null>(null);
@@ -34,49 +35,50 @@ function fmtSize(n: number): string {
   return `${n} B`;
 }
 
-function patchFont(name: string, patch: Partial<NonNullable<FontAsset['conv']>> & { sizePx?: number }): void {
-  useProjectStore.getState().mutateV2(`修改字体 ${name}`, (draft) => {
-    const font = draft.assets.fonts.find((item) => item.codeName === name);
-    if (!font) return;
-    font.conv ??= { loader: 'bin', bpp: 4, ranges: '0x20-0x7e', autoCollect: true, license: 'UNSPECIFIED' };
-    const { sizePx: _sizePx, ...convPatch } = patch;
-    Object.assign(font.conv, convPatch, patch.sizePx === undefined ? {} : { sizePx: patch.sizePx });
+function patchFontFamily(sha256: string, patch: Partial<NonNullable<FontAsset['conv']>>): void {
+  useProjectStore.getState().mutateV2('修改字体家族', (draft) => {
+    for (const font of draft.assets.fonts) {
+      if (font.file.sha256 !== sha256) continue;
+      font.conv ??= { loader: 'tiny_ttf', sizePx: 16, bpp: 4, ranges: '0x20-0x7e', autoCollect: true, license: 'UNSPECIFIED' };
+      Object.assign(font.conv, patch);
+    }
   });
-  // tiny_ttf 的字号在创建字体实例时确定；改字号后立即重新注册并重载预览。
-  if (patch.sizePx !== undefined) void resyncAssets();
 }
 
-function FontOptions({ asset }: { asset: FontAsset }): JSX.Element {
+function removeFontFamily(sha256: string): void {
+  useProjectStore.getState().mutateV2('删除字体家族', (draft) => {
+    draft.assets.fonts = draft.assets.fonts.filter((asset) => asset.file.sha256 !== sha256);
+  });
+}
+
+function FontOptions({ asset, sizes }: { asset: FontAsset; sizes: readonly number[] }): JSX.Element {
   const conv = asset.conv ?? { bpp: 4 as const, ranges: '0x20-0x7e' };
   return (
     <div className="asset-font-config">
-      <label>字号
-        <input type="number" min={4} max={256} value={asset.sizePx ?? 16}
-          onChange={(event) => patchFont(asset.name, { sizePx: Number(event.target.value) })} />
-      </label>
+      <div className="asset-font-sizes">已生成字号：{sizes.map((size) => `${size}px`).join('、')}</div>
       <label>BPP
         <select value={conv.bpp}
-          onChange={(event) => patchFont(asset.name, { bpp: Number(event.target.value) as 1 | 2 | 4 | 8 })}>
+          onChange={(event) => patchFontFamily(asset.file.sha256, { bpp: Number(event.target.value) as 1 | 2 | 4 | 8 })}>
           {[1, 2, 4, 8].map((value) => <option key={value} value={value}>{value}</option>)}
         </select>
       </label>
       <label className="asset-font-wide">范围
         <input value={conv.ranges}
-          onChange={(event) => patchFont(asset.name, { ranges: event.target.value })}
+          onChange={(event) => patchFontFamily(asset.file.sha256, { ranges: event.target.value })}
           placeholder="0x20-0x7e,U+4E00-U+4E5F" />
       </label>
       <label className="asset-font-wide">附加字符
         <input value={conv.symbols ?? ''}
-          onChange={(event) => patchFont(asset.name, { symbols: event.target.value })} />
+          onChange={(event) => patchFontFamily(asset.file.sha256, { symbols: event.target.value })} />
       </label>
       <label className="asset-font-wide">许可证
         <input value={conv.license ?? ''}
-          onChange={(event) => patchFont(asset.name, { license: event.target.value })}
+          onChange={(event) => patchFontFamily(asset.file.sha256, { license: event.target.value })}
           placeholder="例如 OFL-1.1；必填" />
       </label>
       <label className="asset-font-check">
         <input type="checkbox" checked={conv.autoCollect !== false}
-          onChange={(event) => patchFont(asset.name, { autoCollect: event.target.checked })} />
+          onChange={(event) => patchFontFamily(asset.file.sha256, { autoCollect: event.target.checked })} />
         自动收集工程文本
       </label>
     </div>
@@ -87,12 +89,17 @@ function AssetRow({
   asset,
   type,
   onUse,
+  displayName,
+  fontSizes,
 }: {
   asset: ImageAsset | FontAsset;
   type: 'image' | 'font';
   onUse?(): void;
+  displayName?: string;
+  fontSizes?: readonly number[];
 }): JSX.Element {
   const image = type === 'image' ? asset as ImageAsset : null;
+  const font = type === 'font' ? asset as FontAsset : null;
   const thumb = useThumb(image);
   const isLottie = image !== null && (image.kind ?? 'image') === 'lottie';
   return (
@@ -103,13 +110,15 @@ function AssetRow({
             : thumb ? <img src={thumb} alt={asset.name} /> : <span className="asset-thumb-icon">…</span>}
       </span>
       <span className="asset-meta">
-        <span className="asset-name">{asset.name}</span>
+        <span className="asset-name">{displayName ?? asset.name}</span>
         <span className="asset-sub">{type === 'font' ? 'font' : isLottie ? 'lottie' : 'image'} · {fmtSize(asset.file.byteSize)}</span>
-        {type === 'font' ? <FontOptions asset={asset as FontAsset} /> : null}
+        {font ? <FontOptions asset={font} sizes={fontSizes ?? [font.sizePx ?? 16]} /> : null}
       </span>
       <span className="asset-row-actions">
         {onUse && !isLottie ? <button className="btn asset-use-btn" title="添加为图片控件；图片控件暂不支持网页发布" onClick={onUse}>使用</button> : null}
-        <button className="icon-btn" title="从工程移除" onClick={() => removeAsset(asset.name)}>✕</button>
+        <button className="icon-btn" title="从工程移除" onClick={() => (
+          type === 'font' ? removeFontFamily(asset.file.sha256) : removeAsset(asset.name)
+        )}>✕</button>
       </span>
     </div>
   );
@@ -156,6 +165,7 @@ function IconAssetRow({
 export function AssetPanel(): JSX.Element {
   const images = useProjectStore((s) => s.project.assets.images);
   const fonts = useProjectStore((s) => s.project.assets.fonts);
+  const uiFonts = useProjectStore((s) => s.uiProject.assets.fonts);
   const icons = useProjectStore((s) => s.uiProject.assets.icons);
   const uiImages = useProjectStore((s) => s.uiProject.assets.images);
   const derivativesBySource = useMemo(() => new Map(uiImages.flatMap((asset) => {
@@ -169,6 +179,10 @@ export function AssetPanel(): JSX.Element {
   const regularImages = useMemo(
     () => images.filter((image) => !iconDerivativeNames.has(image.name)),
     [iconDerivativeNames, images],
+  );
+  const fontFamilies = useMemo(
+    () => fontFamilyOptions(uiFonts).filter((family) => family.sourceCodeName !== null),
+    [uiFonts],
   );
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
@@ -212,7 +226,19 @@ export function AssetPanel(): JSX.Element {
         <div className="asset-empty">尚无素材。支持图片、Lottie JSON 和 TTF 字体。</div>
       ) : (
         <>
-          {fonts.map((a) => <AssetRow key={`font:${a.name}`} asset={a} type="font" />)}
+          {fontFamilies.map((family) => {
+            const asset = fonts.find((font) => font.name === family.sourceCodeName)
+              ?? fonts.find((font) => font.file.sha256 === family.sourceSha256);
+            return asset ? (
+              <AssetRow
+                key={family.id}
+                asset={asset}
+                type="font"
+                displayName={family.label}
+                fontSizes={family.sizes}
+              />
+            ) : null;
+          })}
           {regularImages.map((a) => (
             <AssetRow
               key={`image:${a.name}`}

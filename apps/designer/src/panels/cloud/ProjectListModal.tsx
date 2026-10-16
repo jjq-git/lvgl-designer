@@ -15,7 +15,6 @@ import type { LvProject } from '@lvd/schema';
 import { useDialogFocus } from '../useDialogFocus';
 import { requestConfirmation, requestText } from '../../services/appDialogs';
 import { displayPresetLabel, FALLBACK_DISPLAY_PRESETS } from '../../services/displayPresets';
-import { useBuildTargetStore } from '../../stores/buildTargetStore';
 import './cloud.css';
 
 export function ProjectListModal({ onClose }: { onClose: () => void }): JSX.Element {
@@ -36,8 +35,7 @@ export function ProjectListModal({ onClose }: { onClose: () => void }): JSX.Elem
       ?? FALLBACK_DISPLAY_PRESETS.fixed[0]?.frameId
       ?? '';
   });
-  const [newController, setNewController] = useState<'unconfirmed' | 'screen-only'>(() =>
-    useBuildTargetStore.getState().controllerPreset === 'screen-only' ? 'screen-only' : 'unconfirmed');
+  const [newController, setNewController] = useState<'unconfirmed' | 'screen-only'>('screen-only');
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ tone: 'ok' | 'fail' | 'info'; text: string } | null>(null);
   /** 本地"最近工程"缓存(迁移用),null=无 / undefined=未探测 */
@@ -208,7 +206,7 @@ export function ProjectListModal({ onClose }: { onClose: () => void }): JSX.Elem
                       disabled={busy}
                       onChange={(e) => setNewController(e.target.value as 'unconfirmed' | 'screen-only')}
                     >
-                      <option value="unconfirmed">Controller 待选择</option>
+                      <option value="unconfirmed">Controller 待选择（不能导出 C）</option>
                       <option value="screen-only">裸屏（无外壳）</option>
                     </select>
                   </label>

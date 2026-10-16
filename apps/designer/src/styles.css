@@ -1172,7 +1172,6 @@ select.ed-select:focus-visible,
 .prop-row.unset label { opacity: 1; color: var(--fg-unset); }
 .prop-row input, .prop-row select { min-width: 0; }
 .prop-row > :not(label) { min-width: 0; }
-
 /* ---------- 表单控件 ---------- */
 input.ed-text, input.ed-num, select.ed-select, .screen-row input {
   background: var(--bg-panel);
@@ -1211,6 +1210,12 @@ input::placeholder { color: var(--fg-hint); }
 }
 .ed-size { display: flex; gap: 4px; flex: 1; }
 .ed-size-mode { flex: 0 0 76px; }
+.font-ref-editor { display: contents; }
+.font-ref-editor.unset .prop-row:first-child label { color: var(--fg-unset); }
+.font-size-input { display: flex; align-items: center; gap: 5px; flex: 1; min-width: 0; }
+.font-size-input .ed-num { flex: 1; width: 0; }
+.font-size-input span,
+.font-instance-status { color: var(--fg-hint); font-size: 11px; white-space: nowrap; }
 
 /* ---------- LVGL 符号文本编辑器 ---------- */
 .icon-text-editor {
@@ -1546,6 +1551,11 @@ input::placeholder { color: var(--fg-hint); }
   gap: 4px;
 }
 .asset-font-config .asset-font-check input { width: auto; margin: 0; }
+.asset-font-sizes {
+  grid-column: 1 / -1;
+  color: var(--fg-hint);
+  font-size: 10px;
+}
 /* ---------- 素材选择器(检查器 imageRef) ---------- */
 .asset-picker { position: relative; flex: 1 1 auto; min-width: 0; }
 .asset-picker-btn {

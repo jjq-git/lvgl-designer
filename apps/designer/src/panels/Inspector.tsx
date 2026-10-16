@@ -10,7 +10,6 @@
 import { useMemo, useRef, useState } from 'react';
 import {
   M1_INSPECTOR_STYLE_KEYS,
-  M1_TEXT_FONTS,
   OBJ_BASE,
   REGISTRY,
   SCREEN_INTERACTION,
@@ -45,6 +44,7 @@ import {
   type LocalStyleGroup,
   type PropValueV2,
   type SubjectDefV2,
+  type UiProject,
   type UiEvent,
   type WidgetNodeV2,
 } from '@lvd/schema/v2';
@@ -61,7 +61,13 @@ import {
   type MaterialIconAdornmentInput,
 } from '../services/materialIconAdornment';
 import { AssetMultiPicker, AssetPicker } from './AssetPicker';
+import { FontRefEditor } from './FontRefEditor';
 import { IconTextEditor } from './IconTextEditor';
+import {
+  LVGL_IMAGE_SCALE_NONE,
+  imagePixelSizeForScale,
+  imageScaleForPixelSize,
+} from '../services/imageSizing';
 
 const GROUP_ORDER: { key: PropSpec['ui']['group']; label: string }[] = [
   { key: 'geometry', label: '布局' },
@@ -69,6 +75,10 @@ const GROUP_ORDER: { key: PropSpec['ui']['group']; label: string }[] = [
   { key: 'value', label: '值' },
   { key: 'behavior', label: '行为' },
 ];
+
+const IMAGE_TRANSFORM_PROP_KEYS = new Set([
+  'rotation', 'scale_x', 'scale_y', 'pivot_x', 'pivot_y',
+]);
 
 export function Inspector(): JSX.Element {
   const selectedIds = useEditorStore((s) => s.selectedIds);
@@ -141,6 +151,9 @@ function PropsTab({ node, isRoot }: { node: WidgetNodeV2; isRoot: boolean }): JS
   }, [spec, cs]);
 
   const showObjExtras = spec !== undefined || (cs?.isObj ?? false);
+  const materialIconSize = effectiveType === 'image'
+    ? materialIconSourceSize(project, node)
+    : null;
 
   return (
     <div className="insp-body">
@@ -167,10 +180,18 @@ function PropsTab({ node, isRoot }: { node: WidgetNodeV2; isRoot: boolean }): JS
       {GROUP_ORDER.map(({ key, label }) => {
         const props = allProps.filter((p) => p.ui.group === key);
         if (props.length === 0) return null;
+        const hasSimpleIconSize = key === 'value' && materialIconSize !== null;
+        const visibleProps = materialIconSize !== null
+          ? props.filter((prop) => !IMAGE_TRANSFORM_PROP_KEYS.has(prop.key))
+          : props;
+        if (visibleProps.length === 0 && !hasSimpleIconSize) return null;
         return (
           <section key={key} className="insp-group">
             <div className="panel-subtitle">{label}</div>
-            {props.map((p) => (
+            {hasSimpleIconSize && (
+              <MaterialIconSizeRow node={node} sourceSizePx={materialIconSize} />
+            )}
+            {visibleProps.map((p) => (
               <PropRowEditor key={p.key} node={node} spec={p} />
             ))}
           </section>
@@ -179,6 +200,75 @@ function PropsTab({ node, isRoot }: { node: WidgetNodeV2; isRoot: boolean }): JS
       {!component && spec?.children && spec.children.length > 0 && <ChildrenSection node={node} spec={spec} />}
       {showObjExtras && <FlagsSection node={node} kind="flags" title="标志 (flags)" keys={OBJ_BASE.flags} />}
       {showObjExtras && <FlagsSection node={node} kind="states" title="状态 (states)" keys={OBJ_BASE.states} />}
+    </div>
+  );
+}
+
+function materialIconSourceSize(project: UiProject, node: WidgetNodeV2): number | null {
+  const imageName = node.props.src;
+  if (typeof imageName !== 'string') return null;
+  const image = project.assets.images.find((entry) => entry.codeName === imageName);
+  const sourceIconId = image?.conv?.sourceIconId;
+  if (typeof sourceIconId !== 'string') return null;
+  const icon = project.assets.icons.find((entry) => entry.id === sourceIconId);
+  const sizePx = icon?.conv?.sizePx;
+  return typeof sizePx === 'number' && Number.isFinite(sizePx) && sizePx > 0 ? sizePx : null;
+}
+
+function MaterialIconSizeRow(props: {
+  node: WidgetNodeV2;
+  sourceSizePx: number;
+}): JSX.Element {
+  const { node, sourceSizePx } = props;
+  const scaleX = typeof node.props.scale_x === 'number'
+    ? node.props.scale_x
+    : LVGL_IMAGE_SCALE_NONE;
+  const scaleY = typeof node.props.scale_y === 'number'
+    ? node.props.scale_y
+    : LVGL_IMAGE_SCALE_NONE;
+  const isUniform = scaleX === scaleY;
+  const currentSize = isUniform ? imagePixelSizeForScale(sourceSizePx, scaleX) : '';
+  const isSet = node.props.scale_x !== undefined || node.props.scale_y !== undefined;
+
+  const setSize = (targetSizePx: number): void => {
+    if (!Number.isFinite(targetSizePx) || targetSizePx < 1) return;
+    const scale = imageScaleForPixelSize(sourceSizePx, Math.min(4096, targetSizePx));
+    useProjectStore.getState().mutateV2(
+      '改图标大小',
+      (draft) => {
+        const hit = findNodeByIdV2(draft, node.id);
+        if (!hit) return;
+        hit.node.props.scale_x = scale;
+        hit.node.props.scale_y = scale;
+      },
+      { coalesceKey: `image-size:${node.id}` },
+    );
+  };
+
+  const reset = (): void => {
+    useProjectStore.getState().mutateV2('重置图标大小', (draft) => {
+      const hit = findNodeByIdV2(draft, node.id);
+      if (!hit) return;
+      delete hit.node.props.scale_x;
+      delete hit.node.props.scale_y;
+    });
+  };
+
+  return (
+    <div className={`prop-row ${isSet ? '' : 'unset'}`}>
+      <label title={`素材原始尺寸 ${sourceSizePx}px`}>图标大小(px)</label>
+      <input
+        className="ed-num"
+        aria-label="图标大小(px)"
+        type="number"
+        min={1}
+        max={4096}
+        step={1}
+        value={currentSize}
+        placeholder={isUniform ? String(sourceSizePx) : '非等比'}
+        onChange={(event) => setSize(Number(event.target.value))}
+      />
+      {isSet && <button className="icon-btn" title="恢复素材原始大小" onClick={reset}>↺</button>}
     </div>
   );
 }
@@ -1496,14 +1586,6 @@ function StyleTab({ node }: { node: WidgetNodeV2 }): JSX.Element {
   const component = componentForNode(uiProject, node);
   const effectiveType = component?.root.type ?? node.type;
   const spec = REGISTRY.get(effectiveType);
-  const fonts = useProjectStore((s) => s.project.assets.fonts);
-  const fontTokens = useMemo(
-    () => [
-      ...M1_TEXT_FONTS,
-      ...fonts.map((font) => font.name).filter((name) => !M1_TEXT_FONTS.includes(name)),
-    ],
-    [fonts],
-  );
   const [state, setState] = useState<StateToken>('default');
   const [part, setPart] = useState<string>('main');
   const [styleTarget, setStyleTarget] = useState<string>('local');
@@ -1517,6 +1599,12 @@ function StyleTab({ node }: { node: WidgetNodeV2 }): JSX.Element {
     ? undefined
     : namedStyles.find((style) => style.id === styleTarget);
   const styleValues = namedTarget?.props ?? group?.props;
+  const styleKeys = effectiveType === 'image'
+    ? ['image_recolor', 'image_recolor_opa', 'image_opa', ...M1_INSPECTOR_STYLE_KEYS]
+    : M1_INSPECTOR_STYLE_KEYS;
+  const imageTransformProps = effectiveType === 'image'
+    ? (spec?.props ?? []).filter((prop) => IMAGE_TRANSFORM_PROP_KEYS.has(prop.key))
+    : [];
   const screenBackgroundValues = isScreenRoot
     ? node.styles.find((item) => sameSelector(item.selector, undefined))?.props
     : undefined;
@@ -1533,7 +1621,12 @@ function StyleTab({ node }: { node: WidgetNodeV2 }): JSX.Element {
             ?? draft.screens.flatMap((screen) => screen.styles).find((style) => style.id === namedTarget.id);
           if (!current) return;
           if (v === undefined) delete current.props[key];
-          else current.props[key] = v;
+          else {
+            current.props[key] = v;
+            if (key === 'image_recolor' && current.props.image_recolor_opa === undefined) {
+              current.props.image_recolor_opa = 255;
+            }
+          }
           return;
         }
         const hit = findNodeByIdV2(draft, node.id);
@@ -1552,6 +1645,9 @@ function StyleTab({ node }: { node: WidgetNodeV2 }): JSX.Element {
           hit.node.styles.push(g);
         }
         g.props[key] = v;
+        if (key === 'image_recolor' && g.props.image_recolor_opa === undefined) {
+          g.props.image_recolor_opa = 255;
+        }
       },
       v === undefined ? {} : {
         coalesceKey: namedTarget
@@ -1658,17 +1754,24 @@ function StyleTab({ node }: { node: WidgetNodeV2 }): JSX.Element {
           <StyleRow
             spec={STYLE_PROPS.bg_color!}
             label="背景颜色"
-            fontTokens={fontTokens}
             value={screenBackgroundValues?.bg_color}
             onChange={(v) => setScreenBackgroundProp('bg_color', v)}
           />
           <StyleRow
             spec={STYLE_PROPS.bg_opa!}
             label="背景透明度"
-            fontTokens={fontTokens}
             value={screenBackgroundValues?.bg_opa}
             onChange={(v) => setScreenBackgroundProp('bg_opa', v)}
           />
+        </section>
+      )}
+      {imageTransformProps.length > 0 && (
+        <section className="insp-group">
+          <div className="panel-subtitle">图片变换</div>
+          <div className="insp-note">等比图标大小在“属性”中设置；这里用于旋转、轴心和非等比缩放。</div>
+          {imageTransformProps.map((prop) => (
+            <PropRowEditor key={prop.key} node={node} spec={prop} />
+          ))}
         </section>
       )}
       <div className="prop-row">
@@ -1715,7 +1818,10 @@ function StyleTab({ node }: { node: WidgetNodeV2 }): JSX.Element {
         {namedStyles.length === 0 && <div className="insp-note">先设置局部样式，再点击“提取当前样式”即可复用和动态绑定。</div>}
       </section>
       <div className="panel-subtitle">{namedTarget ? `命名样式 · ${namedTarget.displayName || namedTarget.codeName || namedTarget.id}` : '局部样式(style_*)'}</div>
-      {M1_INSPECTOR_STYLE_KEYS.filter(
+      {effectiveType === 'image' && (
+        <div className="insp-note">图标本体请设置“图标颜色”；背景颜色只影响图片控件的背景。</div>
+      )}
+      {styleKeys.filter(
         (key) => !isScreenRoot || (key !== 'bg_color' && key !== 'bg_opa'),
       ).map((key) => {
         const sp = STYLE_PROPS[key];
@@ -1724,7 +1830,13 @@ function StyleTab({ node }: { node: WidgetNodeV2 }): JSX.Element {
           <StyleRow
             key={key}
             spec={sp}
-            fontTokens={fontTokens}
+            label={key === 'image_opa'
+              ? '图片透明度'
+              : key === 'image_recolor'
+                ? '图标颜色'
+                : key === 'image_recolor_opa'
+                  ? '着色强度'
+                  : undefined}
             value={styleValues?.[key]}
             onChange={(v) => setStyleProp(key, v)}
           />
@@ -1737,11 +1849,13 @@ function StyleTab({ node }: { node: WidgetNodeV2 }): JSX.Element {
 function StyleRow(props: {
   spec: StylePropSpec;
   label?: string;
-  fontTokens: readonly string[];
   value: PropValueV2 | undefined;
   onChange: (v: PropValueV2 | undefined) => void;
 }): JSX.Element {
-  const { spec, label, fontTokens, value, onChange } = props;
+  const { spec, label, value, onChange } = props;
+  if (spec.type === 'fontRef' && !isTokenRef(value)) {
+    return <FontRefEditor value={value} onChange={onChange} />;
+  }
   const isSet = value !== undefined && value !== null;
   return (
     <div className={`prop-row ${isSet ? '' : 'unset'}`}>
@@ -1749,7 +1863,7 @@ function StyleRow(props: {
       <ValueEditor
         ariaLabel={label ?? spec.key}
         type={spec.type === 'fontRef' ? 'fontRef' : spec.type}
-        tokens={spec.type === 'fontRef' ? fontTokens : spec.enum?.tokens}
+        tokens={spec.enum?.tokens}
         value={value}
         onChange={onChange}
       />
@@ -2071,7 +2185,10 @@ function ValueEditor(props: {
             ariaLabel={ariaLabel}
             value={typeof value === 'string' ? value : value !== undefined ? String(value) : ''}
             placeholder={ph}
-            onCommit={(v) => onChange(v === '' ? undefined : v)}
+            // Empty label text is meaningful: LVGL otherwise falls back to its
+            // built-in "Text" value. Keep it explicit instead of resetting the
+            // property to undefined.
+            onCommit={(v) => onChange(node?.type === 'label' ? v : (v === '' ? undefined : v))}
             onMaterialCommit={supportsMaterialIcon ? (choice) => {
               useProjectStore.getState().mutateV2('修改组件图标', (draft) => {
                 const current = node ? findNodeByIdV2(draft, node.id)?.node : undefined;

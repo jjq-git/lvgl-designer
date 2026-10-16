@@ -628,6 +628,14 @@ export function compatiblePreviewFormats(depth: 16 | 24 | 32): readonly PreviewC
   return FORMATS_BY_DEPTH[depth];
 }
 
+/** 为旧工程补齐当前产品唯一的本地控制器预设；已有真实配置绝不覆盖。 */
+export function ensureControllerForExport(): boolean {
+  const state = useBuildTargetStore.getState();
+  if (state.controllerProfile !== null) return false;
+  state.selectController('screen-only');
+  return true;
+}
+
 /** 发布门禁：返回已锁定的 BuildTarget 快照以及 v2 跨引用诊断。 */
 export function validateReleaseTarget(
   state = useBuildTargetStore.getState(),

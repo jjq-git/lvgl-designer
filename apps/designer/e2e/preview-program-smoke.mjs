@@ -89,16 +89,16 @@ try {
   }
   await page.evaluate(() => {
     window.__lvd.buildTargetStore.getState().confirmColorFormat('RGB565_SWAPPED');
+    window.__lvd.buildTargetStore.getState().selectController('screen-only');
     window.__lvd.getPipeline().refreshTarget();
   });
-  await page.selectOption('[aria-label="目标控制器"]', 'screen-only');
   await page.waitForTimeout(100);
   const targetPreview = await page.evaluate(() => {
     window.__lvd.getPipeline().runtime.tick();
     const canvas = document.querySelector('#lvgl-canvas');
     return {
       selection: window.__lvd.buildTargetStore.getState().displayProfile.colorFormat,
-      controller: document.querySelector('[aria-label="目标控制器"]')?.value,
+      controller: window.__lvd.buildTargetStore.getState().controllerPreset,
       badge: document.querySelector('.rt-badge')?.textContent ?? '',
       pixel: [...canvas.getContext('2d').getImageData(10, 10, 1, 1).data],
     };

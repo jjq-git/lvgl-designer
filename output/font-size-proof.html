@@ -1,0 +1,35 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>PodsC · LVGL icon font size verification</title>
+<style>body{font:16px system-ui;background:#eee7df;color:#493628;max-width:1100px;margin:24px auto}canvas{display:block;background:#fff7ea;box-shadow:0 4px 24px #0002;margin-top:20px}select{font:inherit}#status{margin-left:20px}</style>
+<h1>PodsC 舱门图标 · LVGL WASM 字号验证</h1>
+<p>上方：全部 21 种内置字号。底部：同一标签实时切换字号。</p>
+<label>动态字号 <select id="size"><option>20</option><option>8</option><option>16</option><option>24</option><option>32</option><option>40</option><option>48</option></select></label><span id="status">加载运行时…</span>
+<canvas id="canvas" width="1024" height="600"></canvas>
+<script type="module">
+import create from './lvgl_runtime.mjs';
+const canvas = document.querySelector('canvas');
+try {
+ const mod = await create({canvas,locateFile:p=>p.endsWith('.wasm')?'./lvgl_runtime.wasm':p});
+ const call=(name,types,...args)=>{const rc=mod.cwrap(name,'number',types)(...args);if(rc!==0)throw Error(`${name}: ${rc}`)};
+ const prop=(n,k,v)=>call('lvd_preview_set_i32',['string','string','number'],n,k,v);
+ const str=(n,k,v)=>call('lvd_preview_set_string',['string','string','string'],n,k,v);
+ const style=(n,k,v)=>call('lvd_preview_set_style_string',['string','string','string','string','string'],n,k,v,'main','default');
+ call('lvd_init',['number','number'],1024,600);
+ call('lvd_preview_begin',['number','number','number','string'],1,1024,600,'XRGB8888');
+ call('lvd_preview_create_screen',['string'],'proof');
+ style('proof','bg_color','#FFF7EA');
+ function label(name,text,x,y,size){
+  call('lvd_preview_create_node',['string','string','string'],'proof',name,'label');
+  prop(name,'x',x);prop(name,'y',y);prop(name,'width',136);prop(name,'height',90);
+  str(name,'text',text);style(name,'text_font',`montserrat_${size}`);style(name,'text_color','#4A3426');
+ }
+ for(let size=8;size<=48;size+=2){const i=(size-8)/2,x=24+i%7*142,y=16+Math.floor(i/7)*160;label(`title${size}`,`${size} px`,x,y,18);label(`icon${size}`,'\uf52b',x,y+42,size)}
+ label('dynamicTitle','CHANGE SIZE',24,515,18); label('dynamic','\uf52b',230,510,20);
+ call('lvd_preview_finish',['string'],'proof');
+ const tick=mod.cwrap('lvd_tick','number',[]);
+ function frame(){tick();requestAnimationFrame(frame)}frame();
+ document.querySelector('#status').textContent='已加载：21 个字号';
+ document.querySelector('#size').onchange=e=>{style('dynamic','text_font',`montserrat_${e.target.value}`);document.querySelector('#status').textContent=`同一标签已切换至 ${e.target.value}px`};
+}catch(e){document.querySelector('#status').textContent=e.stack;throw e}
+</script>

@@ -350,23 +350,25 @@ export function Toolbar(): JSX.Element {
       <button
         type="button"
         className="btn primary toolbar-icon-btn"
-        aria-label="导出 C 代码"
-        title="导出精确钉死 LVGL 9.5.0 的 C 代码与构建 manifest"
+        aria-label="导出设备端 C 工程"
+        title="导出设备端 C 工程（LVGL 9.5.0 ZIP）"
         onClick={() => { void exportUiZip(useProjectStore.getState().project); }}
       >
         <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="m8 7-5 5 5 5M16 7l5 5-5 5M13 4l-2 16" />
+          <path d="M6 3h8l4 4v14H6zM14 3v5h4" />
+          <path d="M14.5 12.5a3 3 0 1 0 0 4.5" />
         </svg>
       </button>
       <button
         type="button"
         className="btn toolbar-icon-btn"
-        aria-label="导出网页 UI"
-        title="导出冻结的 WebUiDocumentV1；使用 Material 图标时自动包含安全 SVG 素材包"
+        aria-label="导出网页 UI 数据"
+        title="导出网页 UI 数据（JSON；有图标时为含 SVG 的 ZIP）"
         onClick={() => { void exportWebUiJson(useProjectStore.getState().project); }}
       >
         <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M8 4H6a2 2 0 0 0-2 2v3a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5a2 2 0 0 0 2 2h2M16 4h2a2 2 0 0 1 2 2v3a2 2 0 0 0 2 2 2 2 0 0 0-2 2v5a2 2 0 0 1-2 2h-2" />
+          <rect x="3" y="4" width="18" height="16" rx="2" />
+          <path d="M3 8h18M7 6h.01M10 6h.01M12 11v6M9.5 14.5 12 17l2.5-2.5" />
         </svg>
       </button>
       <button

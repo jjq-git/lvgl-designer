@@ -65,6 +65,11 @@ export function upsertMaterialIconAdornment(
   };
 
   if (node.type === 'label') {
+    // LVGL initializes a newly-created label with the built-in text "Text".
+    // An icon-only label therefore needs an explicit empty string; leaving the
+    // property unset would make both the preview and generated firmware show
+    // LVGL's default text next to the generated icon child.
+    if (node.props.text === undefined) node.props.text = '';
     const style = mainStyle(node);
     if (icon.editor?.materialBasePadHor === undefined) {
       icon.editor = {

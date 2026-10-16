@@ -32,6 +32,16 @@ describe('Material icon adornment', () => {
     expect(node.children).toHaveLength(1);
     expect(node.children[0]?.props.src).toBe('settings_32');
     expect(node.styles[0]?.props.pad_hor).toBe(42);
+    expect(node.props.text).toBe('HOME');
+  });
+
+  it('sets an explicit empty label text for an icon-only label', () => {
+    const node = label();
+    delete node.props.text;
+
+    upsertMaterialIconAdornment(node, { codeName: 'home_24', iconName: 'home', sizePx: 24 });
+
+    expect(node.props.text).toBe('');
   });
 
   it('restores existing layout when switching back to a text icon', () => {
